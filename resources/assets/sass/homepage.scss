@@ -1,0 +1,214 @@
+/*!
+ * Start Bootstrap - Scrolling Nav HTML Template (http://startbootstrap.com)
+ * Code licensed under the Apache License v2.0.
+ * For details, see http://www.apache.org/licenses/LICENSE-2.0.
+ */
+
+body {
+    width: 100%;
+    height: 100%;
+}
+
+html {
+    width: 100%;
+    height: 100%;
+}
+
+section {
+    padding: 150px 0;
+}
+
+h5 {
+    font-size: 18px;
+	font-weight: 400;
+}
+
+@media(min-width:767px) {
+    .navbar {
+        padding: 20px 0;
+        -webkit-transition: background .5s ease-in-out,padding .5s ease-in-out;
+        -moz-transition: background .5s ease-in-out,padding .5s ease-in-out;
+        transition: background .5s ease-in-out,padding .5s ease-in-out;
+    }
+
+    .top-nav-collapse {
+        padding: 0;
+    }
+}
+
+/* Demo Sections - You can use these as guides or delete them - the scroller will work with any sort of height, fixed, undefined, or percentage based.
+The padding is very important to make sure the scrollspy picks up the right area when scrolled to. Adjust the margin and padding of sections and children
+of those sections to manage the look and feel of the site. */
+
+.logo {
+    border-radius: 50%;
+    border: 3px solid #fafafa;
+    margin-bottom: 10px;
+}
+
+.navbar-default {
+    background-color: #3c8dbc;
+    border-color: #367fa9;
+    .navbar-brand {
+      color: white;
+      &:hover,
+      &:focus {
+        color: #ffff00;
+      }
+    }
+    .navbar-nav {
+      > li > a {
+        color: white;
+        &:hover,
+        &:focus {
+          color: #ffff00;
+        }
+      }
+      > .active > a {
+        &,
+        &:hover,
+        &:focus {
+            color: #ffff00;
+            background-color: #367fa9;
+        }
+      }
+    }
+}
+
+a.list-group-item,
+button.list-group-item {
+  // Hover state
+  &:hover,
+  &:focus {
+    border-left: 3px solid #3c8dbc;
+  }
+}
+
+.lead {
+  font-size: 21px;
+
+  @media (min-width:767px) {
+    font-size: 21px;
+  }
+}
+
+.intro-section,
+.services-section,
+.about-section,
+.contact-section {
+    text-align: center;
+}
+
+.intro-section,
+.about-section {
+    background: #fff;
+}
+
+.services-section,
+.contact-section {
+    background: #eee;
+}
+
+@media(min-width:767px) {
+    .intro-section {
+        padding-top: 120px;
+    }
+}
+
+section {
+    padding: 100px 0;
+    h2.section-heading {
+		font-size: 40px;
+		margin-top: 0;
+		margin-bottom: 15px;
+    }
+    h3.section-subheading {
+		font-size: 18px;
+		text-transform: none;
+		font-style: italic;
+		font-weight: 400;
+		margin-bottom: 75px;
+    }
+}
+
+@media(min-width:768px) {
+	section {
+		padding: 150px 0;
+	}
+}
+
+section#contact {
+	background-image: url('/images/map-image.png');
+    background-color: #222222;
+    background-position: center center;
+    background-repeat: no-repeat;
+    .section-heading {
+		color: white;
+	}
+    .contact-panel {
+        margin-left: 10px;
+        margin-right: 10px;
+        background-color: white;
+        border-radius: 3px;
+        min-height: 220px;
+        text-align: left;
+        background-color: #efefef;
+        p {
+            margin-bottom: 15px;
+        }
+    }
+}
+
+/*!
+ * Start Bootstrap - Shop Homepage HTML Template (http://startbootstrap.com)
+ * Code licensed under the Apache License v2.0.
+ * For details, see http://www.apache.org/licenses/LICENSE-2.0.
+ */
+
+.slide-image {
+    width: 100%;
+}
+
+.carousel-holder {
+    margin-bottom: 30px;
+}
+
+.carousel-control,
+.item {
+    border-radius: 4px;
+}
+
+.caption {
+    height: 130px;
+    overflow: hidden;
+}
+
+.caption h4 {
+    white-space: nowrap;
+}
+
+.thumbnail img {
+    width: 100%;
+}
+
+.ratings {
+    padding-right: 10px;
+    padding-left: 10px;
+    color: #d17581;
+}
+
+.thumbnail {
+    padding: 0;
+}
+
+.thumbnail .caption-full {
+    padding: 9px;
+    color: #333;
+}
+
+footer {
+    background-color: #d2d6de;
+    p {
+        margin: 18px 0;
+    }
+}
