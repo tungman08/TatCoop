@@ -1,9 +1,15 @@
 {
-  "css/bootstrap.css": "css/bootstrap-92853f5762.css",
-  "css/font-awesome.css": "css/font-awesome-8b52af5f42.css",
-  "css/homepage.css": "css/homepage-22cba087d6.css",
+  "css/admin-lte.css": "css/admin-lte-d93c3f7382.css",
+  "css/announce.css": "css/announce-b94ec54653.css",
+  "css/bootstrap.css": "css/bootstrap-2bae9d3654.css",
+  "css/font-awesome.css": "css/font-awesome-f2da7ba605.css",
+  "css/homepage.css": "css/homepage-b82a362911.css",
+  "css/metisMenu.css": "css/metisMenu-3440a716fd.css",
+  "css/sb-admin-2.css": "css/sb-admin-2-e7f046fc56.css",
   "js/bootstrap.js": "js/bootstrap-84eef983ad.js",
+  "js/homepage.js": "js/homepage-1a92b2605e.js",
   "js/jquery.easing.js": "js/jquery.easing-7e23a70455.js",
   "js/jquery.js": "js/jquery-5eccfcbd5b.js",
-  "js/scrolling-nav.js": "js/scrolling-nav-1a92b2605e.js"
+  "js/metisMenu.js": "js/metisMenu-3e999c8aab.js",
+  "js/sb-admin-2.js": "js/sb-admin-2-168722dfec.js"
 }

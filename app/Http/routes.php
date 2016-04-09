@@ -25,15 +25,11 @@ Route::group(['middleware' => ['web']], function () {
                 'uses' => 'HomeController@showIndex'
             ]);
 
-            // PR Route...
-            Route::group(['prefix' => 'pr'], function () {
-
-                // Matches The "/pr/docs" URL
-                Route::get('docs', [
-                    'as' => 'docs',
-                    'uses' => 'PrController@showDocs'
-                ]);
-            });
+            // Announce Route...
+            Route::get('announce/{docs}', [
+                'as' => 'docs',
+                'uses' => 'AnnounceController@showDocs'
+            ]);
 
             // Auth Route...
             Route::group(['middleware' => 'auth'], function () {
@@ -41,7 +37,7 @@ Route::group(['middleware' => ['web']], function () {
             });
         });
     });
-    
+
     /* ============================================================================= */
     // Admin Route...
     /* ============================================================================= */

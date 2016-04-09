@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>:: สหกรณ์ออมทรัพย์สหภาพแรงงานรัฐวิสาหกิจการท่องเที่ยวแห่งประเทศไทย ::</title>
+    <title>:: สหกรณ์ออมทรัพย์สหภาพแรงงานรัฐวิสาหกิจการท่องเที่ยวแห่งประเทศไทย จำกัด ::</title>
 
     <!-- Bootstrap Core CSS -->
     {!! Html::style(elixir('css/bootstrap.css')) !!}
@@ -18,6 +18,7 @@
     {!! Html::style(elixir('css/font-awesome.css')) !!}
 
     <!-- Custom CSS -->
+    {!! Html::style(elixir('css/metisMenu.css')) !!}
     {!! Html::style(elixir('css/homepage.css')) !!}
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -44,17 +45,11 @@
             <div class="row">
 
                 <div class="col-md-3">
-                    @yield('content')
+                    @include('homepage.menu')
                 </div>
 
                 <div class="col-md-9">
-                    <div class="row carousel-holder">
-                        @include('homepage.carousel')
-                    </div>
-
-                    <div class="row">
-                        @include('homepage.news')
-                    </div>
+                    @yield('content')
                 </div>
 
             </div>
@@ -88,8 +83,10 @@
     {!! Html::script(elixir('js/bootstrap.js')) !!}
 
     <!-- Homepage JavaScript -->
+    {!! Html::script(elixir('js/sb-admin-2.js')) !!}
     {!! Html::script(elixir('js/jquery.easing.js')) !!}
-    {!! Html::script(elixir('js/scrolling-nav.js')) !!}
+    {!! Html::script(elixir('js/metisMenu.js')) !!}
+    {!! Html::script(elixir('js/homepage.js')) !!}
 
 </body>
 

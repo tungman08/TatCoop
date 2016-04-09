@@ -10,10 +10,10 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="panel-body">
-                        <h5 class="subheading" style="margin-bottom: 15px;">
+                        <h5 style="margin-bottom: 15px;">
                             สหกรณ์ออมทรัพย์สหภาพแรงงานรัฐวิสาหกิจการท่องเที่ยวแห่งประเทศไทย จำกัด
                             <br/>
-                            Tourism Authority of Thailand Labour Union Savings and Credit Coopperative Limited
+                            <span class="subheading">Tourism Authority of Thailand Labour Union Savings and Credit Coopperative Limited</span>
                         </h5>
                         <p>
                             <i class="fa fa-map-marker fa-fw"></i>

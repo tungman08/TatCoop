@@ -7,9 +7,9 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
-class PrController extends Controller
+class AnnounceController extends Controller
 {
     public function showDocs() {
-        return 'dasdasdas';
+        return view('announce.docs');
     }
 }

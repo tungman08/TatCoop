@@ -19,13 +19,13 @@ section {
 }
 
 h5 {
-    font-size: 18px;
+    font-size: 16px;
 	font-weight: 400;
 }
 
 @media(min-width:767px) {
     .navbar {
-        padding: 20px 0;
+        padding: 14px 0;
         -webkit-transition: background .5s ease-in-out,padding .5s ease-in-out;
         -moz-transition: background .5s ease-in-out,padding .5s ease-in-out;
         transition: background .5s ease-in-out,padding .5s ease-in-out;
@@ -33,6 +33,18 @@ h5 {
 
     .top-nav-collapse {
         padding: 0;
+    }
+}
+
+.navbar-default {
+    .navbar-toggle {
+        &:focus,
+        &:hover {
+            background-color: #286090;
+        }
+        .icon-bar {
+            background-color: #fff;
+        }
     }
 }
 
@@ -44,44 +56,6 @@ of those sections to manage the look and feel of the site. */
     border-radius: 50%;
     border: 3px solid #fafafa;
     margin-bottom: 10px;
-}
-
-.navbar-default {
-    background-color: #3c8dbc;
-    border-color: #367fa9;
-    .navbar-brand {
-      color: white;
-      &:hover,
-      &:focus {
-        color: #ffff00;
-      }
-    }
-    .navbar-nav {
-      > li > a {
-        color: white;
-        &:hover,
-        &:focus {
-          color: #ffff00;
-        }
-      }
-      > .active > a {
-        &,
-        &:hover,
-        &:focus {
-            color: #ffff00;
-            background-color: #367fa9;
-        }
-      }
-    }
-}
-
-a.list-group-item,
-button.list-group-item {
-  // Hover state
-  &:hover,
-  &:focus {
-    border-left: 3px solid #3c8dbc;
-  }
 }
 
 .lead {
@@ -111,12 +85,12 @@ button.list-group-item {
 
 @media(min-width:767px) {
     .intro-section {
-        padding-top: 120px;
+        padding-top: 100px;
     }
 }
 
 section {
-    padding: 100px 0;
+    padding: 75px 0;
     h2.section-heading {
 		font-size: 40px;
 		margin-top: 0;
@@ -146,6 +120,7 @@ section#contact {
 		color: white;
 	}
     .contact-panel {
+        padding: 20px 10px;
         margin-left: 10px;
         margin-right: 10px;
         background-color: white;
@@ -153,62 +128,16 @@ section#contact {
         min-height: 220px;
         text-align: left;
         background-color: #efefef;
+        .subheading {
+            font-size: 14px;
+        }
         p {
             margin-bottom: 15px;
+        }
+        .panel-body {
+            padding-right: 5px;
         }
     }
 }
 
-/*!
- * Start Bootstrap - Shop Homepage HTML Template (http://startbootstrap.com)
- * Code licensed under the Apache License v2.0.
- * For details, see http://www.apache.org/licenses/LICENSE-2.0.
- */
-
-.slide-image {
-    width: 100%;
-}
-
-.carousel-holder {
-    margin-bottom: 30px;
-}
-
-.carousel-control,
-.item {
-    border-radius: 4px;
-}
-
-.caption {
-    height: 130px;
-    overflow: hidden;
-}
-
-.caption h4 {
-    white-space: nowrap;
-}
-
-.thumbnail img {
-    width: 100%;
-}
-
-.ratings {
-    padding-right: 10px;
-    padding-left: 10px;
-    color: #d17581;
-}
-
-.thumbnail {
-    padding: 0;
-}
-
-.thumbnail .caption-full {
-    padding: 9px;
-    color: #333;
-}
-
-footer {
-    background-color: #d2d6de;
-    p {
-        margin: 18px 0;
-    }
-}
+@import "announce";

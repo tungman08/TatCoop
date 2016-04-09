@@ -11,3 +11,5 @@
     font-weight: normal;
     font-style: normal;
 }
+
+.#{$fa-css-prefix}-baht:before { content: '฿'; }
