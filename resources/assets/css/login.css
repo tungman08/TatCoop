@@ -1,0 +1,63 @@
+html, body {
+    height: 100%;
+}
+
+body {
+    background-color: #4a90a9;
+    background-repeat: repeat-x;
+    background-position: left top;
+    background-attachment: fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+.login-form {
+	min-width: 350px;
+}
+
+.img-responsive {
+    border-radius: 50%;
+    border: 3px solid #fafafa;
+}
+
+.vertical-center {
+  min-height: 100%;  /* Fallback for browsers do NOT support vh unit */
+  min-height: 100vh; /* These two lines are counted as one :-)       */
+
+  display: flex;
+  align-items: center;
+}
+
+form[role=form] {
+	color: #5d5d5d;
+	background: #f2f2f2;
+	padding: 26px;
+	border-radius: 10px;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+}
+	form[role=form] img {
+		display: block;
+		margin: 0 auto;
+		margin-bottom: 35px;
+	}
+	form[role=form] input,
+	form[role=form] button {
+		font-size: 18px;
+		margin: 16px 0;
+        max-width: 100%;
+	}
+	form[role=form] > div {
+		text-align: center;
+	}
+
+.form-links {
+	text-align: center;
+	margin-top: 1em;
+	margin-bottom: 50px;
+}
+	.form-links a {
+		color: #fff;
+	}

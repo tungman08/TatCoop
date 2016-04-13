@@ -13,42 +13,46 @@
 
 Route::group(['middleware' => ['web']], function () {
 
-    /* ============================================================================= */
+    /* ====================================================================== */
     // Website Route...
-    /* ============================================================================= */
+    /* ====================================================================== */
     Route::group(['domain' => 'www.tatcoop.dev'], function () {
+
+        // Website Filter...
         Route::group(['namespace' => 'Website'], function () {
 
             // Homepage Route...
-            Route::get('/', [
-                'as' => 'homepage',
-                'uses' => 'HomeController@showIndex'
-            ]);
-
-            // Announce Route...
-            Route::get('announce/{docs}', [
-                'as' => 'docs',
-                'uses' => 'AnnounceController@showDocs'
-            ]);
+            Route::controller('/', 'HomepageController');
 
             // Auth Route...
+            Route::controller('/auth', 'AuthController');
+
+            // Member Filter...
             Route::group(['middleware' => 'auth'], function () {
 
+                // Member Route...
+                Route::controller('/member', 'MemberController');
             });
         });
     });
 
-    /* ============================================================================= */
+    /* ====================================================================== */
     // Admin Route...
-    /* ============================================================================= */
+    /* ====================================================================== */
     Route::group(['domain' => 'admin.tatcoop.dev'], function () {
+
+        // Admin Filter...
         Route::group(['namespace' => 'Admin'], function() {
 
-            // Admin page Route...
-            Route::get('/', [
-                'as' => 'adminpage',
-                'uses' => 'HomeController@showIndex'
-            ]);
+            // Auth Route...
+            Route::controller('/auth', 'AuthController');
+
+            // Auth Filter...
+            Route::group(['middleware' => 'auth'], function () {
+
+                // Admin Route...
+                Route::controller('/', 'AdminController');
+            });
         });
     });
 });

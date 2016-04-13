@@ -30,7 +30,8 @@ elixir(function(mix) {
         .scripts('jquery.easing.js')
         .scripts('homepage.js');
 
-    mix.styles('./bower_components/metisMenu/src/metisMenu.css');
+    mix.styles('./bower_components/metisMenu/src/metisMenu.css')
+        .styles('login.css');
 
     mix.copy('bower_components/bootstrap-sass/assets/fonts/bootstrap', 'public/fonts')
         .copy('bower_components/font-awesome/fonts', 'public/fonts')
@@ -51,5 +52,6 @@ elixir(function(mix) {
         'css/sb-admin-2.css',
         'css/homepage.css',
         'css/announce.css',
+        'css/login.css',
     ]);
 });

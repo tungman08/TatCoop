@@ -36,7 +36,7 @@
 
     <!-- Navigation -->
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
-        @include('homepage.navbar')
+        @include('website.homepage.navbar')
     </nav>
 
     <!-- Intro Section -->
@@ -45,7 +45,7 @@
             <div class="row">
 
                 <div class="col-md-3">
-                    @include('homepage.menu')
+                    @include('website.homepage.menu')
                 </div>
 
                 <div class="col-md-9">
@@ -58,22 +58,22 @@
 
     <!-- Services Section -->
     <section id="services" class="services-section">
-        @include('homepage.services')
+        @include('website.homepage.services')
     </section>
 
     <!-- About Section -->
     <section id="about" class="about-section">
-        @include('homepage.about')
+        @include('website.homepage.about')
     </section>
 
     <!-- Contact Section -->
     <section id="contact" class="contact-section">
-        @include('homepage.contact')
+        @include('website.homepage.contact')
     </section>
 
     <!-- Footer -->
     <footer>
-        @include('homepage.footer')
+        @include('website.homepage.footer')
     </footer>
 
     <!-- jQuery -->

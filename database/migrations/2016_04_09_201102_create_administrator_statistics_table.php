@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateVisitorStatisticsTable extends Migration
+class CreateAdministratorStatisticsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,9 +12,11 @@ class CreateVisitorStatisticsTable extends Migration
      */
     public function up()
     {
-        Schema::create('visitor_statistics', function (Blueprint $table) {
+        Schema::create('administrator_statistics', function (Blueprint $table) {
             $table->increments('id');
-            $table->timestamps();
+            $table->string('ip_address');
+            $table->timestamp('created_at');
+            $table->softDeletes();
         });
     }
 
@@ -25,6 +27,6 @@ class CreateVisitorStatisticsTable extends Migration
      */
     public function down()
     {
-        Schema::drop('visitor_statistics');
+        Schema::drop('administrator_statistics');
     }
 }

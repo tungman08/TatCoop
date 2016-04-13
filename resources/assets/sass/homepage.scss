@@ -23,7 +23,37 @@ h5 {
 	font-weight: 400;
 }
 
+footer {
+    .title,
+    .counter {
+        margin: 16px 0;
+        text-align: center;
+    }
+}
+
+.list-inline > li {
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
 @media(min-width:767px) {
+    footer {
+        .title {
+            text-align: left;
+        }
+        .counter {
+            text-align: right;
+            ul {
+                margin-bottom: 0px;
+                li {
+                    font-size: 14px;
+                    padding-left: 0px;
+                    padding-right: 0px;
+                }
+            }
+        }
+    }
+
     .navbar {
         padding: 14px 0;
         -webkit-transition: background .5s ease-in-out,padding .5s ease-in-out;
@@ -33,18 +63,6 @@ h5 {
 
     .top-nav-collapse {
         padding: 0;
-    }
-}
-
-.navbar-default {
-    .navbar-toggle {
-        &:focus,
-        &:hover {
-            background-color: #286090;
-        }
-        .icon-bar {
-            background-color: #fff;
-        }
     }
 }
 
@@ -64,6 +82,47 @@ of those sections to manage the look and feel of the site. */
   @media (min-width:767px) {
     font-size: 21px;
   }
+}
+
+.slide-image {
+    width: 100%;
+}
+
+.carousel-holder {
+    margin-bottom: 30px;
+}
+
+.carousel-control,
+.item {
+    border-radius: 4px;
+}
+
+.caption {
+    height: 130px;
+    overflow: hidden;
+}
+
+.caption h4 {
+    white-space: nowrap;
+}
+
+.thumbnail img {
+    width: 100%;
+}
+
+.ratings {
+    padding-right: 10px;
+    padding-left: 10px;
+    color: #d17581;
+}
+
+.thumbnail {
+    padding: 0;
+}
+
+.thumbnail .caption-full {
+    padding: 9px;
+    color: #333;
 }
 
 .intro-section,
@@ -120,7 +179,7 @@ section#contact {
 		color: white;
 	}
     .contact-panel {
-        padding: 20px 10px;
+        padding: 5px 10px;
         margin-left: 10px;
         margin-right: 10px;
         background-color: white;
@@ -138,6 +197,125 @@ section#contact {
             padding-right: 5px;
         }
     }
+}
+
+.modal-hr {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+#counterModal .modal-dialog {
+    .modal-content {
+        .modal-header {
+            text-align: center;
+        }
+        .modal-body {
+            table {
+                width: 70%;
+                margin: 0 auto;
+                .title {
+                    text-align: left;
+                }
+                .number {
+                    text-align: right;
+                }
+                .title,
+                .number {
+                    padding: 3px;
+                }
+            }
+        }
+    }
+}
+
+@media(min-width: 768px) {
+    #counterModal .modal-dialog {
+        .modal-content {
+            .modal-body {
+                table {
+                    width: 50%;
+                }
+            }
+        }
+    }
+}
+
+#counterModal.modal {
+    bottom: 0px;
+    left: 0px;
+    outline: 0 none;
+    right: 0px;
+    top: 0px;
+}
+
+.one {
+    left: 0px;
+    width: 15px;
+    height: 20px;
+    background: url('/images/counter.png') 0 0;
+}
+
+.two {
+    left: 0px;
+    width: 15px;
+    height: 20px;
+    background: url('/images/counter.png') -15px 0;
+}
+
+.three {
+    left: 0px;
+    width: 15px;
+    height: 20px;
+    background: url('/images/counter.png') -30px 0;
+}
+
+.four {
+    left: 0px;
+    width: 15px;
+    height: 20px;
+    background: url('/images/counter.png') -45px 0;
+}
+
+.five {
+    left: 0px;
+    width: 15px;
+    height: 20px;
+    background: url('/images/counter.png') -60px 0;
+}
+
+.six {
+    left: 0px;
+    width: 15px;
+    height: 20px;
+    background: url('/images/counter.png') -75px 0;
+}
+
+.seven {
+    left: 0px;
+    width: 15px;
+    height: 20px;
+    background: url('/images/counter.png') -90px 0;
+}
+
+.eight {
+    left: 0px;
+    width: 15px;
+    height: 20px;
+    background: url('/images/counter.png') -105px 0;
+}
+
+.nine {
+    left: 0px;
+    width: 15px;
+    height: 20px;
+    background: url('/images/counter.png') -120px 0;
+}
+
+.zero {
+    left: 0px;
+    width: 15px;
+    height: 20px;
+    background: url('/images/counter.png') -135px 0;
 }
 
 @import "announce";

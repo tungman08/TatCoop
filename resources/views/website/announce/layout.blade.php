@@ -49,7 +49,7 @@
         <div class="row">
 
             <div class="col-md-3 sidebar">
-                @include('homepage.menu')
+                @include('website.homepage.menu')
             </div>
 
             <div class="col-md-9">
@@ -63,7 +63,7 @@
 
     <!-- Footer -->
     <footer>
-        @include('homepage.footer')
+        @include('website.announce.footer')
     </footer>
 
     <!-- jQuery -->

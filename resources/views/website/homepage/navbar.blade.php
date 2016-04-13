@@ -10,7 +10,7 @@
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
-    <div class="collapse navbar-collapse navbar-ex1-collapse pull-right">
+    <div class="collapse navbar-collapse navbar-ex1-collapse navbar-right">
         <ul class="nav navbar-nav">
             <!-- Hidden li included to remove active class from about link when scrolled up past about section -->
             <li class="hidden">

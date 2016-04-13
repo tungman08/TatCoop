@@ -1,4 +1,4 @@
-@extends('announce.layout')
+@extends('website.announce.layout')
 
 @section('content')
 <div class="row">
