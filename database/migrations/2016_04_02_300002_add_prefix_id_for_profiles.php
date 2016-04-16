@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddPrefixIdForMembers extends Migration
+class AddPrefixIdForProfiles extends Migration
 {
     /**
      * Run the migrations.
@@ -12,8 +12,8 @@ class AddPrefixIdForMembers extends Migration
      */
     public function up()
     {
-        Schema::table('members', function (Blueprint $table) {
-            $table->integer('prefix_id')->unsigned()->after('employee_code');
+        Schema::table('profiles', function (Blueprint $table) {
+            $table->integer('prefix_id')->unsigned()->after('citizen_code');
             $table->foreign('prefix_id')->references('id')
                 ->on('prefixs')->onDelete('cascade');
         });
@@ -26,8 +26,8 @@ class AddPrefixIdForMembers extends Migration
      */
     public function down()
     {
-        Schema::table('members', function (Blueprint $table) {
-            $table->dropForeign('members_prefix_id_foreign');
+        Schema::table('profiles', function (Blueprint $table) {
+            $table->dropForeign('profiles_prefix_id_foreign');
         });
     }
 }

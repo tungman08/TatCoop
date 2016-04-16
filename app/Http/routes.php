@@ -45,13 +45,18 @@ Route::group(['middleware' => ['web']], function () {
         Route::group(['namespace' => 'Admin'], function() {
 
             // Auth Route...
-            Route::controller('/auth', 'AuthController');
+            Route::controller('/auth', 'AuthController', [
+                'getLogin' => 'admin.auth.login',
+            ]);
 
             // Auth Filter...
             Route::group(['middleware' => 'auth'], function () {
 
                 // Admin Route...
-                Route::controller('/', 'AdminController');
+                Route::controller('/', 'AdminController', [
+                    'getIndex' => 'admin.index',
+                    'getUnauthorize' => 'admin.unauthorize',
+                ]);
             });
         });
     });

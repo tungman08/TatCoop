@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateBrowsersTable extends Migration
+class CreateSubdistrictsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,10 +12,10 @@ class CreateBrowsersTable extends Migration
      */
     public function up()
     {
-        Schema::create('browsers', function (Blueprint $table) {
+        Schema::create('subdistricts', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name')->unique();
-            $table->timestamp('created_at');
+            $table->string('name');
+            $table->timestamps();
             $table->softDeletes();
         });
     }
@@ -27,6 +27,6 @@ class CreateBrowsersTable extends Migration
      */
     public function down()
     {
-        Schema::drop('browsers');
+        Schema::drop('subdistricts');
     }
 }

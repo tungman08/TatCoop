@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePrefixesTable extends Migration
+class CreateEmployeeTypesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,7 +12,7 @@ class CreatePrefixesTable extends Migration
      */
     public function up()
     {
-        Schema::create('prefixes', function (Blueprint $table) {
+        Schema::create('employee_types', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name')->unique();
             $table->timestamps();
@@ -27,6 +27,6 @@ class CreatePrefixesTable extends Migration
      */
     public function down()
     {
-        Schema::drop('prefixes');
+        Schema::drop('employee_types');
     }
 }

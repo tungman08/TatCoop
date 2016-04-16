@@ -4,11 +4,17 @@ namespace App;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Diamond;
 
 class User extends Authenticatable
 {
     use SoftDeletes;
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+	protected $table = 'users';
 
     /**
      * The attributes that are mass assignable.
@@ -18,6 +24,13 @@ class User extends Authenticatable
     protected $fillable = [
         'email', 'password',
     ];
+
+    /**
+     * The attributes that should be mutated to dates.
+     *
+     * @var array
+     */
+    protected $dates = ['created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -40,16 +53,6 @@ class User extends Authenticatable
      */
     public function user_statistics() {
         return $this->hasMany(UserStatistic::class);
-    }
-
-    /**
-     * Get the user's create date.
-     *
-     * @param  string  $value
-     * @return string
-     */
-    public function getCreateAtAttribute($value) {
-        return Diamond::parse($value)->thai_format('j M Y');
     }
 
     /**

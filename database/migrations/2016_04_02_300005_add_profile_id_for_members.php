@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddSubdistrictIdForMembers extends Migration
+class AddProfileIdForMembers extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,9 @@ class AddSubdistrictIdForMembers extends Migration
     public function up()
     {
         Schema::table('members', function (Blueprint $table) {
-            $table->integer('subdistrict_id')->unsigned()->after('address');
-            $table->foreign('subdistrict_id')->references('id')
-                ->on('subdistricts')->onDelete('cascade');
+            $table->integer('profile_id')->unsigned()->after('id');
+            $table->foreign('profile_id')->references('id')
+                ->on('profiles')->onDelete('cascade');
         });
     }
 
@@ -27,7 +27,7 @@ class AddSubdistrictIdForMembers extends Migration
     public function down()
     {
         Schema::table('members', function (Blueprint $table) {
-            $table->dropForeign('members_subdistrict_id_foreign');
+            $table->dropForeign('members_profile_id_foreign');
         });
     }
 }

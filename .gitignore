@@ -1,5 +1,8 @@
 /bower_components
-/database/seeds
+/database/seeds/AdministratorsTableSeeder.php
+/database/seeds/MembersTableSeeder.php
+/database/seeds/ProfilesTableSeeder.php
+/database/seeds/EmployeesTableSeeder.php
 /node_modules
 /public/build
 /vendor

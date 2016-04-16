@@ -4,11 +4,17 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Diamond;
 
 class Member extends Model
 {
     use SoftDeletes;
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+	protected $table = 'members';
 
     /**
      * The attributes that are mass assignable.
@@ -16,37 +22,20 @@ class Member extends Model
      * @var array
      */
     protected $fillable = [
-        'citizen_code', 'employee_code', 'name', 'surname', 'address', 'birth_date', 'member_date', 'shareholding_date',
+        'start_date', 'leave_date', 'shareholding_date',
     ];
 
     /**
-     * Get the prefix of the menber.
-     */
-    public function prefix() {
-        return $this->belongsTo(Prefix::class);
-    }
-
-    /**
-     * Get the subdistrict of the menber.
-     */
-    public function subdistrict() {
-        return $this->belongsTo(Subdistrict::class);
-    }
-
-    /**
-     * Get the postcode of the menber.
-     */
-    public function postcode() {
-        return $this->belongsTo(Postcode::class);
-    }
-
-    /**
-     * Get the member's create date.
+     * The attributes that should be mutated to dates.
      *
-     * @param  string  $value
-     * @return string
+     * @var array
      */
-    public function getCreateAtAttribute($value) {
-        return Diamond::parse($value)->thai_format('j M Y');
+    protected $dates = ['start_date', 'leave_date', 'shareholding_date', 'created_at', 'updated_at', 'deleted_at'];
+
+    /**
+     * Get the profile that uses by the member.
+     */
+    public function profile() {
+        return $this->belongsTo(Profile::class);
     }
 }

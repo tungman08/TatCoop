@@ -5,7 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class District extends Model
+class Profile extends Model
 {
     use SoftDeletes;
 
@@ -14,7 +14,7 @@ class District extends Model
      *
      * @var string
      */
-	protected $table = 'districts';
+	protected $table = 'profiles';
 
     /**
      * The attributes that are mass assignable.
@@ -22,7 +22,7 @@ class District extends Model
      * @var array
      */
     protected $fillable = [
-        'name'
+        'citizen_code', 'name', 'lastName', 'address', 'birth_date',
     ];
 
     /**
@@ -30,19 +30,21 @@ class District extends Model
      *
      * @var array
      */
-    protected $dates = ['created_at', 'updated_at', 'deleted_at'];
+    protected $dates = ['birth_date', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
-     * Get the province of the district.
+     * Get the members for the profile.
      */
-    public function province() {
-        return $this->belongsTo(Province::class);
+    public function members()
+    {
+        return $this->hasMany(Member::class);
     }
 
     /**
-     * Get the subdistricts for the district.
+     * Get the employees for the profile.
      */
-    public function subdistricts() {
-        return $this->hasMany(SubDistrict::class);
+    public function employees()
+    {
+        return $this->hasMany(Employee::class);
     }
 }

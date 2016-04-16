@@ -11,11 +11,30 @@
 |
 */
 
-$factory->define(App\User::class, function (Faker\Generator $faker) {
+$factory->define(App\Profile::class, function (Faker\Generator $faker) {
     return [
-        'name' => $faker->name,
-        'email' => $faker->safeEmail,
-        'password' => bcrypt(str_random(10)),
-        'remember_token' => str_random(10),
+        'prefix_id' => 1,
+        'name' => $faker->firstNameMale,
+        'lastName' => $faker->lastName,
+        'address' => $faker->streetAddress,
+        'subdistrict_id' => 1,
+        'postcode_id' => 9,
+        'birth_date' => Diamond::today(),
+    ];
+});
+
+$factory->define(App\Member::class, function (Faker\Generator $faker) {
+    return [
+        'start_date' => Diamond::today(),
+        'shareholding_date' => Diamond::today(),
+        'leave_date' => Diamond::today(),
+    ];
+});
+
+$factory->define(App\Employee::class, function (Faker\Generator $faker) {
+    return [
+        'employee_type_id' => 1,
+        'start_date' => Diamond::today(),
+        'leave_date' => Diamond::today(),
     ];
 });

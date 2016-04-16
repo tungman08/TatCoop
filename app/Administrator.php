@@ -4,11 +4,17 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Diamond;
 
 class Administrator extends Model
 {
     use SoftDeletes;
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+	protected $table = 'administrators';
 
     /**
      * The attributes that are mass assignable.
@@ -18,6 +24,13 @@ class Administrator extends Model
     protected $fillable = [
         'name', 'email', 'password',
     ];
+
+    /**
+     * The attributes that should be mutated to dates.
+     *
+     * @var array
+     */
+    protected $dates = ['created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -33,16 +46,6 @@ class Administrator extends Model
      */
     public function administrator_statistics() {
         return $this->hasMany(AdministratorStatistic::class);
-    }
-
-    /**
-     * Get the administrator's create date.
-     *
-     * @param  string  $value
-     * @return string
-     */
-    public function getCreateAtAttribute($value) {
-        return Diamond::parse($value)->thai_format('j M Y');
     }
 
     /**

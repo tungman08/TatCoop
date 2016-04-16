@@ -6,14 +6,26 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use App\Libraries\Statistic;
 
 class HomepageController extends Controller
 {
     /**
+     * Create a new homepage controller instance.
+     *
+     * @return void
+     */
+    public function __construct() {
+       Statistic::visitor();
+    }
+
+    /**
      * Responds to requests to GET /
      */
     public function getIndex() {
-        return view('website.homepage.index');
+        return view('website.homepage.index', [
+            'statistics' => Statistic::visitor_statistic()
+        ]);
     }
 
     /**

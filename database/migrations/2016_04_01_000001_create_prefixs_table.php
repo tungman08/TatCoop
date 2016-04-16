@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateSubdistrictsTable extends Migration
+class CreatePrefixsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,9 +12,9 @@ class CreateSubdistrictsTable extends Migration
      */
     public function up()
     {
-        Schema::create('subdistricts', function (Blueprint $table) {
+        Schema::create('prefixs', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
+            $table->string('name')->unique();
             $table->timestamps();
             $table->softDeletes();
         });
@@ -27,6 +27,6 @@ class CreateSubdistrictsTable extends Migration
      */
     public function down()
     {
-        Schema::drop('sub_districts');
+        Schema::drop('prefixs');
     }
 }

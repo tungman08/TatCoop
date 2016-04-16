@@ -10,6 +10,13 @@ class Postcode extends Model
     use SoftDeletes;
 
     /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+	protected $table = 'postcodes';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array
@@ -19,9 +26,16 @@ class Postcode extends Model
     ];
 
     /**
+     * The attributes that should be mutated to dates.
+     *
+     * @var array
+     */
+    protected $dates = ['created_at', 'updated_at', 'deleted_at'];
+    
+    /**
      * Get the subdistrict associated with the postcode.
      */
-    public function subdistrict() {
-        return $this->belongsTo(Postcode::class);
+    public function subdistricts() {
+        return $this->hasMany(Subdistrict::class);
     }
 }

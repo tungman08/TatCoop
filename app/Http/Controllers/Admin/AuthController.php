@@ -55,4 +55,23 @@ class AuthController extends Controller
     public function getLogin() {
         return view('admin.auth.login');
     }
+
+    /**
+     * Handle an authentication attempt.
+     *
+     * @return Response
+     */
+    public function postLogin(Request $request) {
+        // grab credentials from the request
+        $credentials = $request->only('email', 'password');
+        
+        if (Auth::attempt($credentials)) {
+            Statistic::addOfficer(Auth::id());
+
+            return redirect()->route('admin.user.password');
+        }
+        else {
+            return redirect()->back()->withErrors('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง')->withInput($request->except('password'));
+        }
+    }
 }

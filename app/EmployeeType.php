@@ -5,7 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Province extends Model
+class EmployeeType extends Model
 {
     use SoftDeletes;
 
@@ -14,7 +14,7 @@ class Province extends Model
      *
      * @var string
      */
-	protected $table = 'provinces';
+	protected $table = 'employee_types';
 
     /**
      * The attributes that are mass assignable.
@@ -22,7 +22,7 @@ class Province extends Model
      * @var array
      */
     protected $fillable = [
-        'name'
+        'name',
     ];
 
     /**
@@ -31,11 +31,4 @@ class Province extends Model
      * @var array
      */
     protected $dates = ['created_at', 'updated_at', 'deleted_at'];
-
-    /**
-     * Get the districts for the province.
-     */
-    public function districts() {
-        return $this->hasMany(District::class);
-    }
 }

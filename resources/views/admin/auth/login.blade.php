@@ -36,7 +36,7 @@
                     <section class="login-form">
                         {!! Form::open(['url' => '/auth/login', 'role' => 'form']) !!}
                             <img src="{{ asset('images/logo-coop.png') }}" class="img-responsive" alt="Co-op logo" />
-                            {!! Form::text('username', null, ['required', 'class'=>'form-control input-lg', 'placeholder'=>'บัญชีผู้ใช้งาน', 'autocomplete'=>'off']) !!}
+                            {!! Form::text('email', null, ['required', 'class'=>'form-control input-lg', 'placeholder'=>'อีเมล', 'autocomplete'=>'off']) !!}
                             {!! Form::password('password', ['required', 'class'=>'form-control input-lg', 'placeholder'=>'รหัสผ่าน']) !!}
                             @if ($errors->count() > 0)
                             <div class="alert alert-danger">

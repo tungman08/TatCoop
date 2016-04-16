@@ -15,7 +15,7 @@ class CreatePlatformsTable extends Migration
         Schema::create('platforms', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            $table->timestamp('created_at');
+            $table->timestamps();
             $table->softDeletes();
         });
     }

@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddPostcodeIdForMembers extends Migration
+class AddPostcodeIdForSubdistricts extends Migration
 {
     /**
      * Run the migrations.
@@ -12,10 +12,10 @@ class AddPostcodeIdForMembers extends Migration
      */
     public function up()
     {
-        Schema::table('members', function (Blueprint $table) {
-            $table->integer('postcode_id')->unsigned()->after('subdistrict_id');
+        Schema::table('subdistricts', function (Blueprint $table) {
+            $table->integer('postcode_id')->unsigned()->after('name');
             $table->foreign('postcode_id')->references('id')
-                ->on('postcodes')->onDelete('cascade');
+                  ->on('postcodes')->onDelete('cascade');
         });
     }
 
@@ -26,8 +26,8 @@ class AddPostcodeIdForMembers extends Migration
      */
     public function down()
     {
-        Schema::table('members', function (Blueprint $table) {
-            $table->dropForeign('members_postcode_id_foreign');
+        Schema::table('subdistricts', function (Blueprint $table) {
+            $table->dropForeign('subdistricts_postcode_id_foreign');
         });
     }
 }
