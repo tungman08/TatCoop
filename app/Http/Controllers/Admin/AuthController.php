@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 
 use App\Admin;
+use App\Libraries\Statistic;
+use Auth;
 use Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
@@ -26,7 +28,7 @@ class AuthController extends Controller
     use AuthenticatesAndRegistersUsers, ThrottlesLogins;
 
     /**
-     * Where to redirect users after login / registration.
+     * Where to redirect administartors after login / registration.
      *
      * @var string
      */
@@ -64,14 +66,31 @@ class AuthController extends Controller
     public function postLogin(Request $request) {
         // grab credentials from the request
         $credentials = $request->only('email', 'password');
-        
-        if (Auth::attempt($credentials)) {
-            Statistic::addOfficer(Auth::id());
+        $remember = $request->has('remember') ? true : false;
 
-            return redirect()->route('admin.user.password');
+        $rules = [
+            'email' => 'required|email|exists:administrators,email,deleted_at,NULL',
+            'password' => 'required|min:6'
+        ];
+
+        $validator = Validator::make($credentials, $rules);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput($request->except('password'));
         }
         else {
-            return redirect()->back()->withErrors('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง')->withInput($request->except('password'));
+            if (Auth::guard($this->guard)->attempt($credentials, $remember)) {
+                Statistic::administartor(Auth::guard($this->guard)->id());
+
+                return redirect()->route('admin.index');
+            }
+            else {
+                return redirect()->back()
+                    ->withErrors(trans('auth.failed'))
+                    ->withInput($request->except('password'));
+            }
         }
     }
 }

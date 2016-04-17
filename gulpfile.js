@@ -27,11 +27,13 @@ elixir(function(mix) {
         .scripts('./bower_components/jquery/dist/jquery.js')
         .scripts('./bower_components/metisMenu/src/metisMenu.js')
         .scripts('./bower_components/startbootstrap-sb-admin-2/dist/js/sb-admin-2.js')
+        .scripts(['jquery.inputmask.js', 'jquery.inputmask.date.extensions.js', 'jquery.inputmask.extensions.js'], 'public/js/jquery.inputmask.js', './bower_components/AdminLTE/plugins/input-mask')
         .scripts('jquery.easing.js')
+        .scripts('auth.js')
         .scripts('homepage.js');
 
     mix.styles('./bower_components/metisMenu/src/metisMenu.css')
-        .styles('login.css');
+        .styles('auth.css');
 
     mix.copy('bower_components/bootstrap-sass/assets/fonts/bootstrap', 'public/fonts')
         .copy('bower_components/font-awesome/fonts', 'public/fonts')
@@ -42,8 +44,10 @@ elixir(function(mix) {
         'js/bootstrap.js',
         'js/jquery.js',
         'js/jquery.easing.js',
+        'js/jquery.inputmask.js',
         'js/sb-admin-2.js',
         'js/metisMenu.js',
+        'js/auth.js',
         'js/homepage.js',
         'css/bootstrap.css',
         'css/font-awesome.css',
@@ -52,6 +56,6 @@ elixir(function(mix) {
         'css/sb-admin-2.css',
         'css/homepage.css',
         'css/announce.css',
-        'css/login.css',
+        'css/auth.css',
     ]);
 });

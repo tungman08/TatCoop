@@ -38,4 +38,21 @@ class Member extends Model
     public function profile() {
         return $this->belongsTo(Profile::class);
     }
+
+    /**
+     * Get the user for the member.
+     */
+    public function user() {
+        return $this->hasOne(User::class);
+    }
+
+    /**
+     * Scope a query to expect inactive member.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeActive($query)
+    {
+        return $query->whereNull('leave_date');
+    }
 }

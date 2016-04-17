@@ -1,63 +1,50 @@
-<!DOCTYPE html>
-<html>
+@extends('website.auth.layout')
 
-<head>
+@section('content')
+<div class="login-logo">
+    <a href="{{ url(env('APP_URL', 'http://www.tatcoop.dev')) }}"><b>TAT Coopperative</b></a>
+</div>
 
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <title>:: สหกรณ์ออมทรัพย์สหภาพแรงงานรัฐวิสาหกิจการท่องเที่ยวแห่งประเทศไทย จำกัด ::</title>
-
-    <!-- Bootstrap Core CSS -->
-    {!! Html::style(elixir('css/bootstrap.css')) !!}
-
-    <!-- My Custom CSS -->
-    {!! Html::style(elixir('css/login.css')) !!}
-
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
-
-</head>
-
-<body>
-
-    <div class="vertical-center">
-        <div class="container">
-            <div class="row" id="pwd-container">
-                <div class="col-md-4"></div>
-                <div class="col-md-4">
-                    <section class="login-form">
-                        {!! Form::open(['url' => '/auth/login', 'role' => 'form']) !!}
-                            <img src="{{ asset('images/logo-coop.png') }}" class="img-responsive" alt="Co-op logo" />
-                            {!! Form::text('email', null, ['required', 'class'=>'form-control input-lg', 'placeholder'=>'อีเมล', 'autocomplete'=>'off']) !!}
-                            {!! Form::password('password', ['required', 'class'=>'form-control input-lg', 'placeholder'=>'รหัสผ่าน']) !!}
-                            @if ($errors->count() > 0)
-                            <div class="alert alert-danger">
-                                {{ $errors->first() }}
-                            </div>
-                            @endif
-                            {!! Form::submit('เข้าสู่ระบบ', ['class'=>'btn btn-lg btn-primary btn-block']) !!}
-                        {!! Form::close() !!}
-                    </section>
-                </div>
-                <div class="col-md-4"></div>
-            </div>
-        </div>
+<div class="login-box-body">
+    <div class="login-logo">
+        <img src="{{ asset('images/logo-coop.png') }}" class="img-circle img-responsive" alt="Co-op logo" />
+        <b>Administrator</b>
     </div>
+    <!-- /.login-logo -->
 
-    <!-- jQuery -->
-    {!! Html::script(elixir('js/jquery.js')) !!}
+    {{ Form::open(['url' => '/auth/login', 'role' => 'form']) }}
+        <div class="form-group has-feedback">
+            {{ Form::text('email', null, ['required', 'class'=>'form-control', 'placeholder'=>'E-mail', 'autocomplete'=>'off']) }}
+            <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+        </div>
+        <div class="form-group has-feedback">
+            {{ Form::password('password', ['required', 'class'=>'form-control', 'placeholder'=>'Password']) }}
+            <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+        </div>
+        <div class="row">
+            <div class="col-xs-8">
+                <div class="checkbox">
+                    <label>
+                        {{ Form::checkbox('remember', (1 or true), null) }} Remember Me
+                    </label>
+                </div>
+            </div>
+            <!-- /.col -->
+            <div class="col-xs-4">
+                {{ Form::button('<i class="glyphicon glyphicon-log-in"></i>&nbsp; Sign In', ['type' => 'submit', 'class'=>'btn btn-primary btn-block btn-flat']) }}
+            </div>
+            <!-- /.col -->
+        </div>
+    {{ Form::close() }}
 
-    <!-- Bootstrap Core JavaScript -->
-    {!! Html::script(elixir('js/bootstrap.js')) !!}
+    @if ($errors->count() > 0)
+        <div class="alert alert-danger alert-dismissible">
+            <button type="button" class="close" aria-hidden="true" data-dismiss="alert" data-tooltip="true" title="Close">×</button>
+            <h4>Authentication failed!</h4>
+            {{ Html::ul($errors->all()) }}
+        </div>
+    @endif
 
-</body>
-
-</html>
+</div>
+<!-- /.login-box-body -->
+@endsection

@@ -16,7 +16,7 @@ class Statistic
         $info = Client::info();
 
         $admin = new AdministratorStatistic();
-        $admin->administartor_id = $admin_id;
+        $admin->administrator_id = $admin_id;
         $admin->ip_address = $info->ip_address;
         $admin->platform_id = self::platform($info->platform)->id;
         $admin->browser_id = self::browser($info->browser)->id;
@@ -52,7 +52,7 @@ class Statistic
 
     public static function visitor_statistic() {
         $info = Client::info();
-        
+
         $statistics = new stdClass();
         $statistics->total = VisitorStatistic::count();
         $statistics->today = VisitorStatistic::where(DB::raw('date_format(created_at, \'%Y-%m-%d\')'), Diamond::today()->toDateString())->count();

@@ -11,53 +11,62 @@
 |
 */
 
-Route::group(['middleware' => ['web']], function () {
+/* ====================================================================== */
+// Website Route...
+/* ====================================================================== */
+Route::group(['domain' => 'www.tatcoop.dev',
+    'namespace' => 'Website',
+    'middleware' => 'locale:th'], function () {
 
-    /* ====================================================================== */
-    // Website Route...
-    /* ====================================================================== */
-    Route::group(['domain' => 'www.tatcoop.dev'], function () {
+    // Auth Route...
+    Route::controller('/auth', 'AuthController', [
+        'getLogin' => 'website.auth.login',
+        'getRegister' => 'website.auth.register',
+        'getLogout' => 'website.auth.logout',
+    ]);
 
-        // Website Filter...
-        Route::group(['namespace' => 'Website'], function () {
+    // Password Route...
+    Route::controller('/password', 'PasswordController', [
+        'getRecovery' => 'website.password.recovery',
+    ]);
 
-            // Homepage Route...
-            Route::controller('/', 'HomepageController');
+    // Users Filter...
+    Route::group(['middleware' => 'auth:users'], function () {
 
-            // Auth Route...
-            Route::controller('/auth', 'AuthController');
-
-            // Member Filter...
-            Route::group(['middleware' => 'auth'], function () {
-
-                // Member Route...
-                Route::controller('/member', 'MemberController');
-            });
-        });
+        // Member Route...
+        Route::controller('/member', 'MemberController', [
+            'getIndex' => 'website.member.index',
+            'getAdmin' => 'website.member.admin',
+        ]);
     });
 
-    /* ====================================================================== */
-    // Admin Route...
-    /* ====================================================================== */
-    Route::group(['domain' => 'admin.tatcoop.dev'], function () {
+    // Homepage Route...
+    Route::controller('/', 'HomepageController', [
+        'getIndex' => 'website.index',
+        'getAnnounce' => 'website.announce',
+    ]);
+});
 
-        // Admin Filter...
-        Route::group(['namespace' => 'Admin'], function() {
+/* ====================================================================== */
+// Admin Route...
+/* ====================================================================== */
+Route::group(['domain' => 'admin.tatcoop.dev',
+    'namespace' => 'Admin',
+    'middleware' => 'locale:en'], function () {
 
-            // Auth Route...
-            Route::controller('/auth', 'AuthController', [
-                'getLogin' => 'admin.auth.login',
-            ]);
+    // Auth Route...
+    Route::controller('/auth', 'AuthController', [
+        'getLogin' => 'admin.auth.login',
+        'getLogout' => 'admin.auth.logout',
+    ]);
 
-            // Auth Filter...
-            Route::group(['middleware' => 'auth'], function () {
+    // Administartors Filter...
+    Route::group(['middleware' => 'auth:admins'], function () {
 
-                // Admin Route...
-                Route::controller('/', 'AdminController', [
-                    'getIndex' => 'admin.index',
-                    'getUnauthorize' => 'admin.unauthorize',
-                ]);
-            });
-        });
+        // Admin Route...
+        Route::controller('/', 'AdminController', [
+            'getIndex' => 'admin.index',
+            'getUnauthorize' => 'admin.unauthorize',
+        ]);
     });
 });

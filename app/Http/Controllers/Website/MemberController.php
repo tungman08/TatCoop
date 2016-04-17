@@ -9,19 +9,17 @@ use App\Http\Controllers\Controller;
 
 class MemberController extends Controller
 {
-    /**
-     * Create a new member controller instance.
-     *
-     * @return void
-     */
-    public function __construct(){
-        $this->middleware('user');
-   }
-
    /**
     * Responds to requests to GET /member
     */
     public function getIndex() {
         return 'member';
     }
+
+    /**
+     * Responds to requests to GET /member/admin
+     */
+     public function getAdmin() {
+         return 'admin';
+     }
 }

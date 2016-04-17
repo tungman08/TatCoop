@@ -24,6 +24,16 @@ class Authenticate
                 return redirect()->guest('/auth/login');
             }
         }
+        elseif ($guard == 'admins') {
+            if (Auth::guard('users')->check()) {
+                return redirect()->route('admin.unauthorize');
+            }
+        }
+        elseif ($guard == 'users') {
+            if (Auth::guard('admins')->check()) {
+                return redirect()->route('website.member.admin');
+            }
+        }
 
         return $next($request);
     }

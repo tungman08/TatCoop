@@ -1,15 +1,17 @@
 {
   "css/admin-lte.css": "css/admin-lte-d93c3f7382.css",
   "css/announce.css": "css/announce-52ded92a5d.css",
+  "css/auth.css": "css/auth-bc289dd540.css",
   "css/bootstrap.css": "css/bootstrap-f6fc9fc5c0.css",
   "css/font-awesome.css": "css/font-awesome-589b92e0b8.css",
   "css/homepage.css": "css/homepage-7f28bda929.css",
-  "css/login.css": "css/login-afaf9e8bbd.css",
   "css/metisMenu.css": "css/metisMenu-3440a716fd.css",
   "css/sb-admin-2.css": "css/sb-admin-2-e7f046fc56.css",
+  "js/auth.js": "js/auth-65a82b6bad.js",
   "js/bootstrap.js": "js/bootstrap-84eef983ad.js",
   "js/homepage.js": "js/homepage-fb1db37ccd.js",
   "js/jquery.easing.js": "js/jquery.easing-7e23a70455.js",
+  "js/jquery.inputmask.js": "js/jquery.inputmask-d8628a6e65.js",
   "js/jquery.js": "js/jquery-5eccfcbd5b.js",
   "js/metisMenu.js": "js/metisMenu-3e999c8aab.js",
   "js/sb-admin-2.js": "js/sb-admin-2-168722dfec.js"

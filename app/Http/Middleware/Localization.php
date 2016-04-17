@@ -2,24 +2,21 @@
 
 namespace App\Http\Middleware;
 
+use App;
 use Closure;
-use Illuminate\Support\Facades\Auth;
 
-class RedirectIfNotUser
+class Localization
 {
     /**
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
-     * @param  string|null  $guard
      * @return mixed
      */
-    public function handle($request, Closure $next, $guard = 'users')
+    public function handle($request, Closure $next, $language = null)
     {
-        if (!Auth::guard($guard)->check()) {
-            return redirect('/');
-        }
+        App::setLocale(empty($language) ? Config::get('app.locale') : $language);
 
         return $next($request);
     }
