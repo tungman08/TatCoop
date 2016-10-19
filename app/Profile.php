@@ -22,7 +22,7 @@ class Profile extends Model
      * @var array
      */
     protected $fillable = [
-        'citizen_code', 'name', 'lastName', 'address', 'birth_date',
+        'citizen_code', 'name', 'lastName', 'address', 'birth_date', 'subdistrict_id', 'district_id', 'province_id', 'postcode_id',
     ];
 
     /**
@@ -43,8 +43,47 @@ class Profile extends Model
     /**
      * Get the employees for the profile.
      */
-    public function employees()
+    public function employee()
     {
-        return $this->hasMany(Employee::class);
+        return $this->hasOne(Employee::class);
+    }
+
+    /**
+     * Get the profile that uses by the employee.
+     */
+    public function prefix() {
+        return $this->belongsTo(Prefix::class);
+    }
+
+    public function subdistrict() {
+        return $this->belongsTo(Subdistrict::class);
+    }
+
+    public function postcode() {
+        return $this->belongsTo(Postcode::class);
+    }
+
+    /**
+     * Scope a query to only include normal province.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeActive($query)
+    {
+        return $query->whereNull('leave_date');
+    }
+
+    public function getFullNameAttribute()
+    {
+        return $this->prefix->name . ' ' . $this->attributes['name'] .' '. $this->attributes['lastname'];
+    }
+
+    public function getFullAddressAttribute()
+    {
+        return $this->attributes['address'] . ' ' . 
+            (($this->subdistrict->district->province['id'] == 1) ? 'แขวง'. $this->subdistrict['name'] : 'ต.' . $this->subdistrict['name']) . ' ' . 
+            (($this->subdistrict->district->province['id'] == 1) ? 'เขต' . $this->subdistrict->district['name'] : 'อ.' . $this->subdistrict->district['name']) . ' ' . 
+            (($this->subdistrict->district->province['id'] == 1) ? $this->subdistrict->district->province['name'] : 'จ.' . $this->subdistrict->district->province['name']) . ' ' . 
+            $this->postcode['code'];
     }
 }

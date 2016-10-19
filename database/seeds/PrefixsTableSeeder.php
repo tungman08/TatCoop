@@ -11,13 +11,10 @@ class PrefixsTableSeeder extends Seeder
      */
     public function run()
     {
-        if (DB::table('prefixs')->count() > 0)
-            DB::table('prefixs')->truncate();
-
         $array = [
             ['name' => 'นาย'],
             ['name' => 'นาง'],
-            ['name' => 'นางสาว'],
+            ['name' => 'น.ส.'],
         ];
 
         // Loop through each prefix above and create the record for them in the database

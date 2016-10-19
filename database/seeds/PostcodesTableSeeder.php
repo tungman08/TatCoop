@@ -11,9 +11,6 @@ class PostcodesTableSeeder extends Seeder
      */
     public function run()
     {
-        if (DB::table('postcodes')->count() > 0)
-            DB::table('postcodes')->truncate();
-
         $array = [
             [ 'code' => '10100' ],
             [ 'code' => '10110' ],

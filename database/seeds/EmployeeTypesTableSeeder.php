@@ -11,9 +11,6 @@ class EmployeeTypesTableSeeder extends Seeder
      */
     public function run()
     {
-        if (DB::table('employee_types')->count() > 0)
-            DB::table('employee_types')->truncate();
-
         $array = [
             ['name' => 'พนักงาน'],
             ['name' => 'ลูกจ้าง ททท.'],

@@ -3,12 +3,9 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Subdistrict extends Model
 {
-    use SoftDeletes;
-
     /**
      * The table associated with the model.
      *
@@ -37,6 +34,10 @@ class Subdistrict extends Model
      */
     public function district() {
         return $this->belongsTo(District::class);
+    }
+
+    public function profiles() {
+        return $this->hasMany(Member::class);
     }
 
     /**

@@ -106,10 +106,6 @@ of those sections to manage the look and feel of the site. */
     white-space: nowrap;
 }
 
-.thumbnail img {
-    width: 100%;
-}
-
 .ratings {
     padding-right: 10px;
     padding-left: 10px;
@@ -118,11 +114,14 @@ of those sections to manage the look and feel of the site. */
 
 .thumbnail {
     padding: 0;
-}
-
-.thumbnail .caption-full {
-    padding: 9px;
-    color: #333;
+    text-align: left;
+    img {
+        width: 100%;
+    }
+    .caption-full {
+        padding: 9px;
+        color: #333;
+    }
 }
 
 .intro-section,
@@ -170,6 +169,15 @@ section {
 	}
 }
 
+.panel-default,
+.panel-primary,
+.panel-info,
+.panel-success,
+.panel-warning,
+.panel-danger {
+    text-align: left;
+}
+
 section#contact {
 	background-image: url('/images/map-image.png');
     background-color: #222222;
@@ -180,7 +188,6 @@ section#contact {
 	}
     .contact-panel {
         padding: 5px 10px;
-        margin-left: 10px;
         margin-right: 10px;
         background-color: white;
         border-radius: 3px;

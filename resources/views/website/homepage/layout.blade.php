@@ -12,14 +12,15 @@
     <title>:: สหกรณ์ออมทรัพย์สหภาพแรงงานรัฐวิสาหกิจการท่องเที่ยวแห่งประเทศไทย จำกัด ::</title>
 
     <!-- Bootstrap Core CSS -->
-    {!! Html::style(elixir('css/bootstrap.css')) !!}
+    {{ Html::style(elixir('css/bootstrap.css')) }}
+    {{ Html::style(elixir('css/miscellaneous.css')) }}
 
     <!-- Font-Awesome Fonts -->
-    {!! Html::style(elixir('css/font-awesome.css')) !!}
+    {{ Html::style(elixir('css/font-awesome.css')) }}
 
     <!-- Custom CSS -->
-    {!! Html::style(elixir('css/metisMenu.css')) !!}
-    {!! Html::style(elixir('css/homepage.css')) !!}
+    {{ Html::style(elixir('css/metisMenu.css')) }}
+    {{ Html::style(elixir('css/homepage.css')) }}
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -77,16 +78,16 @@
     </footer>
 
     <!-- jQuery -->
-    {!! Html::script(elixir('js/jquery.js')) !!}
+    {{ Html::script(elixir('js/jquery.js')) }}
 
     <!-- Bootstrap Core JavaScript -->
-    {!! Html::script(elixir('js/bootstrap.js')) !!}
+    {{ Html::script(elixir('js/bootstrap.js')) }}
 
     <!-- Homepage JavaScript -->
-    {!! Html::script(elixir('js/sb-admin-2.js')) !!}
-    {!! Html::script(elixir('js/jquery.easing.js')) !!}
-    {!! Html::script(elixir('js/metisMenu.js')) !!}
-    {!! Html::script(elixir('js/homepage.js')) !!}
+    {{ Html::script(elixir('js/sb-admin-2.js')) }}
+    {{ Html::script(elixir('js/jquery.easing.js')) }}
+    {{ Html::script(elixir('js/metisMenu.js')) }}
+    {{ Html::script(elixir('js/homepage.js')) }}
 
 </body>
 

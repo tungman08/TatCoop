@@ -32,7 +32,7 @@ return [
     'date'                 => 'ข้อมูล :attribute ต้องเป็นวันที่',
     'date_format'          => 'ข้อมูล :attribute ไม่ตรงกับข้อมูลกำหนด :format',
     'different'            => 'ข้อมูล :attribute และ :other ต้องไม่เท่ากัน',
-    'digits'               => 'ข้อมูล :attribute ต้องเป็น :digits',
+    'digits'               => 'ข้อมูล :attribute ต้องประกอบด้วยตัวเลข :digits หลัก',
     'digits_between'       => 'ข้อมูล :attribute ต้องอยู่ในช่วงระหว่าง :min ถึง :max',
     'distinct'             => 'ข้อมูล :attribute มีค่าซ้ำ',
     'email'                => 'ข้อมูล :attribute ต้องเป็นอีเมล',
@@ -77,7 +77,7 @@ return [
     ],
     'string'               => 'ข้อมูล :attribute ต้องเป็นอักขระ',
     'timezone'             => 'ข้อมูล :attribute ต้องเป็นข้อมูลเขตเวลาที่ถูกต้อง',
-    'unique'               => 'ข้อมูล :attribute ไม่สามารถใช้ได้',
+    'unique'               => 'ข้อมูล :attribute ไม่สามารถใช้ได้ เนื่องจากมีข้อมูลอยู่แล้วในระบบ',
     'url'                  => 'ข้อมูล :attribute ไม่ถูกต้อง',
 
     /*

@@ -22,7 +22,7 @@ class Employee extends Model
      * @var array
      */
     protected $fillable = [
-        'code', 'start_date', 'leave_date',
+        'code',
     ];
 
     /**
@@ -30,12 +30,19 @@ class Employee extends Model
      *
      * @var array
      */
-    protected $dates = ['start_date', 'leave_date', 'created_at', 'updated_at', 'deleted_at'];
+    protected $dates = ['created_at', 'updated_at', 'deleted_at'];
 
     /**
      * Get the profile that uses by the employee.
      */
     public function profile() {
         return $this->belongsTo(Profile::class);
+    }
+
+    /**
+     * Get the employee type that uses by the employee.
+     */
+    public function employee_type() {
+        return $this->belongsTo(EmployeeType::class);
     }
 }

@@ -3,12 +3,9 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class EmployeeType extends Model
 {
-    use SoftDeletes;
-
     /**
      * The table associated with the model.
      *
@@ -30,5 +27,5 @@ class EmployeeType extends Model
      *
      * @var array
      */
-    protected $dates = ['created_at', 'updated_at', 'deleted_at'];
+    protected $dates = ['created_at', 'updated_at'];
 }

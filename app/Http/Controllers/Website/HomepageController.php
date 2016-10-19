@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use App\Libraries\Statistic;
+use Statistic;
 
 class HomepageController extends Controller
 {
@@ -31,7 +31,9 @@ class HomepageController extends Controller
     /**
      * Responds to requests to GET /announce/1
      */
-     public function getAnnounce($id) {
-        return view('website.announce.index');
+     public function getAnnounce($key) {
+        return view('website.announce.index', [
+            'key' => $key,
+        ]);
     }
 }

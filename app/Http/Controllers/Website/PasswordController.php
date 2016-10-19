@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ResetsPasswords;
-use Validator;
+use Password;
 
 class PasswordController extends Controller
 {
@@ -24,6 +24,27 @@ class PasswordController extends Controller
     use ResetsPasswords;
 
     /**
+     * Assign send email view for reset password.
+     *
+     * @var string
+     */
+    protected $linkRequestView = 'website.password.email';
+
+    /**
+     * Assign reset password form.
+     *
+     * @var string
+     */
+    protected $resetView = 'website.password.reset';
+
+    /**
+     * Where to redirect users after reset password.
+     *
+     * @var string
+     */
+    protected $redirectTo = '/auth/login';
+
+    /**
      * Create a new password controller instance.
      *
      * @return void
@@ -34,40 +55,56 @@ class PasswordController extends Controller
     }
 
     /**
-     * Responds to requests to GET /password
+     * Send a reset link to the given user.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
      */
-    public function getRecovery() {
-        return view('website.password.recovery');
+    public function sendResetLinkEmail(Request $request)
+    {
+        $this->validate($request, ['email' => 'required|email'], [], ['email' => 'อีเมล']);
+
+        $broker = $this->getBroker();
+
+        $response = Password::broker($broker)->sendResetLink(
+            $request->only('email'), $this->resetEmailBuilder()
+        );
+
+        switch ($response) {
+            case Password::RESET_LINK_SENT:
+                return $this->getSendResetLinkEmailSuccessResponse($response);
+
+            case Password::INVALID_USER:
+            default:
+                return $this->getSendResetLinkEmailFailureResponse($response);
+        }
+    }
+
+     /**
+     * Get the password reset validation custom attributes.
+     *
+     * @return array
+     */    
+    protected function getResetValidationCustomAttributes() {
+        $validator = [
+            'email' => 'อีเมล',
+            'password' => 'รหัสผ่าน',
+        ];
+
+        return $validator;
     }
 
     /**
-     * Handle an user recovery password.
+     * Reset the given user's password.
      *
-     * @return Response
+     * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
+     * @param  string  $password
+     * @return void
      */
-    public function postRecovery(Request $request) {
-        // grab inputs from the request
-        $email = $request->input('email');
-
-        $rules = [
-            'email' => 'required|email|exists:users,email,deleted_at,NULL'
-        ];
-
-        $attributeNames = [
-            'email' => 'อีเมล'
-        ];
-
-        $validator = Validator::make($request->all(), $rules);
-        $validator->setAttributeNames($attributeNames);
-
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-        else {
-            return redirect()->back()
-                ->with('sent', "ส่งลิงก์สำหรับตั้งค่าหรัสผ่านไปที่ $email เรียบร้อยแล้ว");
-        }
+    protected function resetPassword($user, $password)
+    {
+        $user->forceFill([
+            'password' => $password,
+        ])->save();
     }
 }

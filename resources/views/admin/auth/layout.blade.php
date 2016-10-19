@@ -13,6 +13,7 @@
 
     <!-- Bootstrap Core CSS -->
     {{ Html::style(elixir('css/bootstrap.css')) }}
+    {{ Html::style(elixir('css/miscellaneous.css')) }}
 
     <!-- Font-Awesome Fonts -->
     {{ Html::style(elixir('css/font-awesome.css')) }}
@@ -34,16 +35,55 @@
 
 <body class="hold-transition login-page">
 
+    <header>
+        <div class="progress progress-xxs active">
+            <div id="progress" class="progress-bar progress-bar-primary progress-bar-striped"
+                style="width: 100%" aria-valuemax="100" aria-valuemin="0" aria-valuenow="0" role="progressbar">
+                <span class="sr-only">100% Complete</span>
+            </div>
+        </div>
+    </header>
+    <!-- /header -->
+
     <div class="login-box">
+        <div class="login-logo">
+            <a href="{{ url(env('APP_URL', 'http://www.tatcoop.dev')) }}"><b>TAT Coopperative</b></a>
+        </div>
+        <!-- /.login-logo -->
+
         @yield('content')
     </div>
     <!-- /.login-box -->
+
+    <div class="btn-group selector">
+        <button id="previous" type="button" data-selected="0" class="btn btn-flat">
+            <i class="fa fa-angle-left"></i>
+        </button>
+        <button id="next" type="button" data-selected="0" class="btn btn-flat">
+            <i class="fa fa-angle-right"></i>
+        </button>
+    </div>
+
+    <footer class="footer">
+        <p class="muted credit text-right">
+            <a id ="copyrightlink" target="_blank">
+                <i class="fa fa-camera fa-fw margin-r-xs"></i><span id="copyright"></span>
+            </a>
+        </p>
+    </footer>
+    <!-- /footer -->
 
     <!-- jQuery -->
     {{ Html::script(elixir('js/jquery.js')) }}
 
     <!-- Bootstrap Core JavaScript -->
     {{ Html::script(elixir('js/bootstrap.js')) }}
+
+    <!-- InputMask JavaScript -->
+    {{ Html::script(elixir('js/jquery.inputmask.js')) }}
+    
+    <!-- jQuery waitforimages JavaScript -->
+    {{ Html::script(elixir('js/jquery.waitforimages.js')) }}
 
     <!-- Custom JavaScript -->
     {{ Html::script(elixir('js/auth.js')) }}

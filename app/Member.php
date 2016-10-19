@@ -22,7 +22,7 @@ class Member extends Model
      * @var array
      */
     protected $fillable = [
-        'start_date', 'leave_date', 'shareholding_date',
+        'share_holding', 'fee', 'start_date', 'leave_date',
     ];
 
     /**
@@ -30,13 +30,20 @@ class Member extends Model
      *
      * @var array
      */
-    protected $dates = ['start_date', 'leave_date', 'shareholding_date', 'created_at', 'updated_at', 'deleted_at'];
+    protected $dates = ['start_date', 'leave_date', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * Get the profile that uses by the member.
      */
     public function profile() {
         return $this->belongsTo(Profile::class);
+    }
+
+    /**
+     * Get the shares that uses by the member.
+     */
+    public function shareHoldings() {
+        return $this->hasMany(ShareHolding::class);
     }
 
     /**
@@ -54,5 +61,15 @@ class Member extends Model
     public function scopeActive($query)
     {
         return $query->whereNull('leave_date');
+    }
+
+    public function scopeInactive($query)
+    {
+        return $query->whereNotNull('leave_date');
+    }
+
+    public function getMemberCodeAttribute()
+    {
+        return str_pad($this->attributes['id'], 5, "0", STR_PAD_LEFT);
     }
 }

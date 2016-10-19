@@ -16,8 +16,7 @@ class CreateVisitorStatisticsTable extends Migration
             $table->increments('id');
             $table->string('session')->unique();
             $table->string('ip_address');
-            $table->timestamp('created_at');
-            $table->softDeletes();
+            $table->timestamps();
         });
     }
 

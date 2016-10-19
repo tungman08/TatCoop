@@ -22,7 +22,7 @@ class Administrator extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password', 'password_changed',
     ];
 
     /**
@@ -56,5 +56,15 @@ class Administrator extends Authenticatable
      */
     public function setPasswordAttribute($value) {
         $this->attributes['password'] = bcrypt($value);
+    }
+
+    /**
+     * Scope a query to only include normal province.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeNormal($query)
+    {
+        return $query->where('id', '>', 1);
     }
 }

@@ -14,8 +14,9 @@ class CreateMembersTable extends Migration
     {
         Schema::create('members', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('shareholding')->default(0);
+            $table->double('fee');
             $table->date('start_date');
-            $table->date('shareholding_date');
             $table->date('leave_date')->nullable();
             $table->timestamps();
             $table->softDeletes();

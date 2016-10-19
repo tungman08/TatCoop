@@ -11,9 +11,6 @@ class ProvincesTableSeeder extends Seeder
      */
     public function run()
     {
-        if (DB::table('provinces')->count() > 0)
-            DB::table('provinces')->truncate();
-
         $array = [
             [ 'name' => 'กรุงเทพมหานคร', 'districts' => [
                 [ 'name' => 'พระนคร', 'subdistricts' => [

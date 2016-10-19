@@ -16,7 +16,6 @@ class CreatePostcodesTable extends Migration
             $table->increments('id');
             $table->string('code')->unique();
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 

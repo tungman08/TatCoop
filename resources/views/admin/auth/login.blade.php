@@ -1,10 +1,6 @@
-@extends('website.auth.layout')
+@extends('admin.auth.layout')
 
 @section('content')
-<div class="login-logo">
-    <a href="{{ url(env('APP_URL', 'http://www.tatcoop.dev')) }}"><b>TAT Coopperative</b></a>
-</div>
-
 <div class="login-box-body">
     <div class="login-logo">
         <img src="{{ asset('images/logo-coop.png') }}" class="img-circle img-responsive" alt="Co-op logo" />
@@ -31,7 +27,10 @@
             </div>
             <!-- /.col -->
             <div class="col-xs-4">
-                {{ Form::button('<i class="glyphicon glyphicon-log-in"></i>&nbsp; Sign In', ['type' => 'submit', 'class'=>'btn btn-primary btn-block btn-flat']) }}
+                {{ Form::button('Sign In&nbsp; <i class="glyphicon glyphicon-log-in"></i>', [
+                    'type' => 'submit', 
+                    'class'=>'btn btn-primary btn-block btn-flat']) 
+                }}
             </div>
             <!-- /.col -->
         </div>

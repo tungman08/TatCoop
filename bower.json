@@ -21,6 +21,7 @@
     "bootstrap-sass": "^3.3.6",
     "font-awesome": "^4.5.0",
     "AdminLTE": "admin-lte#^2.3.3",
-    "startbootstrap-sb-admin-2": "^1.0.8"
+    "startbootstrap-sb-admin-2": "^1.0.8",
+    "waitForImages": "^2.2.0"
   }
 }

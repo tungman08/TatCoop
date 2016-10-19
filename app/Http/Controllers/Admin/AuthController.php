@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 
 use App\Admin;
-use App\Libraries\Statistic;
+use Statistic;
 use Auth;
 use Validator;
 use App\Http\Controllers\Controller;
@@ -48,15 +48,15 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware($this->guestMiddleware(), ['except' => 'logout']);
+        $this->middleware($this->guestMiddleware(), ['except' => 'getLogout']);
     }
 
     /**
-     * Responds to requests to GET /auth/login
+     * Assign view for login form.
+     *
+     * @var string
      */
-    public function getLogin() {
-        return view('admin.auth.login');
-    }
+    protected $loginView = 'admin.auth.login';
 
     /**
      * Handle an authentication attempt.
@@ -84,7 +84,12 @@ class AuthController extends Controller
             if (Auth::guard($this->guard)->attempt($credentials, $remember)) {
                 Statistic::administartor(Auth::guard($this->guard)->id());
 
-                return redirect()->route('admin.index');
+                if (Auth::guard($this->guard)->user()->password_changed) {
+                    return redirect()->route('admin.index');
+                }
+                else {
+                    return redirect()->route('admin.user.password');
+                }
             }
             else {
                 return redirect()->back()

@@ -34,7 +34,5 @@ $factory->define(App\Member::class, function (Faker\Generator $faker) {
 $factory->define(App\Employee::class, function (Faker\Generator $faker) {
     return [
         'employee_type_id' => 1,
-        'start_date' => Diamond::today(),
-        'leave_date' => Diamond::today(),
     ];
 });

@@ -3,6 +3,10 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App;
+use Auth;
+use Blade;
+use App\Theme;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -13,7 +17,25 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        /* bind data to website views */
+        view()->composer('website.member.*', function ($view) {
+            if (Auth::check()) {
+                $view->with('user', Auth::user())
+                    ->with('skins', Theme::All());
+            }
+        });
+
+        /* bind data to admin views */
+        view()->composer('admin.*', function ($view) {
+            if (Auth::guard('admins')->check()) {
+                $view->with('admin', Auth::guard('admins')->user());
+            }
+        });
+
+        /* @eval($var++) */
+        Blade::directive('eval', function($expression) {
+            return "<?php $expression; ?>";
+        });
     }
 
     /**
@@ -23,6 +45,36 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        App::bind('bingphoto', function() {
+            return new \App\Classes\BingPhoto;
+        });
+
+        App::bind('client', function() {
+            return new \App\Classes\Client;
+        });
+
+        App::bind('diamond', function() {
+            return new \App\Classes\Diamond;
+        });
+
+        App::bind('icon', function() {
+            return new \App\Classes\Icon;
+        });
+ 
+        App::bind('mainmenu', function() {
+            return new \App\Classes\MainMenu;
+        });
+               
+        App::bind('statistic', function() {
+            return new \App\Classes\Statistic;
+        });
+
+        App::bind('memberproperty', function() {
+            return new \App\Classes\MemberProperty;
+        });
+
+        App::bind('number', function() {
+            return new \App\Classes\Number;
+        });       
     }
 }

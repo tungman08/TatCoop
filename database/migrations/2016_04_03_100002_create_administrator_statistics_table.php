@@ -15,8 +15,7 @@ class CreateAdministratorStatisticsTable extends Migration
         Schema::create('administrator_statistics', function (Blueprint $table) {
             $table->increments('id');
             $table->string('ip_address');
-            $table->timestamp('created_at');
-            $table->softDeletes();
+            $table->timestamps();
         });
     }
 

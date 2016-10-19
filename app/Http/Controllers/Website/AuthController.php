@@ -6,8 +6,11 @@ use Illuminate\Http\Request;
 
 use App\User;
 use App\Member;
-use App\Libraries\Statistic;
+use Statistic;
 use Auth;
+use DB;
+use Mail;
+
 use Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
@@ -36,6 +39,13 @@ class AuthController extends Controller
     protected $redirectTo = '/member';
 
     /**
+     * Where to redirect users after logout.
+     *
+     * @var string
+     */
+    protected $redirectAfterLogout = '/auth/login';
+
+    /**
      * Only user authorize to access this section.
      *
      * @var string
@@ -49,15 +59,15 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware($this->guestMiddleware(), ['except' => 'logout']);
+        $this->middleware($this->guestMiddleware(), ['except' => 'getLogout']);
     }
 
     /**
-     * Responds to requests to GET /auth/login
+     * Assign view for login form.
+     *
+     * @var string
      */
-    public function getLogin() {
-        return view('website.auth.login');
-    }
+    protected $loginView = 'website.auth.login';
 
     /**
      * Handle an authentication attempt.
@@ -67,7 +77,6 @@ class AuthController extends Controller
     public function postLogin(Request $request) {
         // grab credentials from the request
         $credentials = $request->only('email', 'password');
-        $remember = $request->has('remember') ? true : false;
 
         $rules = [
             'email' => 'required|email|exists:users,email,deleted_at,NULL',
@@ -82,13 +91,23 @@ class AuthController extends Controller
         $validator = Validator::make($credentials, $rules);
         $validator->setAttributeNames($attributeNames);
 
+        $validator->after(function($validator) use ($request) {
+            $user = User::where('email', strtolower($request->input('email')))->first();
+
+            if (!is_null($user)) {
+                if (!$user->confirmed) {
+                    $validator->errors()->add('verify', 'ยังไม่ได้ทำการยืนยันข้อมูลสมาชิกนี้ โปรดตรวจสอบอีเมลที่ได้รับจากระบบ');
+                }
+            }
+        });
+
         if ($validator->fails()) {
             return redirect()->back()
                 ->withErrors($validator)
                 ->withInput($request->except('password'));
         }
         else {
-            if (Auth::guard($this->guard)->attempt($credentials, $remember)) {
+            if (Auth::guard($this->guard)->attempt($credentials, $request->has('remember'))) {
                 Statistic::user(Auth::guard($this->guard)->id());
 
                 return redirect()->route('website.member.index');
@@ -102,11 +121,11 @@ class AuthController extends Controller
     }
 
     /**
-     * Responds to requests to GET /auth/register
+     * Assign view for register form.
+     *
+     * @var string
      */
-    public function getRegister() {
-        return view('website.auth.register');
-    }
+    protected $registerView = 'website.auth.register';
 
     /**
      * Handle an user registation.
@@ -128,7 +147,7 @@ class AuthController extends Controller
             'email' => 'อีเมล',
             'password' => 'รหัสผ่าน',
             'citizen_code' => 'เลขประจำตัวประชาชน',
-            'member_id' => 'รหัสสมาชิก',
+            'member_id' => 'เลขทะเบียนสมาชิก',
         ];
 
         $validator = Validator::make($register, $rules);
@@ -150,12 +169,55 @@ class AuthController extends Controller
                 ->withInput($request->except(['password', 'member_id', 'terms']));
         }
         else {
-            $user = new User($request->only('email', 'password'));
-            $member = Member::find($request->input('member_id'));
-            $member->user()->save($user);
+            DB::transaction(function() use ($request) {
+                $user = new User($request->only('email', 'password'));
+                $member = Member::find($request->input('member_id'));
+                $member->user()->save($user);
 
-            return redirect()->route('website.auth.login')
-                ->with('registed', 'ลงทะเบียนการใช้งานบริการอิเล็กทรอนิกส์เรียบร้อยแล้ว');
+                $token = hash_hmac('sha256', str_random(40), config('app.key'));
+                $confirm = DB::table('user_confirmations')->insert([
+                        'email' => strtolower($request->input('email')), 
+                        'token' => $token
+                    ]);
+
+                Mail::send('website.emails.verify', ['token' => $token], function($message) use ($user) {
+                    $message->to($user->email, $user->member->profile->name . " " . $user->member->profile->lastname)
+                        ->subject('ยืนยันการสมัครเข้าใช้งานระบบเว็บไซต์ www.tatcoop.com');
+                });
+            });
+
+            return redirect()->back()
+                ->with('registed', 'ลงทะเบียนเรียบร้อยแล้ว คุณต้องเข้ายืนยันการใช้งานจากลิงก์ที่ส่งไปยังอีเมล ' . $request->input('email'));
         }
+    }
+
+    /**
+     * Responds to requests to GET /auth/verify/SeMXnmSNLPzcQvWFnoTGdmj4OucAfe2UpbbrBu28HdY=
+     */
+    public function getVerify($token) {
+        if(!$token) {
+            return redirect()->route('website.index');
+        }
+
+        $confirm = DB::table('user_confirmations')
+            ->where('token', $token)
+            ->first();
+
+        if (!$confirm) {
+            return redirect()->route('website.index');
+        }
+
+        DB::transaction(function() use ($confirm) {
+            $user = User::where('email', $confirm->email)->first();
+            $user->forceFill(['confirmed' => true])->save();
+
+            DB::table('user_confirmations')
+                ->where('token', $confirm->token)
+                ->delete();
+        });
+
+        return redirect()->route('website.auth.login')
+            ->with('verified', 'คุณทำการยืนยันอีเมลเรียบร้อยแล้ว')
+            ->withInput(['email' => $confirm->email]);
     }
 }

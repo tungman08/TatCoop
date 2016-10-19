@@ -8,7 +8,7 @@
                 <li class="dropup">
                     <a href="#counterModal" data-toggle="modal" data-tooltip="true" data-placement="top" title="สถิติจำนวนผู้เข้าชม">
                         <ul class="list-inline quicklinks">
-                            {!! App\Libraries\Statistic::counter($statistics->total) !!}
+                            {!! Statistic::counter($statistics->total) !!}
                         </ul>
                     </a>
                 </li>

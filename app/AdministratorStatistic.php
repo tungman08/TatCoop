@@ -3,12 +3,9 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class AdministratorStatistic extends Model
 {
-    use SoftDeletes;
-
     /**
      * The table associated with the model.
      *
@@ -40,12 +37,18 @@ class AdministratorStatistic extends Model
     protected $dates = ['created_at', 'deleted_at'];
 
     /**
+     * Get the administrator that uses by the session.
+     */
+    public function administrator() {
+        return $this->belongsTo(Administrator::class);
+    }
+
+    /**
      * Get the platform that uses by the session.
      */
     public function platform() {
         return $this->belongsTo(Platform::class);
     }
-
 
     /**
      * Get the browser that uses by the session.
