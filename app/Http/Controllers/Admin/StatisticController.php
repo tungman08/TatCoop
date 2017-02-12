@@ -25,11 +25,13 @@ class StatisticController extends Controller
      */
     public function getIndex() {
         $website = Statistic::visitor_statistic();
+        $webuser = Statistic::user_statistic();
         $webapp = Statistic::administrator_statistic();
 
         return view('admin.statistic.index', [
             'date' => Diamond::today(),
             'website' => $website,
+            'webuser' => $webuser,
             'webapp' => $webapp
         ]);
     }

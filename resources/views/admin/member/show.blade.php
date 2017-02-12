@@ -8,10 +8,18 @@
             <small>เพิ่ม ลบ แก้ไข บัญชีสมาชิก สอ.สรทท.</small>
         </h1>
 
-        @include('admin.member.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการสมาชิกสหกรณ์', 'link' => '/admin/member'],
-            ['item' => 'ข้อมูลสมาชิกสหกรณ์', 'link' => ''],
-        ]])
+        @if (is_null($member->leave_date))
+            @include('admin.member.breadcrumb', ['breadcrumb' => [
+                ['item' => 'จัดการสมาชิกสหกรณ์', 'link' => '/admin/member'],
+                ['item' => 'ข้อมูลสมาชิกสหกรณ์', 'link' => ''],
+            ]])
+        @else
+            @include('admin.member.breadcrumb', ['breadcrumb' => [
+                ['item' => 'จัดการสมาชิกสหกรณ์', 'link' => '/admin/member'],
+                ['item' => 'สมาชิกสหกรณ์ที่ลาออก', 'link' => '/admin/member/inactive'],
+                ['item' => 'ข้อมูลสมาชิกสหกรณ์', 'link' => ''],
+            ]])
+        @endif
     </section>
 
     <!-- Main content -->
@@ -70,11 +78,11 @@
 
         <div class="nav-tabs-custom">
             <ul class="nav nav-tabs">
-                <li class="{{ ($tab == 0) ? 'active' : '' }}"><a href="#result" data-toggle="tab"><i class="fa fa-user fa-fw"></i> ข้อมูลสมาชิก</a></li>
-                <li class="{{ ($tab == 1) ? 'active' : '' }}"><a href="#shareholding" data-toggle="tab"><i class="fa fa-money fa-fw"></i> ทุนเรือนหุ้น</a></li>
-                <li class="{{ ($tab == 2) ? 'active' : '' }}"><a href="#loan" data-toggle="tab"><i class="fa fa-credit-card fa-fw"></i> การกู้ยืม</a></li>
-                <li class="{{ ($tab == 3) ? 'active' : '' }}"><a href="#dividend" data-toggle="tab"><i class="fa fa-dollar fa-fw"></i> เงินปันผล</a></li>
-                <li class="{{ ($tab == 4) ? 'active' : '' }}"><a href="#guarantee" data-toggle="tab"><i class="fa fa-share-alt fa-fw"></i> การค้ำประกัน</a></li>
+                <li class="{{ ($tab == 0) ? 'active' : '' }}"><a href="#result" data-toggle="tab"><strong><i class="fa fa-user fa-fw"></i> ข้อมูลสมาชิก</a></strong></li>
+                <li class="{{ ($tab == 1) ? 'active' : '' }}"><a href="#shareholding" data-toggle="tab"><strong><i class="fa fa-money fa-fw"></i> ทุนเรือนหุ้น</a></strong></li>
+                <li class="{{ ($tab == 2) ? 'active' : '' }}"><a href="#loan" data-toggle="tab"><strong><i class="fa fa-credit-card fa-fw"></i> การกู้ยืม</a></strong></li>
+                <li class="{{ ($tab == 3) ? 'active' : '' }}"><a href="#dividend" data-toggle="tab"><strong><i class="fa fa-dollar fa-fw"></i> เงินปันผล</a></strong></li>
+                <li class="{{ ($tab == 4) ? 'active' : '' }}"><a href="#guarantee" data-toggle="tab"><strong><i class="fa fa-share-alt fa-fw"></i> การค้ำประกัน</a></strong></li>
                 
             </ul>
 

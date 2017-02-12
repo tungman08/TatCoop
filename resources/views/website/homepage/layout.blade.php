@@ -22,6 +22,12 @@
     {{ Html::style(elixir('css/metisMenu.css')) }}
     {{ Html::style(elixir('css/homepage.css')) }}
 
+    @php($ribbon = Diamond::parse('2017-10-13')->gt(Diamond::today()))
+    @if ($ribbon)
+        <!-- Black Ribbon CSS -->
+        {{ Html::style(elixir('css/black-ribbon.css')) }}
+    @endif
+
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -34,6 +40,11 @@
 <!-- The #page-top ID is part of the scrolling feature - the data-spy and data-target are part of the built-in Bootstrap scrollspy function -->
 
 <body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top">
+
+    @if ($ribbon)
+        <!-- Black Ribbon Top Left -->
+        <img src="{{ asset('images/black_ribbon_top_left.png') }}" class="black-ribbon stick-top-left"/>
+    @endif
 
     <!-- Navigation -->
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -64,7 +75,7 @@
 
     <!-- About Section -->
     <section id="about" class="about-section">
-        @include('website.homepage.about')
+        @include('website.homepage.knowledge')
     </section>
 
     <!-- Contact Section -->
@@ -88,6 +99,12 @@
     {{ Html::script(elixir('js/jquery.easing.js')) }}
     {{ Html::script(elixir('js/metisMenu.js')) }}
     {{ Html::script(elixir('js/homepage.js')) }}
+
+    <script>
+    $(document).ready(function () {
+        $('[data-tooltip="true"]').tooltip();    
+    });   
+    </script>
 
 </body>
 

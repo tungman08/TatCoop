@@ -150,6 +150,7 @@ return [
         Collective\Html\HtmlServiceProvider::class,
         Yajra\Datatables\DatatablesServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
+        Intervention\Image\ImageServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -206,6 +207,7 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         'Form' => Collective\Html\FormFacade::class,
         'Html' => Collective\Html\HtmlFacade::class,
+        'Image' => Intervention\Image\Facades\Image::class,
         'Bing' => App\Facades\BingPhoto::class,
         'Client' => App\Facades\Client::class,
         'Diamond' => App\Facades\Diamond::class,
@@ -213,6 +215,7 @@ return [
         'Statistic' => App\Facades\Statistic::class,
         'MemberProperty' => App\Facades\MemberProperty::class,
         'Number' => App\Facades\Number::class,
+        'UploadDocument' => App\Facades\UploadDocument::class,
         'Datatables' => Yajra\Datatables\Facades\Datatables::class,
         'PDF' => Barryvdh\DomPDF\Facade::class,
     ],

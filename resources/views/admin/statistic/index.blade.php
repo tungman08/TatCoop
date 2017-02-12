@@ -14,28 +14,68 @@
 
     <!-- Main content -->
     <section class="content">
-        <div class="nav-tabs-custom">
-            <ul class="nav nav-tabs">
-                <li class="active"><a href="#website_result" data-toggle="tab"><i class="fa fa-laptop fa-fw"></i> เว็บไซต์</a></li>
-                <li><a href="#webapp_result" data-toggle="tab"><i class="fa fa-desktop fa-fw"></i> เว็บแอดมิน</a></li>
-            </ul>
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">สรุปสถิติการเข้าใช้งาน เว็บไซต์</span></h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- /.box-header -->
 
-            <div class="tab-content">
-
-                <div class="tab-pane active" id="website_result">
-                    @include('admin.statistic.result', ['web' => 'website', 'statistics' => $website])
+                    <div class="box-body">
+                        @include('admin.statistic.result', ['statistics' => $website])
+                    </div>
                 </div>
-                <!-- /.tab-pane -->
-
-                <div class="tab-pane" id="webapp_result">
-                    @include('admin.statistic.result', ['web' => 'webapp', 'statistics' => $webapp])
-                </div>
-                <!-- /.tab-pane -->
-
+                <!-- /.box -->
             </div>
-            <!-- /.tab-content -->
+            <!-- /.col-sm-6 -->
+
+            <div class="col-sm-4">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">สรุปสถิติการเข้าใช้งาน เว็บสมาชิก</span></h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- /.box-header -->
+
+                    <div class="box-body">
+                        @include('admin.statistic.result', ['statistics' => $webuser])
+                    </div>
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col-sm-6 -->
+
+            <div class="col-sm-4">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">สรุปสถิติการเข้าใช้งาน เว็บแอดมิน</span></h3>
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- /.box-header -->
+
+                    <div class="box-body">
+                        @include('admin.statistic.result', ['statistics' => $webapp])
+                    </div>
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col-sm-6 -->
         </div>
-        <!-- /.nav-tabs-custom -->
+        <!-- /.row -->
 
         <div class="box box-primary">
             <div class="box-header with-border">
@@ -70,6 +110,7 @@
         <div class="nav-tabs-custom">
             <ul id="chart" class="nav nav-tabs">
                 <li class="active"><a href="#website" data-toggle="tab"><i class="fa fa-laptop fa-fw"></i> เว็บไซต์</a></li>
+                <li><a href="#webuser" data-toggle="tab"><i class="fa fa-desktop fa-fw"></i> เว็บสมาชิก</a></li>
                 <li><a href="#webapp" data-toggle="tab"><i class="fa fa-desktop fa-fw"></i> เว็บแอดมิน</a></li>
             </ul>
 
@@ -79,6 +120,11 @@
                     @include('admin.statistic.chart', ['chart' => 'website'])
                 </div>
                 <!-- /.tab-pane -->
+
+                <div class="tab-pane" id="webuser">
+                    @include('admin.statistic.chart', ['chart' => 'webuser'])
+                </div>
+                <!-- /.tab-pane -->                
 
                 <div class="tab-pane" id="webapp">
                     @include('admin.statistic.chart', ['chart' => 'webapp'])

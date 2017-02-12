@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Statistic;
+use App\Carousel;
+use App\News;
+use App\Knowledge;
 
 class HomepageController extends Controller
 {
@@ -24,16 +27,10 @@ class HomepageController extends Controller
      */
     public function getIndex() {
         return view('website.homepage.index', [
+            'carousels' => Carousel::all(),
+            'news' => News::orderBy('id', 'desc')->take(6)->get(),
+            'knowledges' => Knowledge::orderBy('id', 'desc')->take(8)->get(),
             'statistics' => Statistic::visitor_statistic()
-        ]);
-    }
-
-    /**
-     * Responds to requests to GET /announce/1
-     */
-     public function getAnnounce($key) {
-        return view('website.announce.index', [
-            'key' => $key,
         ]);
     }
 }

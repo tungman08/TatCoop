@@ -37,13 +37,12 @@
 
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title">รายการอัตราเงินปันผลประจำปี</h3>
+                <h3 class="box-title"><i class="fa fa-dollar"></i> รายการอัตราเงินปันผลประจำปี</h3>
             </div>
             <!-- /.box-header -->
 
             <div class="box-body">
-                <button class="btn btn-primary btn-flat" type="button" data-tooltip="true" title="เพิ่มอัตราเงินปันผลประจำปี"
-                    style="margin-top: 15px; margin-bottom: 15px;"
+                <button class="btn btn-primary btn-flat margin-b-md" type="button" data-tooltip="true" title="เพิ่มอัตราเงินปันผลประจำปี"
                     onclick="javascript:window.location.href='{{ url('/admin/dividend/create') }}';">
                     <i class="fa fa-plus"></i> เพิ่มอัตราเงินปันผลประจำปี
                 </button>

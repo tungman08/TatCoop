@@ -25,12 +25,12 @@ class ShareholdingController extends Controller
     public function store(Request $request, $id) {
         $rules = [
             'pay_date' => 'required|date_format:Y-m-d', 
-            'amount_cash' => 'required|numeric'
+            'amount' => 'required|numeric'
         ];
 
         $attributeNames = [
             'pay_date' => 'วันที่ชำระ', 
-            'amount_cash' => 'ค่าหุ้นเงินสด'
+            'amount' => 'ค่าหุ้น'
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -73,13 +73,11 @@ class ShareholdingController extends Controller
        $rules = [
             'pay_date' => 'required|date_format:Y-m-d', 
             'amount' => 'required|numeric',
-            'amount_cash' => 'required|numeric'
         ];
 
         $attributeNames = [
             'pay_date' => 'วันที่ชำระ', 
             'amount' => 'ค่าหุ้น',
-            'amount_cash' => 'ค่าหุ้นเงินสด'
         ];
 
         $validator = Validator::make($request->all(), $rules);

@@ -37,23 +37,20 @@
 
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title">รายชื่อสมาชิกสหกรณ์</h3>
+                <h3 class="box-title"><i class="fa fa-user"></i> รายชื่อสมาชิกสหกรณ์</h3>
             </div>
             <!-- /.box-header -->
 
             <div class="box-body">
-                <button class="btn btn-primary btn-flat" type="button" data-tooltip="true" title="เพิ่มสมาชิกสหกรณ์"
-                    style="margin-top: 15px; margin-bottom: 15px;"
+                <button class="btn btn-primary btn-flat margin-b-md" type="button" data-tooltip="true" title="เพิ่มสมาชิกสหกรณ์"
                     onclick="javascript:window.location.href='{{ url('/admin/member/create') }}';">
                     <i class="fa fa-user-plus"></i> เพิ่มสมาชิกสหกรณ์
                 </button>
-                <button class="btn btn-primary btn-flat" type="button" data-tooltip="true" title="ชำระค่าหุ้นอัตโนมัติ"
-                    style="margin-top: 15px; margin-bottom: 15px;"
+                <button class="btn btn-primary btn-flat margin-b-md" type="button" data-tooltip="true" title="ชำระค่าหุ้นอัตโนมัติ"
                     onclick="javascript:var result = confirm('คุณต้องการทำรายการชำระเงินค่าหุ้นประจำเดือน {{ Diamond::today()->thai_format('M Y') }} ?'); if (result) { window.location.href='{{ url('/admin/member/shareholding') }}'; }">
                     <i class="fa fa-money"></i> ชำระค่าหุ้นอัตโนมัติ
                 </button>
-                <button class="btn btn-default btn-flat pull-right" type="button" data-tooltip="true" title="สมาชิกสหกรณ์ที่ลาออก"
-                    style="margin-top: 15px; margin-bottom: 15px;"
+                <button class="btn btn-default btn-flat margin-b-md pull-right" type="button" data-tooltip="true" title="สมาชิกสหกรณ์ที่ลาออก"
                     onclick="javascript:window.location.href='{{ url('/admin/member/inactive') }}';">
                     <i class="fa fa-trash"></i> แสดงสมาชิกที่ลาออก
                 </button>
@@ -70,19 +67,6 @@
                                 <th style="width: 24%;">วันที่สมัคร</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @foreach($members as $member)
-                            <tr onclick="javascript: document.location = '{{ url('/admin/member/' . $member->id) }}';"
-                                style="cursor: pointer;">
-                                <td>{{ $member->memberCode }}</td>
-                                <td class="text-primary"><i class="fa fa-user fa-fw"></i> {{ ($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' :$member->profile->fullName }} </td>
-                                <td>{{ $member->profile->employee->employee_type->name }}</td>
-                                <td>{{ number_format($member->shareholding, 0,'.', ',') }} หุ้น</td>
-                                <td>{{ number_format($member->shareholdings()->sum('amount'), 2,'.', ',') }} บาท</td>
-                                <td>{{ Diamond::parse($member->start_date)->thai_format('j M Y') }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
                     </table>
                 </div>
                 <!-- /.table-responsive -->
@@ -117,10 +101,32 @@
     <script>
     $(document).ready(function () {
         $('[data-tooltip="true"]').tooltip();
-    });
+        $(".ajax-loading").css("display", "none");
 
-    $('#dataTables-users').dataTable({
-        "iDisplayLength": 25
-    });
+        $('#dataTables-users').dataTable().fnDestroy();
+        $('#dataTables-users').dataTable({
+            "ajax": {
+                "url": "/ajax/members",
+                "type": "get",
+                "data": {
+                    "type": "active"
+                },
+                beforeSend: function () {
+                    $(".ajax-loading").css("display", "block");
+                },
+                complete: function(){
+                    $(".ajax-loading").css("display", "none");
+                }       
+            },
+            "iDisplayLength": 25,
+            "createdRow": function(row, data, index) {
+                $(this).css('cursor', 'pointer');
+            },  
+        });   
+
+        $('#dataTables-users tbody').on('click', 'tr', function() {
+            document.location = '/admin/member/' + parseInt($(this).children("td").first().html());            
+        });         
+    });   
     </script>
 @endsection

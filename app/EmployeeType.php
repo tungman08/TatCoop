@@ -28,4 +28,11 @@ class EmployeeType extends Model
      * @var array
      */
     protected $dates = ['created_at', 'updated_at'];
+
+    /**
+     * Get the employees for the type.
+     */
+    public function employees() {
+        return $this->hasMany(Employee::class);
+    }    
 }

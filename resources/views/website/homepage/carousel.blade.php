@@ -1,20 +1,36 @@
 <div class="col-md-12">
     <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
         <ol class="carousel-indicators">
-            <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
-            <li data-target="#carousel-example-generic" data-slide-to="1"></li>
-            <li data-target="#carousel-example-generic" data-slide-to="2"></li>
+            @php ($index = 0)
+            @forelse ($carousels as $carousel)
+                <li data-target="#carousel-example-generic" data-slide-to="{{ $index }}"{{ ($index == 0) ? ' class="active"' : '' }}></li>
+
+                @php ($index++)
+            @empty
+                <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
+            @endforelse
         </ol>
         <div class="carousel-inner">
-            <div class="item active">
-                <img class="slide-image" src="{{ asset('carousel/pr-index-01.jpg') }}" alt="">
-            </div>
-            <div class="item">
-                <img class="slide-image" src="{{ asset('carousel/pr-index-02.jpg') }}" alt="">
-            </div>
-            <div class="item">
-                <img class="slide-image" src="{{ asset('carousel/pr-index-03.jpg') }}" alt="">
-            </div>
+            @php ($index = 0)
+
+            @forelse ($carousels as $carousel)
+                @php
+                    $document = App\Document::find($carousel->document_id);
+                    $document_type = App\DocumentType::find($document->document_type_id);
+                @endphp
+                
+                <div class="item{{ ($index == 0) ? ' active' : '' }}">
+                    <a href="{{ url('/documents/' . str_plural(strtolower($document_type->name)) . '/' . $document->display) }}">
+                        <img class="slide-image" src="{{ url('/carousel/' . $carousel->image) }}" alt="">
+                    </a>
+                </div>
+
+                @php ($index++)
+            @empty
+                <div class="item active">
+                    <img class="slide-image" src="{{ asset('images/carousel.jpg') }}" alt="">
+                </div>
+            @endforelse
         </div>
         <a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">
             <span class="glyphicon glyphicon-chevron-left"></span>

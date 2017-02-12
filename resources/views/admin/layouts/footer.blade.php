@@ -1,4 +1,5 @@
 <div class="pull-right hidden-xs">
-    <b>Version</b> 2.3.3
+    @eval($laravel = app())
+    <b>Version</b> {{ $laravel::VERSION }}
 </div>
-<strong>Copyright &copy; 2014-2015 <a href="http://almsaeedstudio.com">Almsaeed Studio</a>.</strong> All rights reserved.
+<a href="http://www.tatcoop.com"><i class="fa fa-globe fa-fw"></i></a> <strong>สหกรณ์ออมทรัพย์สหภาพแรงงานรัฐวิสาหกิจการท่องเที่ยวแห่งประเทศไทย จำกัด</strong>

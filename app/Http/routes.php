@@ -36,6 +36,13 @@ Route::group(['domain' => 'www.tatcoop.dev',
         Route::post('reset', 'PasswordController@postReset');
     });
 
+    // Billing Route...
+    Route::group(['prefix' => '/member/shareholding/billing'], function() {
+        Route::get('{date}/print', ['as' => 'website.member.shareholding.billing.print', 'uses' => 'MemberController@getPrintBilling']);
+        Route::get('{date}/pdf', ['as' => 'website.member.shareholding.billing.pdf', 'uses' => 'MemberController@getPdfBilling']);
+        Route::get('{date}', ['as' => 'website.member.shareholding.billing', 'uses' => 'MemberController@getBilling']);
+    });
+
     // Member Route...
     Route::controller('/member', 'MemberController', [
         'getIndex' => 'website.member.index',
@@ -47,13 +54,6 @@ Route::group(['domain' => 'www.tatcoop.dev',
         'getGuaruntee' => 'website.member.guaruntee',
     ]);
 
-    // Billing Route...
-    Route::group(['prefix' => '/member/shareholding/billing'], function() {
-        Route::get('{date}', ['as' => 'website.member.shareholding.billing', 'uses' => 'MemberController@getBilling']);
-        Route::get('{date}/print', ['as' => 'website.member.shareholding.billing.print', 'uses' => 'MemberController@getPrintBilling']);
-        Route::get('{date}/pdf', ['as' => 'website.member.shareholding.billing.pdf', 'uses' => 'MemberController@getPdfBilling']);
-    });
-
     // Profile Route...
     Route::controller('/user', 'UserController', [
         'getProfile' => 'user.profile',
@@ -63,16 +63,36 @@ Route::group(['domain' => 'www.tatcoop.dev',
         'getMessage' => 'user.message',
     ]);
 
+    // Carousel Route...
+    Route::get('/carousel/{image}', ['as' => 'website.carousel', 'uses' => 'CarouselController@getCarousel']);
+
+    // Attachment Route...
+    Route::get('/attachment/{file}', ['as' => 'website.attachment', 'uses' => 'AttachmentController@getAttachment']);
+
+    // Document Route...
+    Route::get('/document/{document}/{display}', ['as' => 'website.document.download', 'uses' => 'DocumentController@getDownloadDocument']);
+    Route::get('/document/{document}', ['as' => 'website.document', 'uses' => 'DocumentController@getDocument']);
+    Route::group(['prefix' => '/documents'], function() {
+        Route::get('rules', ['as' => 'website.documents.rules', 'uses' => 'DocumentController@getRules']);
+        Route::get('rules/{key}', ['as' => 'website.documents.rules.file', 'uses' => 'DocumentController@getRules']);
+        Route::get('forms', ['as' => 'website.documents.forms', 'uses' => 'DocumentController@getForms']);
+        Route::get('forms/{key}', ['as' => 'website.documents.forms.file', 'uses' => 'DocumentController@getForms']);
+        Route::get('{key}', ['as' => 'website.documents.other', 'uses' => 'DocumentController@getOthers']);
+    });
+
+    // News Route...
+    Route::resource('news', 'NewsController');
+
+    // Knowledge Route...
+    Route::resource('knowledges', 'KnowledgeController');
+
     // Ajax Route...
     Route::controller('/ajax', 'AjaxController', [
         'getBackground' => 'website.ajax.background',
     ]);
 
     // Homepage Route...
-    Route::controller('/', 'HomepageController', [
-        'getIndex' => 'website.index',
-        'getAnnounce' => 'website.announce',
-    ]);
+    Route::get('/', ['as' => 'website.index', 'uses' => 'HomepageController@getIndex']);
 });
 
 /* ====================================================================== */
@@ -89,6 +109,18 @@ Route::group(['domain' => 'admin.tatcoop.dev',
     ]);
 
     // Ajax Route...
+    Route::post('/ajax/uploadfile', 'AjaxController@postUploadFile');
+    Route::post('/ajax/updatefile', 'AjaxController@postUpdateFile');
+    Route::post('/ajax/updateother', 'AjaxController@postUpdateOther');
+    Route::post('/ajax/deletefile', 'AjaxController@postDeleteFile');
+    Route::post('/ajax/uploadcarousel', 'AjaxController@postUploadCarousel');
+    Route::post('/ajax/updatecarouselimage', 'AjaxController@postUpdateCarouselImage');
+    Route::post('/ajax/updatecarouseldocument', 'AjaxController@postUpdateCarouselDocument');
+    Route::post('/ajax/deletecarousel', 'AjaxController@postDeleteCarousel');
+    Route::post('/ajax/uploaddocument', 'AjaxController@postUploadDocument');
+    Route::post('/ajax/uploadphoto', 'AjaxController@postUploadPhoto');
+    Route::post('/ajax/deletedocument', 'AjaxController@postDeleteDocument');
+    Route::post('/ajax/deletephoto', 'AjaxController@postDeletePhoto');
     Route::controller('/ajax', 'AjaxController', [
         'getBackground' => 'admin.ajax.background',
         'getMembers' => 'admin.ajax.members',
@@ -98,6 +130,13 @@ Route::group(['domain' => 'admin.tatcoop.dev',
         'getStatus' => 'admin.ajax.status',
         'getProfile' => 'admin.ajax.profile',
         'getDividend' => 'admin.ajax.dividend',
+        'getDocuments' => 'admin.ajax.documents',
+        'getDocumentlists' => 'admin.ajax.documentlists',
+        'getDocumentsbytype' => 'admin.ajax.documentsbytype',
+        'getReorder' => 'admin.ajax.reorder',
+        'getReordercarousel' => 'admin.ajax.reordercarousel',
+        'getRestorefile' => 'admin.ajax.restorefile',
+        'getCarousels' => 'admin.ajax.carousels',
     ]);
 
     // Profile Route...
@@ -111,18 +150,27 @@ Route::group(['domain' => 'admin.tatcoop.dev',
 
     // Management Route...
     Route::group(['prefix' => '/website'], function() {
+        // Documents Route...
+        Route::resource('documents', 'DocumentController');
+
         // Carousel Route...
         Route::resource('carousels', 'CarouselController');
 
-        // Member News Route...
-        Route::resource('membernews', 'MemberNewsController');
-
         // News Route...
+        Route::get('news/inactive', ['as' => 'website.news.inactive', 'uses' => 'NewsController@getInactive']);
+        Route::get('news/{id}/restore', ['as' => 'website.news.restore', 'uses' => 'NewsController@postRestore']);
+        Route::get('news/{id}/delete', ['as' => 'website.news.delete', 'uses' => 'NewsController@postDelete']);
         Route::resource('news', 'NewsController');
 
         // Knowledge Route...
+        Route::get('knowledge/inactive', ['as' => 'website.knowledge.inactive', 'uses' => 'KnowledgeController@getInactive']);
+        Route::get('knowledge/{id}/restore', ['as' => 'website.knowledge.restore', 'uses' => 'KnowledgeController@postRestore']);
+        Route::get('knowledge/{id}/delete', ['as' => 'website.knowledge.delete', 'uses' => 'KnowledgeController@postDelete']);
         Route::resource('knowledge', 'KnowledgeController');    
     });
+
+    // Carousel Route...
+    Route::get('/carousel/{image}', ['as' => 'admin.carousel', 'uses' => 'CarouselController@getCarousel']);
 
     // Admin Route...
     Route::get('/admin/administrator/restore', ['as' => 'admin.administrator.restore', 'uses' => 'AdminController@getRestore']);

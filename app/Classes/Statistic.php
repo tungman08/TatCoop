@@ -51,13 +51,31 @@ class Statistic
     public function visitor_statistic() {
         $statistics = new stdClass();
         $statistics->total = VisitorStatistic::count();
-        $statistics->today = VisitorStatistic::where(DB::raw('date_format(created_at, \'%Y-%m-%d\')'), Diamond::today()->toDateString())->count();
-        $statistics->yesterday = VisitorStatistic::where(DB::raw('date_format(created_at, \'%Y-%m-%d\')'), Diamond::yesterday()->toDateString())->count();
-        $statistics->thisWeek = VisitorStatistic::where(DB::raw('date_format(created_at, \'%Y-%v\')'), Diamond::today()->format('Y-W'))->count();
-        $statistics->lastWeek = VisitorStatistic::where(DB::raw('date_format(created_at, \'%Y-%v\')'), Diamond::today()->subWeek()->format('Y-W'))->count();
-        $statistics->thisMonth = VisitorStatistic::where(DB::raw('date_format(created_at, \'%Y-%m\')'), Diamond::today()->format('Y-m'))->count();
-        $statistics->lastMonth = VisitorStatistic::where(DB::raw('date_format(created_at, \'%Y-%m\')'), Diamond::today()->subMonth()->format('Y-m'))->count();
+        $statistics->today = VisitorStatistic::whereDate('created_at', '=', Diamond::today())->count();
+        $statistics->yesterday = VisitorStatistic::whereDate('created_at', '=', Diamond::yesterday())->count();
+        $statistics->thisWeek = VisitorStatistic::whereBetween('created_at', [Diamond::today()->startOfWeek(), Diamond::today()])->count();
+        $statistics->lastWeek = VisitorStatistic::whereBetween('created_at', [Diamond::today()->subWeek()->startOfWeek(), Diamond::today()->subWeek()->endOfWeek()])->count();
+        $statistics->thisMonth = VisitorStatistic::whereBetween('created_at', [Diamond::today()->startOfMonth(), Diamond::today()])->count();
+        $statistics->lastMonth = VisitorStatistic::whereBetween('created_at', [Diamond::today()->subMonth()->startOfMonth(), Diamond::today()->subMonth()->endOfMonth()])->count();
         $statistics->start = Diamond::parse(VisitorStatistic::min('created_at'))->thai_format('j M Y');
+
+        $statistics->ip_address = $this->info->ip_address;
+        $statistics->platform = $this->info->platform;
+        $statistics->browser = $this->info->browser;
+
+        return $statistics;
+    }
+
+    public function user_statistic() {
+        $statistics = new stdClass();
+        $statistics->total = UserStatistic::count();
+        $statistics->today = UserStatistic::whereDate('created_at', '=', Diamond::today())->count();
+        $statistics->yesterday = UserStatistic::whereDate('created_at', '=', Diamond::yesterday())->count();
+        $statistics->thisWeek = UserStatistic::whereBetween('created_at', [Diamond::today()->startOfWeek(), Diamond::today()])->count();
+        $statistics->lastWeek = UserStatistic::whereBetween('created_at', [Diamond::today()->subWeek()->startOfWeek(), Diamond::today()->subWeek()->endOfWeek()])->count();
+        $statistics->thisMonth = UserStatistic::whereBetween('created_at', [Diamond::today()->startOfMonth(), Diamond::today()])->count();
+        $statistics->lastMonth = UserStatistic::whereBetween('created_at', [Diamond::today()->subMonth()->startOfMonth(), Diamond::today()->subMonth()->endOfMonth()])->count();
+        $statistics->start = Diamond::parse(UserStatistic::min('created_at'))->thai_format('j M Y');
 
         $statistics->ip_address = $this->info->ip_address;
         $statistics->platform = $this->info->platform;
@@ -69,12 +87,12 @@ class Statistic
     public static function administrator_statistic() {
         $statistics = new stdClass();
         $statistics->total = AdministratorStatistic::count();
-        $statistics->today = AdministratorStatistic::where(DB::raw('date_format(created_at, \'%Y-%m-%d\')'), Diamond::today()->toDateString())->count();
-        $statistics->yesterday = AdministratorStatistic::where(DB::raw('date_format(created_at, \'%Y-%m-%d\')'), Diamond::yesterday()->toDateString())->count();
-        $statistics->thisWeek = AdministratorStatistic::where(DB::raw('date_format(created_at, \'%Y-%v\')'), Diamond::today()->format('Y-W'))->count();
-        $statistics->lastWeek = AdministratorStatistic::where(DB::raw('date_format(created_at, \'%Y-%v\')'), Diamond::today()->subWeek()->format('Y-W'))->count();
-        $statistics->thisMonth = AdministratorStatistic::where(DB::raw('date_format(created_at, \'%Y-%m\')'), Diamond::today()->format('Y-m'))->count();
-        $statistics->lastMonth = AdministratorStatistic::where(DB::raw('date_format(created_at, \'%Y-%m\')'), Diamond::today()->subMonth()->format('Y-m'))->count();
+        $statistics->today = AdministratorStatistic::whereDate('created_at', '=', Diamond::today())->count();
+        $statistics->yesterday = AdministratorStatistic::whereDate('created_at', '=', Diamond::yesterday())->count();
+        $statistics->thisWeek = AdministratorStatistic::whereBetween('created_at', [Diamond::today()->startOfWeek(), Diamond::today()])->count();
+        $statistics->lastWeek = AdministratorStatistic::whereBetween('created_at', [Diamond::today()->subWeek()->startOfWeek(), Diamond::today()->subWeek()->endOfWeek()])->count();
+        $statistics->thisMonth = AdministratorStatistic::whereBetween('created_at', [Diamond::today()->startOfMonth(), Diamond::today()])->count();
+        $statistics->lastMonth = AdministratorStatistic::whereBetween('created_at', [Diamond::today()->subMonth()->startOfMonth(), Diamond::today()->subMonth()->endOfMonth()])->count();
         $statistics->start = Diamond::parse(AdministratorStatistic::min('created_at'))->thai_format('j M Y');
 
         return $statistics;

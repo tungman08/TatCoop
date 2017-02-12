@@ -24,13 +24,6 @@ class VisitorStatistic extends Model
     ];
 
     /**
-     * The attributes that are timestamps.
-     *
-     * @var array
-     */
-    public $timestamps = false;
-
-    /**
      * The attributes that should be mutated to dates.
      *
      * @var array

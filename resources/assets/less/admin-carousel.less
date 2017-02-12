@@ -1,0 +1,82 @@
+
+@theme-primary: #0073b7;
+
+// Font Mixins
+.serif-font() {
+  font-family: "Droid Serif", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+// carousel Section
+#carousel {
+    .carousel-item {
+        margin: 0 0;
+        right: 0;
+        background-color: white;
+        cursor: move;
+        .carousel-link {
+            display: block;
+            position: relative;
+            max-width: 400px;
+            margin: 0 auto;
+            cursor: pointer;
+            .carousel-hover {
+                background: fade(@theme-primary, 90%);
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                opacity: 0;
+                transition: all ease 0.5s;
+                -webkit-transition: all ease 0.5s;
+                -moz-transition: all ease 0.5s;
+                &:hover {
+                    opacity: 1;
+                }
+                .carousel-hover-content {
+                    position: absolute;
+                    width: 100%;
+                    height: 20px;
+                    font-size: 20px;
+                    text-align: center;
+                    top: 50%;
+                    margin-top: -12px;
+                    color: white;
+                    i {
+                        margin-top: -12px;
+                    }
+                    h3,
+                    h4 {
+                        margin: 0;
+                    }
+                }                
+            }            
+        }
+        .carousel-caption {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: white;
+            text-align: center;
+            padding: 25px;
+            h4 {
+                text-transform: none;
+                margin: 0;
+            }
+            p {
+                .serif-font;
+                font-style: italic;
+                font-size: 16px;
+                margin: 0;
+            }
+        }
+    }
+    * {
+        z-index: 2;
+    }
+}
+
+@media(min-width:767px) {
+    #carousel {
+        .carousel-item {
+            margin: 0 0;
+        }
+    }
+}

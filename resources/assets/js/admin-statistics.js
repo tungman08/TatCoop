@@ -18,8 +18,8 @@
             case "#webapp":
                 chart_statistic(selected_date, "webapp");
                 break;
-            case "#mobileapp":
-                chart_statistic(selected_date, "mobileapp");
+            case "#webuser":
+                chart_statistic(selected_date, "webuser");
                 break;
         }
     });
@@ -38,8 +38,8 @@
             case "#webapp":
                 chart_statistic(e.date, "webapp");
                 break;
-            case "#mobileapp":
-                chart_statistic(e.date, "mobileapp");
+            case "#webuser":
+                chart_statistic(e.date, "webuser");
                 break;
         }
     });
@@ -61,7 +61,7 @@ function chart_statistic(date, tab) {
         success: function (data) {
             $(".ajax-loading").css("display", "none");
 
-            var dataset_visitor = [{ label: "&nbsp;" + ((tab == "webapp") ? "เจ้าหน้าที่" : "ผู้เข้าชม"), data: data.visitors, color: "#337ab7" }];
+            var dataset_visitor = [{ label: "&nbsp;" + ((tab != "website") ? (tab != "webuser") ? "เจ้าหน้าที่" : "สมาชิก" : "ผู้เข้าชม"), data: data.visitors, color: "#337ab7" }];
             var options_visitor = options_line_chart();
 
             $.plot($("#visitor-" + tab + "-flot-line-chart"), dataset_visitor, options_visitor);
@@ -69,21 +69,19 @@ function chart_statistic(date, tab) {
             $("<div class='axisLabel yaxisLabel'></div>").text((tab != "website") ? "จำนวนการเข้าในงานระบบ (ครั้ง)" : "จำนวนการเข้าชม (ครั้ง)").appendTo($("#visitor-" + tab + "-flot-line-chart"))
                 .css("margin-top", $("<div class='axisLabel yaxisLabel'></div>").width() / 2 - 20);
 
-            if (tab != 'mobileapp') {
-                var dataset_platform = [{ label: "&nbsp;ระบบปฏิบัติการ", data: data.platforms[0], color: "#3c763d" }];
-                var optiond_platform = options_bar_chart(data.platforms[1], data.platforms[0].length);
+            var dataset_platform = [{ label: "&nbsp;ระบบปฏิบัติการ", data: data.platforms[0], color: "#3c763d" }];
+            var optiond_platform = options_bar_chart(data.platforms[1], data.platforms[0].length);
 
-                $.plot($("#platform-" + tab + "-flot-bar-chart"), dataset_platform, optiond_platform);
-                $("<div class='axisLabel yaxisLabel'></div>").text((tab == "webapp") ? "จำนวนการเข้าในงานระบบ (ครั้ง)" : "จำนวนการเข้าชม (ครั้ง)").appendTo($("#platform-" + tab + "-flot-bar-chart"))
-                    .css("margin-top", $("<div class='axisLabel yaxisLabel'></div>").width() / 2 - 20);
+            $.plot($("#platform-" + tab + "-flot-bar-chart"), dataset_platform, optiond_platform);
+            $("<div class='axisLabel yaxisLabel'></div>").text((tab == "webapp") ? "จำนวนการเข้าในงานระบบ (ครั้ง)" : "จำนวนการเข้าชม (ครั้ง)").appendTo($("#platform-" + tab + "-flot-bar-chart"))
+                .css("margin-top", $("<div class='axisLabel yaxisLabel'></div>").width() / 2 - 20);
 
-                var dataset_browser = [{ label: "&nbsp;เบราเซอร์", data: data.browsers[0], color: "#dd4b39" }];
-                var optiond_browser = options_bar_chart(data.browsers[1], data.browsers[0].length);
+            var dataset_browser = [{ label: "&nbsp;เบราเซอร์", data: data.browsers[0], color: "#dd4b39" }];
+            var optiond_browser = options_bar_chart(data.browsers[1], data.browsers[0].length);
 
-                $.plot($("#browser-" + tab + "-flot-bar-chart"), dataset_browser, optiond_browser);
-                $("<div class='axisLabel yaxisLabel'></div>").text((tab == "webapp") ? "จำนวนการเข้าในงานระบบ (ครั้ง)" : "จำนวนการเข้าชม (ครั้ง)").appendTo($("#browser-" + tab + "-flot-bar-chart"))
-                    .css("margin-top", $("<div class='axisLabel yaxisLabel'></div>").width() / 2 - 20);
-            }
+            $.plot($("#browser-" + tab + "-flot-bar-chart"), dataset_browser, optiond_browser);
+            $("<div class='axisLabel yaxisLabel'></div>").text((tab == "webapp") ? "จำนวนการเข้าในงานระบบ (ครั้ง)" : "จำนวนการเข้าชม (ครั้ง)").appendTo($("#browser-" + tab + "-flot-bar-chart"))
+                .css("margin-top", $("<div class='axisLabel yaxisLabel'></div>").width() / 2 - 20);
         }
     });
 }
@@ -217,12 +215,33 @@ function detail_statistic(date) {
         }
     });
 
-    $('#dataTables-mobileapp').dataTable().fnDestroy();
-    $('#dataTables-mobileapp').dataTable();
+    $('#dataTables-webuser').dataTable().fnDestroy();
+    $('#dataTables-webuser').dataTable({
+        "ajax": {
+            "url": "/ajax/detail",
+            "type": "get",
+            "data": {
+                "date": date.format("YYYY-M-D"),
+                "web": "webuser"
+            }
+        }
+    });
 }
 
 function thai_date(date) {
-    var months = { 'January': 'มกราคม', 'February': 'กุมภาพันธ์', 'March': 'มีนาคม', 'April': 'เมษายน', 'May': 'พฤษภาคม', 'June': 'มิถุนายน', 'July': 'กรกฎาคม', 'August': 'สิงหาคม', 'September': 'กันยายน', 'October': 'ตุลาคม', 'November': 'พฤศจิกายน', 'December': 'ธันวาคม' };
+    var months = { 
+        'January': 'มกราคม',
+        'February': 'กุมภาพันธ์', 
+        'March': 'มีนาคม', 
+        'April': 'เมษายน', 
+        'May': 'พฤษภาคม', 
+        'June': 'มิถุนายน', 
+        'July': 'กรกฎาคม', 
+        'August': 'สิงหาคม', 
+        'September': 'กันยายน', 
+        'October': 'ตุลาคม', 
+        'November': 'พฤศจิกายน',
+        'December': 'ธันวาคม' };
     var month = months[date.format("MMMM")];
     var year = parseInt(date.format("YYYY"), 10) + 543;
 

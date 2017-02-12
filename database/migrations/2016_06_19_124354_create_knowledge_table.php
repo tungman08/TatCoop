@@ -12,9 +12,13 @@ class CreateKnowledgeTable extends Migration
      */
     public function up()
     {
-        Schema::create('knowledge', function (Blueprint $table) {
+        Schema::create('knowledges', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('title');
+            $table->longText('content');
+            $table->integer('viewer')->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -25,6 +29,6 @@ class CreateKnowledgeTable extends Migration
      */
     public function down()
     {
-        Schema::drop('knowledge');
+        Schema::drop('knowledges');
     }
 }

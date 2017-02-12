@@ -23,10 +23,10 @@ class MainMenu
         $menu->add(new MenuItem(['title' => 'หน้าหลัก', 'icon' => 'fa-home', 'url' => '/']));
 
         $website = new MenuTree(['title' => 'เว็บไซต์', 'icon' => 'fa-tasks', 'url' => '/website']);
-        $website->add(new MenuItem(['title' => 'ข่าวประกาศ', 'icon' => 'fa-newspaper-o', 'url' => '/website/carousels']));
-        $website->add(new MenuItem(['title' => 'ข่าวสารสำหรับสมาชิก', 'icon' => 'fa-newspaper-o', 'url' => '/website/membernews']));
-        $website->add(new MenuItem(['title' => 'ข่าวประชาสัมพันธ์', 'icon' => 'fa-newspaper-o', 'url' => '/website/news']));
-        $website->add(new MenuItem(['title' => 'สาระน่ารู้', 'icon' => 'fa-newspaper-o', 'url' => '/website/knowledge']));
+        $website->add(new MenuItem(['title' => 'เอกสาร/แบบฟอร์ม', 'icon' => 'fa-files-o', 'url' => '/website/documents']));
+        $website->add(new MenuItem(['title' => 'ข่าวประชาสัมพันธ์', 'icon' => 'fa-rss', 'url' => '/website/carousels']));
+        $website->add(new MenuItem(['title' => 'ข่าวสารสำหรับสมาชิก', 'icon' => 'fa-newspaper-o', 'url' => '/website/news']));
+        $website->add(new MenuItem(['title' => 'สาระน่ารู้', 'icon' => 'fa-commenting', 'url' => '/website/knowledge']));
         $menu->add($website);
 
         $admin = new MenuTree(['title' => 'ผู้ดูแลระบบ', 'icon' => 'fa-gears', 'url' => '/admin']);

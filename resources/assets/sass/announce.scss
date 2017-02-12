@@ -92,6 +92,13 @@
             border-left-color: #3c8dbc;
         }
     }
+    a.borderless {
+        border-color: white;
+        &.active:focus,
+        &.active:hover {
+            border-left: 1px solid #eee;
+        }        
+    }
 }
 
 .nav-second-level {

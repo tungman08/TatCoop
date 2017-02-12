@@ -96,6 +96,13 @@ class AuthController extends Controller
 
             if (!is_null($user)) {
                 if (!$user->confirmed) {
+                    $token = DB::table('user_confirmations')->where('email', $user->email)->first()->token;
+
+                    Mail::send('website.emails.verify', ['token' => $token], function($message) use ($user) {
+                        $message->to($user->email, $user->member->profile->name . " " . $user->member->profile->lastname)
+                            ->subject('ยืนยันการสมัครเข้าใช้งานระบบเว็บไซต์ www.tatcoop.com');
+                    });                        
+
                     $validator->errors()->add('verify', 'ยังไม่ได้ทำการยืนยันข้อมูลสมาชิกนี้ โปรดตรวจสอบอีเมลที่ได้รับจากระบบ');
                 }
             }
@@ -176,9 +183,9 @@ class AuthController extends Controller
 
                 $token = hash_hmac('sha256', str_random(40), config('app.key'));
                 $confirm = DB::table('user_confirmations')->insert([
-                        'email' => strtolower($request->input('email')), 
-                        'token' => $token
-                    ]);
+                                'email' => strtolower($request->input('email')), 
+                                'token' => $token
+                            ]);
 
                 Mail::send('website.emails.verify', ['token' => $token], function($message) use ($user) {
                     $message->to($user->email, $user->member->profile->name . " " . $user->member->profile->lastname)

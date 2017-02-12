@@ -69,7 +69,7 @@
         }}
 
         <div class="col-sm-10">
-            {{ Form::select('shareholding_type_id', $shareholding_types->lists('name', 'id'), null, [
+            {{ Form::select('shareholding_type_id', $shareholding_types->lists('name', 'id'), ((!$edit) ? 2 : null), [
                 'id' => 'shareholding_type_id',
                 'class' => 'form-control']) 
             }}      

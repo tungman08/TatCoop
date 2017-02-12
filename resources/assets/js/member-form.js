@@ -21,6 +21,10 @@ $('#district_id').change(function () {
     getSubdistrict();
 });
 
+$('#subdistrict_id').change(function () {
+    getPostcode();
+});
+
 function getSubdistrict() {
     $.ajax({
         url: '/ajax/subdistricts',

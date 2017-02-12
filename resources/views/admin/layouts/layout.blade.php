@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
 
     <title>:: สหกรณ์ออมทรัพย์สหภาพแรงงานรัฐวิสาหกิจการท่องเที่ยวแห่งประเทศไทย จำกัด ::</title>
 
@@ -21,6 +22,9 @@
 
         <!-- Theme style -->
         {{ Html::style(elixir('css/admin-lte.css')) }}
+
+        <!-- bootstrap-wysihtml5 style -->
+        {{ Html::style(elixir('css/bootstrap3-wysihtml5.css')) }}
     @show
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -66,11 +70,17 @@
         <!-- jQuery -->
         {{ Html::script(elixir('js/jquery.js')) }}
 
+        <!-- jQuery UI -->
+        {{ Html::script(elixir('js/jquery-ui.js')) }}
+
         <!-- Bootstrap Core JavaScript -->
         {{ Html::script(elixir('js/bootstrap.js')) }}
 
         <!-- AdminLTE App -->
         {{ Html::script(elixir('js/admin-lte.js')) }}
+
+        <!-- bootstrap-wysihtml5 -->
+        {{ Html::script(elixir('js/bootstrap3-wysihtml5.all.js')) }}
     @show
 </body>
 </html>

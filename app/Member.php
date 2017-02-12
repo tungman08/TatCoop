@@ -22,7 +22,7 @@ class Member extends Model
      * @var array
      */
     protected $fillable = [
-        'share_holding', 'fee', 'start_date', 'leave_date',
+        'profile_id', 'shareholding', 'fee', 'start_date', 'leave_date',
     ];
 
     /**

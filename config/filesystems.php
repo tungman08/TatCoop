@@ -1,7 +1,7 @@
 <?php
 
 return [
-
+ 
     /*
     |--------------------------------------------------------------------------
     | Default Filesystem Disk
@@ -52,6 +52,26 @@ return [
             'driver' => 'local',
             'root' => storage_path('app/public'),
             'visibility' => 'public',
+        ],
+
+        'initial' => [
+            'driver' => 'local',
+            'root' => storage_path('app/initial'),
+        ],
+
+        'documents' => [
+            'driver' => 'local',
+            'root' => storage_path('app/documents'),
+        ],
+
+        'carousels' => [
+            'driver' => 'local',
+            'root' => storage_path('app/carousels'),
+        ],
+
+        'attachments' => [
+            'driver' => 'local',
+            'root' => storage_path('app/attachments'),
         ],
 
         's3' => [

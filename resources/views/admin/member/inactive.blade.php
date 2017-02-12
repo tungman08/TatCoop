@@ -25,12 +25,12 @@
 
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title">รายชื่อสมาชิกสหกรณ์ที่ลาออกไปแล้ว</h3>
+                <h3 class="box-title"><i class="fa fa-user"></i> รายชื่อสมาชิกสหกรณ์ที่ลาออกไปแล้ว</h3>
             </div>
             <!-- /.box-header -->
 
             <div class="box-body">
-                <button class="btn btn-default btn-flat" style="margin-top: 15px; margin-bottom: 15px;"
+                <button class="btn btn-default btn-flat margin-b-md"
                     onclick="javascript:window.history.go(-1);">
                     <i class="fa fa-reply"></i> ถอยกลับ
                 </button>
@@ -48,20 +48,6 @@
                                 <th style="width: 12%;">วันที่ลาออก</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @foreach($members as $member)
-                            <tr onclick="javascript: document.location = '{{ url('/admin/member/' . $member->id) }}';"
-                                style="cursor: pointer;">
-                                <td>{{ $member->memberCode }}</td>
-                                <td class="text-primary">{!! ($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' : '<i class="fa fa-user fa-fw"></i> ' . $member->profile->fullName !!} </td>
-                                <td>{{ $member->profile->employee->employee_type->name }}</td>
-                                <td>{{ number_format($member->shareholding, 0,'.', ',') }} หุ้น</td>
-                                <td>{{ number_format($member->shareholdings()->sum('amount'), 2,'.', ',') }} บาท</td>
-                                <td>{{ Diamond::parse($member->start_date)->thai_format('j M Y') }}</td>
-                                <td>{{ Diamond::parse($member->leave_date)->thai_format('j M Y') }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
                     </table>
                 </div>
                 <!-- /.table-responsive -->
@@ -96,10 +82,32 @@
     <script>
     $(document).ready(function () {
         $('[data-tooltip="true"]').tooltip();
-    });
+        $(".ajax-loading").css("display", "none");
 
-    $('#dataTables-users').dataTable({
-        "iDisplayLength": 25
+        $('#dataTables-users').dataTable().fnDestroy();
+        $('#dataTables-users').dataTable({
+            "ajax": {
+                "url": "/ajax/members",
+                "type": "get",
+                "data": {
+                    "type": "inactive"
+                },
+                beforeSend: function () {
+                    $(".ajax-loading").css("display", "block");
+                },
+                complete: function(){
+                    $(".ajax-loading").css("display", "none");
+                }       
+            },
+            "iDisplayLength": 25,
+            "createdRow": function(row, data, index) {
+                $(this).css('cursor', 'pointer');
+            },  
+        });   
+
+        $('#dataTables-users tbody').on('click', 'tr', function() {
+            document.location = '/admin/member/' + parseInt($(this).children("td").first().html());            
+        });           
     });
     </script>
 @endsection

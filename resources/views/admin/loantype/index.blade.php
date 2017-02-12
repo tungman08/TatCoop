@@ -37,18 +37,16 @@
 
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title">รายชื่อประเภทเงินกู้พิเศษ</h3>
+                <h3 class="box-title"><i class="fa fa-credit-card"></i> รายชื่อประเภทเงินกู้พิเศษ</h3>
             </div>
             <!-- /.box-header -->
 
             <div class="box-body">
-                <button class="btn btn-primary btn-flat" type="button" data-tooltip="true" title="เพิ่มประเภทเงินกู้พิเศษ"
-                    style="margin-top: 15px; margin-bottom: 15px;"
+                <button class="btn btn-primary btn-flat margin-b-md" type="button" data-tooltip="true" title="เพิ่มประเภทเงินกู้พิเศษ"
                     onclick="javascript:window.location.href='{{ url('/admin/loantype/create') }}';">
                     <i class="fa fa-plus"></i> เพิ่มประเภทเงินกู้พิเศษ
                 </button>
-                <button class="btn btn-default btn-flat pull-right" type="button" data-tooltip="true" title="สมาชิกประเภทเงินกู้พิเศษที่หมดอายุ"
-                    style="margin-top: 15px; margin-bottom: 15px;"
+                <button class="btn btn-default btn-flat margin-b-md pull-right" type="button" data-tooltip="true" title="สมาชิกประเภทเงินกู้พิเศษที่หมดอายุ"
                     onclick="javascript:window.location.href='{{ url('/admin/loantype/expire') }}';">
                     <i class="fa fa-ban"></i> แสดงประเภทเงินกู้พิเศษที่หมดอายุ
                 </button>

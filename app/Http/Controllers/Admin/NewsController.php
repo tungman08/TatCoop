@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use App\News;
+use DB;
+use Validator;
 
 class NewsController extends Controller
 {
@@ -19,6 +22,137 @@ class NewsController extends Controller
     }
 
     public function index() {
-        return view('admin.news.index');
+        $newses = News::orderBy('id', 'desc')->get();
+
+        return view('admin.news.index', [
+            'newses' => $newses
+        ]);
+    }
+
+    public function create() {
+        return view('admin.news.create');
+    }
+
+    public function show($id) {
+        $news = News::find($id);
+
+        return view('admin.news.show', [
+            'news' => $news
+        ]);
+    }
+
+    public function edit($id) {
+        $news = News::find($id);
+
+        return view('admin.news.edit', [
+            'news' => $news
+        ]);
+    }
+
+    public function store(Request $request) {
+        $rules = [
+            'title' => 'required',
+            'content' => 'required'
+        ];
+
+        $attributeNames = [
+            'title' => 'หัวข้อข่าวสารสำหรับสมาชิก',
+            'content' => 'เนื้อหาข่าวสารสำหรับสมาชิก'
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+        $validator->setAttributeNames($attributeNames);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+        else {
+            DB::transaction(function() use ($request) {
+                $title = $request->input('title');
+                $content = $request->input('content');
+
+                $news = new News();
+                $news->title = $title;
+                $news->content = $content;
+                $news->save();
+            });
+
+            return redirect()->route('website.news.index')
+                ->with('flash_message', 'เพิ่มข่าวสารสำหรับสมาชิกเรียบร้อยแล้ว')
+                ->with('callout_class', 'callout-success');
+        }
+    }
+
+    public function update(Request $request, $id) {
+        $rules = [
+            'title' => 'required',
+            'content' => 'required'
+        ];
+
+        $attributeNames = [
+            'title' => 'หัวข้อข่าวสารสำหรับสมาชิก',
+            'content' => 'เนื้อหาข่าวสารสำหรับสมาชิก'
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+        $validator->setAttributeNames($attributeNames);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+        else {
+            DB::transaction(function() use ($request, $id) {
+                $title = $request->input('title');
+                $content = $request->input('content');
+
+                $news = News::find($id);
+                $news->title = $title;
+                $news->content = $content;
+                $news->save();
+            });
+
+            return redirect()->route('website.news.show', ['id' => $id])
+                ->with('flash_message', 'แก้ไขข่าวสารสำหรับสมาชิกเรียบร้อยแล้ว')
+                ->with('callout_class', 'callout-success');
+        }
+    }
+
+    public function destroy($id) {
+        $news = News::find($id);
+        $news->delete();
+
+        return redirect()->route('website.news.index')
+            ->with('flash_message', 'ลบข่าวสารสำหรับสมาชิกเรียบร้อยแล้ว')
+            ->with('callout_class', 'callout-success');
+    }
+
+    public function getInactive() {
+        $inactives = News::inactive()->orderBy('deleted_at', 'desc')->get();
+
+        return view('admin.news.inactive', [
+            'inactives' => $inactives
+        ]);
+    }
+
+    public function postRestore($id) {
+        $news = News::withTrashed()->where('id', $id)->first();
+        $news->restore();
+
+        return redirect()->route('website.news.index')
+            ->with('flash_message', 'คืนสภาพข่าวสารสำหรับสมาชิกเรียบร้อยแล้ว')
+            ->with('callout_class', 'callout-success');
+    }
+
+    public function postDelete($id) {
+        $news = News::withTrashed()->where('id', $id)->first();
+        $news->forceDelete();
+
+        return redirect()->route('website.news.index')
+            ->with('flash_message', 'ลบข่าวสารสำหรับสมาชิกเรียบร้อยแล้ว')
+            ->with('callout_class', 'callout-success');
     }
 }

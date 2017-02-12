@@ -23,18 +23,18 @@ class UserStatistic extends Model
     ];
 
     /**
-     * The attributes that are timestamps.
-     *
-     * @var array
-     */
-    public $timestamps = false;
-
-    /**
      * The attributes that should be mutated to dates.
      *
      * @var array
      */
     protected $dates = ['created_at', 'updated_at'];
+
+    /**
+     * Get the user that uses by the session.
+     */
+    public function user() {
+        return $this->belongsTo(User::class);
+    }
 
     /**
      * Get the platform that uses by the session.

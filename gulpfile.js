@@ -25,12 +25,15 @@ elixir(function(mix) {
 
     mix.less('bootstrap-datetimepicker.less')
         .less('admin-lte.less')
-        .less('sb-admin-2.less');
+        .less('sb-admin-2.less')
+        .less('admin-carousel.less');
 
     mix.scripts('./bower_components/bootstrap-sass/assets/javascripts/bootstrap.js')
         .scripts('./bower_components/jquery/dist/jquery.js')
+        .scripts('./bower_components/jquery-ui/jquery-ui.js')
         .scripts('./bower_components/metisMenu/src/metisMenu.js')
         .scripts(['./bower_components/AdminLTE/dist/js/app.js', 'admin-lte-addon.js'], 'public/js/admin-lte.js')
+        .scripts('./bower_components/AdminLTE/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.js')
         .scripts('./bower_components/startbootstrap-sb-admin-2/dist/js/sb-admin-2.js')
         .scripts('./bower_components/waitForImages/src/jquery.waitforimages.js')
         .scripts('./bower_components/moment/min/moment-with-locales.js', 'public/js/moment.js')
@@ -41,17 +44,26 @@ elixir(function(mix) {
         .scripts('./bower_components/flot/jquery.flot.js')
         .scripts('./bower_components/flot/jquery.flot.resize.js')
         .scripts('./bower_components/flot.tooltip/js/jquery.flot.tooltip.js')
+        .scripts('./bower_components/jquery-circle-progress/dist/circle-progress.js')
+        .scripts('./bower_components/magnific-popup/dist/jquery.magnific-popup.js')
         .scripts(['jquery.inputmask.js', 'jquery.inputmask.date.extensions.js', 'jquery.inputmask.extensions.js'], 'public/js/jquery.inputmask.js', './bower_components/AdminLTE/plugins/input-mask')
         .scripts('jquery.easing.js')
         .scripts('admin-statistics.js')
         .scripts('admin-form.js')
+        .scripts('admin-document.js')
+        .scripts('admin-carousel.js')
+        .scripts('admin-attachment.js')
         .scripts('member-form.js')
         .scripts('auth.js')
         .scripts('homepage.js');
 
     mix.styles('./bower_components/metisMenu/src/metisMenu.css')
         .styles('./bower_components/datatables/media/css/dataTables.bootstrap.css')
-        .styles('auth.css');
+        .styles('./bower_components/AdminLTE/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.css')
+        .styles('./bower_components/magnific-popup/dist/magnific-popup.css')
+        .styles('auth.css')
+        .styles('jquery-circle-progress.css')
+        .styles('black-ribbon.css');
 
     mix.copy('bower_components/bootstrap-sass/assets/fonts/bootstrap', 'public/fonts')
         .copy('bower_components/font-awesome/fonts', 'public/fonts')
@@ -61,13 +73,20 @@ elixir(function(mix) {
     mix.version([
         'js/bootstrap.js',
         'js/jquery.js',
+        'js/jquery-ui.js',
         'js/jquery.easing.js',
         'js/jquery.inputmask.js',
         'js/admin-lte.js',
+        'js/bootstrap3-wysihtml5.all.js',
         'js/admin-form.js',
+        'js/admin-document.js',
+        'js/admin-carousel.js',
+        'js/admin-attachment.js',
         'js/member-form.js',
         'js/sb-admin-2.js',
         'js/jquery.waitforimages.js',
+        'js/jquery.magnific-popup.js',
+        'js/circle-progress.js',
         'js/metisMenu.js',
         'js/moment.js',
         'js/bootstrap-datetimepicker.js',
@@ -83,13 +102,18 @@ elixir(function(mix) {
         'css/bootstrap.css',
         'css/miscellaneous.css',
         'css/font-awesome.css',
+        'css/bootstrap3-wysihtml5.css',
         'css/bootstrap-datetimepicker.css',
         'css/dataTables.bootstrap.css',
+        'css/jquery-circle-progress.css',
+        'css/magnific-popup.css',
         'css/metisMenu.css',
         'css/admin-lte.css',
         'css/sb-admin-2.css',
         'css/homepage.css',
         'css/announce.css',
         'css/auth.css',
+        'css/admin-carousel.css',
+        'css/black-ribbon.css',
     ]);
 });

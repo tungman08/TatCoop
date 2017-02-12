@@ -30,7 +30,7 @@
         </tr>
         <tr>
             <th>ประเภทสมาชิก:</th>
-            <td>{{ $member->profile->employee->employee_type->name }}</td>
+            <td>{{ (is_null($member->leave_date)) ? $member->profile->employee->employee_type->name : 'ลาออก' }}</td>
         </tr>
         <tr>
             <th>วันเกิด:</th>

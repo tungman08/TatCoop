@@ -13,46 +13,44 @@
 </div>
 <!-- /.panel -->
 
-@if ($chart != 'mobileapp')
-    <div class="row">
-        <div class="col-md-6">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <i class="fa fa-bar-chart-o fa-fw"></i> 
-                    ระบบปฏิบัติการที่ใช้
-                </div>
-                <!-- /.panel-heading -->
-                <div class="panel-body">
-                    <div class="flot-chart">
-                        <div class="flot-chart-content" id="platform-{{ $chart }}-flot-bar-chart"></div>
-                    </div>
-                </div>
-                <!-- /.panel-body -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <i class="fa fa-bar-chart-o fa-fw"></i> 
+                ระบบปฏิบัติการที่ใช้
             </div>
-            <!-- /.panel -->
-        </div>
-        <!-- /.col -->
-
-        <div class="col-md-6">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <i class="fa fa-bar-chart-o fa-fw"></i> 
-                    เว็บเบราเซอร์ที่ใช้
+            <!-- /.panel-heading -->
+            <div class="panel-body">
+                <div class="flot-chart">
+                    <div class="flot-chart-content" id="platform-{{ $chart }}-flot-bar-chart"></div>
                 </div>
-                <!-- /.panel-heading -->
-                <div class="panel-body">
-                    <div class="flot-chart">
-                        <div class="flot-chart-content" id="browser-{{ $chart }}-flot-bar-chart"></div>
-                    </div>
-                </div>
-                <!-- /.panel-body -->
             </div>
-            <!-- /.panel -->
+            <!-- /.panel-body -->
         </div>
-        <!-- /.col -->
+        <!-- /.panel -->
     </div>
-    <!-- /.row -->
-@endif
+    <!-- /.col -->
+
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <i class="fa fa-bar-chart-o fa-fw"></i> 
+                เว็บเบราเซอร์ที่ใช้
+            </div>
+            <!-- /.panel-heading -->
+            <div class="panel-body">
+                <div class="flot-chart">
+                    <div class="flot-chart-content" id="browser-{{ $chart }}-flot-bar-chart"></div>
+                </div>
+            </div>
+            <!-- /.panel-body -->
+        </div>
+        <!-- /.panel -->
+    </div>
+    <!-- /.col -->
+</div>
+<!-- /.row -->
 
 <div class="panel panel-default">
     <div class="panel-heading">
@@ -80,23 +78,14 @@
         <div class="table-responsive" style="padding-left: 15px; padding-right: 15px;">
             <table id="dataTables-{{ $chart }}" class="table table-hover dataTable" width="100%">
                 <thead>
-                    @if ($chart != 'mobileapp')
-                        <tr>
-                            <th style="width: 5%;">#</th>
-                            <th style="width: 23%;">{{ ($chart != 'webapp') ? 'เซสชั่น' : 'บัญชี' }}</th>
-                            <th style="width: 23%;">เข้าชมเมื่อ</th>
-                            <th style="width: 21%;">หมายเลขไอที</th>
-                            <th style="width: 14%;">ระบบปฏิบัติการ</th>
-                            <th style="width: 14%;">เว็บเบราเซอร์</th>
-                        </tr>
-                    @else
-                        <tr>
-                            <th style="width: 5%;">#</th>
-                            <th style="width: 35%;">เซสชั่น</th>
-                            <th style="width: 35%;">เข้าชมเมื่อ</th>
-                            <th style="width: 25%;">หมายเลขไอที</th>
-                        </tr>
-                    @endif
+                    <tr>
+                        <th style="width: 5%;">#</th>
+                        <th style="width: 23%;">{{ ($chart == 'website') ? 'เซสชั่น' : 'บัญชี' }}</th>
+                        <th style="width: 23%;">เข้าชมเมื่อ</th>
+                        <th style="width: 21%;">หมายเลขไอที</th>
+                        <th style="width: 14%;">ระบบปฏิบัติการ</th>
+                        <th style="width: 14%;">เว็บเบราเซอร์</th>
+                    </tr>
                 </thead>
             </table>
         </div>

@@ -86,19 +86,15 @@ of those sections to manage the look and feel of the site. */
 
 .slide-image {
     width: 100%;
+    max-height: 466px;
 }
 
 .carousel-holder {
     margin-bottom: 30px;
 }
 
-.carousel-control,
-.item {
-    border-radius: 4px;
-}
-
 .caption {
-    height: 130px;
+    height: 100px;
     overflow: hidden;
 }
 
@@ -107,6 +103,7 @@ of those sections to manage the look and feel of the site. */
 }
 
 .ratings {
+    padding-top: 10px;
     padding-right: 10px;
     padding-left: 10px;
     color: #d17581;
@@ -235,6 +232,11 @@ section#contact {
     }
 }
 
+.thumbnail-box {
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
 @media(min-width: 768px) {
     #counterModal .modal-dialog {
         .modal-content {
@@ -244,6 +246,11 @@ section#contact {
                 }
             }
         }
+    }
+
+    .thumbnail-box {
+        padding-left: 0px;
+        padding-right: 30px;
     }
 }
 

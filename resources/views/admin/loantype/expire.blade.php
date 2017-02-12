@@ -31,7 +31,7 @@
             <!-- /.box-header -->
 
             <div class="box-body">
-                <button class="btn btn-default btn-flat" style="margin-top: 15px; margin-bottom: 15px;"
+                <button class="btn btn-default btn-flat margin-b-md"
                     onclick="javascript:window.history.go(-1);">
                     <i class="fa fa-reply"></i> ถอยกลับ
                 </button>

@@ -75,6 +75,10 @@ class AppServiceProvider extends ServiceProvider
 
         App::bind('number', function() {
             return new \App\Classes\Number;
-        });       
+        }); 
+
+        App::bind('uploaddocument', function() {
+            return new \App\Classes\UploadDocument;
+        });          
     }
 }

@@ -12,8 +12,8 @@
                     </h4>
                 </div>
                 <div class="panel-body">
-                    <p>สามารถแก้ไขข้อมูลส่วนตัว และเรียกดูข้อมูลทุนเรือนหุ้น การกู้ยืน การกู้ยืม รวมถึงสถานะการค้ำประกัน</p>
-                    <button class="btn btn-primary" onclick="javascript:window.location.href='{{ url('/member') }}'">เริ่มใช้งาน</button>
+                    <p>สามารถแก้ไขข้อมูลส่วนตัว และเรียกดูข้อมูลทุนเรือนหุ้น เงินปันผลประจำปี การกู้ยืม รวมถึงสถานะการค้ำประกัน</p>
+                    <button class="btn btn-primary" onclick="javascript:window.location.href='{{ url('/member') }}'">เข้าใช้งาน</button>
                 </div>
             </div>
         </div>
@@ -26,7 +26,7 @@
                 </div>
                 <div class="panel-body">
                     <p>สำหรับใช้คำนวณการผ่อนชำระค่างวดเงินกู้เบื้องต้น สำหรับสมาชิกก่อนทำการกู้ยืม</p>
-                    <button class="btn btn-success disabled">เริ่มใช้งาน</button>
+                    <button class="btn btn-success disabled">อยู่ในระหว่างพัฒนา</button>
                 </div>
             </div>
         </div>
@@ -39,7 +39,7 @@
                 </div>
                 <div class="panel-body">
                     <p>สำหรับแจ้งข่าวสารจากสหกรณ์ และเป็นช่องทางสื่อสารระหว่างสมาชิก</p>
-                    <button class="btn btn-danger disabled">เริ่มใช้งาน</button>
+                    <button class="btn btn-danger disabled">อยู่ในระหว่างพัฒนา</button>
                 </div>
             </div>
         </div>
