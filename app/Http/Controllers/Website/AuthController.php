@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\User;
 use App\Member;
 use Statistic;
+use History;
 use Auth;
 use DB;
 use Mail;
@@ -116,6 +117,7 @@ class AuthController extends Controller
         else {
             if (Auth::guard($this->guard)->attempt($credentials, $request->has('remember'))) {
                 Statistic::user(Auth::guard($this->guard)->id());
+                History::addUserHistory(Auth::guard($this->guard)->id(), 'เข้าสู่ระบบ');
 
                 return redirect()->route('website.member.index');
             }
@@ -180,6 +182,9 @@ class AuthController extends Controller
                 $user = new User($request->only('email', 'password'));
                 $member = Member::find($request->input('member_id'));
                 $member->user()->save($user);
+
+                $id = User::where('email', $request->input('email'))->first()->id;
+                History::addUserHistory($id, 'สร้างบัญชีผู้ใช้');
 
                 $token = hash_hmac('sha256', str_random(40), config('app.key'));
                 $confirm = DB::table('user_confirmations')->insert([

@@ -30,7 +30,7 @@
                 <div class="col-xs-12">
                     <h2 class="page-header">
                         <i class="fa fa-file-text-o"></i> ใบเสร็จรับเงินค่าหุ้น
-                        <small class="pull-right">วันที่: {{ Diamond::today()->thai_format('d/m/Y') }}</small>
+                        <small class="pull-right">วันที่: {{ Diamond::today()->thai_format('d M Y') }}</small>
                     </h2>
                 </div>
                 <!-- /.col -->

@@ -89,6 +89,11 @@ Route::group(['domain' => 'www.tatcoop.dev',
     // Ajax Route...
     Route::controller('/ajax', 'AjaxController', [
         'getBackground' => 'website.ajax.background',
+        'getLoadmore' => 'website.ajax.loadmore',
+        'getDistricts' => 'website.ajax.district',
+        'getSubdistricts' => 'website.ajax.subdistrict',
+        'getPostcode' => 'website.ajax.postcode',
+        'getDividend' => 'website.ajax.dividend',
     ]);
 
     // Homepage Route...
@@ -123,7 +128,9 @@ Route::group(['domain' => 'admin.tatcoop.dev',
     Route::post('/ajax/deletephoto', 'AjaxController@postDeletePhoto');
     Route::controller('/ajax', 'AjaxController', [
         'getBackground' => 'admin.ajax.background',
+        'getLoadmore' => 'admin.ajax.loadmore',
         'getMembers' => 'admin.ajax.members',
+        'getMembershareholding' => 'admin.ajax.membershareholding',
         'getDistricts' => 'admin.ajax.district',
         'getSubdistricts' => 'admin.ajax.subdistrict',
         'getPostcode' => 'admin.ajax.postcode',
@@ -183,7 +190,6 @@ Route::group(['domain' => 'admin.tatcoop.dev',
 
     // Member Route...
     Route::get('/admin/member/inactive', 'MemberController@getInactive');
-    Route::get('/admin/member/shareholding', 'MemberController@getShareHolding');
     Route::resource('/admin/member', 'MemberController');
     Route::group(['prefix' => '/admin/member/{id}'], function() {
         Route::get('leave', ['as' => 'admin.member.leave', 'uses' => 'MemberController@getLeave']);
@@ -196,6 +202,10 @@ Route::group(['domain' => 'admin.tatcoop.dev',
         // Loan Route...
         Route::resource('loan', 'LoanController');
     });
+
+    // Share Holding Route...
+    Route::get('/admin/autoshareholding', 'ShareholdingController@getAutoShareholding');
+    Route::post('/admin/autoshareholding', 'ShareholdingController@postAutoShareholding');
 
     // Loan Type Route...
     Route::get('/admin/loantype/expire', 'LoanTypeController@getExpire');

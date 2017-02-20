@@ -167,23 +167,31 @@
                 'year': $('#selectyear').val()
             },
             success: function(data) {
-                $('#dividend_rate').html('(' + (data.dividend_rate == null ? '0' : data.dividend_rate ) + '%)');
+                $('#dividend_rate').html((data.dividend_rate == 0 ? 'ยังไม่ได้กำหนดอัตราเงินปันผล' : 'อัตราเงินปันผล ' + data.dividend_rate + '%' ));
                 $('#dividend tbody>tr').remove();
+                var selected_year = $('#selectyear').val();
                 var index = 0;
                 var total_amount = 0;
                 var total_shareholding = 0;
                 var total_dividend = 0;
 
                 jQuery.each(data.dividends, function(i, val) {
+                    var amount = (val.amount == null) ? 0 : val.amount;
+
                     $("#dividend tbody").append('<tr><td class="text-primary">' + 
                         ((index == 0) ? val.name : thai_date(moment(val.name, 'YYYY-MM-DD'))) + '</td><td>' + 
                         val.shareholding.format() + ' หุ้น</td><td>' + 
-                        val.amount.format(2) + ' บาท</td><td>' + 
-                        val.dividend.format(2) + ' บาท</td><td' + (data.dividend_rate == null ? ' class="text-danger"' : '') + '>' + 
-                        val.remark + '</td></tr>');
+                        amount.format(2) + ' บาท</td><td>' + 
+                        ((data.member.leave_date != null) ? 
+                            (moment(data.member.leave_date).format('YYYY') <= selected_year) ? 
+                                '0.00' : 
+                                val.dividend.format(2) : 
+                                val.dividend.format(2)) + ' บาท</td>' +
+                        '<td' + ((data.member.leave_date == null) ? (data.dividend_rate > 0) ? '' : ' class="text-danger"' : ' class="text-danger"') + '>' + 
+                        ((data.member.leave_date == null) ? val.remark : 'ลาออกแล้ว') + '</td></tr>');
 
                     index++;
-                    total_amount += val.amount;
+                    total_amount += amount;
                     total_shareholding += val.shareholding;
                     total_dividend += val.dividend;
                 });
@@ -191,8 +199,13 @@
                 $("#dividend tbody").append('<tr><td class="text-primary"><strong>รวม</strong></td><td><strong>' + 
                     total_shareholding.format() + ' หุ้น</strong></td><td><strong>' + 
                     total_amount.format(2) + ' บาท</strong></td><td class="text-success"><strong>' + 
-                    total_dividend.format(2) + ' บาท</strong></td><td' + (data.dividend_rate == null ? ' class="text-danger"' : '') + '>' + 
-                    (data.dividend_rate == null ? 'ยังไม้ได้กำหนดอัตราเงินปันผล' : '') + '</td></tr>');
+                    ((data.member.leave_date != null) ? 
+                        (moment(data.member.leave_date).format('YYYY') <= selected_year) ? 
+                            '0.00' :
+                            total_dividend.format(2) : 
+                            total_dividend.format(2)) + ' บาท</strong></td>' +
+                    '<td' + ((data.member.leave_date == null) ? (data.dividend_rate > 0) ? '' : ' class="text-danger"' : ' class="text-danger"') + '>' + 
+                    ((data.member.leave_date == null) ? (data.dividend_rate > 0) ? '' : 'ยังไม้ได้กำหนดอัตราเงินปันผล' : 'ลาออกแล้ว') + '</td></tr>');
             }
         });
     });

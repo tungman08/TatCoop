@@ -17,7 +17,7 @@
             </tr>
         </thead>
         <tbody>
-            @eval($count = 0)
+            @php($count = 0)
             @foreach($member->shareholdings->sortByDesc('pay_date') as $share) 
             <tr onclick="javascript: document.location = '{{ url('admin/member/' . $member->id . '/shareholding/' . $share->id . '/edit') }}';"
                 style="cursor: pointer;">

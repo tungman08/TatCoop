@@ -103,8 +103,8 @@ class PasswordController extends Controller
      */
     protected function resetPassword($user, $password)
     {
-        $user->forceFill([
-            'password' => $password,
-        ])->save();
+        $user->forceFill(['password' => $password])->save();
+
+        History::addUserHistory($user->id, 'ลาออก');
     }
 }

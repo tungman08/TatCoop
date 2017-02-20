@@ -52,8 +52,9 @@
                         <thead>
                             <tr>
                                 <th style="width: 10%;">#</th>
-                                <th style="width: 45%;">ปี พ.ศ.</th>
-                                <th style="width: 45%;">อัตราเงินปันผล</th>
+                                <th style="width: 35%;">ปี พ.ศ.</th>
+                                <th style="width: 35%;">อัตราเงินปันผล</th>
+                                <th style="width: 20%;"><i class="fa fa-gear"></i></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -64,7 +65,9 @@
                                 <td>{{ ++$count }}</td>
                                 <td class="text-primary">ปี {{ $dividend->rate_year + 543 }}</td>
                                 <td>{{ $dividend->rate }} %</td>
-                                <td></td>
+                                <td>
+                                    <a href="#"><i class="fa fa-file-excel-o fa-fw"></i> สรุปการปันผลเป็นเอกสาร Excel</a>
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>

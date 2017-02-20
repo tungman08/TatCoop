@@ -45,7 +45,10 @@ class DocumentsTableSeeder extends Seeder
             ['document_type_id' => 2, 'display' => 'ตัวอย่างการกรอกคำขอกู้เงินและหนังสือกู้เงินสามัญเฉพาะกิจเพื่อการท่องเที่ยวเชิงศาสนา', 'file' => 'religion'],
         ];
 
-        Storage::deleteDirectory('documents');
+        if (in_array('documents', Storage::directories())) {
+            Storage::deleteDirectory('documents');
+            Storage::makeDirectory('documents');
+        }
 
         // Loop through each type above and create the record for them in the database
         foreach ($array as $document) {

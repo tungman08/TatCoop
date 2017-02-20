@@ -7,11 +7,20 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\News;
+use Auth;
+use History;
 use DB;
 use Validator;
 
 class NewsController extends Controller
 {
+    /**
+     * Only administartor authorize to access this section.
+     *
+     * @var string
+     */
+    protected $guard = 'admins';
+
     /**
      * Create a new controller instance.
      *
@@ -77,6 +86,8 @@ class NewsController extends Controller
                 $news->title = $title;
                 $news->content = $content;
                 $news->save();
+
+                History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'เพิ่มข้อมูลข่าวสารสำหรับสมาชิกบนหน้าเว็บไซต์');
             });
 
             return redirect()->route('website.news.index')
@@ -113,6 +124,8 @@ class NewsController extends Controller
                 $news->title = $title;
                 $news->content = $content;
                 $news->save();
+
+                History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'แก้ไขข้อมูลข่าวสารสำหรับสมาชิกบนหน้าเว็บไซต์');
             });
 
             return redirect()->route('website.news.show', ['id' => $id])
@@ -122,8 +135,12 @@ class NewsController extends Controller
     }
 
     public function destroy($id) {
-        $news = News::find($id);
-        $news->delete();
+        DB::transaction(function() use ($id) {
+            $news = News::find($id);
+            $news->delete();
+
+            History::addAdminHistory(Auth::guard($this->guard)->id(), 'ลบข้อมูล', 'ลบข้อมูลข่าวสารสำหรับสมาชิกบนหน้าเว็บไซต์');
+        });
 
         return redirect()->route('website.news.index')
             ->with('flash_message', 'ลบข่าวสารสำหรับสมาชิกเรียบร้อยแล้ว')
@@ -139,8 +156,12 @@ class NewsController extends Controller
     }
 
     public function postRestore($id) {
-        $news = News::withTrashed()->where('id', $id)->first();
-        $news->restore();
+        DB::transaction(function() use ($id) {
+            $news = News::withTrashed()->where('id', $id)->first();
+            $news->restore();
+
+            History::addAdminHistory(Auth::guard($this->guard)->id(), 'คืนสภาพข้อมูล', 'คืนสภาพข้อมูลข่าวสารสำหรับสมาชิกบนหน้าเว็บไซต์');
+        });
 
         return redirect()->route('website.news.index')
             ->with('flash_message', 'คืนสภาพข่าวสารสำหรับสมาชิกเรียบร้อยแล้ว')
@@ -148,8 +169,17 @@ class NewsController extends Controller
     }
 
     public function postDelete($id) {
-        $news = News::withTrashed()->where('id', $id)->first();
-        $news->forceDelete();
+        DB::transaction(function() use ($id) {
+            $news = News::withTrashed()->where('id', $id)->first();
+
+            foreach ($news->attachments as $attachment) {
+                Storage::disk('attachments')->delete($attachment->file);
+            }
+
+            $news->forceDelete();
+
+            History::addAdminHistory(Auth::guard($this->guard)->id(), 'ลบข้อมูลอย่างถาวร', 'ลบข้อมูลข่าวสารสำหรับสมาชิกบนหน้าเว็บไซต์อย่างถาวร');
+        });
 
         return redirect()->route('website.news.index')
             ->with('flash_message', 'ลบข่าวสารสำหรับสมาชิกเรียบร้อยแล้ว')

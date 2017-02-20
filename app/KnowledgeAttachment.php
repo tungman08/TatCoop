@@ -11,7 +11,7 @@ class KnowledgeAttachment extends Model
      *
      * @var string
      */
-	protected $table = 'knowledge_atachments';
+	protected $table = 'knowledge_attachments';
 
     /**
      * The attributes that are mass assignable.
@@ -35,7 +35,7 @@ class KnowledgeAttachment extends Model
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function knowledges() {
-        return $this->belongsTo(News::class);
+        return $this->belongsTo(Knowledge::class);
     }
 
     /**

@@ -64,6 +64,7 @@
 
             <div class="box-body">
                 <h3 class="text-center text-primary">{{ $knowledge->title }}</h3>
+                <br />
                 <div class="margin-l-sm margin-r-sm">
                     {!! $knowledge->content !!}             
                 </div>

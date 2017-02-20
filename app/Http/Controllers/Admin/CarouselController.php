@@ -14,6 +14,13 @@ use File;
 class CarouselController extends Controller
 {
     /**
+     * Only administartor authorize to access this section.
+     *
+     * @var string
+     */
+    protected $guard = 'admins';
+
+    /**
      * Create a new controller instance.
      *
      * @return void

@@ -25,6 +25,7 @@
     "waitForImages": "^2.2.0",
     "bootstrap-wysihtml5": "*",
     "jquery-circle-progress": "^1.2.1",
-    "magnific-popup": "^1.1.0"
+    "magnific-popup": "^1.1.0",
+    "eonasdan-bootstrap-datetimepicker": "^4.17.45"
   }
 }

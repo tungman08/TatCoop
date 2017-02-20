@@ -70,9 +70,9 @@ class Diamond extends Carbon
         return $this->format(implode($newformat));
     }
 
-    public function thai_diffForHumans() {
-        Carbon::setLocale('th');
+    public function thai_diffForHumans($other = null, $absolute = false, $short = false) {
+        parent::setLocale('th');
 
-        return $this->diffForHumans();
+        return $this->diffForHumans($other, $absolute, $short);
     }
 }

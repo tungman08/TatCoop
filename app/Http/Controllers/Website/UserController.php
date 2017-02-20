@@ -8,6 +8,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Auth;
 use Hash;
+use History;
 use Validator;
 
 class UserController extends Controller
@@ -30,7 +31,10 @@ class UserController extends Controller
 
     public function getProfile() {
         return view('website.user.profile', [
-            'user' => Auth::user()
+            'user' => Auth::user(),
+            'index' => 0,
+            'count' => History::countUserHistory(Auth::guard()->id()),
+            'histories' => History::user(Auth::guard()->id())
         ]);
     }
 
@@ -75,6 +79,8 @@ class UserController extends Controller
             $user = Auth::user();
             $user->password = $request->input('new_password');
             $user->push();
+
+            History::addUserHistory(Auth::guard()->id(), 'เปลี่ยนรหัสผ่าน');
 
             return redirect()->route('user.profile')
                 ->with('password_changed', 'เปลี่ยนรหัสผ่านเสร็จเรียบร้อยแล้ว!');

@@ -38,7 +38,7 @@ class Knowledge extends Model
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function attachments() {
-        return $this->hasMany(NewsAttachment::class);
+        return $this->hasMany(KnowledgeAttachment::class);
     }
 
     /**

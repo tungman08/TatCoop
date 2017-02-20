@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
+use Auth;
+use History;
 use DB;
 use Diamond;
 use Validator;
@@ -14,6 +16,22 @@ use App\LoanType;
 
 class LoanTypeController extends Controller
 {
+    /**
+     * Only administartor authorize to access this section.
+     *
+     * @var string
+     */
+    protected $guard = 'admins';
+
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct() {
+        $this->middleware('auth:admins');
+    }
+
     public function index() {
         return view('admin.loantype.index', [
             'loantypes' => LoanType::active()->get()
@@ -58,6 +76,8 @@ class LoanTypeController extends Controller
                 $loanType->start_date = Diamond::parse($request->input('start_date'));
                 $loanType->expire_date = Diamond::parse($request->input('expire_date'));
                 $loanType->save();
+
+                History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'เพิ่มข้อมูลประเภทเงินกู้');
             });
 
             return redirect()->route('admin.loantype.index')

@@ -25,7 +25,7 @@
 
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title"><i class="fa fa-user"></i> รายชื่อสมาชิกสหกรณ์ที่ลาออกไปแล้ว</h3>
+                <h3 class="box-title"><i class="fa fa-user-circle-o"></i> รายชื่อสมาชิกสหกรณ์ที่ลาออกไปแล้ว</h3>
             </div>
             <!-- /.box-header -->
 
@@ -87,6 +87,8 @@
         $('#dataTables-users').dataTable().fnDestroy();
         $('#dataTables-users').dataTable({
             "ajax": {
+                "processing": true,
+                "serverSide": true,
                 "url": "/ajax/members",
                 "type": "get",
                 "data": {
@@ -103,6 +105,15 @@
             "createdRow": function(row, data, index) {
                 $(this).css('cursor', 'pointer');
             },  
+            "columns": [
+                { "data": "code" },
+                { "data": "fullname" },
+                { "data": "typename" },
+                { "data": "shareholding" },
+                { "data": "amount" },
+                { "data": "startdate" },
+                { "data": "leavedate" },
+            ]
         });   
 
         $('#dataTables-users tbody').on('click', 'tr', function() {

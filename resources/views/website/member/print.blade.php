@@ -36,8 +36,8 @@
                             <img src="{{ asset('images/logo-coop.png') }}" style="width: 100px; height: 100px;" alt="tat-logo" />
                         </div>
                         <div class="col-xs-10 text-center">
-                            <h3 style="font-size: 18px; margin: 5px 0px;"><strong>สหกรณ์ออมทรัพย์ สหภาพแรงงานรัฐวิสาหกิจการท่องเที่ยวแห่งประเทศไทย จำกัด</strong></h3><br>
-                            <h3 style="font-size: 18px; margin: 0px;">ใบเสร็จรับเงินค่าหุ้น</h3>
+                            <h3 style="font-size: 15px; margin: 10px 0px;"><strong>สหกรณ์ออมทรัพย์ สหภาพแรงงานรัฐวิสาหกิจการท่องเที่ยวแห่งประเทศไทย จำกัด</strong></h3><br>
+                            <h3 style="font-size: 15px; margin: 0px;">ใบเสร็จรับเงินค่าหุ้น</h3>
                         </div>
                     </div>
                 </div>
@@ -144,6 +144,10 @@
                 <!-- /.col -->
                 <div class="col-lg-12 text-center" style="padding-top: 20px;">
                     <span>ใบรับเงินประจำเดือนจะสมบูรณ์ต่อเมื่อสหกรณ์ได้รับเงินที่เรียกเก็บครบถ้วนแล้ว</span>
+                </div>
+                <!-- /.col -->
+                <div class="col-lg-12 text-right" style="padding-top: 80px;">
+                    <span>พิมพ์เอกสารวันที่: {{ Diamond::today()->thai_format('d M Y') }}</span>
                 </div>
                 <!-- /.col -->
             </div>

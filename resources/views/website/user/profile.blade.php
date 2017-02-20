@@ -64,97 +64,7 @@
 
                     <div class="box-body">
                         <div class="panel-body">
-                            <!-- The timeline -->
-                            <ul class="timeline timeline-inverse">
-                                <!-- timeline time label -->
-                                <li class="time-label">
-                                    <span class="bg-red">
-                                        10 Feb. 2014
-                                    </span>
-                                </li>
-                                <!-- /.timeline-label -->
-                                <!-- timeline item -->
-                                <li>
-                                <i class="fa fa-envelope bg-blue"></i>
-
-                                <div class="timeline-item">
-                                    <span class="time"><i class="fa fa-clock-o"></i> 12:05</span>
-
-                                    <h3 class="timeline-header"><a href="#">Support Team</a> sent you an email</h3>
-
-                                    <div class="timeline-body">
-                                        Etsy doostang zoodles disqus groupon greplin oooj voxy zoodles,
-                                        weebly ning heekya handango imeem plugg dopplr jibjab, movity
-                                        jajah plickers sifteo edmodo ifttt zimbra. Babblely odeo kaboodle
-                                        quora plaxo ideeli hulu weebly balihoo...
-                                    </div>
-                                    <div class="timeline-footer">
-                                        <a class="btn btn-primary btn-xs">Read more</a>
-                                        <a class="btn btn-danger btn-xs">Delete</a>
-                                    </div>
-                                </div>
-                                </li>
-                                <!-- END timeline item -->
-                                <!-- timeline item -->
-                                <li>
-                                <i class="fa fa-user bg-aqua"></i>
-                                    <div class="timeline-item">
-                                        <span class="time"><i class="fa fa-clock-o"></i> 5 mins ago</span>
-
-                                        <h3 class="timeline-header no-border"><a href="#">Sarah Young</a> accepted your friend request
-                                        </h3>
-                                    </div>
-                                </li>
-                                <!-- END timeline item -->
-                                <!-- timeline item -->
-                                <li>
-                                <i class="fa fa-comments bg-yellow"></i>
-
-                                <div class="timeline-item">
-                                    <span class="time"><i class="fa fa-clock-o"></i> 27 mins ago</span>
-
-                                    <h3 class="timeline-header"><a href="#">Jay White</a> commented on your post</h3>
-
-                                    <div class="timeline-body">
-                                        Take me to your leader!
-                                        Switzerland is small and neutral!
-                                        We are more like Germany, ambitious and misunderstood!
-                                    </div>
-                                    <div class="timeline-footer">
-                                        <a class="btn btn-warning btn-flat btn-xs">View comment</a>
-                                    </div>
-                                </div>
-                                </li>
-                                <!-- END timeline item -->
-                                <!-- timeline time label -->
-                                <li class="time-label">
-                                    <span class="bg-green">
-                                        3 Jan. 2014
-                                    </span>
-                                </li>
-                                <!-- /.timeline-label -->
-                                <!-- timeline item -->
-                                <li>
-                                <i class="fa fa-camera bg-purple"></i>
-
-                                <div class="timeline-item">
-                                    <span class="time"><i class="fa fa-clock-o"></i> 2 days ago</span>
-
-                                    <h3 class="timeline-header"><a href="#">Mina Lee</a> uploaded new photos</h3>
-
-                                    <div class="timeline-body">
-                                        <img src="http://placehold.it/150x100" alt="..." class="margin">
-                                        <img src="http://placehold.it/150x100" alt="..." class="margin">
-                                        <img src="http://placehold.it/150x100" alt="..." class="margin">
-                                        <img src="http://placehold.it/150x100" alt="..." class="margin">
-                                    </div>
-                                </div>
-                                </li>
-                                <!-- END timeline item -->
-                                <li>
-                                <i class="fa fa-clock-o bg-gray"></i>
-                                </li>
-                            </ul>
+                            @include('website.user.timeline')
                         </div>
                     </div>          
                     <!-- /.box-body-->
@@ -177,4 +87,74 @@
 
 @section('scripts')
     @parent
+
+    {{ Html::script(elixir('js/moment.js')) }}
+
+    <script>
+        $(document).ready(function () {
+            $('[data-tooltip="true"]').tooltip();
+        });
+
+        function loadmore(index) {
+            $.ajax({
+                dataType: 'json',
+                url: '/ajax/loadmore',
+                type: 'get',
+                cache: false,
+                data: {
+                    'index': index
+                },
+                error: function(xhr, ajaxOption, thrownError) {
+                    console.log(xhr.responseText);
+                    console.log(thrownError);
+                },
+                success: function(obj) {
+                    $('#end').remove();
+                    moment.locale('th')
+                    var history = obj.histories[0];
+
+                    var item = '<li class="time-label">';
+                        item += '<span class="bg-red">' + moment(history.date.date).add(543, 'years').format('D MMM YYYY') + '</span>';
+                        item += '</li>';
+
+                        $.each(history.items, function(i, action) {
+                            item += '<li><i class="fa ' + action.history_type.icon + ' ' + action.history_type.color + '"></i>';
+
+                            if (action.description == null) {
+                                item += '<div class="timeline-item">';
+                                item += '<span class="time"><i class="fa fa-clock-o"></i> ';
+                                item += moment(action.created_at).add(543, 'years').format('D MMM YYYY');
+                                item += '</span>';
+                                item += '<h3 class="timeline-header no-border">' + action.history_type.name + '</h3>';
+                                item += '</div>';
+                            }
+                            else {
+                                item += '<div class="timeline-item">';
+                                item += '<span class="time"><i class="fa fa-clock-o"></i> ';
+                                item += moment(action.created_at).add(543, 'years').format('D MMM YYYY');
+                                item += '</span>';
+                                item += '<h3 class="timeline-header no-border">' + action.history_type.name + '</h3>';
+                                item += '<div class="timeline-body">' + action.description + '</div>';
+                                item += '</div>';
+                            }
+
+                            item += '</li>';
+                        });
+
+                        item += '<li id="end">';
+                        item += '<i class="fa fa-clock-o bg-gray"></i>';
+
+                        if (obj.index < obj.count - 1) {
+                            item += '<div class="timeline-item" style="border: none; background: none;">';
+                            item += '<button id="more" onclick="javascript:loadmore(' + (obj.index + 1) + ');" data-tooltip="true" title="Load more...">...</button>';
+                            item += '</div>';
+                        }
+
+                        item += '</li>';
+
+                    $('.timeline').append(item);
+                }
+            });
+        }
+    </script>
 @endsection

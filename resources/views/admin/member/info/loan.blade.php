@@ -1,8 +1,9 @@
-<button class="btn btn-primary btn-flat" style="margin-bottom: 15px;"
-    onclick="javascript:window.location = '/admin/member/{{ $member->id }}/loan/create';">
-    <i class="fa fa-plus"></i> เพิ่มสัญญาการกู้ยืม
-</button>
-
+@if (is_null($member->leave_date))
+    <button class="btn btn-primary btn-flat" style="margin-bottom: 15px;"
+        onclick="javascript:window.location = '/admin/member/{{ $member->id }}/loan/create';">
+        <i class="fa fa-plus"></i> เพิ่มสัญญาการกู้ยืม
+    </button>
+@endif
 <div class="table-responsive">
     <table id="dataTables-loan" class="table table-hover dataTable" width="100%">
         <thead>

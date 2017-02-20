@@ -32,9 +32,9 @@ class MainMenu
         $admin = new MenuTree(['title' => 'ผู้ดูแลระบบ', 'icon' => 'fa-gears', 'url' => '/admin']);
 
         if ($super)
-            $admin->add(new MenuItem(['title' => 'จัดการผู้ดูแลระบบ', 'icon' => 'fa-user-secret', 'url' => '/admin/administrator']));
+            $admin->add(new MenuItem(['title' => 'จัดการผู้ดูแลระบบ', 'icon' => 'fa-user-circle-o', 'url' => '/admin/administrator']));
 
-        $admin->add(new MenuItem(['title' => 'จัดการสมาชิกสหกรณ์', 'icon' => 'fa-user', 'url' => '/admin/member']));
+        $admin->add(new MenuItem(['title' => 'จัดการสมาชิกสหกรณ์', 'icon' => 'fa-user-circle-o', 'url' => '/admin/member']));
         $admin->add(new MenuItem(['title' => 'จัดการประเภทเงินกู้พิเศษ', 'icon' => 'fa-credit-card', 'url' => '/admin/loantype']));
         $admin->add(new MenuItem(['title' => 'จัดการอัตราเงินปันผล', 'icon' => 'fa-dollar', 'url' => '/admin/dividend']));
         $admin->add(new MenuItem(['title' => 'สถิติการเข้าใช้งาน', 'icon' => 'fa-bar-chart', 'url' => '/admin/statistic']));

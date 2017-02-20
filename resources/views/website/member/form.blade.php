@@ -90,7 +90,7 @@
             'class'=>'col-sm-2 control-label']) 
         }}
 
-        <div class="col-sm-10 input-group" id="birth_date" style="padding: 0 15px;">
+        <div class="col-sm-10 input-group" id="birth_date" style="padding: 0 5px;">
             {{ Form::text('profile[birth_date]', null, [
                 'id' => 'birth_date',
                 'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 

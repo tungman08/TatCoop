@@ -13,7 +13,8 @@
                 </div>
                 <div class="panel-body">
                     <p>สามารถแก้ไขข้อมูลส่วนตัว และเรียกดูข้อมูลทุนเรือนหุ้น เงินปันผลประจำปี การกู้ยืม รวมถึงสถานะการค้ำประกัน</p>
-                    <button class="btn btn-primary" onclick="javascript:window.location.href='{{ url('/member') }}'">เข้าใช้งาน</button>
+                    <button class="btn btn-primary disabled" onclick="">อยู่ในระหว่างพัฒนา</button>
+                    <!-- <button class="btn btn-primary" onclick="javascript:window.location.href='{{-- url('/member') --}}'">เข้าใช้งาน</button> -->
                 </div>
             </div>
         </div>

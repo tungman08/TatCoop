@@ -6,7 +6,8 @@
             <h3 class="page-header">
                 <ol class="breadcrumb">
                     <li><a href="{{ url('/') }}"><i class="fa fa-home fa-fw"></i></a></li>
-                    <li class="active">สาระน่ารู้เกี่ยวกับสหกรณ์</li>            
+                    <li><a href="{{ url('/knowledges') }}">สาระน่ารู้เกี่ยวกับสหกรณ์</a></li>
+                    <li class="active">เนื้อหาสาระน่ารู้</li>
                 </ol>
             </h3>
         </div>

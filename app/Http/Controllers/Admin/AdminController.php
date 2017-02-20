@@ -9,20 +9,29 @@ use App\Http\Controllers\Controller;
 use App\Administrator;
 use App\Member;
 use App\Shareholding;
+use Auth;
 use DB;
 use Diamond;
+use History;
 use Mail;
 use Validator;
 
 class AdminController extends Controller
 {
     /**
+     * Only administartor authorize to access this section.
+     *
+     * @var string
+     */
+    protected $guard = 'admins';
+
+    /**
      * Create a new controller instance.
      *
      * @return void
      */
     public function __construct() {
-        $this->middleware('auth:admins');
+        $this->middleware('auth:admins', ['except' => 'getUnauthorize']);
     }
 
     /**
@@ -108,6 +117,9 @@ class AdminController extends Controller
                 $admin->password = $request->input('new_password');
                 $admin->save();
 
+                History::addAdminHistory($admin->id, 'สร้างบัญชีผู้ดูแลระบบ');
+                History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'เพิ่มบัญชี ' . $admin->name . ' (' . $admin->email . ') เป็นผู้ดูแลระบบ');
+
                 Mail::send('admin.emails.newadmin', ['email' => $request->input('email'), 'password' => $request->input('new_password')], function($message) use ($admin) {
                     $message->to($admin->email, $admin->name)
                         ->subject('คุณได้รับการแต่งตั้งเป็นผู้ดูแลระบบเว็บไซต์ www.tatcoop.com');
@@ -182,6 +194,8 @@ class AdminController extends Controller
 
                 $admin->save();
 
+                History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'แก้ไขบัญชีผู้ดูแลระบบชื่อ ' . $admin->name . ' (' . $admin->email . ')');
+
                 if (!empty($request->input('new_password'))) {
                     Mail::send('admin.emails.updateadmin', ['email' => $request->input('email'), 'password' => $request->input('new_password')], function($message) use ($admin) {
                         $message->to($admin->email, $admin->name)
@@ -243,6 +257,9 @@ class AdminController extends Controller
         }
         else {
             $admin = Administrator::findOrFail($id);
+
+            History::addAdminHistory(Auth::guard($this->guard)->id(), 'ลบข้อมูล', 'ลบบัญชีผู้ดูแลระบบชื่อ ' . $admin->name . ' (' . $admin->email . ')');
+
             $admin->delete();
 
             return redirect()->route('admin.administrator.index')
@@ -261,6 +278,8 @@ class AdminController extends Controller
         $admin = Administrator::withTrashed()->findOrFail($id);
         $admin->restore();
 
+        History::addAdminHistory(Auth::guard($this->guard)->id(), 'คืนสภาพข้อมูล', 'คืนสภาพบัญชีผู้ดูแลระบบชื่อ ' . $admin->name . ' (' . $admin->email . ')');
+
         return redirect()->route('admin.administrator.index')
             ->with('flash_message', 'คืนค่าบัญชีผู้ใช้เรียบร้อยแล้ว')
             ->with('callout_class', 'callout-success');
@@ -273,6 +292,9 @@ class AdminController extends Controller
      */
     public function getForceDelete($id) {
         $admin = Administrator::withTrashed()->findOrFail($id);
+
+        History::addAdminHistory(Auth::guard($this->guard)->id(), 'ลบข้อมูลอย่างถาวร', 'ลบบัญชีผู้ดูแลระบบชื่อ ' . $admin->name . ' (' . $admin->email . ') ออกจากระบบอย่างถาวร');
+
         $admin->forceDelete();
 
         return redirect()->route('admin.administrator.index')

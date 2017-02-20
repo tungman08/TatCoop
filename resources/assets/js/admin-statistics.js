@@ -1,29 +1,4 @@
 ﻿$(document).ready(function () {
-    var init_date = moment($('#datepicker').find("input").val(), "YYYY-MM");
-
-    $(".display-month").html(thai_date(init_date));
-    $(".ajax-loading").css("display", "none");
-
-    detail_statistic(init_date);
-    chart_statistic(init_date, "website");
-
-    $('#chart a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-        var selected_date = moment($('#datepicker').find("input").val(), "YYYY-MM")
-        $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
-
-        switch ($(e.target).attr("href")) {
-            default:
-                chart_statistic(selected_date, "website");
-                break;
-            case "#webapp":
-                chart_statistic(selected_date, "webapp");
-                break;
-            case "#webuser":
-                chart_statistic(selected_date, "webuser");
-                break;
-        }
-    });
-
     $('#datepicker').datetimepicker({
         viewMode: 'months',
         format: 'YYYY-MM'
@@ -40,6 +15,35 @@
                 break;
             case "#webuser":
                 chart_statistic(e.date, "webuser");
+                break;
+        }
+    }).on('dp.hide', function(e){
+        setTimeout(function() {
+            $('#datepicker').data('DateTimePicker').viewMode('months');
+        }, 1);
+    });
+
+    var init_date = $('#datepicker').data('DateTimePicker').date(); //moment($('#datepicker').find("input").val(), "YYYY-MM");
+
+    $(".display-month").html(thai_date(init_date));
+    $(".ajax-loading").css("display", "none");
+
+    detail_statistic(init_date);
+    chart_statistic(init_date, "website");
+
+    $('#chart a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        var selected_date = $('#datepicker').data('DateTimePicker').date(); //moment($('#datepicker').find("input").val(), "YYYY-MM");
+        $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
+
+        switch ($(e.target).attr("href")) {
+            default:
+                chart_statistic(selected_date, "website");
+                break;
+            case "#webapp":
+                chart_statistic(selected_date, "webapp");
+                break;
+            case "#webuser":
+                chart_statistic(selected_date, "webuser");
                 break;
         }
     });

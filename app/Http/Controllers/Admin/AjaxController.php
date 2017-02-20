@@ -7,6 +7,7 @@ use Response;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use Auth;
 use Bing;
 use DB;
 use Diamond;
@@ -15,6 +16,7 @@ use File;
 use MemberProperty;
 use UploadDocument;
 use App\Classes\Icon;
+use History;
 use Statistic;
 use stdClass;
 use Storage;
@@ -40,6 +42,13 @@ use Datatables;
 class AjaxController extends Controller
 {
     /**
+     * Only administartor authorize to access this section.
+     *
+     * @var string
+     */
+    protected $guard = 'admins';
+
+    /**
      * Create a new controller instance.
      *
      * @return void
@@ -49,56 +58,67 @@ class AjaxController extends Controller
     }
 
     public function getMembers(Request $request) {
-        $data = [];
         $type = $request->input('type');
 
         if ($type == 'active') {
-            $members = Member::active()->get();
+            $members = DB::table('members')
+                ->join('profiles', 'members.profile_id', '=', 'profiles.id')
+                ->join('employees', 'profiles.id', '=', 'employees.profile_id')
+                ->join('employee_types', 'employees.employee_type_id', '=', 'employee_types.id')
+                ->leftJoin('shareholdings', 'members.id', '=', 'shareholdings.member_id')
+                ->whereNull('members.leave_date')
+                ->groupBy(['members.id', 'profiles.name', 'profiles.lastname', 'employee_types.name', 'members.shareholding', 'members.start_date'])
+                ->select([
+                    DB::raw("LPAD(members.id, 5, '0') as code"),
+                    DB::raw("CONCAT('<span class=\"text-primary\"><i class=\"fa fa-user fa-fw\"></i> ', IF(profiles.name = '<ข้อมูลถูกลบ>', profiles.name, CONCAT(profiles.name, ' ', profiles.lastname)), '</span>') as fullname"),
+                    'employee_types.name as typename',
+                    DB::raw("CONCAT(FORMAT(members.shareholding, 0), ' หุ้น') as shareholding"),
+                    DB::raw("CONCAT(FORMAT(SUM(shareholdings.amount), 2), ' บาท') as amount"),
+                    'members.start_date as startdate'
+                ]);
 
-            foreach ($members as $member) {
-                $row = [
-                    $member->memberCode, 
-                    '<span class="text-primary"><i class="fa fa-user fa-fw"></i> ' . (($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' : $member->profile->fullName) . '</span>',
-                    $member->profile->employee->employee_type->name,
-                    number_format($member->shareholding, 0,'.', ',') . ' หุ้น',
-                    number_format($member->shareholdings()->sum('amount'), 2,'.', ',') . ' บาท',
-                    Diamond::parse($member->start_date)->thai_format('j M Y')
-                ];
-
-                $data[] = $row;
-            }
+            return Datatables::queryBuilder($members)
+                ->editColumn('startdate', function($member) {
+                        return Diamond::parse($member->startdate)->thai_format('j M Y');
+                    })
+                ->make(true);
         }
         else {
-            $members = Member::inactive()->get();
+            $members = DB::table('members')
+                ->join('profiles', 'members.profile_id', '=', 'profiles.id')
+                ->whereNotNull('members.leave_date')
+                ->groupBy(['members.id', 'profiles.name', 'profiles.lastname', 'members.shareholding', 'members.start_date', 'members.leave_date'])
+                ->select([
+                    DB::raw("LPAD(members.id, 5, '0') as code"),
+                    DB::raw("CONCAT('<span class=\"text-primary\">', IF(profiles.name = '<ข้อมูลถูกลบ>', profiles.name, CONCAT('<i class=\"fa fa-user fa-fw\"></i> ', profiles.name, ' ', profiles.lastname)), '</span>') as fullname"),
+                    DB::raw("'ลาออก' as typename"),
+                    DB::raw("CONCAT(FORMAT(members.shareholding, 0), ' หุ้น') as shareholding"),
+                    DB::raw("'0 บาท' as amount"),
+                    'members.start_date as startdate',
+                    'members.leave_date as leavedate',
+                ]);
 
-            foreach ($members as $member) {
-                $row = [
-                    $member->memberCode, 
-                    '<span class="text-primary">' . (($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' : '<i class="fa fa-user fa-fw"></i> ' . $member->profile->fullName) . '</span>',
-                    'ลาออก',
-                    number_format($member->shareholding, 0,'.', ',') . ' หุ้น',
-                    number_format($member->shareholdings()->sum('amount'), 2,'.', ',') . ' บาท',
-                    Diamond::parse($member->start_date)->thai_format('j M Y'),
-                    Diamond::parse($member->leave_date)->thai_format('j M Y')
-                ];
-
-                $data[] = $row;
-            }
+            return Datatables::queryBuilder($members)
+                ->editColumn('startdate', function($member) {
+                        return Diamond::parse($member->startdate)->thai_format('j M Y');
+                    })
+                ->editColumn('leavedate', function($member) {
+                        return Diamond::parse($member->leavedate)->thai_format('j M Y');
+                    })
+                ->make(true);
         }
-
-        return compact('data');
     }
 
     public function getDistricts(Request $request) {
         $id = $request->input('id');
 
-        return District::where('province_id', $id)->get();
+        return District::where('province_id', $id)->orderBy('name')->get();
     }
 
     public function getSubdistricts(Request $request) {
         $id = $request->input('id');
 
-        return Subdistrict::where('district_id', $id)->get();
+        return Subdistrict::where('district_id', $id)->orderBy('name')->get();
     }
 
     public function getPostcode(Request $request) {
@@ -133,9 +153,11 @@ class AjaxController extends Controller
     public function getDividend(Request $request) {
         $member = Member::find($request->input('id'));
         $year = $request->input('year');
-        $dividends = MemberProperty::getDividend($member->id);
+        $dividends = MemberProperty::getDividend($member->id, $year);
+        $rate = Dividend::where('rate_year', $year)->first();
+        $dividend_rate = (!is_null($rate)) ? $rate->rate : 0;
         
-        return compact('dividends', 'dividend_rate');
+        return compact('member', 'dividends', 'dividend_rate');
     }
 
     /**
@@ -325,6 +347,7 @@ class AjaxController extends Controller
         $index = $request->input('index');
 
         $affect = UploadDocument::reorderDocument($id, $index);
+        History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'จัดเรียงลำดับเอกสารบนหน้าเว็บไซต์');
 
         return Response::json('Success: ' . $affect);
     }
@@ -336,9 +359,11 @@ class AjaxController extends Controller
         $display = mb_ereg_replace('\s+', ' ', basename($file->getClientOriginalName(), '.' . $file->getClientOriginalExtension()));
         $filename = time() . uniqid() . '.' . $file->getClientOriginalExtension();
         $order = UploadDocument::lastOrder(0, $documentType);
-        Storage::disk('documents')->put($filename, file_get_contents($file->getRealPath()));
+        $path = ($file->getRealPath() != false) ? $file->getRealPath() : $file->getPathname();
+        Storage::disk('documents')->put($filename, file_get_contents($path));
 
         $id = UploadDocument::insertDocument($display, $filename, $documentType, $order);
+        History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'เพิ่มเอกสารบนหน้าเว็บไซต์');
 
         $data = new stdClass();
         $data->id = $id;
@@ -353,10 +378,12 @@ class AjaxController extends Controller
 
         $display = mb_ereg_replace('\s+', ' ', basename($file->getClientOriginalName(), '.' . $file->getClientOriginalExtension()));
         $filename = time() . uniqid() . '.' . $file->getClientOriginalExtension();
-        Storage::disk('documents')->put($filename, file_get_contents($file->getRealPath()));
+        $path = ($file->getRealPath() != false) ? $file->getRealPath() : $file->getPathname();
+        Storage::disk('documents')->put($filename, file_get_contents($path));
 
         $oldFile = UploadDocument::updateDocument($id, $display, $filename);
         Storage::disk('documents')->delete($oldFile);
+        History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'แก้ไขเอกสารบนหน้าเว็บไซต์');
 
         $data = new stdClass();
         $data->id = $id;
@@ -377,10 +404,13 @@ class AjaxController extends Controller
         $file = $request->file('file');
 
         $filename = mb_ereg_replace('\s+', ' ', $file->getClientOriginalName());
-        Storage::disk('documents')->put($filename, file_get_contents($file->getRealPath()));  
+        $path = ($file->getRealPath() != false) ? $file->getRealPath() : $file->getPathname();
+        Storage::disk('documents')->put($filename, file_get_contents($path));  
 
         $oldFile = UploadDocument::updateOther($id, $filename);
         Storage::disk('documents')->delete($oldFile);
+
+        History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'แก้ไขเอกสารบนหน้าเว็บไซต์');
 
         return Response::json($filename);      
     }
@@ -394,6 +424,8 @@ class AjaxController extends Controller
         Storage::disk('documents')->delete($document->file);
         $document->delete();
 
+        History::addAdminHistory(Auth::guard($this->guard)->id(), 'ลบข้อมูล', 'ลบเอกสารบนหน้าเว็บไซต์');
+
         return Response::json($id);
     }
 
@@ -402,12 +434,15 @@ class AjaxController extends Controller
         $document_id = $request->input('document_id');
         $imagename = time() . uniqid() . '.' . $image->getClientOriginalExtension();
 
-        Storage::disk('carousels')->put($imagename, file_get_contents($image->getRealPath()));
-        Storage::disk('carousels')->put('thumbnail_' . $imagename, Image::make($image->getRealPath())->resize(256, 144)->stream()->__toString());
+        $path = ($image->getRealPath() != false) ? $image->getRealPath() : $image->getPathname();
+        Storage::disk('carousels')->put($imagename, file_get_contents($path));
+        Storage::disk('carousels')->put('thumbnail_' . $imagename, Image::make($path)->resize(256, 144)->stream()->__toString());
 
         $order = UploadDocument::lastOrder(1);
         $id = UploadDocument::insertCarousel($document_id, $imagename, $order);
         $document = Document::find($document_id);
+
+        History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'เพิ่มข่าวประชาสัมพันธ์บนหน้าเว็บไซต์');
 
         $data = new stdClass();
         $data->id = $id;
@@ -425,12 +460,15 @@ class AjaxController extends Controller
         $image = $request->file('image');
         $imagename = time() . uniqid() . '.' . $image->getClientOriginalExtension();
 
-        Storage::disk('carousels')->put($imagename, file_get_contents($image->getRealPath()));
-        Storage::disk('carousels')->put('thumbnail_' . $imagename, Image::make($image->getRealPath())->resize(256, 144)->stream()->__toString());
+        $path = ($image->getRealPath() != false) ? $image->getRealPath() : $image->getPathname();
+        Storage::disk('carousels')->put($imagename, file_get_contents($path));
+        Storage::disk('carousels')->put('thumbnail_' . $imagename, Image::make($path)->resize(256, 144)->stream()->__toString());
 
         $oldImage = UploadDocument::updateCarouselImage($id, $imagename);
         Storage::disk('carousels')->delete($oldImage);
         Storage::disk('carousels')->delete('thumbnail_' . $oldImage);
+
+        History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'แก้ไขรูปประกอบข่าวประชาสัมพันธ์บนหน้าเว็บไซต์');
 
         $data = new stdClass();
         $data->id = $id;
@@ -444,6 +482,7 @@ class AjaxController extends Controller
         $document_id = $request->input('document_id');
 
         UploadDocument::updateCarouselDocument($id, $document_id);
+        History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'แก้ไขเอกสารประกอบข่าวประชาสัมพันธ์บนหน้าเว็บไซต์');
 
         return compact('id');
     }
@@ -452,6 +491,8 @@ class AjaxController extends Controller
         $id = $request->input('id');
 
         UploadDocument::reindexCarousel($id);
+
+        History::addAdminHistory(Auth::guard($this->guard)->id(), 'ลบข้อมูล', 'ลบข่าวประชาสัมพันธ์บนหน้าเว็บไซต์');
 
         $carousel = Carousel::find($id);
         Storage::disk('carousels')->delete($carousel->image);
@@ -466,6 +507,7 @@ class AjaxController extends Controller
         $index = $request->input('index');
 
         $affect = UploadDocument::reorderCarousel($id, $index);
+        History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'จัดเรียงลำดับข่าวประชาสัมพันธ์บนหน้าเว็บไซต์');
 
         return Response::json('Success: ' . $affect);
     }
@@ -484,7 +526,8 @@ class AjaxController extends Controller
         $photoname = time() . uniqid() . '.' . $photo->getClientOriginalExtension();
         $display = mb_ereg_replace('\s+', ' ', basename($photo->getClientOriginalName(), '.' . $photo->getClientOriginalExtension()));
 
-        $image = Image::make($photo->getRealPath());
+        $path = ($photo->getRealPath() != false) ? $photo->getRealPath() : $photo->getPathname();
+        $image = Image::make($path);
         $max_width = 800;
         $max_height = 800;
         $width = $image->width();
@@ -504,6 +547,7 @@ class AjaxController extends Controller
 
         $new_id = UploadDocument::attachFile($type, $id, 'photo', $photoname, $display);
         Storage::disk('attachments')->put($photoname, $image->resize($width, $height)->stream()->__toString());
+        History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'เพิ่มรูปประกอบข่าวสารสำหรับสมาชิก/สาระน่ารู้เกี่ยวกับสหกรณ์');
 
         $data = new stdClass();
         $data->id = $new_id;
@@ -520,6 +564,8 @@ class AjaxController extends Controller
         Storage::disk('attachments')->delete($photo->file);
         $photo->delete();
 
+        History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'ลบรูปประกอบข่าวสารสำหรับสมาชิก/สาระน่ารู้เกี่ยวกับสหกรณ์');
+
         return Response::json($id);
     }
 
@@ -531,7 +577,9 @@ class AjaxController extends Controller
         $display = mb_ereg_replace('\s+', ' ', basename($document->getClientOriginalName(), '.' . $document->getClientOriginalExtension()));
 
         $new_id = UploadDocument::attachFile($type, $id, 'document', $documentname, $display);
-        Storage::disk('attachments')->put($documentname, file_get_contents($document->getRealPath()));
+        $path = ($document->getRealPath() != false) ? $document->getRealPath() : $document->getPathname();
+        Storage::disk('attachments')->put($documentname, file_get_contents($path));
+        History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'เพิ่มเอกสารแนบข่าวสารสำหรับสมาชิก/สาระน่ารู้เกี่ยวกับสหกรณ์');
 
         $data = new stdClass();
         $data->id = $new_id;
@@ -548,6 +596,48 @@ class AjaxController extends Controller
         Storage::disk('attachments')->delete($document->file);
         $document->delete();
 
+        History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'ลบเอกสารแนบข่าวสารสำหรับสมาชิก/สาระน่ารู้เกี่ยวกับสหกรณ์');
+
         return Response::json($id);
+    }
+
+    public function getLoadmore(Request $request) {
+        $index = intval($request->input('index'));
+        $count = History::countAdminHistory(Auth::guard($this->guard)->id());
+        $histories = History::administrator(Auth::guard($this->guard)->id(), $index);
+
+        return compact('index', 'count', 'histories');
+    }
+
+    public function getMembershareholding(Request $request) {
+        $date = Diamond::parse($request->input('date'))->endOfMonth();
+
+        $members = DB::table('members')
+            ->join('profiles', 'members.profile_id', '=', 'profiles.id')
+            ->join('employees', 'profiles.id', '=', 'employees.profile_id')
+            ->join('employee_types', 'employees.employee_type_id', '=', 'employee_types.id')
+            ->leftJoin('shareholdings', 'members.id', '=', 'shareholdings.member_id')
+            ->whereNull('members.leave_date')
+            ->where('members.shareholding', '>', 0)
+            ->where('employees.employee_type_id', '<', 3)
+            ->whereDate('members.start_date', '<', $date)
+            ->whereNotIn('members.id', function($query) use ($date) {
+                $query->from('shareholdings')
+                    ->whereMonth('pay_date', '=', $date->month)
+                    ->whereYear('pay_date', '=', $date->year)
+                    ->where('shareholding_type_id', 1)
+                    ->select('member_id');
+            })
+            ->groupBy(['members.id', 'profiles.name', 'profiles.lastname', 'employee_types.name', 'members.shareholding'])
+            ->select([
+                DB::raw("LPAD(members.id, 5, '0') as code"),
+                DB::raw("CONCAT('<span class=\"text-primary\"><i class=\"fa fa-user fa-fw\"></i> ', IF(profiles.name = '<ข้อมูลถูกลบ>', profiles.name, CONCAT(profiles.name, ' ', profiles.lastname)), '</span>') as fullname"),
+                'employee_types.name as typename',
+                DB::raw("CONCAT(FORMAT(members.shareholding, 0), ' หุ้น') as shareholding"),
+                DB::raw("CONCAT(FORMAT(SUM(shareholdings.amount), 2), ' บาท') as amount")
+            ]);
+
+        return Datatables::queryBuilder($members)
+             ->make(true);
     }
 }

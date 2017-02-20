@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Auth;
+use History;
 use Validator;
 use Hash;
 
@@ -29,7 +30,11 @@ class UserController extends Controller
     }
 
     public function getProfile() {
-        return view('admin.user.profile');
+        return view('admin.user.profile', [
+            'index' => 0,
+            'count' => History::countAdminHistory(Auth::guard($this->guard)->id()),
+            'histories' => History::administrator(Auth::guard($this->guard)->id())
+        ]);
     }
 
     public function getPassword() {
@@ -84,10 +89,12 @@ class UserController extends Controller
             return redirect()->back()->withErrors($validator);
         }
         else {
-            $admin = Auth::guard('admins')->user();
+            $admin = Auth::guard($this->guard)->user();
             $admin->password = $request->input('new_password');
             $admin->password_changed = true;
             $admin->push();
+
+            History::addAdminHistory(Auth::guard($this->guard)->id(), 'เปลี่ยนรหัสผ่าน');
 
             return redirect()->route('admin.user.profile')
                 ->with('password_changed', 'เปลี่ยนรหัสผ่านเสร็จเรียบร้อยแล้ว!');

@@ -53,9 +53,9 @@ class Statistic
         $statistics->total = VisitorStatistic::count();
         $statistics->today = VisitorStatistic::whereDate('created_at', '=', Diamond::today())->count();
         $statistics->yesterday = VisitorStatistic::whereDate('created_at', '=', Diamond::yesterday())->count();
-        $statistics->thisWeek = VisitorStatistic::whereBetween('created_at', [Diamond::today()->startOfWeek(), Diamond::today()])->count();
+        $statistics->thisWeek = VisitorStatistic::whereBetween('created_at', [Diamond::today()->startOfWeek(), Diamond::today()->endOfDay()])->count();
         $statistics->lastWeek = VisitorStatistic::whereBetween('created_at', [Diamond::today()->subWeek()->startOfWeek(), Diamond::today()->subWeek()->endOfWeek()])->count();
-        $statistics->thisMonth = VisitorStatistic::whereBetween('created_at', [Diamond::today()->startOfMonth(), Diamond::today()])->count();
+        $statistics->thisMonth = VisitorStatistic::whereBetween('created_at', [Diamond::today()->startOfMonth(), Diamond::today()->endOfDay()])->count();
         $statistics->lastMonth = VisitorStatistic::whereBetween('created_at', [Diamond::today()->subMonth()->startOfMonth(), Diamond::today()->subMonth()->endOfMonth()])->count();
         $statistics->start = Diamond::parse(VisitorStatistic::min('created_at'))->thai_format('j M Y');
 
@@ -71,9 +71,9 @@ class Statistic
         $statistics->total = UserStatistic::count();
         $statistics->today = UserStatistic::whereDate('created_at', '=', Diamond::today())->count();
         $statistics->yesterday = UserStatistic::whereDate('created_at', '=', Diamond::yesterday())->count();
-        $statistics->thisWeek = UserStatistic::whereBetween('created_at', [Diamond::today()->startOfWeek(), Diamond::today()])->count();
+        $statistics->thisWeek = UserStatistic::whereBetween('created_at', [Diamond::today()->startOfWeek(), Diamond::today()->endOfDay()])->count();
         $statistics->lastWeek = UserStatistic::whereBetween('created_at', [Diamond::today()->subWeek()->startOfWeek(), Diamond::today()->subWeek()->endOfWeek()])->count();
-        $statistics->thisMonth = UserStatistic::whereBetween('created_at', [Diamond::today()->startOfMonth(), Diamond::today()])->count();
+        $statistics->thisMonth = UserStatistic::whereBetween('created_at', [Diamond::today()->startOfMonth(), Diamond::today()->endOfDay()])->count();
         $statistics->lastMonth = UserStatistic::whereBetween('created_at', [Diamond::today()->subMonth()->startOfMonth(), Diamond::today()->subMonth()->endOfMonth()])->count();
         $statistics->start = Diamond::parse(UserStatistic::min('created_at'))->thai_format('j M Y');
 
@@ -89,9 +89,9 @@ class Statistic
         $statistics->total = AdministratorStatistic::count();
         $statistics->today = AdministratorStatistic::whereDate('created_at', '=', Diamond::today())->count();
         $statistics->yesterday = AdministratorStatistic::whereDate('created_at', '=', Diamond::yesterday())->count();
-        $statistics->thisWeek = AdministratorStatistic::whereBetween('created_at', [Diamond::today()->startOfWeek(), Diamond::today()])->count();
+        $statistics->thisWeek = AdministratorStatistic::whereBetween('created_at', [Diamond::today()->startOfWeek(), Diamond::today()->endOfDay()])->count();
         $statistics->lastWeek = AdministratorStatistic::whereBetween('created_at', [Diamond::today()->subWeek()->startOfWeek(), Diamond::today()->subWeek()->endOfWeek()])->count();
-        $statistics->thisMonth = AdministratorStatistic::whereBetween('created_at', [Diamond::today()->startOfMonth(), Diamond::today()])->count();
+        $statistics->thisMonth = AdministratorStatistic::whereBetween('created_at', [Diamond::today()->startOfMonth(), Diamond::today()->endOfDay()])->count();
         $statistics->lastMonth = AdministratorStatistic::whereBetween('created_at', [Diamond::today()->subMonth()->startOfMonth(), Diamond::today()->subMonth()->endOfMonth()])->count();
         $statistics->start = Diamond::parse(AdministratorStatistic::min('created_at'))->thai_format('j M Y');
 

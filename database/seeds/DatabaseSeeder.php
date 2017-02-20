@@ -13,10 +13,11 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(PrefixsTableSeeder::class);
         $this->call(ThemesTableSeeder::class);
+        $this->call(HistoryTypesTableSeeder::class);
+        $this->call(AdministratorsTableSeeder::class);
         $this->call(EmployeeTypesTableSeeder::class);
         $this->call(PostcodesTableSeeder::class);
         $this->call(ProvincesTableSeeder::class);
-        $this->call(AdministratorsTableSeeder::class);
         $this->call(ProfilesTableSeeder::class);
         $this->call(MembersTableSeeder::class);
         $this->call(EmployeesTableSeeder::class);
@@ -24,6 +25,7 @@ class DatabaseSeeder extends Seeder
         $this->call(ShareholdingsTableSeeder::class);
         $this->call(DocumentTypesTableSeeder::class);
         $this->call(DocumentsTableSeeder::class);
+        $this->call(AttachmentsTableSeeder::class);
         $this->call(CarouselsTableSeeder::class);
     }
 }

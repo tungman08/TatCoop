@@ -11,6 +11,9 @@ class CarouselsTableSeeder extends Seeder
      */
     public function run()
     {
-        Storage::deleteDirectory('carousels');
+        if (in_array('carousels', Storage::directories())) {
+            Storage::deleteDirectory('carousels');
+            Storage::makeDirectory('carousels');
+        }
     }
 }

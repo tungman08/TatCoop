@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Auth;
+use History;
 use DB;
 use Diamond;
 use MemberProperty;
@@ -25,6 +26,13 @@ use App\Shareholding;
 
 class MemberController extends Controller
 {
+    /**
+     * Only user authorize to access this section.
+     *
+     * @var string
+     */
+    protected $guard = 'users';
+
     /**
      * Create a new controller instance.
      *
@@ -51,9 +59,9 @@ class MemberController extends Controller
      */
      public function getEdit() {
         $member = Member::find(Auth::user()->member_id);
-        $provinces = Province::all();
-        $districts = District::where('province_id', $member->profile->province_id)->get();
-        $subdistricts = Subdistrict::where('district_id', $member->profile->district_id)->get();
+        $provinces = Province::orderBy('name')->get();
+        $districts = District::where('province_id', $member->profile->province_id)->orderBy('name')->get();
+        $subdistricts = Subdistrict::where('district_id', $member->profile->district_id)->orderBy('name')->get();
 
          return view('website.member.edit', [
             'member' => $member,
@@ -94,6 +102,8 @@ class MemberController extends Controller
                 $profile->postcode_id = Postcode::where('code', $request->input('profile')['postcode']['code'])->first()->id;
                 $profile->birth_date = Diamond::parse($request->input('profile')['birth_date']);
                 $profile->save();
+
+                History::addUserHistory(Auth::guard()->id(), 'แก้ไขข้อมูล', 'แก้ไขข้อมูลส่วนตัว');
             });
 
             return redirect()->route('website.member.index', ['id' => $id])
@@ -128,16 +138,17 @@ class MemberController extends Controller
 
      public function getDividend() {
         $member = Member::find(Auth::user()->member_id);
-        $dividend_years = Shareholding::where('member_id', $member->id)
-                ->where('remark', '<>', 'ยอดยกมา')
-                ->select(DB::raw('year(pay_date) as pay_year'))
-                ->groupBy(DB::raw('year(pay_date)'))
-                ->get();
+        $dividend_years = [];
+        $start_year = (Diamond::parse($member->start_date)->year > 2016) ? Diamond::parse($member->start_date)->year : 2016;
+
+        for ($i = $start_year; $i <= Diamond::today()->year; $i++) {
+            $dividend_years[] = (object)['pay_year' => $i];
+        }
 
          return view('website.member.dividend', [
             'member' => $member,
             'dividend_years' => $dividend_years,
-            'dividends' => MemberProperty::getDividend($member->id),
+            'dividends' => MemberProperty::getDividend($member->id, Diamond::today()->year),
         ]);
      }
 
@@ -180,6 +191,8 @@ class MemberController extends Controller
             ->where('pay_date', '<=', $billdate)
             ->sum('amount');
 
+        History::addUserHistory(Auth::guard()->id(), 'นำข้อมูลออก', 'นำข้อมูลใบเสร็จออกจากระบบ');
+
         return view('website.member.print', [
             'member' => $member,
             'shareholdings' => $shareholdings,
@@ -200,16 +213,16 @@ class MemberController extends Controller
             ->where('pay_date', '<=', $billdate)
             ->sum('amount');
 
-        $html = view('website.member.print', [
+        $data = [
             'member' => $member,
             'shareholdings' => $shareholdings,
             'total_shareholding' => $total_shareholding,
             'billno' => $billdate->thai_format('Y') . str_pad($shareholdings->max('id'), 8, '0', STR_PAD_LEFT),
             'date' => $billdate
-        ])->render();
+        ];
 
-        $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
+        History::addUserHistory(Auth::guard()->id(), 'นำข้อมูลออก', 'นำข้อมูลใบเสร็จออกจากระบบ');
 
-        return PDF::loadHTML($html)->download('billing.pdf');
+        return PDF::loadView('website.member.pdf', $data)->download('ใบเสร็จรับเงินค่าหุ้นเดือน-' . $billdate->thai_format('M-Y') . '.pdf');
      }
 }

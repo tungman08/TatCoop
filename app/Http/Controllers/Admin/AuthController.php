@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Admin;
 use Statistic;
+use History;
 use Auth;
 use Validator;
 use App\Http\Controllers\Controller;
@@ -83,6 +84,7 @@ class AuthController extends Controller
         else {
             if (Auth::guard($this->guard)->attempt($credentials, $remember)) {
                 Statistic::administartor(Auth::guard($this->guard)->id());
+                History::addAdminHistory(Auth::guard($this->guard)->id(), 'เข้าสู่ระบบ');
 
                 if (Auth::guard($this->guard)->user()->password_changed) {
                     return redirect()->route('admin.index');

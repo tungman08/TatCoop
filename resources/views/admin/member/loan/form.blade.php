@@ -75,7 +75,7 @@
             'class'=>'col-sm-2 control-label']) 
         }}
 
-        <div class="col-sm-10 input-group" id="datepicker" style="padding: 0 15px;">
+        <div class="col-sm-10 input-group" id="datepicker" style="padding: 0 5px;">
             {{ Form::text('loan_date', null, [
                 'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
                 'class'=>'form-control'])

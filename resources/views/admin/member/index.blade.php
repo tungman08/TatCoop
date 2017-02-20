@@ -37,7 +37,7 @@
 
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title"><i class="fa fa-user"></i> รายชื่อสมาชิกสหกรณ์</h3>
+                <h3 class="box-title"><i class="fa fa-user-circle-o"></i> รายชื่อสมาชิกสหกรณ์</h3>
             </div>
             <!-- /.box-header -->
 
@@ -47,8 +47,8 @@
                     <i class="fa fa-user-plus"></i> เพิ่มสมาชิกสหกรณ์
                 </button>
                 <button class="btn btn-primary btn-flat margin-b-md" type="button" data-tooltip="true" title="ชำระค่าหุ้นอัตโนมัติ"
-                    onclick="javascript:var result = confirm('คุณต้องการทำรายการชำระเงินค่าหุ้นประจำเดือน {{ Diamond::today()->thai_format('M Y') }} ?'); if (result) { window.location.href='{{ url('/admin/member/shareholding') }}'; }">
-                    <i class="fa fa-money"></i> ชำระค่าหุ้นอัตโนมัติ
+                    onclick="javascript:window.location.href='{{ url('/admin/autoshareholding') }}';">
+                    <i class="fa fa-bolt"></i> ชำระค่าหุ้นแบบอัตโนมัติ
                 </button>
                 <button class="btn btn-default btn-flat margin-b-md pull-right" type="button" data-tooltip="true" title="สมาชิกสหกรณ์ที่ลาออก"
                     onclick="javascript:window.location.href='{{ url('/admin/member/inactive') }}';">
@@ -106,6 +106,8 @@
         $('#dataTables-users').dataTable().fnDestroy();
         $('#dataTables-users').dataTable({
             "ajax": {
+                "processing": true,
+                "serverSide": true,
                 "url": "/ajax/members",
                 "type": "get",
                 "data": {
@@ -121,7 +123,15 @@
             "iDisplayLength": 25,
             "createdRow": function(row, data, index) {
                 $(this).css('cursor', 'pointer');
-            },  
+            },
+            "columns": [
+                { "data": "code" },
+                { "data": "fullname" },
+                { "data": "typename" },
+                { "data": "shareholding" },
+                { "data": "amount" },
+                { "data": "startdate" },
+            ]
         });   
 
         $('#dataTables-users tbody').on('click', 'tr', function() {

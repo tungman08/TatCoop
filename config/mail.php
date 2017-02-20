@@ -55,7 +55,7 @@ return [
     |
     */
 
-    'from' => ['address' => 'poocpe9@gmail.com', 'name' => 'www.tatcoop.com'],
+    'from' => ['address' => 'no-reply@tatcoop.com', 'name' => 'สอทท. tatcoop.com'],
 
     /*
     |--------------------------------------------------------------------------

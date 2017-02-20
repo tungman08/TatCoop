@@ -65,10 +65,14 @@
     {!! Html::script(elixir('js/member-form.js')) !!}
 
     <script>
-    $('#rate_year').datetimepicker({
-        locale: 'th',
-        format: 'YYYY',
-        viewMode: 'years'
-    });
+        $('#rate_year').datetimepicker({
+            locale: 'th',
+            format: 'YYYY',
+            viewMode: 'years'
+        }).on('dp.hide', function(e){
+            setTimeout(function() {
+                $('#rate_year').data('DateTimePicker').viewMode('months');
+            }, 1);
+        });
     </script>
 @endsection

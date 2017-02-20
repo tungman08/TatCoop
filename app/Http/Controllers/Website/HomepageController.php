@@ -11,6 +11,9 @@ use App\Carousel;
 use App\News;
 use App\Knowledge;
 
+use DB;
+use Storage;
+
 class HomepageController extends Controller
 {
     /**

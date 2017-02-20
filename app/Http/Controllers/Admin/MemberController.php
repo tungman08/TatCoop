@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 
+use Auth;
+use History;
 use DB;
 use Diamond;
 use MemberProperty;
@@ -21,9 +23,17 @@ use App\Employee;
 use App\EmployeeType;
 use App\Shareholding;
 use App\Dividend;
+use App\User;
 
 class MemberController extends Controller
-{
+{    
+    /**
+     * Only administartor authorize to access this section.
+     *
+     * @var string
+     */
+    protected $guard = 'admins';
+
     /**
      * Create a new controller instance.
      *
@@ -38,9 +48,9 @@ class MemberController extends Controller
     }
 
     public function create() {
-        $provinces = Province::all();
-        $districts = $provinces->first()->districts;
-        $subdistricts = $districts->first()->subdistricts;
+        $provinces = Province::orderBy('name')->get();
+        $districts = District::where('province_id', $provinces->first()->id)->orderBy('name')->get();
+        $subdistricts = Subdistrict::where('district_id', $districts->first()->id)->orderBy('name')->get();
 
         return view('admin.member.create', [
             'prefixs' => Prefix::all(),
@@ -136,6 +146,8 @@ class MemberController extends Controller
                 $member->fee = ($is_employee) ? 200 : 100;
                 $member->start_date = Diamond::now();
                 $member->save();
+
+                History::addAdminHistory(Auth::guard($this->guard)->id(), 'สร้างข้อมูลสมาชิกใหม่', 'คุณ' . $profile->name . ' ' . $profile->lastname . ' สมัครเป็นสมาชิกสหกรณ์');
             });
 
             return redirect()->route('admin.member.index')
@@ -148,26 +160,28 @@ class MemberController extends Controller
 
     public function show($id) {
         $member = Member::find($id);
-        $dividend_years = Shareholding::where('member_id', $member->id)
-                ->where('remark', '<>', 'ยอดยกมา')
-                ->select(DB::raw('year(pay_date) as pay_year'))
-                ->groupBy(DB::raw('year(pay_date)'))
-                ->get();
+
+        $dividend_years = [];
+        $start_year = (Diamond::parse($member->start_date)->year > 2016) ? Diamond::parse($member->start_date)->year : 2016;
+
+        for ($i = $start_year; $i <= Diamond::today()->year; $i++) {
+            $dividend_years[] = (object)['pay_year' => $i];
+        }
 
         return view('admin.member.show', [
             'member' => $member,
             'histories' => Member::where('profile_id', $member->profile_id)->get(),
             'dividend_years' => $dividend_years,
-            'dividends' => MemberProperty::getDividend($member->id),
+            'dividends' => MemberProperty::getDividend($member->id, Diamond::today()->year),
             'tab' => 0
         ]);
     }
 
     public function edit($id) {
         $member = Member::find($id);
-        $provinces = Province::all();
-        $districts = District::where('province_id', $member->profile->province_id)->get();
-        $subdistricts = Subdistrict::where('district_id', $member->profile->district_id)->get();
+        $provinces = Province::orderBy('name')->get();
+        $districts = District::where('province_id', $member->profile->province_id)->orderBy('name')->get();
+        $subdistricts = Subdistrict::where('district_id', $member->profile->district_id)->orderBy('name')->get();
         $employee_types = EmployeeType::all();
 
         return view('admin.member.edit', [
@@ -233,6 +247,8 @@ class MemberController extends Controller
                 $employee->code = $request->input('profile')['employee']['code'];
                 $employee->employee_type_id = $request->input('profile')['employee']['employee_type_id'];
                 $employee->save();
+
+                History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'แก้ไขข้อมูลของสมาชิกสหกรณ์ ชื่อ คุณ' . $profile->name . ' ' . $profile->lastname);
             });
 
             return redirect()->route('admin.member.show', ['id' => $id])
@@ -262,12 +278,18 @@ class MemberController extends Controller
                 $share->amount = 0 - $total;
                 $share->save();
             }
+
+            $user = User::where('member_id', $member->id)->first();
+
+            History::addAdminHistory(Auth::guard($this->guard)->id(), 'บันทึกการลาออกของสมาชิก', 'คุณ' . $member->profile->fullName . ' ได้ลาออกจากการเป็นเป็นสมาชิกสหกรณ์');
+
+            if (!is_null($user)) {
+                History::addAdminHistory($user->id, 'ลาออก');
+            }
         });
 
-        $profile = Profile::find($member->profile_id);
-
         return redirect()->route('admin.member.index')
-            ->with('flash_message', 'คุณ ' . $profile->fulleName . ' รหัสสมาชิก ' . str_pad($member->id, 5, "0", STR_PAD_LEFT) . ' ได้ลาออกจากการเป็นเป็นสมาชิกสหกรณ์แล้ว')
+            ->with('flash_message', 'คุณ ' . $member->profile->fullName . ' รหัสสมาชิก ' . str_pad($member->id, 5, "0", STR_PAD_LEFT) . ' ได้ลาออกจากการเป็นเป็นสมาชิกสหกรณ์แล้ว')
             ->with('callout_class', 'callout-success');
     }
 
@@ -283,36 +305,8 @@ class MemberController extends Controller
             'member' => $member,
             'histories' => Member::where('profile_id', $member->profile_id)->get(),
             'dividend_years' => $dividend_years,
-            'dividends' => MemberProperty::getDividend($member->id),
+            'dividends' => MemberProperty::getDividend($member->id, Diamond::today()->year),
             'tab' => $tab
         ]);
-    }
-
-    public function getShareholding() {
-        $members = Member::active()->where('shareholding', '>', 0)->get();
-        $endOfMonth = Diamond::today()->endOfMonth();
-
-        DB::transaction(function() use ($members, $endOfMonth) {
-            foreach($members as $member) {
-                if ($member->shareholdings()->whereYear('pay_date', '=', $endOfMonth->year)->whereMonth('pay_date', '=', $endOfMonth->month)->count() == 0) {
-                    $share = new Shareholding();
-                    $share->pay_date = $endOfMonth;
-                    $share->shareholding_type_id = 1;
-                    $share->amount = $member->shareholding * 10 ;
-                    $share->remark = 'ป้อนข้อมูลอัตโนมัติ';
-                    $member->shareholdings()->save($share);
-                }
-                else {
-                    $share = $member->shareholdings()->whereYear('pay_date', '=', $endOfMonth->year)->whereMonth('pay_date', '=', $endOfMonth->month)->first();
-                    $share->pay_date = $endOfMonth;
-                    $share->amount = $member->shareholding * 10;
-                    $share->save();
-                }
-            }
-        });
-
-        return redirect()->route('admin.member.index')
-            ->with('flash_message', 'ทำรายการชำระค่าหุ้นอัตโนมัติประจำเดือน' . $endOfMonth->thai_format('F Y') . ' เรียบร้อยแล้ว')
-            ->with('callout_class', 'callout-success');
     }
 }

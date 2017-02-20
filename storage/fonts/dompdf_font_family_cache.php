@@ -77,10 +77,13 @@
     'italic' => $rootDir . '\lib\fonts\DejaVuSerif-Italic',
     'normal' => $rootDir . '\lib\fonts\DejaVuSerif',
   ),
+  'thsarabunnew' => array(
+    'normal' => $fontDir . '\8905f4364adac79d85885d597db8dd7a',
+    'bold' => $fontDir . '\d011c762c64c4e804b7d697264429a25',
+    'italic' => $fontDir . '\a3bb96199f9fcbfd5a3bcd923052b4d6',
+    'bold_italic' => $fontDir . '\d4ab25444ebbad96f8d7c3abcd49ede9',
+  ),
   'glyphicons halflings' => array(
     'normal' => $fontDir . '\5540697cb69b20851a56e957e7545d56',
-  ),
-  'fontawesome' => array(
-    'normal' => $fontDir . '\d87dbcb14ef3e8849bf61436bd892355',
   ),
 ) ?>

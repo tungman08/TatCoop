@@ -33,7 +33,7 @@
             'class'=>'col-sm-2 control-label']) 
         }}
 
-        <div class="col-sm-10 input-group" style="padding: 0 15px;">
+        <div class="col-sm-10 input-group" style="padding: 0 5px;">
             {{ Form::text('new_password', null, [
                 ($edit) ? '' : 'required',
                 'class'=>'form-control', 

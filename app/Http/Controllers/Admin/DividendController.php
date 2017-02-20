@@ -7,11 +7,29 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Dividend;
+use Auth;
+use History;
 use DB;
 use Validator;
 
 class DividendController extends Controller
 {
+    /**
+     * Only administartor authorize to access this section.
+     *
+     * @var string
+     */
+    protected $guard = 'admins';
+
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct() {
+        $this->middleware('auth:admins');
+    }
+
     public function index() {
         return view('admin.dividend.index', ['dividends'=>Dividend::all()]);
     }
@@ -45,6 +63,8 @@ class DividendController extends Controller
                 $dividend->rate_year = $request->input('rate_year');
                 $dividend->rate = $request->input('rate');
                 $dividend->save();
+    
+                History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'ป้อนอัตราเงินปันผล ประจำปี ' . $dividend->rate_year + 543);
             });
 
             return redirect()->route('admin.dividend.index')
@@ -79,6 +99,8 @@ class DividendController extends Controller
                 $dividend = Dividend::find($id);
                 $dividend->rate = $request->input('rate');
                 $dividend->save();
+    
+                History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'แก้ไขอัตราเงินปันผล ประจำปี ' . $dividend->rate_year + 543);
             });
 
             return redirect()->route('admin.dividend.index')
@@ -90,6 +112,9 @@ class DividendController extends Controller
     public function getErase($id) {
         DB::transaction(function() use ($id) {
             $dividend = Dividend::find($id);
+
+            History::addAdminHistory(Auth::guard($this->guard)->id(), 'ลบข้อมูล', 'ลบอัตราเงินปันผล ประจำปี ' . $dividend->rate_year + 543);
+
             $dividend->delete();
         });
 

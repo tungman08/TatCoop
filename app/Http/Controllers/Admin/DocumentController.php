@@ -11,6 +11,13 @@ use App\Document;
 class DocumentController extends Controller
 {
     /**
+     * Only administartor authorize to access this section.
+     *
+     * @var string
+     */
+    protected $guard = 'admins';
+
+    /**
      * Create a new controller instance.
      *
      * @return void

@@ -218,6 +218,7 @@ return [
         'UploadDocument' => App\Facades\UploadDocument::class,
         'Datatables' => Yajra\Datatables\Facades\Datatables::class,
         'PDF' => Barryvdh\DomPDF\Facade::class,
+        'History' => App\Facades\History::class,
     ],
 
 ];
