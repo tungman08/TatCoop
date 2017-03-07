@@ -20,6 +20,8 @@
             {{ Form::text('profile[employee][code]', null, [
                 'id'=>'employee_code',
                 'placeholder' => 'รหัสพนักงาน 5 หลัก...',
+                'data-inputmask'=>'\'mask\': \'99999\',\'placeholder\':\'0\',\'removeMaskOnSubmit\':true',
+                'data-mask',
                 'autocomplete'=>'off',
                 'class'=>'form-control'])
             }}
@@ -91,6 +93,8 @@
                 'id' => 'citizen_code',
                 'class'=>'form-control', 
                 'placeholder'=>'หมายเลขบัตรประชาชน 13 หลัก...', 
+                'data-inputmask'=>'\'mask\': \'9-9999-99999-99-9\',\'placeholder\':\'0\',\'removeMaskOnSubmit\':true',
+                'data-mask',
                 'autocomplete'=>'off'])
             }}        
         </div>
@@ -189,7 +193,7 @@
         </div>
     </div>
     <div class="form-group">
-        {{ Form::label('shareholding', 'จำนวนหุ้นต่อเดือน', [
+        {{ Form::label('shareholding', 'จำนวนหุ้นต่อเดือน (หุ้น)', [
             'class'=>'col-sm-2 control-label']) 
         }}
 

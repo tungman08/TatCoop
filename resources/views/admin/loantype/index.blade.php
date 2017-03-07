@@ -3,23 +3,22 @@
 @section('content')
     <!-- Content Header (Page header) -->
     <section class="content-header">
-    <h1>
-        จัดการประเภทเงินกู้พิเศษ
-        <small>เพิ่ม ลบ แก้ไข ประเภทเงินกู้ของ สอ.สรทท.</small>
-    </h1>
+        <h1>
+            จัดการประเภทเงินกู้
+            <small>เพิ่ม ลบ แก้ไข ประเภทเงินกู้ของ สอ.สรทท.</small>
+        </h1>
 
-    @include('admin.member.breadcrumb', ['breadcrumb' => [
-        ['item' => 'จัดการประเภทเงินกู้พิเศษ', 'link' => ''],
-    ]])
-
+        @include('admin.member.breadcrumb', ['breadcrumb' => [
+            ['item' => 'จัดการประเภทเงินกู้', 'link' => ''],
+        ]])
     </section>
 
     <!-- Main content -->
     <section class="content">
         <!-- Info boxes -->
         <div class="well">
-            <h4>การจัดการประเภทเงินกู้พิเศษของสหกรณ์</h4>
-            <p>ให้ผู้ดูแลระบบสามารถ เพิ่ม ลบ แก้ไข ประเภทเงินกู้พิเศษของสหกรณ์</p>
+            <h4>การจัดการประเภทเงินกู้ของสหกรณ์</h4>
+            <p>ให้ผู้ดูแลระบบสามารถ เพิ่ม ลบ แก้ไข ประเภทเงินกู้ของสหกรณ์</p>
         </div>
 
         @if(Session::has('flash_message'))
@@ -37,18 +36,22 @@
 
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title"><i class="fa fa-credit-card"></i> รายชื่อประเภทเงินกู้พิเศษ</h3>
+                <h3 class="box-title"><i class="fa fa-credit-card"></i> รายชื่อประเภทเงินกู้</h3>
             </div>
             <!-- /.box-header -->
 
             <div class="box-body">
-                <button class="btn btn-primary btn-flat margin-b-md" type="button" data-tooltip="true" title="เพิ่มประเภทเงินกู้พิเศษ"
+                <button class="btn btn-primary btn-flat margin-b-md" type="button" data-tooltip="true" title="เพิ่มประเภทเงินกู้"
                     onclick="javascript:window.location.href='{{ url('/admin/loantype/create') }}';">
-                    <i class="fa fa-plus"></i> เพิ่มประเภทเงินกู้พิเศษ
+                    <i class="fa fa-plus"></i> เพิ่มประเภทเงินกู้
                 </button>
-                <button class="btn btn-default btn-flat margin-b-md pull-right" type="button" data-tooltip="true" title="สมาชิกประเภทเงินกู้พิเศษที่หมดอายุ"
+                <button class="btn btn-default btn-flat margin-b-md pull-right" type="button" data-tooltip="true" title="สมาชิกประเภทเงินกู้ที่ถูกลบ"
+                    onclick="javascript:window.location.href='{{ url('/admin/loantype/deleted') }}';">
+                    <i class="fa fa-trash"></i> แสดงประเภทเงินกู้ที่ถูกลบ
+                </button>
+                <button class="btn btn-default btn-flat margin-b-md margin-r-sm pull-right" type="button" data-tooltip="true" title="สมาชิกประเภทเงินกู้ที่หมดอายุ"
                     onclick="javascript:window.location.href='{{ url('/admin/loantype/expire') }}';">
-                    <i class="fa fa-ban"></i> แสดงประเภทเงินกู้พิเศษที่หมดอายุ
+                    <i class="fa fa-ban"></i> แสดงประเภทเงินกู้ที่สิ้นสุดการใช้
                 </button>
 
                 <div class="table-responsive" style=" margin-top: 10px;">
@@ -56,26 +59,22 @@
                         <thead>
                             <tr>
                                 <th style="width: 10%;">#</th>
-                                <th style="width: 30%;">ชื่อประเภทเงินกู้พิเศษ</th>
-                                <th style="width: 15%;">วงเงินกู้สูงสุด</th>
-                                <th style="width: 15%;">ระยะเวลาผ่อนชำระสูงสุด</th>
-                                <th style="width: 10%;">วันที่เริ่มใช้</th>
-                                <th style="width: 10%;">วันที่หมดอายุ</th>
-                                <th style="width: 10%;">จำนวนสัญญาเงินกู้</th>
+                                <th style="width: 45%;">ชื่อประเภทเงินกู้</th>
+                                <th style="width: 15%;">วันที่เริ่มใช้</th>
+                                <th style="width: 15%;">วันที่สิ้นสุดการใช้</th>
+                                <th style="width: 15%;">จำนวนสัญญาเงินกู้</th>
                             </tr>
                         </thead>
                         <tbody>
                             @eval($count = 0)
                             @foreach($loantypes as $type)
-                            <tr onclick="javascript: document.location = '{{ url('/admin/loantype/' . $type->id . '/edit') }}';"
+                            <tr onclick="javascript: document.location = '{{ url('/admin/loantype/' . $type->id) }}';"
                                 style="cursor: pointer;">
-                                <td>{{ ++$count }}</td>
+                                <td>{{ ++$count }}.</td>
                                 <td class="text-primary"><i class="fa fa-money fa-fw"></i> {{ $type->name }}</td>
-                                <td>{{ number_format($type->cash_limit, 2,'.', ',') }} บาท</td>
-                                <td>{{ number_format($type->installment_limit, 0,'.', ',') }} งวด</td>
-                                <td>{{ Diamond::parse($type->start_date)->thai_format('j M Y') }}</td>
-                                <td>{{ Diamond::parse($type->expire_date)->thai_format('j M Y') }}</td>
-                                <td></td>
+                                <td>{{ (Diamond::minValue()->diffInDays(Diamond::parse($type->start_date)) > 0) ? Diamond::parse($type->start_date)->thai_format('j M Y') : 'N/A' }}</td>
+                                <td>{{ (Diamond::maxValue()->diffInDays(Diamond::parse($type->expire_date)) > 0) ? Diamond::parse($type->expire_date)->thai_format('j M Y') : 'N/A' }}</td>
+                                <td>0</td>
                             </tr>
                             @endforeach
                         </tbody>

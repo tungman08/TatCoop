@@ -74,6 +74,11 @@ return [
             'root' => storage_path('app/attachments'),
         ],
 
+        'backgrounds' => [
+            'driver' => 'local',
+            'root' => storage_path('app/backgrounds'),
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => 'your-key',

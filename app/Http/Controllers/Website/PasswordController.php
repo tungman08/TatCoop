@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ResetsPasswords;
 use Password;
+use History;
 
 class PasswordController extends Controller
 {
@@ -105,6 +106,6 @@ class PasswordController extends Controller
     {
         $user->forceFill(['password' => $password])->save();
 
-        History::addUserHistory($user->id, 'ลาออก');
+        History::addUserHistory($user->id, 'ตั้งค่ารหัสผ่านใหม่');
     }
 }

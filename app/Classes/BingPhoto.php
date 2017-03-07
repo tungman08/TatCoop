@@ -84,11 +84,11 @@ class BingPhoto {
             'date'       => self::TODAY,
             'n'          => 1,
             'locale'     => 'en-US',
-            'resolution' => self::RESOLUTION_HIGH
-        ), $args);
+            'resolution' => self::RESOLUTION_HIGH), $args);
+
         $this->sanityCheck();
 
-		 try {
+		try {
             $this->fetchImages();
         } catch (Exception $e) {
             die($e->getMessage());

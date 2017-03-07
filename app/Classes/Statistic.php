@@ -8,7 +8,7 @@ use App\VisitorStatistic;
 use App\Browser;
 use App\Platform;
 use stdClass;
-use Client;
+use ClientInfo;
 use DB;
 
 class Statistic
@@ -16,7 +16,7 @@ class Statistic
     private $info;
 
     public function __construct() {
-        $this->info = Client::info();
+        $this->info = ClientInfo::info();
     }
 
     public function administartor($admin_id) {

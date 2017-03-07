@@ -79,21 +79,27 @@ class UploadDocument
     public static function reorderDocument($id, $index) {
         $document = Document::find($id);
         $position = $index + 1;
-        $start = ($document->position > $position) ? $position : $document->position;
-        $end = ($document->position > $position) ? $document->position : $position;
 
-        $friends = Document::where('document_type_id', $document->document_type_id)
-            ->whereBetween('position', [$start, $end])
-            ->where('id', '<>', $id)
-            ->get();
+        if ($document->position != $position) {
+            $start = ($document->position > $position) ? $position : $document->position;
+            $end = ($document->position > $position) ? $document->position : $position;
 
-        foreach ($friends as $friend) {
-            $friend->update(['position' => ($document->position > $index) ? $friend->position + 1 : $friend->position - 1]);
+            $friends = Document::where('document_type_id', $document->document_type_id)
+                ->whereBetween('position', [$start, $end])
+                ->where('id', '<>', $id)
+                ->get();
+
+            foreach ($friends as $friend) {
+                $friend->update(['position' => ($document->position > $index) ? $friend->position + 1 : $friend->position - 1]);
+            }
+
+            $document->update(['position' => $position]);
+
+            return $friends->count();
         }
-
-        $document->update(['position' => $position]);
-
-        return $friends->count();
+        else {
+            return 0;
+        }
     }
 
     public static function base64_to_content($base64_string) {

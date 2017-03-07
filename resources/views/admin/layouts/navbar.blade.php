@@ -6,9 +6,9 @@
     <!-- Navbar Right Menu -->
     <div class="navbar-custom-menu">
         <ul class="nav navbar-nav">
-            @include('admin.layouts.message')
-            @include('admin.layouts.notice')
-            @include('admin.layouts.alert')
+            {{-- @include('admin.layouts.message') --}}
+            {{-- @include('admin.layouts.notice') --}}
+            {{-- @include('admin.layouts.alert') --}}
             @include('admin.layouts.user')
         </ul>
     </div>

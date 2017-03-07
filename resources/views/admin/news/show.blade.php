@@ -85,7 +85,7 @@
                         <div class="btn-group pull-right">
                             <button type="button" id="button-photo" class="btn btn-default btn-flat btn-xs"
                                 onclick="javascript:$('#uploadimage').click();">
-                                <i class="fa fa-plus fa-fw"></i> เพิ่มรูปประกอบ
+                                <i class="fa fa-plus-circle fa-fw"></i> เพิ่มรูปประกอบ
                             </button>
                             <input type="file" id="uploadimage" name="image-uploadimage" class="file-upload" accept="image/jpeg"
                                 onchange="javascript:uploadImage($(this), 'news', {{ $news->id }});" />
@@ -124,7 +124,7 @@
                         <div class="btn-group pull-right">
                             <button type="button" id="button-document" class="btn btn-default btn-flat btn-xs"
                                     onclick="javascript:$('#uploadfile').click();">
-                                    <i class="fa fa-plus fa-fw"></i> เพิ่มเอกสารแนบ
+                                    <i class="fa fa-plus-circle fa-fw"></i> เพิ่มเอกสารแนบ
                             </button>
                             <input type="file" id="uploadfile" name="image-uploadfile" class="file-upload" accept="application/pdf"
                                 onchange="javascript:uploadDocument($(this), 'news', {{ $news->id }});" />

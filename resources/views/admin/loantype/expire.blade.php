@@ -3,30 +3,29 @@
 @section('content')
     <!-- Content Header (Page header) -->
     <section class="content-header">
-    <h1>
-        จัดการประเภทเงินกู้พิเศษ
-        <small>เพิ่ม ลบ แก้ไข ประเภทเงินกู้ของ สอ.สรทท.</small>
-    </h1>
+        <h1>
+            จัดการประเภทเงินกู้
+            <small>เพิ่ม ลบ แก้ไข ประเภทเงินกู้ของ สอ.สรทท.</small>
+        </h1>
 
-    @include('admin.member.breadcrumb', ['breadcrumb' => [
-        ['item' => 'จัดการประเภทเงินกู้พิเศษ', 'link' => '/admin/loantype'],
-        ['item' => 'หมดอายุ', 'link' => ''],
-    ]])
-
+        @include('admin.member.breadcrumb', ['breadcrumb' => [
+            ['item' => 'จัดการประเภทเงินกู้', 'link' => '/admin/loantype'],
+            ['item' => 'หมดอายุ', 'link' => ''],
+        ]])
     </section>
 
     <!-- Main content -->
     <section class="content">
         <!-- Info boxes -->
         <div class="well">
-            <h4>ประเภทเงินกู้พิเศษของสหกรณ์ที่หมดอายุ</h4>
-            <p>แสดงรายชื่อประเภทเงินกู้พิเศษของสหกรณ์ที่หมดอายุทั้งหมด</p>
+            <h4>ประเภทเงินกู้ของสหกรณ์ที่หมดอายุ</h4>
+            <p>แสดงรายชื่อประเภทเงินกู้ของสหกรณ์ที่หมดอายุทั้งหมด</p>
         </div>
 
         <div class="box box-primary">
 
             <div class="box-header with-border">
-                <h3 class="box-title">รายชื่อประเภทเงินกู้พิเศษที่หมดอายุ</h3>
+                <h3 class="box-title"><i class="fa fa-credit-card"></i> รายชื่อประเภทเงินกู้ที่หมดอายุ</h3>
             </div>
             <!-- /.box-header -->
 
@@ -41,12 +40,10 @@
                         <thead>
                             <tr>
                                 <th style="width: 10%;">ลำดับ</th>
-                                <th style="width: 30%;">ชื่อเงินกู้พิเศษ</th>
-                                <th style="width: 15%;">วงเงินกู้สูงสุด</th>
-                                <th style="width: 15%;">ระยะเวลาผ่อนชำระสูงสุด</th>
-                                <th style="width: 10%;">วันที่เริ่มใช้</th>
-                                <th style="width: 10%;">วันที่หมดอายุ</th>
-                                <th style="width: 10%;">จำนวนสัญญาเงินกู้</th>
+                                <th style="width: 45%;">ชื่อประเภทเงินกู้</th>
+                                <th style="width: 15%;">วันที่เริ่มใช้</th>
+                                <th style="width: 15%;">วันที่สิ้นสุดการใช้</th>
+                                <th style="width: 15%;">จำนวนสัญญาเงินกู้</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -55,11 +52,9 @@
                             <tr>
                                 <td>{{ ++$count }}</td>
                                 <td class="text-primary"><i class="fa fa-money fa-fw"></i> {{ $type->name }}</td>
-                                <td>{{ number_format($type->cash_limit, 2,'.', ',') }} บาท</td>
-                                <td>{{ number_format($type->installment_limit, 0,'.', ',') }} งวด</td>
                                 <td>{{ Diamond::parse($type->start_date)->thai_format('j M Y') }}</td>
                                 <td>{{ Diamond::parse($type->expire_date)->thai_format('j M Y') }}</td>
-                                <td></td>
+                                <td>0</td>
                             </tr>
                             @endforeach
                         </tbody>

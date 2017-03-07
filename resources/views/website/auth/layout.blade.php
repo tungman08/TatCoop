@@ -33,7 +33,7 @@
 
 </head>
 
-<body class="hold-transition login-page">
+<body class="hold-transition login-page" style="height: initial;">
 
     <header>
         <div class="progress progress-xxs active">
@@ -87,7 +87,7 @@
 
     <!-- Custom JavaScript -->
     {{ Html::script(elixir('js/auth.js')) }}
-
+    {{ Html::script(elixir('js/moment.js')) }}
 </body>
 
 </html>

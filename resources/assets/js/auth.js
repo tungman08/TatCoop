@@ -28,7 +28,7 @@ function background(date) {
             $("#copyrightlink").attr("href", '#');
         },
         success: function (image) {
-            $("body").css("backgroundImage", "url('" + image.url + "')").waitForImages({
+            $("body").css("backgroundImage", "url('/background/" + moment(image.background_date).format('YYYYMMDD') + ".jpg')").waitForImages({
                 waitForAll: true,
                 finished: function() {
                     $("header").hide();

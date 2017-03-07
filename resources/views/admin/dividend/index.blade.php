@@ -60,13 +60,23 @@
                         <tbody>
                             @eval($count = 0)
                             @foreach($dividends->sortByDesc('rate_year') as $dividend)
-                            <tr onclick="javascript: document.location = '{{ url('/admin/dividend/' . $dividend->id . '/edit') }}';"
-                                style="cursor: pointer;">
+                            <tr>
                                 <td>{{ ++$count }}</td>
                                 <td class="text-primary">ปี {{ $dividend->rate_year + 543 }}</td>
                                 <td>{{ $dividend->rate }} %</td>
                                 <td>
-                                    <a href="#"><i class="fa fa-file-excel-o fa-fw"></i> สรุปการปันผลเป็นเอกสาร Excel</a>
+                                    <div class="btn-group">
+                                        <button type="button"
+                                            class="btn btn-default btn-flat btn-xs"
+                                            onclick="javascript:window.location.href = '{{ url('/admin/dividend/' . $dividend->id . '/edit') }}';"
+                                            data-tooltip="true" title="แก้ไข"><i class="fa fa-pencil"></i></button>
+                                        @if ($dividend->rate_year < Diamond::today()->year)
+                                            <button type="button" 
+                                                class="btn btn-default btn-flat btn-xs"
+                                                onclick="javascript:document.location = '{{ url('admin/dividend/' . $dividend->id . '/export') }}';"
+                                                data-tooltip="true" title="สรุปการปันผลเป็นเอกสาร Excel"><i class="fa fa-file-excel-o"></i></button>
+                                        @endif
+                                    </div>                             
                                 </td>
                             </tr>
                             @endforeach

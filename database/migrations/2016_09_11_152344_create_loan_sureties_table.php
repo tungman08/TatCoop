@@ -23,6 +23,8 @@ class CreateLoanSuretiesTable extends Migration
             $table->foreign('member_id')->references('id')
                 ->on('members')->onDelete('cascade');
 
+            $table->boolean('myself')->default(false);
+            $table->double('amount');
             $table->timestamps();
         });
     }

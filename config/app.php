@@ -150,6 +150,7 @@ return [
         Collective\Html\HtmlServiceProvider::class,
         Yajra\Datatables\DatatablesServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
+        Maatwebsite\Excel\ExcelServiceProvider::class,
         Intervention\Image\ImageServiceProvider::class,
 
         /*
@@ -208,17 +209,19 @@ return [
         'Form' => Collective\Html\FormFacade::class,
         'Html' => Collective\Html\HtmlFacade::class,
         'Image' => Intervention\Image\Facades\Image::class,
-        'Bing' => App\Facades\BingPhoto::class,
-        'Client' => App\Facades\Client::class,
+        'Datatables' => Yajra\Datatables\Facades\Datatables::class,
+        'PDF' => Barryvdh\DomPDF\Facade::class,
+        'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+        'Bing' => App\Facades\Bing::class,
+        'ClientInfo' => App\Facades\ClientInfo::class,
         'Diamond' => App\Facades\Diamond::class,
         'MainMenu' => App\Facades\MainMenu::class,
         'Statistic' => App\Facades\Statistic::class,
         'MemberProperty' => App\Facades\MemberProperty::class,
         'Number' => App\Facades\Number::class,
         'UploadDocument' => App\Facades\UploadDocument::class,
-        'Datatables' => Yajra\Datatables\Facades\Datatables::class,
-        'PDF' => Barryvdh\DomPDF\Facade::class,
         'History' => App\Facades\History::class,
+        'Loan' => App\Facades\Loan::class,
     ],
 
 ];

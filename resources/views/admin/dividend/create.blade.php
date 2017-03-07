@@ -65,16 +65,18 @@
     {!! Html::script(elixir('js/member-form.js')) !!}
 
     <script>
-        $('#rate_year').datetimepicker({
-            locale: 'th',
-            format: 'YYYY',
-            viewMode: 'years',
-            minDate: moment('2015-12-31'),
-            maxDate: moment()
-        }).on('dp.hide', function(e){
-            setTimeout(function() {
-                $('#rate_year').data('DateTimePicker').viewMode('months');
-            }, 1);
+        $(document).ready(function() {
+            $('#rate_year').datetimepicker({
+                locale: 'th',
+                format: 'YYYY',
+                viewMode: 'years',
+                minDate: moment('2015-12-31'),
+                maxDate: moment()
+            }).on('dp.hide', function(e){
+                setTimeout(function() {
+                    $('#rate_year').data('DateTimePicker').viewMode('months');
+                }, 1);
+            });
         });
     </script>
 @endsection

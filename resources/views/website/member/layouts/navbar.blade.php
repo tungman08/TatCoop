@@ -6,9 +6,9 @@
     <!-- Navbar Right Menu -->
     <div class="navbar-custom-menu">
         <ul class="nav navbar-nav">
-            @include('website.user.message')
-            @include('website.user.notice')
-            @include('website.user.alert')
+            {{-- @include('website.user.message') --}}
+            {{-- @include('website.user.notice') --}}
+            {{-- @include('website.user.alert') --}}
             @include('website.user.user')
 
             <!-- Control Sidebar Toggle Button -->

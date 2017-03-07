@@ -3,11 +3,17 @@
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-position: center;
+    background-size: cover;
 }
 
 .img-responsive {
     border: 3px solid #fafafa;
     margin: 0 auto;
+}
+
+.login-box, .register-box {
+    width: 360px;
+    margin: 8% auto 0;
 }
 
 .login-box-body {

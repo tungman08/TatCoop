@@ -43,6 +43,11 @@ Route::group(['domain' => 'www.tatcoop.dev',
         Route::get('{date}', ['as' => 'website.member.shareholding.billing', 'uses' => 'MemberController@getBilling']);
     });
 
+    // Pre Loan Route...
+    Route::controller('/loan', 'LoanController', [
+        'getIndex' => 'website.loan.index',
+    ]);
+
     // Member Route...
     Route::controller('/member', 'MemberController', [
         'getIndex' => 'website.member.index',
@@ -87,6 +92,7 @@ Route::group(['domain' => 'www.tatcoop.dev',
     Route::resource('knowledges', 'KnowledgeController');
 
     // Ajax Route...
+    Route::post('/ajax/loan', 'AjaxController@postLoan');
     Route::controller('/ajax', 'AjaxController', [
         'getBackground' => 'website.ajax.background',
         'getLoadmore' => 'website.ajax.loadmore',
@@ -95,6 +101,9 @@ Route::group(['domain' => 'www.tatcoop.dev',
         'getPostcode' => 'website.ajax.postcode',
         'getDividend' => 'website.ajax.dividend',
     ]);
+
+    // Background Route...
+    Route::get('/background/{photo}', ['as' => 'website.background', 'uses' => 'HomepageController@getBackground']);
 
     // Homepage Route...
     Route::get('/', ['as' => 'website.index', 'uses' => 'HomepageController@getIndex']);
@@ -126,6 +135,8 @@ Route::group(['domain' => 'admin.tatcoop.dev',
     Route::post('/ajax/uploadphoto', 'AjaxController@postUploadPhoto');
     Route::post('/ajax/deletedocument', 'AjaxController@postDeleteDocument');
     Route::post('/ajax/deletephoto', 'AjaxController@postDeletePhoto');
+    Route::post('/ajax/loannormalemployeestep1', 'AjaxController@postLoanNormalEmployeeStep1');
+    Route::post('/ajax/getsurety', 'AjaxController@postGetSurety');
     Route::controller('/ajax', 'AjaxController', [
         'getBackground' => 'admin.ajax.background',
         'getLoadmore' => 'admin.ajax.loadmore',
@@ -200,6 +211,9 @@ Route::group(['domain' => 'admin.tatcoop.dev',
         Route::resource('shareholding', 'ShareholdingController');
 
         // Loan Route...
+        Route::get('loan/createnormal', ['as' => 'admin.member.loan.createnormal', 'uses' => 'LoanController@getCreateNormal']);
+        Route::get('loan/createemerging', ['as' => 'admin.member.loan.createemerging', 'uses' => 'LoanController@getCreateEmerging']);
+        Route::get('loan/createspecial/{loantype_id}', ['as' => 'admin.member.loan.createspecial', 'uses' => 'LoanController@getCreateSpecial']);
         Route::resource('loan', 'LoanController');
     });
 
@@ -209,16 +223,22 @@ Route::group(['domain' => 'admin.tatcoop.dev',
 
     // Loan Type Route...
     Route::get('/admin/loantype/expire', 'LoanTypeController@getExpire');
+    Route::get('/admin/loantype/deleted', 'LoanTypeController@getDeleted');
+    Route::get('/admin/loantype/{id}/finish', 'LoanTypeController@getFinish');
     Route::resource('/admin/loantype', 'LoanTypeController');
 
     // Dividend Route...
     Route::get('/admin/dividend/{id}/erase', 'DividendController@getErase');
+    Route::get('/admin/dividend/{id}/export', 'DividendController@getExport');
     Route::resource('/admin/dividend', 'DividendController');
 
     // Statistic Route...
     Route::controller('/admin/statistic', 'StatisticController', [
         'getProfile' => 'admin.statistic.index',
     ]);
+
+    // Background Route...
+    Route::get('/background/{photo}', ['as' => 'website.background', 'uses' => 'BackgroundController@getBackground']);
 
     // Admin Route...
     Route::controller('/', 'AdminController', [

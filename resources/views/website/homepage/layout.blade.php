@@ -99,13 +99,7 @@
     {{ Html::script(elixir('js/jquery.easing.js')) }}
     {{ Html::script(elixir('js/metisMenu.js')) }}
     {{ Html::script(elixir('js/homepage.js')) }}
-
-    <script>
-    $(document).ready(function () {
-        $('[data-tooltip="true"]').tooltip();    
-    });   
-    </script>
-
+    
 </body>
 
 </html>

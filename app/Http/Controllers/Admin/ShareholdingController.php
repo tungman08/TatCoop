@@ -12,6 +12,7 @@ use DB;
 use Diamond;
 use Validator;
 use App\Member;
+use App\Profile;
 use App\Shareholding;
 use App\ShareholdingType;
 
@@ -34,7 +35,7 @@ class ShareholdingController extends Controller
     }
 
     public function create($id) {
-        return view('admin.member.shareholding.create', [
+        return view('admin.shareholding.create', [
             'member' => Member::find($id),
             'shareholding_types' => ShareholdingType::all()
         ]);
@@ -72,7 +73,9 @@ class ShareholdingController extends Controller
                     
                 $shareholding->save();
 
-                History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'เพิ่มข้อมูลค่าหุ้นแก่สมาชิกรหัส ' . str_pad($id, 5, "0", STR_PAD_LEFT));
+                $profile = Profile::find(Member::find($id)->profile_id);
+
+                History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'เพิ่มข้อมูลค่าหุ้นของคุณ' . $profile->name . ' ' . $profile->lastname);
             });
 
             return redirect()->route('admin.member.tab', ['id' => $id, 'tab' => 1])
@@ -82,7 +85,7 @@ class ShareholdingController extends Controller
     }
 
     public function edit($member_id, $id) {
-        return view('admin.member.shareholding.edit', [
+        return view('admin.shareholding.edit', [
             'member' => Member::find($member_id),
             'shareholding' => Shareholding::find($id),
             'shareholding_types' => ShareholdingType::all()
@@ -120,7 +123,9 @@ class ShareholdingController extends Controller
                 
                 $shareholding->save();
 
-                History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'แก้ไขข้อมูลค่าหุ้นแก่สมาชิกรหัส ' . str_pad($shareholding->member_id, 5, "0", STR_PAD_LEFT));
+                $profile = Profile::find(Member::find($shareholding->member_id)->profile_id);
+
+                History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'แก้ไขข้อมูลค่าหุ้นของคุณ' . $profile->name . ' ' . $profile->lastname);
             });
 
             return redirect()->route('admin.member.tab', ['id' => $member_id, 'tab' => 1])
@@ -133,7 +138,9 @@ class ShareholdingController extends Controller
         DB::transaction(function() use ($id) {
             $shareholding = Shareholding::find($id);
 
-            History::addAdminHistory(Auth::guard($this->guard)->id(), 'ลบข้อมูล', 'ลบข้อมูลค่าหุ้นแก่สมาชิกรหัส ' . str_pad($shareholding->member_id, 5, "0", STR_PAD_LEFT));
+            $profile = Profile::find(Member::find($shareholding->member_id)->profile_id);
+
+            History::addAdminHistory(Auth::guard($this->guard)->id(), 'ลบข้อมูล', 'ลบข้อมูลค่าหุ้นคุณ' . $profile->name . ' ' . $profile->lastname);
 
             $shareholding->delete();
         });

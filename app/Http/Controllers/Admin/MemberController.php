@@ -24,6 +24,7 @@ use App\EmployeeType;
 use App\Shareholding;
 use App\Dividend;
 use App\User;
+use App\LoanType;
 
 class MemberController extends Controller
 {    
@@ -73,7 +74,7 @@ class MemberController extends Controller
             'profile.lastname' => 'required', 
             'profile.citizen_code' => 'required|digits:13', 
             'shareholding' => 'required|numeric', 
-            'profile.birth_date' => 'date_format:Y-m-d', 
+            'profile.birth_date' => 'required|date_format:Y-m-d', 
             'profile.address' => 'required'
         ];
 
@@ -168,11 +169,14 @@ class MemberController extends Controller
             $dividend_years[] = (object)['pay_year' => $i];
         }
 
+        $specialLoans = LoanType::special()->get();
+
         return view('admin.member.show', [
             'member' => $member,
             'histories' => Member::where('profile_id', $member->profile_id)->get(),
             'dividend_years' => $dividend_years,
             'dividends' => MemberProperty::getDividend($member->id, Diamond::today()->year),
+            'special_loans' => $specialLoans,
             'tab' => 0
         ]);
     }
@@ -202,7 +206,7 @@ class MemberController extends Controller
             'profile.lastname' => 'required', 
             'profile.citizen_code' => 'required|digits:13', 
             'shareholding' => 'required|numeric', 
-            'profile.birth_date' => 'date_format:Y-m-d', 
+            'profile.birth_date' => 'required|date_format:Y-m-d', 
             'profile.address' => 'required', 
         ];
 
@@ -262,6 +266,21 @@ class MemberController extends Controller
     }
 
     public function getLeave($id) {
+        $member = Member::find($id);
+
+        if (is_null($member->leave_date)) {
+            return view('admin.member.leave', [
+                'member' => $member
+            ]);
+        }
+        else {
+            return redirect()->route('admin.member.show', [
+                'member' => $member->id
+            ]);
+        }
+    }
+
+    public function postLeave($id) {
         $member = Member::find($id);
 
         DB::transaction(function() use ($member) {

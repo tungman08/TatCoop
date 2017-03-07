@@ -7,7 +7,7 @@ function uploadImage(input, type, id) {
 
     var formData = new FormData();
         formData.append('photo', photo);
-        formData.append('id', id)
+        formData.append('id', id);
         formData.append('type', type);
 
     if (photo.size < 20971520) {

@@ -70,70 +70,80 @@
     {!! Html::script(elixir('js/moment.js')) !!}
     {!! Html::script(elixir('js/bootstrap-datetimepicker.js')) !!}
 
+    <!-- InputMask JavaScript -->
+    {{ Html::script(elixir('js/jquery.inputmask.js')) }}
+
     <!-- Custom JavaScript -->
     {!! Html::script(elixir('js/member-form.js')) !!}
 
     <script>
-    $('#birth_date').datetimepicker({
-        locale: 'th',
-        viewMode: 'days',
-        format: 'YYYY-MM-DD'
-    });
+    $(document).ready(function () {
+        $("[data-mask]").inputmask();
+        $('form').submit(function() {
+            $("[data-mask]").inputmask('remove');
+        });
+        
+        $('#birth_date').datetimepicker({
+            locale: 'th',
+            viewMode: 'days',
+            format: 'YYYY-MM-DD'
+        });
 
-    $('#employee_code').blur(function() {
-        if ( $('#employee_code').val().length == 5) {
-            $.ajax({
-                url: '/ajax/status',
-                type: "get",
-                data: {
-                    'code': $('#employee_code').val()
-                },
-                success: function (data) {
-                    $('#fee').val(data.message);
+        $('#employee_code').blur(function() {
+            if ( $('#employee_code').val().length == 5) {
+                $.ajax({
+                    url: '/ajax/status',
+                    type: "get",
+                    data: {
+                        'code': $('#employee_code').val()
+                    },
+                    success: function (data) {
+                        $('#fee').val(data.message);
 
-                    if (data.message == 'ยังคงเป็นสมาชิกอยู่'){
-                        $('#save').addClass('disabled');
-                        $('#save').prop('disabled', true);
-                    }
-                    else {
-                        if (data.message == '200') {
-                            $('#prefix').val(data.member.profile.prefix_id);
-                            $('#name').val(data.member.profile.name);
-                            $('#lastname').val(data.member.profile.lastname);
-                            $('#citizen_code').val(data.member.profile.citizen_code);
-                            $('#employee_type').val(data.member.employee.employee_type_id);
-                            $('#birth_date').datetimepicker({
-                                defaultDate: data.member.profile.birth_date,
-                                viewMode: 'days',
-                                format: 'YYYY-MM-DD'
-                            });
-                            $('#address').val(data.member.profile.address);
-                            $('#province_id').val(data.member.profile.province_id);
-                            $('#district_id').empty();
-                            $.each(data.member.districts, function (i, item) {
-                                $('#district_id').append($('<option>', { 
-                                    value: item.id,
-                                    text : item.name 
-                                }));
-                            });
-                            $('#district_id').val(data.member.profile.district_id);
-                            $('#subdistrict_id').empty();
-                            $.each(data.member.subdistricts, function (i, item) {
-                                $('#subdistrict_id').append($('<option>', { 
-                                    value: item.id,
-                                    text : item.name 
-                                }));
-                            });
-                            $('#subdistrict_id').val(data.member.profile.subdistrict_id);
-                            $('#postcode').val(data.member.postcode);
+                        if (data.message == 'ยังคงเป็นสมาชิกอยู่'){
+                            $('#save').addClass('disabled');
+                            $('#save').prop('disabled', true);
                         }
+                        else {
+                            if (data.message == '200') {
+                                $('#prefix').val(data.member.profile.prefix_id);
+                                $('#name').val(data.member.profile.name);
+                                $('#lastname').val(data.member.profile.lastname);
+                                $('#citizen_code').val(data.member.profile.citizen_code);
+                                $('#employee_type').val(data.member.employee.employee_type_id);
+                                $('#birth_date').datetimepicker({
+                                    defaultDate: data.member.profile.birth_date,
+                                    viewMode: 'days',
+                                    format: 'YYYY-MM-DD'
+                                });
+                                $('#address').val(data.member.profile.address);
+                                $('#province_id').val(data.member.profile.province_id);
+                                $('#district_id').empty();
+                                $.each(data.member.districts, function (i, item) {
+                                    $('#district_id').append($('<option>', { 
+                                        value: item.id,
+                                        text : item.name 
+                                    }));
+                                });
+                                $('#district_id').val(data.member.profile.district_id);
+                                $('#subdistrict_id').empty();
+                                $.each(data.member.subdistricts, function (i, item) {
+                                    $('#subdistrict_id').append($('<option>', { 
+                                        value: item.id,
+                                        text : item.name 
+                                    }));
+                                });
+                                $('#subdistrict_id').val(data.member.profile.subdistrict_id);
+                                $('#postcode').val(data.member.postcode);
+                            }
 
-                        $('#save').removeClass('disabled');
-                        $('#save').prop('disabled', false);
+                            $('#save').removeClass('disabled');
+                            $('#save').prop('disabled', false);
+                        }
                     }
-                }
-            });
-        }
+                });
+            }
+        });
     });
     </script>
 @endsection

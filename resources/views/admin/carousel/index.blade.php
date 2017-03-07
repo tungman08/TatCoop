@@ -79,7 +79,7 @@
 
                 <div class="btn-group">
                     <button id="add" type="button" class="btn btn-primary btn-flat">
-                        <i class="fa fa-plus fa-fw"></i> เพิ่มข่าวประชาสัมพันธ์
+                        <i class="fa fa-plus-circle fa-fw"></i> เพิ่มข่าวประชาสัมพันธ์
                     </button>
                 </div>            
             </div>

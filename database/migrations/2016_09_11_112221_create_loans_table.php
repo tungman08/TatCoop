@@ -16,10 +16,9 @@ class CreateLoansTable extends Migration
             $table->increments('id');
             $table->string('code')->unique();
             $table->date('loan_date');
-            $table->double('salary');
-            $table->double('amount');
+            $table->double('outstanding');
             $table->float('rate');
-            $table->integer('preriod');
+            $table->integer('period');
             $table->timestamps();
         });
     }

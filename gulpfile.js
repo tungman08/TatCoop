@@ -62,6 +62,7 @@ elixir(function(mix) {
         .styles('./bower_components/AdminLTE/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.css')
         .styles('./bower_components/magnific-popup/dist/magnific-popup.css')
         .styles('auth.css')
+        .styles('stepwizard.css')
         .styles('jquery-circle-progress.css')
         .styles('black-ribbon.css');
 
@@ -113,6 +114,7 @@ elixir(function(mix) {
         'css/homepage.css',
         'css/announce.css',
         'css/auth.css',
+        'css/stepwizard.css',
         'css/admin-carousel.css',
         'css/black-ribbon.css',
     ]);

@@ -70,14 +70,24 @@
     {!! Html::script(elixir('js/moment.js')) !!}
     {!! Html::script(elixir('js/bootstrap-datetimepicker.js')) !!}
 
+    <!-- InputMask JavaScript -->
+    {{ Html::script(elixir('js/jquery.inputmask.js')) }}
+    
     <!-- Custom JavaScript -->
     {!! Html::script(elixir('js/member-form.js')) !!}
 
     <script>
-    $('#birth_date').datetimepicker({
-        locale: 'th',
-        viewMode: 'days',
-        format: 'YYYY-MM-DD'
+    $(document).ready(function () {
+        $("[data-mask]").inputmask();
+        $('form').submit(function() {
+            $("[data-mask]").inputmask('remove');
+        });
+        
+        $('#birth_date').datetimepicker({
+            locale: 'th',
+            viewMode: 'days',
+            format: 'YYYY-MM-DD'
+        });
     });
     </script>
 @endsection

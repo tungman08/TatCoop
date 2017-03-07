@@ -47,3 +47,17 @@
         </li>
     </ul>
 </div>
+
+@if (Request::is('/'))
+    <div>
+        บราวเซอร์ที่รองรับ
+        <ul class="list-inline margin-t-sm">
+            <li class="margin-r-xs" style="cursor: pointer;" data-tooltip="true" title="IE เวอร์ชั่น 9 ขึ้นไป"><i class="fa fa-internet-explorer"></i></li>
+            <li class="margin-l-xs margin-r-xs" style="cursor: pointer;" data-tooltip="true" title="Chrome เวอร์ชั่น 8 ขึ้นไป"><i class="fa fa-chrome"></i></li>
+            <li class="margin-l-xs margin-r-xs" style="cursor: pointer;" data-tooltip="true" title="Firefox เวอร์ชั่น 19 ขึ้นไป"><i class="fa fa-firefox"></i></li>
+            <li class="margin-l-xs margin-r-xs" style="cursor: pointer;" data-tooltip="true" title="Edge ทุกเวอร์ชั่น"><i class="fa fa-edge"></i></li>
+            <li class="margin-l-xs margin-r-xs" style="cursor: pointer;" data-tooltip="true" title="Opera เวอร์ชั่น 12 ขึ้นไป"><i class="fa fa-opera"></i></li>
+            <li class="margin-l-xs" style="cursor: pointer;" data-tooltip="true" title="Safari เวอร์ชั่น 5 ขึ้นไป"><i class="fa fa-safari"></i></li>
+        </ul>
+    </div>
+@endif

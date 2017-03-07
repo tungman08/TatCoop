@@ -351,3 +351,30 @@ table.dataTable thead .sorting:after {
     border: 1px solid lightgray;
     padding: 10px;
 }
+
+.table-info {
+    tr {
+        th,td {
+            border-top: none; 
+            border-bottom: 1px solid #e4e4e4;
+        }
+        &:last-child {
+            th,td {
+                border-bottom: none;
+            }
+        }
+        td {
+            ul.list-info {
+                padding: 0px;
+                margin: 0px 12px;
+                li {
+                    padding-top: 0px;
+                    padding-bottom: 4px;
+                    &:last-child {
+                        padding-bottom: 0px;
+                    }
+                }
+            }
+        }
+    }
+}

@@ -24,7 +24,7 @@ class LoanType extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'cash_limit', 'installment_limit', 'start_date', 'expire_date',
+        'name', 'rate', 'start_date', 'expire_date',
     ];
 
     /**
@@ -35,13 +35,33 @@ class LoanType extends Model
     protected $dates = ['start_date', 'expire_date', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
+     * Get the limits that uses by the type.
+     */
+    public function limits() {
+        return $this->hasMany(LoanTypeLimit::class);
+    }
+    
+    /**
      * Scope a query to only include normal province.
      *
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeActive($query)
     {
-        return $query->where('expire_date', '>=', Diamond::today());
+        return $query->whereDate('expire_date', '>=', Diamond::today())
+            ->whereNull('deleted_at');
+    }
+
+    /**
+     * Scope a query to only include normal province.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeSpecial($query)
+    {
+        return $query->where('id', '>', 2)
+            ->whereDate('expire_date', '>=', Diamond::today())
+            ->whereNull('deleted_at');
     }
 
     /**
@@ -51,6 +71,17 @@ class LoanType extends Model
      */
     public function scopeExpired($query)
     {
-        return $query->where('expire_date', '<', Diamond::today());
+        return $query->whereDate('expire_date', '<', Diamond::today())
+            ->whereNull('deleted_at');
+    }
+
+    /**
+     * Scope a query to only include normal province.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeDeletedType($query)
+    {
+        return $query->whereNotNull('deleted_at');
     }
 }

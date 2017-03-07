@@ -15,8 +15,7 @@ class CreateLoanTypesTable extends Migration
         Schema::create('loan_types', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            $table->double('cash_limit');
-            $table->integer('installment_limit');
+            $table->float('rate');
             $table->date('start_date');
             $table->date('expire_date');
             $table->timestamps();

@@ -112,7 +112,7 @@
                                     <tbody>
                                         @foreach ($histories as $history)
                                             <tr>
-                                                <td><a href="/admin/member/{{ $history->id }}">{{ $history->memberCode }}</a></td>
+                                                <td>{{ $history->memberCode }}</td>
                                                 <td>{{ Diamond::parse($history->start_date)->thai_format('j M Y') }}</td>
                                                 <td>{{ is_null($history->leave_date) ? '-' : Diamond::parse($history->leave_date)->thai_format('j M Y') }}</td>
                                             </tr>

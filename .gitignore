@@ -2,11 +2,13 @@ bootstrap/cache/
 bower_components/
 node_modules/
 public/build/
+storage/
 vendor/
 database/seeds/AdministratorsTableSeeder.php
 database/seeds/MembersTableSeeder.php
 database/seeds/ProfilesTableSeeder.php
 database/seeds/EmployeesTableSeeder.php
+.vscode/
 .env
 .env.example
 artisan

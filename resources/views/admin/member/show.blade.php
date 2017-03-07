@@ -28,36 +28,13 @@
         <div class="well" style="padding-bottom: 0px;">
             <h4>รายละเอียดข้อมูลสมาชิกสหกรณ์</h4>
 
-            <div class="table-responsive">
-                <table class="table">
-                    <tr>
-                        <th style="width:20%; border-top: none; border-bottom: 1px solid #e4e4e4;">หมายเลขสมาชิก:</th>
-                        <td style="border-top: none; border-bottom: 1px solid #e4e4e4;">{{ $member->member_code }}</td>
-                    </tr>
-                    <tr>
-                        <th style="border-top: none; border-bottom: 1px solid #e4e4e4;">ชื่อ:</th>
-                        <td style="border-top: none; border-bottom: 1px solid #e4e4e4;">{{ ($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' :$member->profile->fullName }} </td>
-                    </tr>
-                    <tr>
-                        <th style="border-top: none; border-bottom: 1px solid #e4e4e4;">จำนวนหุ้นต่อเดือน:</th>
-                        <td style="border-top: none; border-bottom: 1px solid #e4e4e4;">{{ number_format($member->shareholding, 0,'.', ',') }} หุ้น ({{ number_format($member->shareholding * 10, 2,'.', ',') }} บาท)</td>
-                    </tr>
-                    <tr>
-                        <th style="border-top: none; border-bottom: 1px solid #e4e4e4;">ทุนเรือนหุ้นสะสม:</th>
-                        <td style="border-top: none; border-bottom: 1px solid #e4e4e4;">{{ number_format($member->shareholdings()->sum('amount'), 2,'.', ',') }} บาท</td>
-                    </tr>
-                    <tr>
-                        <th>ยอดหนี้คงเหลือ:</th>
-                        <td>- บาท</td>
-                    </tr>                   
-                </table>
-            </div>
+            @include('admin.member.info.detail', ['member' => $member])
 
             @if (is_null($member->leave_date))
                 <button class="btn btn-danger btn-flat"
                     style="margin-bottom: 20px; width: 120px;"
                     title="ลาออกจากสมาชิก"
-                    onclick="javascript:var result = confirm('สมาชิกท่านนี้ต้องการลาออกจากการเป็นสมาชิกใช่หรือไม่ ?'); if (result) { window.location = '/admin/member/{{ $member->id }}/leave'; }">
+                    onclick="javascript:window.location = '/admin/member/{{ $member->id }}/leave';">
                     <i class="fa fa-user-times"></i> ลาออก
                 </button>
             @endif

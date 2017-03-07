@@ -45,7 +45,7 @@
             <div class="box-body">
                 <button class="btn btn-primary btn-flat margin-b-md" type="button" data-tooltip="true" title="เพิ่มสาระน่ารู้"
                     onclick="javascript:window.location.href='{{ url('/website/knowledge/create') }}';">
-                    <i class="fa fa-plus"></i> เพิ่มสาระน่ารู้
+                    <i class="fa fa-plus-circle"></i> เพิ่มสาระน่ารู้
                 </button>
                 <button class="btn btn-default btn-flat margin-b-md pull-right" type="button" data-tooltip="true" title="สาระน่ารู้ที่ถูกลบ"
                     onclick="javascript:window.location.href='{{ url('/website/knowledge/inactive') }}';">

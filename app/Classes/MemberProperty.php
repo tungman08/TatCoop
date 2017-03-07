@@ -80,4 +80,21 @@ class MemberProperty
 
         return $dividends;
     }
+
+    public function getExcelColumn($val) {
+        $first = floor(($val / 26));
+        $second = $val % 26;
+
+        if ($first > 0) {
+            if ($second == 0) {
+                return 'Z';
+            }
+            else {
+                return chr(64 + $first) . chr(64 + $second);
+            }
+        }
+        else {
+            return chr(64 + $second);
+        }
+    }
 }

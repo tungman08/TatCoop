@@ -13,6 +13,7 @@ use DB;
 use Diamond;
 use Image;
 use File;
+use Loan;
 use MemberProperty;
 use UploadDocument;
 use App\Classes\Icon;
@@ -37,6 +38,7 @@ use App\DocumentType;
 use App\Carousel;
 use App\NewsAttachment;
 use App\KnowledgeAttachment;
+use App\LoanType;
 use Datatables;
 
 class AjaxController extends Controller
@@ -73,7 +75,7 @@ class AjaxController extends Controller
                     DB::raw("CONCAT('<span class=\"text-primary\"><i class=\"fa fa-user fa-fw\"></i> ', IF(profiles.name = '<ข้อมูลถูกลบ>', profiles.name, CONCAT(profiles.name, ' ', profiles.lastname)), '</span>') as fullname"),
                     'employee_types.name as typename',
                     DB::raw("CONCAT(FORMAT(members.shareholding, 0), ' หุ้น') as shareholding"),
-                    DB::raw("CONCAT(FORMAT(SUM(shareholdings.amount), 2), ' บาท') as amount"),
+                    DB::raw("CONCAT(FORMAT(COALESCE(SUM(shareholdings.amount), 0), 2), ' บาท') as amount"),
                     'members.start_date as startdate'
                 ]);
 
@@ -167,8 +169,9 @@ class AjaxController extends Controller
      * @return Response
      */
     public function getBackground(Request $request) {
+        $date = $request->input('date');
 
-        return response()->json(Bing::setArgs(['date'=>$request->input('date')])->getImage());
+        return Bing::photo($date);
     }
 
     public function getChart(Request $request) {
@@ -347,7 +350,10 @@ class AjaxController extends Controller
         $index = $request->input('index');
 
         $affect = UploadDocument::reorderDocument($id, $index);
-        History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'จัดเรียงลำดับเอกสารบนหน้าเว็บไซต์');
+
+        if ($affect > 0) {
+            History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'จัดเรียงลำดับเอกสารบนหน้าเว็บไซต์');
+        }
 
         return Response::json('Success: ' . $affect);
     }
@@ -639,5 +645,47 @@ class AjaxController extends Controller
 
         return Datatables::queryBuilder($members)
              ->make(true);
+    }
+
+    function postLoanNormalEmployeeStep1(Request $request) {
+        $member_id = $request->input('member_id');
+        $payment_type = $request->input('payment_type');
+        $outstanding = $request->input('outstanding');
+        $period = $request->input('period');
+        $salary = $request->input('salary');
+        $net_salary = $request->input('net_salary');
+
+        $loanType = LoanType::find(1);
+        $member = Member::find($member_id);
+        $shareholding = $member->shareholdings->sum('amount');
+        $percent = ($shareholding * 100) / $outstanding;
+        $rate = $loanType->rate;
+        $max_outstanding = $salary * 40;
+        $max_cash = $loanType->limits->max('cash_end');
+        $pmt = Loan::pmt($rate, $outstanding, $period);
+        $limit = $loanType->limits()->where('cash_begin', '<=', $outstanding)
+            ->where('cash_end', '>=', $outstanding)->first();
+
+        if ($outstanding > $max_cash) {
+            return Response::json("ไม่สามารถกู้ได้ เนื่องจากยอดเงินที่ขอกู้มากกว่าวงเงินที่สามารถกู้ได้ (วงเงินที่กู้ได้สูงสุด " . number_format($max_cash, 2, '.', ',') . " บาท)");
+        }
+
+        if ($outstanding > $max_outstanding) {
+            return Response::json("ไม่สามารถกู้ได้ เนื่องจากเงินเดือนน้อยกว่าวงเงินที่ขอกู้ (วงเงินที่กู้ได้สูงสุด " . number_format($max_outstanding, 2, '.', ',') . " บาท)");
+        }
+
+        if ($net_salary - $pmt < 3000) {
+            return Response::json("ไม่สามารถกู้ได้ เนื่องจากเงินเดือนสุทธิไม่พอสำหรับขอกู้ (ค่างวดต่อเดือน " . number_format($pmt, 2, '.', ',') . " บาท)");
+        }
+
+        if ($limit->period < $period) {
+            return Response::json("ไม่สามารถกู้ได้ เนื่องจากระยะเวลาผ่อนชำระนานกว่าที่กำหนด (จำนวนงวดสูงสุด " . number_format($limit->period, 0, '.', ',') . " งวด)");
+        }
+
+        if ($percent < $limit->shareholding) {
+            return Response::json("ไม่สามารถกู้ได้ เนื่องจากมีทุนเรือนหุ้นไม่พอ (ต้องการหุ้น " . number_format($limit->shareholding, 1, '.', ',') . "%, ผู้กู้มี " . number_format($percent, 1, '.', ',') . "%)");
+        }
+
+        return Response::json(true);
     }
 }

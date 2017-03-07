@@ -9,12 +9,14 @@ use App\Http\Controllers\Controller;
 use Auth;
 use History;
 use Bing;
+use Loan;
 use MemberProperty;
 use App\Theme;
 use App\District;
 use App\Subdistrict;
 use App\Member;
 use App\Dividend;
+use App\LoanType;
 
 class AjaxController extends Controller
 {
@@ -24,7 +26,7 @@ class AjaxController extends Controller
      * @return void
      */
     public function __construct() {
-        $this->middleware('auth:users', ['except' => 'getBackground']);
+        $this->middleware('auth:users', ['except' => ['getBackground', 'postLoan']]);
     }
 
     /**
@@ -34,8 +36,9 @@ class AjaxController extends Controller
      * @return Response
      */
     public function getBackground(Request $request) {
+        $date = $request->input('date');
 
-        return response()->json(Bing::setArgs(['date'=>$request->input('date')])->getImage());
+        return Bing::photo($date);
     }
 
     public function postSkin(Request $request) {
@@ -85,5 +88,23 @@ class AjaxController extends Controller
         $dividend_rate = (!is_null($rate)) ? $rate->rate : 0;
         
         return compact('member', 'dividends', 'dividend_rate');
+    }
+
+    public function postLoan(Request $request) {
+        $loan_type_id = $request->input('loan_type');
+        $outstanding = $request->input('outstanding');
+        $period = $request->input('period');
+        $loanType = LoanType::find($loan_type_id);
+
+        $general = collect(Loan::payment($loanType->rate, 1, $outstanding, $period));
+        $stable = collect(Loan::payment($loanType->rate, 2, $outstanding, $period));
+
+        $info = (object)[
+            'rate' => $loanType->rate,
+            'general' => (object) [ 'total_pay' => $general->sum('pay'), 'total_interest' => $general->sum('interest') ],
+            'stable' => (object) [ 'total_pay' => $stable->sum('pay') + $stable->sum('addon'), 'total_interest' => $stable->sum('interest') ]
+        ];
+
+        return compact('info', 'general', 'stable');
     }
 }

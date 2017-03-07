@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use App;
 use Auth;
 use Blade;
+use Validator;
 use App\Theme;
 
 class AppServiceProvider extends ServiceProvider
@@ -45,12 +46,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        App::bind('bingphoto', function() {
-            return new \App\Classes\BingPhoto;
-        });
-
-        App::bind('client', function() {
-            return new \App\Classes\Client;
+        App::bind('clientinfo', function() {
+            return new \App\Classes\ClientInfo;
         });
 
         App::bind('diamond', function() {
@@ -83,6 +80,14 @@ class AppServiceProvider extends ServiceProvider
         
         App::bind('history', function() {
             return new \App\Classes\History;
-        });        
+        });  
+
+        App::bind('bing', function() {
+            return new \App\Classes\Bing;
+        });   
+
+        App::bind('loan', function() {
+            return new \App\Classes\Loan;
+        });         
     }
 }

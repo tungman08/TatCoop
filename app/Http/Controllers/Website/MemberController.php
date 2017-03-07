@@ -74,7 +74,7 @@ class MemberController extends Controller
 
      public function putUpdate(Request $request, $id) {
         $rules = [
-            'profile.birth_date' => 'date_format:Y-m-d', 
+            'profile.birth_date' => 'required|date_format:Y-m-d', 
             'profile.address' => 'required', 
         ];
 

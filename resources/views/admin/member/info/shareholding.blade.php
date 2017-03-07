@@ -1,7 +1,7 @@
 @if (is_null($member->leave_date))
     <button class="btn btn-primary btn-flat" style="margin-bottom: 15px;"
         onclick="javascript:window.location = '/admin/member/{{ $member->id }}/shareholding/create';">
-        <i class="fa fa-plus"></i> ชำระเงินค่าหุ้น
+        <i class="fa fa-plus-circle"></i> ชำระเงินค่าหุ้น
     </button>
 @endif
 
