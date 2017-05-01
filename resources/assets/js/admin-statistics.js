@@ -1,7 +1,12 @@
 ﻿$(document).ready(function () {
+    $.ajaxSetup({
+        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+    });
+
     $('#datepicker').datetimepicker({
         viewMode: 'months',
-        format: 'YYYY-MM'
+        format: 'YYYY-MM',
+        locale: moment().lang("th")
     }).on("dp.change", function (e) {
         $('.display-month').html(thai_date(e.date));
         detail_statistic(e.date);
@@ -53,7 +58,7 @@ function chart_statistic(date, tab) {
     $.ajax({
         dataType: 'json',
         url: '/ajax/chart',
-        type: 'get',
+        type: 'post',
         cache: false,
         data: {
             'date': date.format("YYYY-M-D"),
@@ -199,7 +204,7 @@ function detail_statistic(date) {
     $('#dataTables-website').dataTable({
         "ajax": {
             "url": "/ajax/detail",
-            "type": "get",
+            "type": "post",
             "data": {
                 "date": date.format("YYYY-M-D"),
                 "web": "website"
@@ -211,7 +216,7 @@ function detail_statistic(date) {
     $('#dataTables-webapp').dataTable({
         "ajax": {
             "url": "/ajax/detail",
-            "type": "get",
+            "type": "post",
             "data": {
                 "date": date.format("YYYY-M-D"),
                 "web": "webapp"
@@ -223,7 +228,7 @@ function detail_statistic(date) {
     $('#dataTables-webuser').dataTable({
         "ajax": {
             "url": "/ajax/detail",
-            "type": "get",
+            "type": "post",
             "data": {
                 "date": date.format("YYYY-M-D"),
                 "web": "webuser"
@@ -233,20 +238,7 @@ function detail_statistic(date) {
 }
 
 function thai_date(date) {
-    var months = { 
-        'January': 'มกราคม',
-        'February': 'กุมภาพันธ์', 
-        'March': 'มีนาคม', 
-        'April': 'เมษายน', 
-        'May': 'พฤษภาคม', 
-        'June': 'มิถุนายน', 
-        'July': 'กรกฎาคม', 
-        'August': 'สิงหาคม', 
-        'September': 'กันยายน', 
-        'October': 'ตุลาคม', 
-        'November': 'พฤศจิกายน',
-        'December': 'ธันวาคม' };
-    var month = months[date.format("MMMM")];
+    var month = date.format("MMMM");
     var year = parseInt(date.format("YYYY"), 10) + 543;
 
     return month + " " + year.toString();

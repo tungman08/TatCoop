@@ -8,7 +8,7 @@
             <small>เพิ่ม ลบ แก้ไข ประเภทเงินกู้ของ สอ.สรทท.</small>
         </h1>
 
-        @include('admin.member.breadcrumb', ['breadcrumb' => [
+        @include('admin.layouts.breadcrumb', ['breadcrumb' => [
             ['item' => 'จัดการประเภทเงินกู้', 'link' => ''],
         ]])
     </section>
@@ -46,11 +46,11 @@
                     <i class="fa fa-plus"></i> เพิ่มประเภทเงินกู้
                 </button>
                 <button class="btn btn-default btn-flat margin-b-md pull-right" type="button" data-tooltip="true" title="สมาชิกประเภทเงินกู้ที่ถูกลบ"
-                    onclick="javascript:window.location.href='{{ url('/admin/loantype/deleted') }}';">
+                    onclick="javascript:window.location.href='{{ url('/admin/loantype/inactive') }}';">
                     <i class="fa fa-trash"></i> แสดงประเภทเงินกู้ที่ถูกลบ
                 </button>
                 <button class="btn btn-default btn-flat margin-b-md margin-r-sm pull-right" type="button" data-tooltip="true" title="สมาชิกประเภทเงินกู้ที่หมดอายุ"
-                    onclick="javascript:window.location.href='{{ url('/admin/loantype/expire') }}';">
+                    onclick="javascript:window.location.href='{{ url('/admin/loantype/expired') }}';">
                     <i class="fa fa-ban"></i> แสดงประเภทเงินกู้ที่สิ้นสุดการใช้
                 </button>
 
@@ -71,10 +71,10 @@
                             <tr onclick="javascript: document.location = '{{ url('/admin/loantype/' . $type->id) }}';"
                                 style="cursor: pointer;">
                                 <td>{{ ++$count }}.</td>
-                                <td class="text-primary"><i class="fa fa-money fa-fw"></i> {{ $type->name }}</td>
+                                <td class="text-primary"><i class="fa fa-credit-card fa-fw"></i> {{ $type->name }}</td>
                                 <td>{{ (Diamond::minValue()->diffInDays(Diamond::parse($type->start_date)) > 0) ? Diamond::parse($type->start_date)->thai_format('j M Y') : 'N/A' }}</td>
                                 <td>{{ (Diamond::maxValue()->diffInDays(Diamond::parse($type->expire_date)) > 0) ? Diamond::parse($type->expire_date)->thai_format('j M Y') : 'N/A' }}</td>
-                                <td>0</td>
+                                <td>{{ number_format($type->loans->filter(function ($value, $key) { return !is_null($value->code); })->count()) }}</td>
                             </tr>
                             @endforeach
                         </tbody>

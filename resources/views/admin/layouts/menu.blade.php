@@ -8,9 +8,15 @@
         <!-- link -->
         <li class="header">บริการของ สอ.สรทท.</li>
         <li>
-            <a href="{{ url('/') }}" target="_blank">
+            <a href="https://www.tatcoop.com" target="_blank">
                 <i class="fa fa-circle-o text-yellow"></i> 
                 <span>เว็บไซต์ สอ.สรทท.</span>
+            </a>
+        </li>
+        <li>
+            <a href="https://mail.tatcoop.com" target="_blank">
+                <i class="fa fa-circle-o text-danger"></i> 
+                <span>เว็บเมล สอ.สรทท.</span>
             </a>
         </li>
     </ul>

@@ -3,15 +3,16 @@
 @section('content')
     <!-- Content Header (Page header) -->
     <section class="content-header">
-    <h1>
-        จัดการประเภทเงินกู้
-        <small>เพิ่ม ลบ แก้ไข ประเภทเงินกู้ของ สอ.สรทท.</small>
-    </h1>
+        <h1>
+            จัดการประเภทเงินกู้
+            <small>เพิ่ม ลบ แก้ไข ประเภทเงินกู้ของ สอ.สรทท.</small>
+        </h1>
 
-    @include('admin.member.breadcrumb', ['breadcrumb' => [
-        ['item' => 'ข้อมูลประเภทเงินกู้', 'link' => '/admin/loantype'],
-        ['item' => 'เพิ่ม', 'link' => ''],
-    ]])
+        @include('admin.layouts.breadcrumb', ['breadcrumb' => [
+            ['item' => 'ข้อมูลประเภทเงินกู้', 'link' => '/admin/loantype'],
+            ['item' => 'ประเภทเงินกู้', 'link' => '/admin/loantype/' . $loantype->id],
+            ['item' => 'แก้ไข', 'link' => ''],
+        ]])
 
     </section>
 
@@ -72,13 +73,17 @@
             $('#start_date').datetimepicker({
                 locale: 'th',
                 viewMode: 'days',
-                format: 'YYYY-MM-DD'
+                format: 'YYYY-MM-DD',
+                locale: moment().lang('th'),
+                useCurrent: false
             });
 
             $('#expire_date').datetimepicker({
                 locale: 'th',
                 viewMode: 'days',
-                format: 'YYYY-MM-DD'
+                format: 'YYYY-MM-DD',
+                locale: moment().lang('th'),
+                useCurrent: false
             });
         });
   

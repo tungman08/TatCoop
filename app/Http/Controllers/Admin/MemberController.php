@@ -25,6 +25,7 @@ use App\Shareholding;
 use App\Dividend;
 use App\User;
 use App\LoanType;
+use App\Loan;
 
 class MemberController extends Controller
 {    
@@ -151,7 +152,7 @@ class MemberController extends Controller
                 History::addAdminHistory(Auth::guard($this->guard)->id(), 'สร้างข้อมูลสมาชิกใหม่', 'คุณ' . $profile->name . ' ' . $profile->lastname . ' สมัครเป็นสมาชิกสหกรณ์');
             });
 
-            return redirect()->route('admin.member.index')
+            return redirect()->action('Admin\MemberController@index')
                 ->with('flash_message', 
                     'คุณ ' . $request->input('profile')['name'] . ' ' . $request->input('profile')['lastname'] . 
                     ' รหัสสมาชิก ' . str_pad(Member::all()->last()->id, 5, "0", STR_PAD_LEFT) . ' เป็นสมาชิกสหกรณ์เรียบร้อยแล้ว')
@@ -161,23 +162,12 @@ class MemberController extends Controller
 
     public function show($id) {
         $member = Member::find($id);
-
-        $dividend_years = [];
-        $start_year = (Diamond::parse($member->start_date)->year > 2016) ? Diamond::parse($member->start_date)->year : 2016;
-
-        for ($i = $start_year; $i <= Diamond::today()->year; $i++) {
-            $dividend_years[] = (object)['pay_year' => $i];
-        }
-
-        $specialLoans = LoanType::special()->get();
+        $account = User::where('member_id', $member->id)->first();
 
         return view('admin.member.show', [
             'member' => $member,
             'histories' => Member::where('profile_id', $member->profile_id)->get(),
-            'dividend_years' => $dividend_years,
-            'dividends' => MemberProperty::getDividend($member->id, Diamond::today()->year),
-            'special_loans' => $specialLoans,
-            'tab' => 0
+            'account' => !is_null($account) ? $account->email : '<span class="text-danger">ยังไม่ได้ลงทะเบียนใช้งาน</span>'
         ]);
     }
 
@@ -255,7 +245,7 @@ class MemberController extends Controller
                 History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'แก้ไขข้อมูลของสมาชิกสหกรณ์ ชื่อ คุณ' . $profile->name . ' ' . $profile->lastname);
             });
 
-            return redirect()->route('admin.member.show', ['id' => $id])
+            return redirect()->action('Admin\MemberController@show', ['id' => $id])
                 ->with('flash_message', 'ข้อมูลคุณ ' . $request->input('profile')['name'] . ' ' . $request->input('profile')['lastname'] . ' ถูกแก้ไขเรียบร้อยแล้ว')
                 ->with('callout_class', 'callout-success');
         }
@@ -274,58 +264,88 @@ class MemberController extends Controller
             ]);
         }
         else {
-            return redirect()->route('admin.member.show', [
+            return redirect()->action('Admin\MemberController@show', [
                 'member' => $member->id
             ]);
         }
     }
 
-    public function postLeave($id) {
+    public function postLeave($id, Request $request) {
         $member = Member::find($id);
 
-        DB::transaction(function() use ($member) {
-            $member->leave_date = Diamond::now();
-            $member->save();
+        $rules = [
+            'member_code' => 'required|exists:members,id', 
+        ];
 
-            $total = Shareholding::where('member_id', $member->id)->sum('amount');
+        $attributeNames = [
+            'member_code' => 'รหัสสมาชิก', 
+        ];
 
-            if ($total > 0) {
-                $share = new Shareholding();
-                $share->member_id = $member->id;
-                $share->pay_date = Diamond::today();
-                $share->shareholding_type_id = 2;
-                $share->amount = 0 - $total;
-                $share->save();
-            }
+        $validator = Validator::make($request->all(), $rules);
+        $validator->setAttributeNames($attributeNames);
 
-            $user = User::where('member_id', $member->id)->first();
+        $validator->after(function($validator) use ($member, $request) {
+            $member_id = $request->input("member_code");
 
-            History::addAdminHistory(Auth::guard($this->guard)->id(), 'บันทึกการลาออกของสมาชิก', 'คุณ' . $member->profile->fullName . ' ได้ลาออกจากการเป็นเป็นสมาชิกสหกรณ์');
-
-            if (!is_null($user)) {
-                History::addAdminHistory($user->id, 'ลาออก');
+            if (!empty($member_id)) {
+                if ($member->id != intval($member_id)) {
+                    if ($member->leave_date == null) {
+                        $validator->errors()->add('membered', 'รหัสสมาชิกที่ป้อนไม่ตรงกับรหัสสมาชิกของผู้ต้องการลาออก');
+                    }
+                }
             }
         });
 
-        return redirect()->route('admin.member.index')
-            ->with('flash_message', 'คุณ ' . $member->profile->fullName . ' รหัสสมาชิก ' . str_pad($member->id, 5, "0", STR_PAD_LEFT) . ' ได้ลาออกจากการเป็นเป็นสมาชิกสหกรณ์แล้ว')
-            ->with('callout_class', 'callout-success');
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+        else {
+            DB::transaction(function() use ($member) {
+                $member->leave_date = Diamond::now();
+                $member->save();
+
+                $total = Shareholding::where('member_id', $member->id)->sum('amount');
+
+                if ($total > 0) {
+                    $share = new Shareholding();
+                    $share->member_id = $member->id;
+                    $share->pay_date = Diamond::today();
+                    $share->shareholding_type_id = 2;
+                    $share->amount = 0 - $total;
+                    $share->save();
+                }
+
+                $user = User::where('member_id', $member->id)->first();
+
+                History::addAdminHistory(Auth::guard($this->guard)->id(), 'บันทึกการลาออกของสมาชิก', 'คุณ' . $member->profile->fullName . ' ได้ลาออกจากการเป็นเป็นสมาชิกสหกรณ์');
+
+                if (!is_null($user)) {
+                    History::addAdminHistory($user->id, 'ลาออก');
+                }
+            });
+
+            return redirect()->action('Admin\MemberController@index')
+                ->with('flash_message', 'คุณ ' . $member->profile->fullName . ' รหัสสมาชิก ' . str_pad($member->id, 5, "0", STR_PAD_LEFT) . ' ได้ลาออกจากการเป็นเป็นสมาชิกสหกรณ์แล้ว')
+                ->with('callout_class', 'callout-success');      
+        }
     }
 
-    public function getShowTab($id, $tab) {
-        $member = Member::find($id);
-        $dividend_years = Shareholding::where('member_id', $member->id)
-                ->where('remark', '<>', 'ยอดยกมา')
-                ->select(DB::raw('year(pay_date) as pay_year'))
-                ->groupBy(DB::raw('year(pay_date)'))
-                ->get();
+    // public function getShowTab($id, $tab) {
+    //     $member = Member::find($id);
+    //     $dividend_years = Shareholding::where('member_id', $member->id)
+    //             ->where('remark', '<>', 'ยอดยกมา')
+    //             ->select(DB::raw('year(pay_date) as pay_year'))
+    //             ->groupBy(DB::raw('year(pay_date)'))
+    //             ->get();
 
-        return view('admin.member.show', [
-            'member' => $member,
-            'histories' => Member::where('profile_id', $member->profile_id)->get(),
-            'dividend_years' => $dividend_years,
-            'dividends' => MemberProperty::getDividend($member->id, Diamond::today()->year),
-            'tab' => $tab
-        ]);
-    }
+    //     return view('admin.member.show', [
+    //         'member' => $member,
+    //         'histories' => Member::where('profile_id', $member->profile_id)->get(),
+    //         'dividend_years' => $dividend_years,
+    //         'dividends' => MemberProperty::getDividend($member->id, Diamond::today()->year),
+    //         'tab' => $tab
+    //     ]);
+    // }
 }

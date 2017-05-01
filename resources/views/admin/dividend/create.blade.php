@@ -3,16 +3,15 @@
 @section('content')
     <!-- Content Header (Page header) -->
     <section class="content-header">
-    <h1>
-        จัดการเงินปันผล
-        <small>เพิ่ม ลบ แก้ไข อัตราเงินปันผลประจำปี สอ.สรทท.</small>
-    </h1>
+        <h1>
+            จัดการเงินปันผล
+            <small>เพิ่ม ลบ แก้ไข อัตราเงินปันผลประจำปี สอ.สรทท.</small>
+        </h1>
 
-    @include('admin.member.breadcrumb', ['breadcrumb' => [
-        ['item' => 'จัดการเงินปันผล', 'link' => '/admin/dividend'],
-        ['item' => 'เพิ่ม', 'link' => ''],
-    ]])
-
+        @include('admin.layouts.breadcrumb', ['breadcrumb' => [
+            ['item' => 'จัดการเงินปันผล', 'link' => '/admin/dividend'],
+            ['item' => 'เพิ่ม', 'link' => ''],
+        ]])
     </section>
 
     <!-- Main content -->
@@ -71,7 +70,9 @@
                 format: 'YYYY',
                 viewMode: 'years',
                 minDate: moment('2015-12-31'),
-                maxDate: moment()
+                maxDate: moment(),
+                locale: moment().lang('th'),
+                useCurrent: false
             }).on('dp.hide', function(e){
                 setTimeout(function() {
                     $('#rate_year').data('DateTimePicker').viewMode('months');

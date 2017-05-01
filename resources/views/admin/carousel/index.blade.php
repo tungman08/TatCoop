@@ -3,12 +3,14 @@
 @section('content')
     <!-- Content Header (Page header) -->
     <section class="content-header">
-    <h1>
-        จัดการข่าวประชาสัมพันธ์
-        <small>การจัดการข่าวประชาสัมพันธ์ของ สอ.สรทท.</small>
-    </h1>
+        <h1>
+            จัดการข่าวประชาสัมพันธ์
+            <small>การจัดการข่าวประชาสัมพันธ์ของ สอ.สรทท.</small>
+        </h1>
 
-    @include('admin.carousel.breadcrumb')
+        @include('admin.layouts.breadcrumb', ['breadcrumb' => [
+            ['item' => 'จัดการข่าวประกาศ', 'link' => ''],
+        ]])
 
     </section>
 
@@ -33,7 +35,7 @@
                         <li id="item-{{ $carousel->id }}" class="carousel-item">
                             <div class="form-group" style="position: relative; border: 1px solid lightgray; padding: 10px;">
                                 <div class="row">
-                                    <div class="col-md-2">
+                                    <div class="col-md-2 col-lg-2">
                                         <div class="carousel-link" onclick="$('#image-{{ $carousel->id }}').click();">
                                             <div class="carousel-hover">
                                                 <div class="carousel-hover-content">

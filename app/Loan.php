@@ -19,7 +19,7 @@ class Loan extends Model
      * @var array
      */
     protected $fillable = [
-        'code', 'loan_date', 'outstanding', 'rate', 'period'
+        'member_id', 'loan_type_id', 'payment_type_id', 'code', 'loaned_at', 'outstanding', 'rate', 'period', 'completed_at'
     ];
 
     /**
@@ -27,13 +27,23 @@ class Loan extends Model
      *
      * @var array
      */
-    protected $dates = ['loan_date', 'created_at', 'updated_at'];
+    protected $dates = ['loaned_at', 'completed_at', 'created_at', 'updated_at'];
 
     /**
-     * Get the sureties that uses by the loan.
+     * Get the loan sureties that uses by the loan.
      */
     public function sureties() {
-        return $this->hasMany(LoanSurety::class);
+        return $this->belongsToMany(Member::class)
+            ->withPivot('amount', 'yourself')
+            ->withTimestamps();
+    }
+
+    public function loanType() {
+        return $this->belongsTo(LoanType::class);
+    }
+
+    public function paymentType() {
+        return $this->belongsTo(PaymentType::class);
     }
 
     /**
@@ -41,6 +51,13 @@ class Loan extends Model
      */
     public function payments() {
         return $this->hasMany(LoanPayment::class);
+    }
+    
+    /**
+     * Get the member that uses by the loan.
+     */
+    public function member() {
+        return $this->belongsTo(Member::class);
     }
 
     /**
@@ -50,7 +67,7 @@ class Loan extends Model
      */
     public function scopeActive($query)
     {
-        return $query->where('outstanding', '>', $query->payments->sum('principle'));
+        return $query->whereNull('completed_at');
     }
 
     /**
@@ -60,6 +77,6 @@ class Loan extends Model
      */
     public function scopeFinished($query)
     {
-        return $query->where('outstanding', $query->payments->sum('principle'));
+        return $query->whereNotNull('completed_at');
     }
 }

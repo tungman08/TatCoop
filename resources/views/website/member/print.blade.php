@@ -37,7 +37,7 @@
                         </div>
                         <div class="col-xs-10 text-center">
                             <h3 style="font-size: 15px; margin: 10px 0px;"><strong>สหกรณ์ออมทรัพย์ สหภาพแรงงานรัฐวิสาหกิจการท่องเที่ยวแห่งประเทศไทย จำกัด</strong></h3><br>
-                            <h3 style="font-size: 15px; margin: 0px;">ใบเสร็จรับเงินค่าหุ้น</h3>
+                            <h3 style="font-size: 15px; margin: 0px;">ใบรับเงินค่าหุ้น</h3>
                         </div>
                     </div>
                 </div>
@@ -127,12 +127,22 @@
 
             <!-- Officer row -->
             <div class="row" style="margin-top: 20px; margin-right: 0px;">
-                <div class="col-xs-6" style="white-space: nowrap; overflow-x: hidden;">
-                    ผู้จัดการ <span style="color: #bbb;">....................................................................................................................................................................................................................</span>
+                <div class="col-xs-6">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="white-space: nowrap; width: 1%;">ผู้จัดการ</td>
+                            <td style="border-bottom: 2px dotted #bbb; padding-left: 50px;">{{ $billing->manager }}</td>
+                        </tr>
+                    </table>
                 </div>
                 <!-- /.col -->
-                <div class="col-xs-6" style="white-space: nowrap; overflow-x: hidden;">
-                    เจ้าหน้าที่ผู้รับเงิน <span style="color: #bbb;">....................................................................................................................................................................................................................</span>          
+                <div class="col-xs-6">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="white-space: nowrap; width: 1%;">เหรัญญิก</td>
+                            <td style="border-bottom: 2px dotted #bbb; padding-left: 50px;">{{ $billing->treasurer }}</td>
+                        </tr>
+                    </table>      
                 </div>
                 <!-- /.col -->
             </div>

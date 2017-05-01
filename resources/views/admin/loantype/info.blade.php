@@ -37,7 +37,7 @@
         </tr>
         <tr>
             <th>จำนวนสัญญาเงินกู้:</th>
-            <td>0</td>
+            <td>{{ number_format($loantype->loans->filter(function ($value, $key) { return !is_null($value->code); })->count()) }}</td>
         </tr>
     </table>
 </div>

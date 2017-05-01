@@ -8,7 +8,9 @@
         <small>รายละเอียดการเข้าใช้งานระบบของสมาชิก สอ.สรทท.</small>
     </h1>
 
-    @include('admin.statistic.breadcrumb')
+        @include('admin.layouts.breadcrumb', ['breadcrumb' => [
+            ['item' => 'สถิติการเข้าใช้งาน', 'link' => ''],
+        ]])
 
     </section>
 

@@ -2,6 +2,10 @@ var min = 0;
 var max = 4;
 
 $(document).ready(function () {
+    $.ajaxSetup({
+        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+    });
+
     $('[data-tooltip="true"]').tooltip();
     $("[data-mask]").inputmask();
     $("header").hide();

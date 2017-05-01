@@ -3,12 +3,15 @@
 @section('content')
     <!-- Content Header (Page header) -->
     <section class="content-header">
-    <h1>
-        ข้อมูลผู้ใช้งาน
-        <small>รายละเอียดข้อมูลผู้ใช้งานระบบ</small>
-    </h1>
+        <h1>
+            ข้อมูลผู้ใช้งาน
+            <small>รายละเอียดข้อมูลผู้ใช้งานระบบ</small>
+        </h1>
 
-    @include('admin.user.breadcrumb', ['breadcrumb' => 'ข้อมูลผู้ใช้งาน'])
+        @include('admin.layouts.breadcrumb', ['breadcrumb' => [
+            ['item' => 'ผู้ใช้งาน', 'link' => ''],
+            ['item' => 'ข้อมูลผู้ใช้งาน', 'link' => ''],
+        ]])
 
     </section>
 
@@ -92,6 +95,10 @@
 
     <script>
         $(document).ready(function () {
+            $.ajaxSetup({
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+            });
+
             $('[data-tooltip="true"]').tooltip();
         });
 
@@ -99,7 +106,7 @@
             $.ajax({
                 dataType: 'json',
                 url: '/ajax/loadmore',
-                type: 'get',
+                type: 'post',
                 cache: false,
                 data: {
                     'index': index

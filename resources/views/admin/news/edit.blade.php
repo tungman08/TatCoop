@@ -3,15 +3,16 @@
 @section('content')
     <!-- Content Header (Page header) -->
     <section class="content-header">
-    <h1>
-        จัดการข่าวสารสำหรับสมาชิก
-        <small>การจัดการข่าวสารสำหรับสมาชิกของ สอ.สรทท.</small>
-    </h1>
+        <h1>
+            จัดการข่าวสารสำหรับสมาชิก
+            <small>การจัดการข่าวสารสำหรับสมาชิกของ สอ.สรทท.</small>
+        </h1>
 
-    @include('admin.news.breadcrumb', ['breadcrumb' => [
-        ['item' => 'จัดการข่าวสารสำหรับสมาชิก', 'link' => '/website/news'],
-        ['item' => 'แก้ไข', 'link' => ''],
-    ]])
+        @include('admin.layouts.breadcrumb', ['breadcrumb' => [
+            ['item' => 'จัดการข่าวสารสำหรับสมาชิก', 'link' => '/website/news'],
+            ['item' => 'แสดงรายละเอียด', 'link' => '/website/news/' . $news->id],
+            ['item' => 'แก้ไข', 'link' => ''],
+        ]])
 
     </section>
 
@@ -68,7 +69,7 @@
                     "font-styles": true, // Font styling, e.g. h1, h2, etc.
                     "emphasis": true, // Italics, bold, etc.
                     "lists": true, // (Un)ordered lists, e.g. Bullets, Numbers.
-                    "html": false, // Button which allows you to edit the generated HTML.
+                    "html": true, // Button which allows you to edit the generated HTML.
                     "link": true, // Button to insert a link.
                     "image": false, // Button to insert an image.
                     "color": true, // Button to change color of font

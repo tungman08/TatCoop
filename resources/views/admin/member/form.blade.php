@@ -20,7 +20,7 @@
             {{ Form::text('profile[employee][code]', null, [
                 'id'=>'employee_code',
                 'placeholder' => 'รหัสพนักงาน 5 หลัก...',
-                'data-inputmask'=>'\'mask\': \'99999\',\'placeholder\':\'0\',\'removeMaskOnSubmit\':true',
+                'data-inputmask'=>"'mask': '99999','placeholder': '0','autoUnmask': true,'removeMaskOnSubmit': true",
                 'data-mask',
                 'autocomplete'=>'off',
                 'class'=>'form-control'])
@@ -93,7 +93,7 @@
                 'id' => 'citizen_code',
                 'class'=>'form-control', 
                 'placeholder'=>'หมายเลขบัตรประชาชน 13 หลัก...', 
-                'data-inputmask'=>'\'mask\': \'9-9999-99999-99-9\',\'placeholder\':\'0\',\'removeMaskOnSubmit\':true',
+                'data-inputmask'=>"'mask': '9-9999-99999-99-9','placeholder':'0','autoUnmask': true,'removeMaskOnSubmit':true",
                 'data-mask',
                 'autocomplete'=>'off'])
             }}        
@@ -207,8 +207,8 @@
         </div>
     </div>
 </div>
-
 <!-- /.box-body -->
+
 <div class="box-footer">
     {{ Form::button('<i class="fa fa-save"></i> บันทึก', [
         'id'=>'save',
@@ -217,7 +217,7 @@
     }}
     {{ Form::button('<i class="fa fa-ban"></i> ยกเลิก', [
         'class'=>'btn btn-default btn-flat', 
-        'onclick'=> ($edit) ? 'javascript:window.location = "/admin/member/' . $member->id . '";' : 'javascript:window.location = "/admin/member";'])
+        'onclick'=> 'javascript:history.go(-1);'])
     }}
 </div>
 <!-- /.box-footer -->

@@ -34,7 +34,7 @@
     }}
     {{ Form::button('<i class="fa fa-ban"></i> ยกเลิก', [
         'class'=>'btn btn-default btn-flat', 
-        'onclick'=>'javascript:window.location = ' . (($edit) ? '"/website/news/' . $news->id . '"' : '"/website/news"') . ';'])
+        'onclick'=>'javascript:history.go(-1);'])
     }}
 </div>
 <!-- /.box-footer -->

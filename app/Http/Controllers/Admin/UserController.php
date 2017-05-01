@@ -96,7 +96,7 @@ class UserController extends Controller
 
             History::addAdminHistory(Auth::guard($this->guard)->id(), 'เปลี่ยนรหัสผ่าน');
 
-            return redirect()->route('admin.user.profile')
+            return redirect()->action('Admin\UserController@getProfile')
                 ->with('password_changed', 'เปลี่ยนรหัสผ่านเสร็จเรียบร้อยแล้ว!');
         }
     }

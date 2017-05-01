@@ -3,16 +3,16 @@
 @section('content')
     <!-- Content Header (Page header) -->
     <section class="content-header">
-    <h1>
-        จัดการเงินปันผล
-        <small>เพิ่ม ลบ แก้ไข อัตราเงินปันผลประจำปี สอ.สรทท.</small>
-    </h1>
+        <h1>
+            จัดการเงินปันผล
+            <small>เพิ่ม ลบ แก้ไข อัตราเงินปันผลประจำปี สอ.สรทท.</small>
+        </h1>
 
-    @include('admin.member.breadcrumb', ['breadcrumb' => [
-        ['item' => 'จัดการเงินปันผล', 'link' => '/admin/dividend'],
-        ['item' => 'แก้ไข', 'link' => ''],
-    ]])
-
+        @include('admin.layouts.breadcrumb', ['breadcrumb' => [
+            ['item' => 'จัดการเงินปันผล', 'link' => '/admin/dividend'],
+            ['item' => 'ข้อมูลเงินปันผล', 'link' => ''],
+            ['item' => 'แก้ไข', 'link' => ''],
+        ]])
     </section>
 
     <!-- Main content -->
@@ -68,7 +68,9 @@
         $('#rate_year').datetimepicker({
             locale: 'th',
             format: 'YYYY',
-            viewMode: 'years'
+            viewMode: 'years',
+            locale: moment().lang('th'),
+            useCurrent: false
         }).on('dp.hide', function(e){
             setTimeout(function() {
                 $('#rate_year').data('DateTimePicker').viewMode('months');

@@ -82,7 +82,7 @@ class UserController extends Controller
 
             History::addUserHistory(Auth::guard()->id(), 'เปลี่ยนรหัสผ่าน');
 
-            return redirect()->route('user.profile')
+            return redirect()->action('Website\UserController@getProfile')
                 ->with('password_changed', 'เปลี่ยนรหัสผ่านเสร็จเรียบร้อยแล้ว!');
         }
     }

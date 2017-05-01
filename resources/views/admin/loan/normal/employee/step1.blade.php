@@ -1,4 +1,5 @@
 <h4>1.ตรวจสอบคุณสมบัติผู้กู้</h4>
+{{ Form::hidden('step', '1') }}
 
 <div class="form-group">
     {{ Form::label('payment_type', 'วิธีผ่อนชำระ', [
@@ -71,8 +72,9 @@
 </div>
 
 <hr />
+
 {{ Form::button('<i class="fa fa-arrow-circle-right"></i> ถัดไป', [
     'id' => 'step1',
-    'class'=>'btn btn-default btn-flat nextBtn'])
+    'type' => 'submit',
+    'class'=>'btn btn-primary btn-flat nextBtn'])
 }}
-<span id="message_step1" class="text-danger margin-l-lg"><span>

@@ -37,7 +37,7 @@
                                 <th style="width: 18%;">ค่าหุ้นปกติ</th>
                                 <th style="width: 18%;">ค่าหุ้นเงินสด</th>
                                 <th style="width: 18%;">รวมเป็นเงิน</th>
-                                <th style="width: 18%;">ใบเสร็จรับเงินค่าหุ้น</th>
+                                <th style="width: 18%;">ใบรับเงินค่าหุ้น</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -52,7 +52,7 @@
                                     <td>{{ number_format($share->amount + $share->amount_cash, 2, '.', ',') }} บาท</td>
                                     <td>
                                         @if (Diamond::parse($share->name)->gte(Diamond::create(2016, 1, 1, 0, 0, 0)))
-                                            <a href="/member/shareholding/billing/{{ $date->endOfMonth()->format('Y-m-d') }}"><i class="fa fa-file-o"></i> ใบเสร็จรับเงิน</a>
+                                            <a href="/member/shareholding/billing/{{ $date->endOfMonth()->format('Y-m-d') }}"><i class="fa fa-file-o"></i> ใบรับเงินค่าหุ้น</a>
                                         @endif
                                     </td>
                                 </tr>

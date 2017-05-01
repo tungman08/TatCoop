@@ -3,16 +3,15 @@
 @section('content')
     <!-- Content Header (Page header) -->
     <section class="content-header">
-    <h1>
-        รหัสผ่าน
-        <small>เปลี่ยนรหัสผ่าน</small>
-    </h1>
+        <h1>
+            รหัสผ่าน
+            <small>เปลี่ยนรหัสผ่าน</small>
+        </h1>
 
-   <ol class="breadcrumb">
-        <li><a href="{{ url('/') }}"><i class="fa fa-home"></i> หน้าหลัก</a></li>
-        <li><a href="{{ url('/user/profile') }}">ผู้ใช้งาน</a></li>
-        <li class="active">เปลี่ยนรหัสผ่าน</li>
-    </ol>
+        @include('admin.layouts.breadcrumb', ['breadcrumb' => [
+            ['item' => 'ผู้ใช้งาน', 'link' => '/user/profile'],
+            ['item' => 'เปลี่ยนรหัสผ่าน', 'link' => ''],
+        ]])
     </section>
 
     <!-- Main content -->

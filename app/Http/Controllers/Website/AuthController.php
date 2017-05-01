@@ -119,7 +119,7 @@ class AuthController extends Controller
                 Statistic::user(Auth::guard($this->guard)->id());
                 History::addUserHistory(Auth::guard($this->guard)->id(), 'เข้าสู่ระบบ');
 
-                return redirect()->route('website.member.index');
+                return redirect()->action('Website\MemberController@index');
             }
             else {
                 return redirect()->back()
@@ -208,7 +208,7 @@ class AuthController extends Controller
      */
     public function getVerify($token) {
         if(!$token) {
-            return redirect()->route('website.index');
+            return redirect()->action('HomeController@getIndex');
         }
 
         $confirm = DB::table('user_confirmations')
@@ -216,7 +216,7 @@ class AuthController extends Controller
             ->first();
 
         if (!$confirm) {
-            return redirect()->route('website.index');
+            return redirect()->action('HomeController@getIndex');
         }
 
         DB::transaction(function() use ($confirm) {
@@ -228,7 +228,7 @@ class AuthController extends Controller
                 ->delete();
         });
 
-        return redirect()->route('website.auth.login')
+        return redirect()->action('Website\AuthController@getLogin')
             ->with('verified', 'คุณทำการยืนยันอีเมลเรียบร้อยแล้ว')
             ->withInput(['email' => $confirm->email]);
     }

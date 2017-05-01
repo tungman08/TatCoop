@@ -3,15 +3,15 @@
 @section('content')
     <!-- Content Header (Page header) -->
     <section class="content-header">
-    <h1>
-        จัดการสมาชิกสหกรณ์
-        <small>เพิ่ม ลบ แก้ไข บัญชีสมาชิก สอ.สรทท.</small>
-    </h1>
+        <h1>
+            จัดการสมาชิกสหกรณ์ฯ
+            <small>เพิ่ม ลบ แก้ไข บัญชีสมาชิก สอ.สรทท.</small>
+        </h1>
 
-    @include('admin.member.breadcrumb', ['breadcrumb' => [
-        ['item' => 'จัดการสมาชิกสหกรณ์', 'link' => '/admin/member'],
-        ['item' => 'สมาชิกสหกรณ์ที่ลาออก', 'link' => ''],
-    ]])
+        @include('admin.layouts.breadcrumb', ['breadcrumb' => [
+            ['item' => 'จัดการสมาชิกสหกรณ์', 'link' => '/service/member'],
+            ['item' => 'สมาชิกสหกรณ์ที่ลาออก', 'link' => ''],
+        ]])
 
     </section>
 
@@ -40,12 +40,10 @@
                         <thead>
                             <tr>
                                 <th style="width: 10%;">รหัสสมาชิก</th>
-                                <th style="width: 21%;">ชื่อสมาชิก</th>
-                                <th style="width: 15%;">ประเภทสมาชิก</th>
-                                <th style="width: 15%;">จำนวนหุ้นปัจจุบัน</th>
-                                <th style="width: 15%;">ทุนเรือนหุ้นสะสม</th>
-                                <th style="width: 12%;">วันที่สมัคร</th>
-                                <th style="width: 12%;">วันที่ลาออก</th>
+                                <th style="width: 20%;">ชื่อสมาชิก</th>
+                                <th style="width: 20%;">ประเภทสมาชิก</th>
+                                <th style="width: 25%;">วันที่สมัคร</th>
+                                <th style="width: 25%;">วันที่ลาออก</th>
                             </tr>
                         </thead>
                     </table>
@@ -109,10 +107,8 @@
                 { "data": "code" },
                 { "data": "fullname" },
                 { "data": "typename" },
-                { "data": "shareholding" },
-                { "data": "amount" },
                 { "data": "startdate" },
-                { "data": "leavedate" },
+                { "data": "leavedate" }
             ]
         });   
 

@@ -3,16 +3,15 @@
 @section('content')
     <!-- Content Header (Page header) -->
     <section class="content-header">
-    <h1>
-        จัดการสมาชิกสหกรณ์
-        <small>เพิ่ม ลบ แก้ไข บัญชีสมาชิก สอ.สรทท.</small>
-    </h1>
+        <h1>
+            จัดการสมาชิกสหกรณ์ฯ
+            <small>เพิ่ม ลบ แก้ไข บัญชีสมาชิก สอ.สรทท.</small>
+        </h1>
 
-    @include('admin.member.breadcrumb', ['breadcrumb' => [
-        ['item' => 'จัดการสมาชิกสหกรณ์', 'link' => '/admin/member'],
-        ['item' => 'ข้อมูลสมาชิกสหกรณ์', 'link' => ''],
-        ['item' => 'เพิ่ม', 'link' => ''],
-    ]])
+        @include('admin.layouts.breadcrumb', ['breadcrumb' => [
+            ['item' => 'จัดการสมาชิกสหกรณ์', 'link' => '/service/member'],
+            ['item' => 'เพิ่ม', 'link' => ''],
+        ]])
 
     </section>
 
@@ -40,7 +39,7 @@
             <!-- /.box-header -->
 
             <!-- form start -->
-            {{ Form::open(['url' => '/admin/member', 'method' => 'post', 'class' => 'form-horizontal']) }}
+            {{ Form::open(['url' => '/service/member', 'method' => 'post', 'class' => 'form-horizontal']) }}
                 @include('admin.member.form', ['edit' => false])
             {{ Form::close() }}
         </div>
@@ -78,22 +77,28 @@
 
     <script>
     $(document).ready(function () {
-        $("[data-mask]").inputmask();
-        $('form').submit(function() {
-            $("[data-mask]").inputmask('remove');
+        $.ajaxSetup({
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
         });
+
+        $("[data-mask]").inputmask();
+        // $('form').submit(function() {
+        //    $("[data-mask]").inputmask('remove');
+        //});
         
         $('#birth_date').datetimepicker({
             locale: 'th',
             viewMode: 'days',
-            format: 'YYYY-MM-DD'
+            format: 'YYYY-MM-DD',
+            locale: moment().lang('th'),
+            useCurrent: false
         });
 
         $('#employee_code').blur(function() {
-            if ( $('#employee_code').val().length == 5) {
+            if ($('#employee_code').val().length == 5) {
                 $.ajax({
                     url: '/ajax/status',
-                    type: "get",
+                    type: "post",
                     data: {
                         'code': $('#employee_code').val()
                     },

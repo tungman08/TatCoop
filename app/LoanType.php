@@ -41,6 +41,10 @@ class LoanType extends Model
         return $this->hasMany(LoanTypeLimit::class);
     }
     
+    public function loans() {
+        return $this->hasMany(Loan::class);
+    }
+
     /**
      * Scope a query to only include normal province.
      *

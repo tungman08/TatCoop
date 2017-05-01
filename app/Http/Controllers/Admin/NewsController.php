@@ -90,7 +90,7 @@ class NewsController extends Controller
                 History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'เพิ่มข้อมูลข่าวสารสำหรับสมาชิกบนหน้าเว็บไซต์');
             });
 
-            return redirect()->route('website.news.index')
+            return redirect()->action('Website\NewsController@index')
                 ->with('flash_message', 'เพิ่มข่าวสารสำหรับสมาชิกเรียบร้อยแล้ว')
                 ->with('callout_class', 'callout-success');
         }
@@ -128,7 +128,7 @@ class NewsController extends Controller
                 History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'แก้ไขข้อมูลข่าวสารสำหรับสมาชิกบนหน้าเว็บไซต์');
             });
 
-            return redirect()->route('website.news.show', ['id' => $id])
+            return redirect()->action('Website\NewsController@show', ['id' => $id])
                 ->with('flash_message', 'แก้ไขข่าวสารสำหรับสมาชิกเรียบร้อยแล้ว')
                 ->with('callout_class', 'callout-success');
         }
@@ -142,7 +142,7 @@ class NewsController extends Controller
             History::addAdminHistory(Auth::guard($this->guard)->id(), 'ลบข้อมูล', 'ลบข้อมูลข่าวสารสำหรับสมาชิกบนหน้าเว็บไซต์');
         });
 
-        return redirect()->route('website.news.index')
+        return redirect()->action('Website\NewsController@index')
             ->with('flash_message', 'ลบข่าวสารสำหรับสมาชิกเรียบร้อยแล้ว')
             ->with('callout_class', 'callout-success');
     }
@@ -163,7 +163,7 @@ class NewsController extends Controller
             History::addAdminHistory(Auth::guard($this->guard)->id(), 'คืนสภาพข้อมูล', 'คืนสภาพข้อมูลข่าวสารสำหรับสมาชิกบนหน้าเว็บไซต์');
         });
 
-        return redirect()->route('website.news.index')
+        return redirect()->action('Website\NewsController@index')
             ->with('flash_message', 'คืนสภาพข่าวสารสำหรับสมาชิกเรียบร้อยแล้ว')
             ->with('callout_class', 'callout-success');
     }
@@ -181,7 +181,7 @@ class NewsController extends Controller
             History::addAdminHistory(Auth::guard($this->guard)->id(), 'ลบข้อมูลอย่างถาวร', 'ลบข้อมูลข่าวสารสำหรับสมาชิกบนหน้าเว็บไซต์อย่างถาวร');
         });
 
-        return redirect()->route('website.news.index')
+        return redirect()->action('Website\NewsController@index')
             ->with('flash_message', 'ลบข่าวสารสำหรับสมาชิกเรียบร้อยแล้ว')
             ->with('callout_class', 'callout-success');
     }

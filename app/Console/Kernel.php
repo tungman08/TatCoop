@@ -13,7 +13,9 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
+        Commands\AdminCommand::class,
         Commands\BingCommand::class,
+        Commands\MailCommand::class
     ];
 
     /**

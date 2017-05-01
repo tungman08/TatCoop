@@ -99,7 +99,7 @@
             $.ajax({
                 dataType: 'json',
                 url: '/ajax/loadmore',
-                type: 'get',
+                type: 'post',
                 cache: false,
                 data: {
                     'index': index

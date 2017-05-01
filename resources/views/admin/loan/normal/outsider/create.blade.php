@@ -8,7 +8,7 @@
         <small>เพิ่ม ลบ แก้ไข บัญชีสมาชิก สอ.สรทท.</small>
     </h1>
 
-    @include('admin.member.breadcrumb', ['breadcrumb' => [
+    @include('admin.layouts.breadcrumb', ['breadcrumb' => [
         ['item' => 'จัดการสมาชิกสหกรณ์', 'link' => '/admin/member'],
         ['item' => 'ข้อมูลสมาชิกสหกรณ์', 'link' => "/admin/member/{$member->id}"],
         ['item' => 'การกู้ยืม', 'link' => ''],

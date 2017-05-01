@@ -90,7 +90,7 @@ class KnowledgeController extends Controller
                 History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'เพิ่มสาระน่ารู้บนเว็บไซต์');
             });
 
-            return redirect()->route('website.knowledge.index')
+            return redirect()->action('Website\KnowledgeController@index')
                 ->with('flash_message', 'เพิ่มสาระน่ารู้เรียบร้อยแล้ว')
                 ->with('callout_class', 'callout-success');
         }
@@ -128,7 +128,7 @@ class KnowledgeController extends Controller
                 History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'แก้ไขสาระน่ารู้บนเว็บไซต์');
             });
 
-            return redirect()->route('website.knowledge.show', ['id' => $id])
+            return redirect()->action('Website\KnowledgeController@show', ['id' => $id])
                 ->with('flash_message', 'แก้ไขสาระน่ารู้เรียบร้อยแล้ว')
                 ->with('callout_class', 'callout-success');
         }
@@ -142,7 +142,7 @@ class KnowledgeController extends Controller
             History::addAdminHistory(Auth::guard($this->guard)->id(), 'ลบข้อมูล', 'ลบสาระน่ารู้บนเว็บไซต์');
         });
 
-        return redirect()->route('website.knowledge.index')
+        return redirect()->action('Website\KnowledgeController@index')
             ->with('flash_message', 'ลบสาระน่ารู้เรียบร้อยแล้ว')
             ->with('callout_class', 'callout-success');
     }
@@ -163,7 +163,7 @@ class KnowledgeController extends Controller
             History::addAdminHistory(Auth::guard($this->guard)->id(), 'คืนสภาพข้อมูล', 'คืนสภาพสาระน่ารู้บนเว็บไซต์');
         });
 
-        return redirect()->route('website.knowledge.index')
+        return redirect()->action('Website\KnowledgeController@index')
             ->with('flash_message', 'คืนสภาพสาระน่ารู้เรียบร้อยแล้ว')
             ->with('callout_class', 'callout-success');
     }
@@ -181,7 +181,7 @@ class KnowledgeController extends Controller
             History::addAdminHistory(Auth::guard($this->guard)->id(), 'ลบข้อมูลอย่างถาวร', 'ลบสาระน่ารู้บนเว็บไซต์อย่างถาวร');
         });
 
-        return redirect()->route('website.knowledge.index')
+        return redirect()->action('Website\KnowledgeController@index')
             ->with('flash_message', 'ลบสาระน่ารู้เรียบร้อยแล้ว')
             ->with('callout_class', 'callout-success');
     }

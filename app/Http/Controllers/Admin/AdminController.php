@@ -35,16 +35,6 @@ class AdminController extends Controller
     }
 
     /**
-     * Responds to requests to GET /
-     */
-    public function getIndex() {
-        return view('admin.manage.index', [
-            'member_amount' => Member::whereNull('leave_date')->count(),
-            'member_shareholding' => Shareholding::all()->sum('amount')
-        ]);
-    }
-
-    /**
      * Responds to requests to GET /unauthorize
      */
     public function getUnauthorize() {
@@ -60,16 +50,6 @@ class AdminController extends Controller
         return view('admin.administrator.index', [
             'admins' => Administrator::normal()->get()
         ]);
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function show($id) {
-        //
     }
 
     /**
@@ -126,7 +106,7 @@ class AdminController extends Controller
                 });
             });
 
-            return redirect()->route('admin.administrator.index')
+            return redirect()->action('Admin\AdminController@index')
                 ->with('flash_message', 'เพิ่มบัญชีผู้ใช้เรียบร้อยแล้ว ระบบได้ส่งอีเมลแจ้งผู้ใช้ด้วย username = \'' . $request->input('email') . '\' และ password = \'' . $request->input('new_password') . '\'')
                 ->with('callout_class', 'callout-success');
         }
@@ -204,26 +184,10 @@ class AdminController extends Controller
                 }
             });
 
-            return redirect()->route('admin.administrator.index')
+            return redirect()->action('Admin\AdminController@index')
                 ->with('flash_message', (!empty($request->input('new_password'))) ? 'แก้ไขข้อมูลผู้ใช้เรียบร้อยแล้ว ระบบได้ส่งอีเมลแจ้งผู้ใช้ด้วย username = \'' . $request->input('email') . '\' และ password = \'' . $request->input('new_password') . '\'' : 'แก้ไขข้อมูลผู้ใช้เรียบร้อยแล้ว')
                 ->with('callout_class', 'callout-success');
         }
-    }
-
-    /**
-     * Show the form for delete the specified resource.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function getErase($id) {
-        if ($id <= 1 || $id > Administrator::max('id')) {
-            return redirect()->to('/admin/administrator');
-        }
-
-        return view('admin.administrator.erase', [
-            'admins' => Administrator::find($id)
-        ]);
     }
 
     /**
@@ -262,7 +226,7 @@ class AdminController extends Controller
 
             $admin->delete();
 
-            return redirect()->route('admin.administrator.index')
+            return redirect()->action('Admin\AdminController@index')
                 ->with('flash_message', 'ลบบัญชีผู้ใช้เรียบร้อยแล้ว ยกเลิกคำสั่งให้คลิกที่นี่ ')
                 ->with('callout_class', 'callout-warning')
                 ->with('flash_link', '/admin/administrator/' . $id . '/undelete');
@@ -270,17 +234,46 @@ class AdminController extends Controller
     }
 
     /**
+     * Show the form for delete the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function getDelete($id) {
+        if ($id <= 1 || $id > Administrator::max('id')) {
+            return redirect()->to('/admin/administrator');
+        }
+
+        return view('admin.administrator.delete', [
+            'admins' => Administrator::find($id)
+        ]);
+    }
+
+    /**
+     * Show all deleted items in storage.
+     *
+     * @return Response
+     */
+    public function getInactive() {
+        $admin = Administrator::onlyTrashed()->get();
+
+        return view('admin.administrator.inactive', [
+            'admins' => $admin
+        ]);
+    }
+
+    /**
      * Restore a deleted this item.
      *
      * @return Response
      */
-    public function getUnDelete($id) {
+    public function postRestore($id) {
         $admin = Administrator::withTrashed()->findOrFail($id);
         $admin->restore();
 
         History::addAdminHistory(Auth::guard($this->guard)->id(), 'คืนสภาพข้อมูล', 'คืนสภาพบัญชีผู้ดูแลระบบชื่อ ' . $admin->name . ' (' . $admin->email . ')');
 
-        return redirect()->route('admin.administrator.index')
+        return redirect()->action('Admin\AdminController@index')
             ->with('flash_message', 'คืนค่าบัญชีผู้ใช้เรียบร้อยแล้ว')
             ->with('callout_class', 'callout-success');
     }
@@ -290,28 +283,15 @@ class AdminController extends Controller
      *
      * @return Response
      */
-    public function getForceDelete($id) {
+    public function postForceDelete($id) {
         $admin = Administrator::withTrashed()->findOrFail($id);
 
         History::addAdminHistory(Auth::guard($this->guard)->id(), 'ลบข้อมูลอย่างถาวร', 'ลบบัญชีผู้ดูแลระบบชื่อ ' . $admin->name . ' (' . $admin->email . ') ออกจากระบบอย่างถาวร');
 
         $admin->forceDelete();
 
-        return redirect()->route('admin.administrator.index')
+        return redirect()->action('Admin\AdminController@index')
             ->with('flash_message', 'ลบบัญชีผู้ใช้อย่างถาวรเรียบร้อยแล้ว')
             ->with('callout_class', 'callout-danger');
-    }
-
-    /**
-     * Show all deleted items in storage.
-     *
-     * @return Response
-     */
-    public function getRestore() {
-        $admin = Administrator::onlyTrashed()->get();
-
-        return view('admin.administrator.restore', [
-            'admins' => $admin
-        ]);
     }
 }

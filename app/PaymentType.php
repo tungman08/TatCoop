@@ -22,6 +22,10 @@ class PaymentType extends Model
         'name'
     ];
 
+    public function loans() {
+        return $this->hasMany(Loan::class);
+    }
+
     /**
      * The attributes that should be mutated to dates.
      *

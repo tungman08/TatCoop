@@ -3,15 +3,14 @@
 @section('content')
     <!-- Content Header (Page header) -->
     <section class="content-header">
-    <h1>
-        จัดการเงินปันผล
-        <small>เพิ่ม ลบ แก้ไข อัตราเงินปันผลประจำปี สอ.สรทท.</small>
-    </h1>
+        <h1>
+            จัดการเงินปันผล
+            <small>เพิ่ม ลบ แก้ไข อัตราเงินปันผลประจำปี สอ.สรทท.</small>
+        </h1>
 
-    @include('admin.member.breadcrumb', ['breadcrumb' => [
-        ['item' => 'จัดการเงินปันผล', 'link' => ''],
-    ]])
-
+        @include('admin.layouts.breadcrumb', ['breadcrumb' => [
+            ['item' => 'จัดการเงินปันผล', 'link' => ''],
+        ]])
     </section>
 
     <!-- Main content -->
@@ -66,16 +65,31 @@
                                 <td>{{ $dividend->rate }} %</td>
                                 <td>
                                     <div class="btn-group">
-                                        <button type="button"
-                                            class="btn btn-default btn-flat btn-xs"
-                                            onclick="javascript:window.location.href = '{{ url('/admin/dividend/' . $dividend->id . '/edit') }}';"
-                                            data-tooltip="true" title="แก้ไข"><i class="fa fa-pencil"></i></button>
-                                        @if ($dividend->rate_year < Diamond::today()->year)
-                                            <button type="button" 
-                                                class="btn btn-default btn-flat btn-xs"
-                                                onclick="javascript:document.location = '{{ url('admin/dividend/' . $dividend->id . '/export') }}';"
-                                                data-tooltip="true" title="สรุปการปันผลเป็นเอกสาร Excel"><i class="fa fa-file-excel-o"></i></button>
-                                        @endif
+                                        {{ Form::open(['url' => '/admin/dividend/' . $dividend->id, 'method' => 'delete']) }}
+                                            {{ Form::button('<i class="fa fa-edit"></i>', [
+                                                'class'=>'btn btn-default btn-flat btn-xs', 
+                                                'data-tooltip'=>'true',
+                                                'title'=>'แก้ไข',
+                                                'onclick'=>"javascript:window.location.href = '" . url('/admin/dividend/' . $dividend->id . '/edit') . "';"])
+                                            }}
+
+                                            {{ Form::button('<i class="fa fa-trash"></i>', [
+                                                'type'=>'submit',
+                                                'class'=>'btn btn-default btn-flat btn-xs', 
+                                                'data-tooltip'=>'true',
+                                                'title'=>'ลบ',
+                                                'onclick'=>"javascript:return confirm('คุณต้องการลบรายการนี้ใช่ไหม ?');"])
+                                            }}
+
+                                            @if ($dividend->rate_year < Diamond::today()->year)
+                                                {{ Form::button('<i class="fa fa-file-excel-o"></i>', [
+                                                    'class'=>'btn btn-default btn-flat btn-xs', 
+                                                    'data-tooltip'=>'true',
+                                                    'title'=>'สรุปการปันผลเป็นเอกสาร Excel',
+                                                    'onclick'=>"javascript:document.location = '" . url('admin/dividend/' . $dividend->id . '/export') . "';"])
+                                                }}
+                                            @endif
+                                        {{ Form::close() }}
                                     </div>                             
                                 </td>
                             </tr>

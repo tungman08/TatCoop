@@ -8,7 +8,7 @@
         <small>การจัดการสาระน่ารู้ในหน้าเว็บไซต์ สอ.สรทท.</small>
     </h1>
 
-    @include('admin.knowledge.breadcrumb', ['breadcrumb' => [
+    @include('admin.layouts.breadcrumb', ['breadcrumb' => [
         ['item' => 'จัดการสาระน่ารู้', 'link' => ''],
     ]])
 

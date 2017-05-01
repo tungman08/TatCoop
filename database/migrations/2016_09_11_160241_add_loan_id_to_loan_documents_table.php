@@ -13,7 +13,6 @@ class AddLoanIdToLoanDocumentsTable extends Migration
     public function up()
     {
         Schema::table('loan_documents', function (Blueprint $table) {
-
             $table->integer('loan_id')->unsigned()->nullable()->after('id');
             $table->foreign('loan_id')->references('id')
                 ->on('loans')->onDelete('cascade');

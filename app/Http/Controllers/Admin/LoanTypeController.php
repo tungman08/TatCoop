@@ -12,6 +12,7 @@ use History;
 use DB;
 use Diamond;
 use Validator;
+use App\Loan;
 use App\LoanType;
 use App\LoanTypeLimit;
 
@@ -108,7 +109,7 @@ class LoanTypeController extends Controller
                 History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'เพิ่มข้อมูลประเภทเงินกู้');
             });
 
-            return redirect()->route('admin.loantype.index')
+            return redirect()->action('Admin\LoanTypeController@index')
                 ->with('flash_message', 'สร้างประเภทเงินกู้ชื่อ ' . $request->input('name') . ' เรียบร้อยแล้ว')
                 ->with('callout_class', 'callout-success');
         }
@@ -152,29 +153,69 @@ class LoanTypeController extends Controller
                 History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'แก้ไขข้อมูลประเภทเงินกู้');
             });
 
-            return redirect()->route('admin.loantype.show', [ 'loantype' => LoanType::find($id) ])
+            return redirect()->action('Admin\LoanTypeController@show', [ 'loantype' => LoanType::find($id) ])
                 ->with('flash_message', 'แก้ไขประเภทเงินกู้ชื่อ ' . $request->input('name') . ' เรียบร้อยแล้ว')
                 ->with('callout_class', 'callout-success');
         }
     }
 
     public function destroy($id) {
+        $loantype = LoanType::find($id);
 
+        if ($loantype->loans->count() > 0) {
+            return redirect()->back()
+                ->withErrors(['error' => 'ไม่สามารถลบประเภทเงินกู้นี้ได้ เนื่องจากมีการใช้งานไปแล้ว']);
+        }
+        else {
+            History::addAdminHistory(Auth::guard($this->guard)->id(), 'ลบข้อมูล', 'ลบประเภทเงินกู้ชื่อ ' . $loantype->name);
+
+            $loantype->delete();
+
+            return redirect()->action('Admin\LoanTypeController@index')
+                ->with('flash_message', 'ลบประเภทเงินกู้ชื่อ ' . $loantype->name . ' เรียบร้อยแล้ว')
+                ->with('callout_class', 'callout-success');
+        }
     }
 
-    public function getExpire() {
-        return view('admin.loantype.expire', [
+    public function getFinished($id) {
+        return view('admin.loantype.finished', [
+            'loantype' => LoanType::find($id),
+            'loans' => Loan::finished()->where('loan_type_id', $id)->get()
+        ]);
+    }
+
+    public function getExpired() {
+        return view('admin.loantype.expired', [
             'loantypes' => LoanType::expired()->get()
         ]);
     }
 
-    public function getDeleted() {
-        return view('admin.loantype.deleted', [
+    public function getInactive() {
+        return view('admin.loantype.inactive', [
             'loantypes' => LoanType::deletedType()->get()
         ]);
     }
 
-    public function getFinish($id) {
-        return 'finish';
+    public function postForceDelete($id) {
+        $loanType = LoanType::withTrashed()->findOrFail($id);
+
+        History::addAdminHistory(Auth::guard($this->guard)->id(), 'ลบข้อมูลอย่างถาวร', 'ลบประเภทเงินกู้ชื่อ ' . $loanType->name . ' ออกจากระบบอย่างถาวร');
+
+        $loanType->forceDelete();
+
+        return redirect()->action('Admin\LoanTypeController@index')
+            ->with('flash_message', 'ลบประเภทเงินกู้อย่างถาวรเรียบร้อยแล้ว')
+            ->with('callout_class', 'callout-danger');
+    }
+
+    public function postRestore($id) {
+        $loanType = LoanType::withTrashed()->findOrFail($id);
+        $loanType->restore();
+
+        History::addAdminHistory(Auth::guard($this->guard)->id(), 'คืนสภาพข้อมูล', 'คืนสภาพประเภทเงินกู้ชื่อชื่อ ' . $loanType->name);
+
+        return redirect()->action('Admin\LoanTypeController@index')
+            ->with('flash_message', 'คืนค่าประเภทเงินกู้เรียบร้อยแล้ว')
+            ->with('callout_class', 'callout-success');
     }
 }

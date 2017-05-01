@@ -87,10 +87,10 @@ class AuthController extends Controller
                 History::addAdminHistory(Auth::guard($this->guard)->id(), 'เข้าสู่ระบบ');
 
                 if (Auth::guard($this->guard)->user()->password_changed) {
-                    return redirect()->route('admin.index');
+                    return redirect()->action('Admin\HomeController@getIndex');
                 }
                 else {
-                    return redirect()->route('admin.user.password');
+                    return redirect()->action('Admin\UserController@getPassword');
                 }
             }
             else {

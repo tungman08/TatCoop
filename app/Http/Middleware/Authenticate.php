@@ -26,12 +26,12 @@ class Authenticate
         }
         elseif ($guard == 'admins') {
             if (Auth::guard('users')->check()) {
-                return redirect()->route('admin.unauthorize');
+                return redirect()->action('Admin\AdminController@getUnauthorize');
             }
         }
         elseif ($guard == 'users') {
             if (Auth::guard('admins')->check()) {
-                return redirect()->route('website.member.admin');
+                return redirect()->action('Website\MemberController@getUnauthorize');
             }
         }
 

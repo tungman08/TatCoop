@@ -9,7 +9,7 @@ use App\Http\Controllers\Controller;
 use Auth;
 use History;
 use Bing;
-use Loan;
+use LoanCalculator;
 use MemberProperty;
 use App\Theme;
 use App\District;
@@ -52,7 +52,7 @@ class AjaxController extends Controller
         return $skins;
     }
 
-    public function getLoadmore(Request $request) {
+    public function postLoadmore(Request $request) {
         $index = intval($request->input('index'));
         $count = History::countUserHistory(Auth::guard()->id());
         $histories = History::user(Auth::guard()->id(), $index);
@@ -60,19 +60,19 @@ class AjaxController extends Controller
         return compact('index', 'count', 'histories');
     }
 
-    public function getDistricts(Request $request) {
+    public function postDistricts(Request $request) {
         $id = $request->input('id');
 
         return District::where('province_id', $id)->orderBy('name')->get();
     }
 
-    public function getSubdistricts(Request $request) {
+    public function postSubdistricts(Request $request) {
         $id = $request->input('id');
 
         return Subdistrict::where('district_id', $id)->orderBy('name')->get();
     }
 
-    public function getPostcode(Request $request) {
+    public function postPostcode(Request $request) {
         $id = $request->input('id');
 
         $subdistrict = Subdistrict::find($id);
@@ -80,7 +80,7 @@ class AjaxController extends Controller
         return $subdistrict->postcode->code;
     }
 
-    public function getDividend(Request $request) {
+    public function postDividend(Request $request) {
         $member = Member::find($request->input('id'));
         $year = $request->input('year');
         $dividends = MemberProperty::getDividend($member->id, $year);
@@ -96,8 +96,8 @@ class AjaxController extends Controller
         $period = $request->input('period');
         $loanType = LoanType::find($loan_type_id);
 
-        $general = collect(Loan::payment($loanType->rate, 1, $outstanding, $period));
-        $stable = collect(Loan::payment($loanType->rate, 2, $outstanding, $period));
+        $general = collect(LoanCalculator::payment($loanType->rate, 1, $outstanding, $period));
+        $stable = collect(LoanCalculator::payment($loanType->rate, 2, $outstanding, $period));
 
         $info = (object)[
             'rate' => $loanType->rate,

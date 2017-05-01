@@ -33,22 +33,12 @@ function uploadImage(input, type, id) {
                 button_d.addClass('disabled');
 
                 var item = '<div id="photo-new" class="col-lg-4 col-md-6 padding-sm">';
-                    item += '<div class="thumbnail margin-b-sm text-center" style="height: 150px; padding-top: 65px;">';
-                    item += '<span id="progress">0%</span>';
+                    item += '<div class="thumbnail margin-b-sm text-center" style="height: 100px; padding-top: 40px;">';
+                    item += '<span id="progress">Uploading...</span>';
                     item += '</div>';
                     item += '</div>';
 
                 preview.append(item);
-            },
-            xhr: function(){
-                // get the native XmlHttpRequest object
-                var xhr = $.ajaxSettings.xhr() ;
-                // set the onprogress event handler
-                xhr.upload.onprogress = function(evt){ $('#progress').html(Math.ceil((evt.loaded / evt.total) * 100) + '%'); };
-                // set the onload event handler
-                // xhr.upload.onload = function(){ };
-                // return the customized object
-                return xhr;
             },
             success: function(obj) {
                 result.html('<span class="text-success"><i class="fa fa-check-circle fa-fw"></i> เพิ่มรูปประกอบเรียบร้อย</span>');
@@ -134,7 +124,7 @@ function uploadDocument(input, type, id) {
                 return xhr;
             },
             success: function(obj) {
-                result.html('<span class="text-success"><i class="fa fa-check-circle fa-fw"></i> เพิ่มรูปประกอบเรียบร้อย</span>');
+                result.html('<span class="text-success"><i class="fa fa-check-circle fa-fw"></i> เพิ่มเอกสารประกอบเรียบร้อย</span>');
                 result.show().delay(3000).fadeOut();
 
                 $('#document-new').remove();
@@ -177,6 +167,13 @@ function deleteImage(type, id) {
         error: function(xhr, ajaxOption, thrownError) {
             console.log(xhr.responseText);
             console.log(thrownError);
+        },
+        beforeSend: function() {
+            var item = '<div class="thumbnail margin-b-sm text-center" style="height: 100px; padding-top: 40px;">';
+                item += '<span id="progress">Deleting...</span>';
+                item += '</div>';
+
+            $('#photo-' + id).html(item);
         },
         success: function(id) {
             $('#photo-' + id).remove();

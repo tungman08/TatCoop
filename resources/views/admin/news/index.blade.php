@@ -3,14 +3,14 @@
 @section('content')
     <!-- Content Header (Page header) -->
     <section class="content-header">
-    <h1>
-        จัดการข่าวสารสำหรับสมาชิก
-        <small>การจัดการข่าวสารสำหรับสมาชิกของ สอ.สรทท.</small>
-    </h1>
+        <h1>
+            จัดการข่าวสารสำหรับสมาชิก
+            <small>การจัดการข่าวสารสำหรับสมาชิกของ สอ.สรทท.</small>
+        </h1>
 
-    @include('admin.news.breadcrumb', ['breadcrumb' => [
-        ['item' => 'จัดการข่าวสารสำหรับสมาชิก', 'link' => ''],
-    ]])
+        @include('admin.layouts.breadcrumb', ['breadcrumb' => [
+            ['item' => 'จัดการข่าวสารสำหรับสมาชิก', 'link' => ''],
+        ]])
 
     </section>
 

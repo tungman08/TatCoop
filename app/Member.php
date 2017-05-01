@@ -40,6 +40,13 @@ class Member extends Model
     }
 
     /**
+     * Get the loans that uses by the member.
+     */
+    public function loans() {
+        return $this->hasMany(Loan::class);
+    }
+
+    /**
      * Get the shares that uses by the member.
      */
     public function shareHoldings() {
@@ -51,6 +58,15 @@ class Member extends Model
      */
     public function user() {
         return $this->hasOne(User::class);
+    }
+
+    /**
+     * Get the loan sureties that uses by the member.
+     */
+    public function sureties() {
+        return $this->belongsToMany(Loan::class)
+            ->withPivot('amount', 'yourself')
+            ->withTimestamps();
     }
 
     /**

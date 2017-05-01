@@ -14,11 +14,12 @@ class CreateLoansTable extends Migration
     {
         Schema::create('loans', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('code')->unique();
-            $table->date('loan_date');
+            $table->string('code')->nullable();
+            $table->date('loaned_at')->nullable();
             $table->double('outstanding');
             $table->float('rate');
             $table->integer('period');
+            $table->dateTime('completed_at')->nullable();
             $table->timestamps();
         });
     }

@@ -3,15 +3,14 @@
 @section('content')
     <!-- Content Header (Page header) -->
     <section class="content-header">
-    <h1>
-        จัดการผู้ดูแลระบบ
-        <small>เพิ่ม ลบ แก้ไข บัญชีของผู้ดูแลระบบ สอ.สรทท.</small>
-    </h1>
+        <h1>
+            จัดการผู้ดูแลระบบฯ
+            <small>เพิ่ม ลบ แก้ไข บัญชีของผู้ดูแลระบบ สอ.สรทท.</small>
+        </h1>
 
-    @include('admin.administrator.breadcrumb', ['breadcrumb' => [
-        ['item' => 'จัดการผู้ดูแลระบบ', 'link' => ''],
-    ]])
-
+        @include('admin.layouts.breadcrumb', ['breadcrumb' => [
+            ['item' => 'จัดการผู้ดูแลระบบ', 'link' => ''],
+        ]])
     </section>
 
     <!-- Main content -->
@@ -47,7 +46,7 @@
                     <i class="fa fa-user-plus"></i> เพื่อบัญชีผู้ดูแลระบบ
                 </button>
                 <button class="btn btn-default btn-flat pull-right" style="margin-top: 15px; margin-bottom: 15px;"
-                    onclick="javascript:window.location.href='{{ url('/admin/administrator/restore') }}';">
+                    onclick="javascript:window.location.href='{{ url('/admin/administrator/inactive') }}';">
                     <i class="fa fa-trash"></i> ผู้ดูแลระบบที่ถูกลบ
                 </button>
 

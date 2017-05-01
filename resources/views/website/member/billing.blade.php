@@ -4,7 +4,7 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
     <h1>
-        ใบเสร็จรับเงินค่าหุ้น
+        ใบรับเงินค่าหุ้น
         <small>รายละเอียดข้อมูลใบเสร็จรับเงินค่าหุ้นของสมาชิก</small>
     </h1>
     @include('admin.member.breadcrumb', ['breadcrumb' => [
@@ -18,8 +18,8 @@
     <section class="content">
         <!-- Info boxes -->
         <div class="well">
-            <h4>ใบเสร็จรับเงินค่าหุ้น</h4>
-            <p>ใบเสร็จรับเงินค่าหุ้นเดือน {{ $date->thai_format('F Y') }} ของ {{ $member->profile->fullName }}</p>
+            <h4>ใบรับเงินค่าหุ้น</h4>
+            <p>ใบรับเงินค่าหุ้นเดือน {{ $date->thai_format('F Y') }} ของ {{ $member->profile->fullName }}</p>
         </div>
 
         <!-- Main content -->
@@ -29,7 +29,7 @@
             <div class="row">
                 <div class="col-xs-12">
                     <h2 class="page-header">
-                        <i class="fa fa-file-text-o"></i> ใบเสร็จรับเงินค่าหุ้น
+                        <i class="fa fa-file-text-o"></i> ใบรับเงินค่าหุ้น
                         <small class="pull-right">วันที่: {{ Diamond::today()->thai_format('d M Y') }}</small>
                     </h2>
                 </div>
@@ -46,7 +46,7 @@
                         </div>
                         <div class="col-xs-10 text-center">
                             <h3 style="font-size: 18px; margin: 5px 0px;"><strong>สหกรณ์ออมทรัพย์ สหภาพแรงงานรัฐวิสาหกิจการท่องเที่ยวแห่งประเทศไทย จำกัด</strong></h3><br>
-                            <h3 style="font-size: 18px; margin: 0px;">ใบเสร็จรับเงินค่าหุ้น</h3>
+                            <h3 style="font-size: 18px; margin: 0px;">ใบรับเงินค่าหุ้น</h3>
                         </div>
                     </div>
                 </div>
@@ -136,12 +136,22 @@
 
             <!-- Officer row -->
             <div class="row" style="margin-top: 20px; margin-right: 0px;">
-                <div class="col-xs-6" style="white-space: nowrap; overflow-x: hidden;">
-                    ผู้จัดการ <span style="color: #bbb;">....................................................................................................................................................................................................................</span>
+                <div class="col-xs-6">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="white-space: nowrap; width: 1%;">ผู้จัดการ</td>
+                            <td style="border-bottom: 2px dotted #bbb; padding-left: 50px;">{{ $billing->manager }}</td>
+                        </tr>
+                    </table>
                 </div>
                 <!-- /.col -->
-                <div class="col-xs-6" style="white-space: nowrap; overflow-x: hidden;">
-                    เจ้าหน้าที่ผู้รับเงิน <span style="color: #bbb;">....................................................................................................................................................................................................................</span>          
+                <div class="col-xs-6">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="white-space: nowrap; width: 1%;">เหรัญญิก</td>
+                            <td style="border-bottom: 2px dotted #bbb; padding-left: 50px;">{{ $billing->treasurer }}</td>
+                        </tr>
+                    </table>      
                 </div>
                 <!-- /.col -->
             </div>

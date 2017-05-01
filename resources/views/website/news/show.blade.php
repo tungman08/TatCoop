@@ -43,12 +43,12 @@
 
             <div class="panel-body">
                 <div class="container parent-container thumbnail-box">
-                    <div class="row">
+                    <div class="row" style="margin-right: 25px;">
                         @foreach ($news->attachments()->where('attach_type', 'photo')->get() as $item)
                             <div class="col-sm-3 col-md-3 col-ld-3">
-                                <div class="thumbnail">
+                                <div class="thumbnail" style="border-radius: 0px;">
                                     <a href="{{ url('/attachment/' . $item->file) }}">
-                                        <img src="{{ url('/attachment/' . $item->file) }}" style="max-height: 200px;" alt="" />
+                                        <img src="{{ url('/attachment/' . $item->file) }}" style="max-height: 200px; max-width: 100%;" alt="" />
                                     </a>
                                 </div>    
                             </div>

@@ -3,26 +3,25 @@
 @section('content')
     <!-- Content Header (Page header) -->
     <section class="content-header">
-    <h1>
-        จัดการสมาชิกสหกรณ์
-        <small>เพิ่ม ลบ แก้ไข บัญชีสมาชิก สอ.สรทท.</small>
-    </h1>
+        <h1>
+            จัดการทุนเรือนหุ้นของสมาชิกสหกรณ์ฯ
+            <small>เพิ่ม ลบ แก้ไข ทุนเรือนหุ้นของสมาชิก สอ.สรทท.</small>
+        </h1>
 
-    @include('admin.member.breadcrumb', ['breadcrumb' => [
-        ['item' => 'จัดการสมาชิกสหกรณ์', 'link' => '/admin/member'],
-        ['item' => 'ข้อมูลสมาชิกสหกรณ์', 'link' => "/admin/member/{$member->id}"],
-        ['item' => 'การชำระค่าหุ้น', 'link' => ''],
-    ]])
+        @include('admin.layouts.breadcrumb', ['breadcrumb' => [
+            ['item' => 'จัดการทุนเรือนหุ้น', 'link' => '/service/shareholding/member'],
+            ['item' => 'ทุนเรือนหุ้น', 'link' => '/service/' . $member->id . '/shareholding'],
+            ['item' => 'ชำระค่าหุ้น', 'link' => '']
+        ]])
 
     </section>
 
     <!-- Main content -->
     <section class="content">
         <!-- Info boxes -->
-        <div class="well" style="padding-bottom: 0px;">
-            <h4>รายละเอียดข้อมูลสมาชิกสหกรณ์</h4>
-
-            @include('admin.member.info.detail', ['member' => $member])
+        <div class="well">
+            <h4>ข้อมูลทุนเรือนหุ้น</h4>
+            <p>เพิ่มการชำระค่าหุ้นต่างๆ ของ {{ $member->profile->fullName }}</p>
         </div>
 
         @if ($errors->count() > 0)
@@ -40,7 +39,7 @@
             <!-- /.box-header -->
 
             <!-- form start -->
-            {{ Form::open(['url' => '/admin/member/' . $member->id . '/shareholding', 'method' => 'post', 'class' => 'form-horizontal']) }}
+            {{ Form::open(['url' => '/service/' . $member->id . '/shareholding', 'method' => 'post', 'class' => 'form-horizontal']) }}
                 @include('admin.shareholding.form', ['edit' => false])
             {{ Form::close() }}
 
@@ -75,7 +74,9 @@
     $('#datepicker').datetimepicker({
         locale: 'th',
         viewMode: 'days',
-        format: 'YYYY-MM-DD'
+        format: 'YYYY-MM-DD',
+        locale: moment().lang('th'),
+        useCurrent: false
     });
     </script>
 @endsection

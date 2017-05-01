@@ -29,14 +29,20 @@ class MainMenu
         $website->add(new MenuItem(['title' => 'สาระน่ารู้', 'icon' => 'fa-commenting', 'url' => '/website/knowledge']));
         $menu->add($website);
 
+        $service = new MenuTree(['title' => 'บริการสมาชิกสหกรณ์ฯ', 'icon' => 'fa-tag', 'url' => '/service']);
+        $service->add(new MenuItem(['title' => 'จัดการสมาชิกสหกรณ์ฯ', 'icon' => 'fa-users', 'url' => '/service/member']));
+        $service->add(new MenuItem(['title' => 'ทุนเรือนหุ้น', 'icon' => 'fa-money', 'url' => '/service/shareholding/member']));
+        $service->add(new MenuItem(['title' => 'การกู้ยืม', 'icon' => 'fa-credit-card', 'url' => '/service/loan/member']));
+        $service->add(new MenuItem(['title' => 'เงินปันผล', 'icon' => 'fa-dollar', 'url' => '/service/dividend/member']));
+        $service->add(new MenuItem(['title' => 'การค้ำประกัน', 'icon' => 'fa-share-alt', 'url' => '/service/guaruntee/member']));
+        $menu->add($service);
+
         $admin = new MenuTree(['title' => 'ผู้ดูแลระบบ', 'icon' => 'fa-gears', 'url' => '/admin']);
-
-        if ($super)
-            $admin->add(new MenuItem(['title' => 'จัดการผู้ดูแลระบบ', 'icon' => 'fa-user-circle-o', 'url' => '/admin/administrator']));
-
-        $admin->add(new MenuItem(['title' => 'จัดการสมาชิกสหกรณ์', 'icon' => 'fa-user-circle-o', 'url' => '/admin/member']));
+        if ($super) $admin->add(new MenuItem(['title' => 'จัดการบัญชีผู้ดูแลระบบฯ', 'icon' => 'fa-user-circle-o', 'url' => '/admin/administrator']));
+        $admin->add(new MenuItem(['title' => 'จัดการบัญชีผู้ใช้งานระบบฯ', 'icon' => 'fa-user-circle-o', 'url' => '/admin/account']));
         $admin->add(new MenuItem(['title' => 'จัดการประเภทเงินกู้', 'icon' => 'fa-credit-card', 'url' => '/admin/loantype']));
         $admin->add(new MenuItem(['title' => 'จัดการอัตราเงินปันผล', 'icon' => 'fa-dollar', 'url' => '/admin/dividend']));
+        $admin->add(new MenuItem(['title' => 'จัดการใบรับเงินค่าหุ้น', 'icon' => 'fa-file-text-o', 'url' => '/admin/billing']));
         $admin->add(new MenuItem(['title' => 'สถิติการเข้าใช้งาน', 'icon' => 'fa-bar-chart', 'url' => '/admin/statistic']));
         $menu->add($admin);
 

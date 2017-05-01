@@ -3,13 +3,14 @@
 @section('content')
     <!-- Content Header (Page header) -->
     <section class="content-header">
-    <h1>
-        เอกสาร/แบบฟอร์ม
-        <small>การจัดการเอกสารและแบบฟอร์มต่างๆ ที่แสดงในเว็บไซต์ สอ.สรทท.</small>
-    </h1>
+        <h1>
+            เอกสาร/แบบฟอร์ม
+            <small>การจัดการเอกสารและแบบฟอร์มต่างๆ ที่แสดงในเว็บไซต์ สอ.สรทท.</small>
+        </h1>
 
-    @include('admin.documents.breadcrumb')
-
+        @include('admin.layouts.breadcrumb', ['breadcrumb' => [
+            ['item' => 'เอกสาร/แบบฟอร์ม', 'link' => ''],
+        ]])
     </section>
 
     <!-- Main content -->

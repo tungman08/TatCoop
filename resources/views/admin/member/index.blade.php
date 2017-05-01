@@ -3,15 +3,14 @@
 @section('content')
     <!-- Content Header (Page header) -->
     <section class="content-header">
-    <h1>
-        จัดการสมาชิกสหกรณ์
-        <small>เพิ่ม ลบ แก้ไข บัญชีสมาชิก สอ.สรทท.</small>
-    </h1>
+        <h1>
+            จัดการสมาชิกสหกรณ์ฯ
+            <small>เพิ่ม ลบ แก้ไข บัญชีสมาชิก สอ.สรทท.</small>
+        </h1>
 
-    @include('admin.member.breadcrumb', ['breadcrumb' => [
-        ['item' => 'จัดการสมาชิกสหกรณ์', 'link' => ''],
-    ]])
-
+        @include('admin.layouts.breadcrumb', ['breadcrumb' => [
+            ['item' => 'จัดการสมาชิกสหกรณ์', 'link' => ''],
+        ]])
     </section>
 
     <!-- Main content -->
@@ -19,7 +18,7 @@
         <!-- Info boxes -->
         <div class="well">
             <h4>การจัดการข้อมูลสมาชิกสหกรณ์</h4>
-            <p>ให้ผู้ดูแลระบบสามารถ เพิ่ม ลบ แก้ไข ตั้งรหัสผ่านใหม่ และกำหนดสิทธิ์การเข้าถึงข้อมูล ของผู้สมาชิกสหกรณ์</p>
+            <p>ให้ผู้ดูแลระบบสามารถ เพิ่ม ลบ แก้ไข ข้อมูลของผู้สมาชิกสหกรณ์</p>
         </div>
 
         @if(Session::has('flash_message'))
@@ -37,21 +36,17 @@
 
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title"><i class="fa fa-user-circle-o"></i> รายชื่อสมาชิกสหกรณ์</h3>
+                <h3 class="box-title"><i class="fa fa-users"></i> รายชื่อสมาชิกสหกรณ์</h3>
             </div>
             <!-- /.box-header -->
 
             <div class="box-body">
                 <button class="btn btn-primary btn-flat margin-b-md" type="button" data-tooltip="true" title="เพิ่มสมาชิกสหกรณ์"
-                    onclick="javascript:window.location.href='{{ url('/admin/member/create') }}';">
+                    onclick="javascript:window.location.href='{{ url('/service/member/create') }}';">
                     <i class="fa fa-user-plus"></i> เพิ่มสมาชิกสหกรณ์
                 </button>
-                <button class="btn btn-primary btn-flat margin-b-md" type="button" data-tooltip="true" title="ชำระค่าหุ้นอัตโนมัติ"
-                    onclick="javascript:window.location.href='{{ url('/admin/autoshareholding') }}';">
-                    <i class="fa fa-bolt"></i> ชำระค่าหุ้นแบบอัตโนมัติ
-                </button>
                 <button class="btn btn-default btn-flat margin-b-md pull-right" type="button" data-tooltip="true" title="สมาชิกสหกรณ์ที่ลาออก"
-                    onclick="javascript:window.location.href='{{ url('/admin/member/inactive') }}';">
+                    onclick="javascript:window.location.href='{{ url('/service/member/inactive') }}';">
                     <i class="fa fa-trash"></i> แสดงสมาชิกที่ลาออก
                 </button>
 
@@ -60,11 +55,10 @@
                         <thead>
                             <tr>
                                 <th style="width: 10%;">รหัสสมาชิก</th>
-                                <th style="width: 21%;">ชื่อสมาชิก</th>
-                                <th style="width: 15%;">ประเภทสมาชิก</th>
-                                <th style="width: 15%;">จำนวนหุ้นปัจจุบัน</th>
-                                <th style="width: 15%;">ทุนเรือนหุ้นสะสม</th>
-                                <th style="width: 24%;">วันที่สมัคร</th>
+                                <th style="width: 20%;">ชื่อสมาชิก</th>
+                                <th style="width: 20%;">ประเภทสมาชิก</th>
+                                <th style="width: 25%;">วันที่สมัคร</th>
+                                <th style="width: 25%;">วันที่ลาออก</th>
                             </tr>
                         </thead>
                     </table>
@@ -100,6 +94,10 @@
 
     <script>
     $(document).ready(function () {
+        $.ajaxSetup({
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+        });
+
         $('[data-tooltip="true"]').tooltip();
         $(".ajax-loading").css("display", "none");
 
@@ -109,7 +107,7 @@
                 "processing": true,
                 "serverSide": true,
                 "url": "/ajax/members",
-                "type": "get",
+                "type": "post",
                 "data": {
                     "type": "active"
                 },
@@ -128,14 +126,13 @@
                 { "data": "code" },
                 { "data": "fullname" },
                 { "data": "typename" },
-                { "data": "shareholding" },
-                { "data": "amount" },
                 { "data": "startdate" },
+                { "data": "leavedate" }
             ]
         });   
 
         $('#dataTables-users tbody').on('click', 'tr', function() {
-            document.location = '/admin/member/' + parseInt($(this).children("td").first().html());            
+            document.location = '/service/member/' + parseInt($(this).children("td").first().html());            
         });         
     });   
     </script>

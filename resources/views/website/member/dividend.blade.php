@@ -158,7 +158,7 @@
     $('#selectyear').change(function() {
         $.ajax({
             url: '/ajax/dividend',
-            type: "get",
+            type: "post",
             data: {
                 'id': {{ $member->id }},
                 'year': $('#selectyear').val()

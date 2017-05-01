@@ -62,13 +62,7 @@
     }}
     {{ Form::button('<i class="fa fa-ban"></i> ยกเลิก', [
         'class'=>'btn btn-default btn-flat', 
-        'onclick'=>'javascript:window.location = "/admin/member/' . $member->id . '/1";'])
+        'onclick'=>'javascript:history.go(-1);'])
     }}
-    @if ($edit)
-        {{ Form::button('<i class="fa fa-trash"></i> ลบ', [
-            'class'=>'btn btn-danger btn-flat pull-right', 
-            'onclick'=>'javascript:var result = confirm(\'คุณต้องการลบรายการนี้ใช่ไหม ?\'); if (result) { window.location = "/admin/member/' . $member->id . '/shareholding/' . $shareholding->id . '/erase"; }'])
-        }}
-    @endif
 </div>
 <!-- /.box-footer -->

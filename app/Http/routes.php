@@ -14,19 +14,19 @@
 /* ====================================================================== */
 // Website Route...
 /* ====================================================================== */
-Route::group(['domain' => 'www.tatcoop.dev',
+Route::group(['domain' => 'www.' . env('APP_DOMAIN'),
     'namespace' => 'Website',
     'middleware' => 'locale:th'], function () {
 
-    // Verify Route...
-    Route::get('/auth/verify/{token}', ['as' => 'website.auth.verify', 'uses' => 'AuthController@getVerify']);
+    // Ajax Route...
+    Route::controller('/ajax', 'AjaxController');
 
     // Auth Route...
-    Route::controller('/auth', 'AuthController', [
-        'getRegister' => 'website.auth.register',
-        'getLogin' => 'website.auth.login',
-        'getLogout' => 'website.auth.logout',
-    ]);
+    Route::get('/auth/verify/{token}', ['as' => 'website.auth.verify', 'uses' => 'AuthController@getVerify']); // Verify Route...
+    Route::controller('/auth', 'AuthController');
+
+    // Background Route...
+    Route::get('/background/{photo}', ['as' => 'website.background', 'uses' => 'HomeController@getBackground']);
 
     // Password Route...
     Route::group(['prefix' => '/password'], function() {
@@ -36,6 +36,9 @@ Route::group(['domain' => 'www.tatcoop.dev',
         Route::post('reset', 'PasswordController@postReset');
     });
 
+    // Member Route...
+    Route::resource('/member', 'MemberController', ['only' => ['index', 'edit', 'update']]);
+
     // Billing Route...
     Route::group(['prefix' => '/member/shareholding/billing'], function() {
         Route::get('{date}/print', ['as' => 'website.member.shareholding.billing.print', 'uses' => 'MemberController@getPrintBilling']);
@@ -44,29 +47,10 @@ Route::group(['domain' => 'www.tatcoop.dev',
     });
 
     // Pre Loan Route...
-    Route::controller('/loan', 'LoanController', [
-        'getIndex' => 'website.loan.index',
-    ]);
-
-    // Member Route...
-    Route::controller('/member', 'MemberController', [
-        'getIndex' => 'website.member.index',
-        'getEdit' => 'website.member.edit',
-        'putUpdate' => 'website.member.update',
-        'getShareholding' => 'website.member.shareholding',
-        'getLoan' => 'website.member.loan',
-        'getDividend' => 'website.member.dividend',
-        'getGuaruntee' => 'website.member.guaruntee',
-    ]);
+    Route::controller('/loan', 'LoanController');
 
     // Profile Route...
-    Route::controller('/user', 'UserController', [
-        'getProfile' => 'user.profile',
-        'getPassword' => 'user.password',
-        'getAlert' => 'user.alert',
-        'getNotice' => 'user.notice',
-        'getMessage' => 'user.message',
-    ]);
+    Route::controller('/user', 'UserController');
 
     // Carousel Route...
     Route::get('/carousel/{image}', ['as' => 'website.carousel', 'uses' => 'CarouselController@getCarousel']);
@@ -91,85 +75,36 @@ Route::group(['domain' => 'www.tatcoop.dev',
     // Knowledge Route...
     Route::resource('knowledges', 'KnowledgeController');
 
-    // Ajax Route...
-    Route::post('/ajax/loan', 'AjaxController@postLoan');
-    Route::controller('/ajax', 'AjaxController', [
-        'getBackground' => 'website.ajax.background',
-        'getLoadmore' => 'website.ajax.loadmore',
-        'getDistricts' => 'website.ajax.district',
-        'getSubdistricts' => 'website.ajax.subdistrict',
-        'getPostcode' => 'website.ajax.postcode',
-        'getDividend' => 'website.ajax.dividend',
-    ]);
-
-    // Background Route...
-    Route::get('/background/{photo}', ['as' => 'website.background', 'uses' => 'HomepageController@getBackground']);
-
     // Homepage Route...
-    Route::get('/', ['as' => 'website.index', 'uses' => 'HomepageController@getIndex']);
+    Route::controller('/', 'HomeController');
 });
 
 /* ====================================================================== */
 // Admin Route...
 /* ====================================================================== */
-Route::group(['domain' => 'admin.tatcoop.dev',
+Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
     'namespace' => 'Admin',
     'middleware' => 'locale:th'], function () {
 
     // Auth Route...
-    Route::controller('/auth', 'AuthController', [
-        'getLogin' => 'admin.auth.login',
-        'getLogout' => 'admin.auth.logout',
-    ]);
+    Route::controller('/auth', 'AuthController');
 
     // Ajax Route...
-    Route::post('/ajax/uploadfile', 'AjaxController@postUploadFile');
-    Route::post('/ajax/updatefile', 'AjaxController@postUpdateFile');
-    Route::post('/ajax/updateother', 'AjaxController@postUpdateOther');
-    Route::post('/ajax/deletefile', 'AjaxController@postDeleteFile');
-    Route::post('/ajax/uploadcarousel', 'AjaxController@postUploadCarousel');
-    Route::post('/ajax/updatecarouselimage', 'AjaxController@postUpdateCarouselImage');
-    Route::post('/ajax/updatecarouseldocument', 'AjaxController@postUpdateCarouselDocument');
-    Route::post('/ajax/deletecarousel', 'AjaxController@postDeleteCarousel');
-    Route::post('/ajax/uploaddocument', 'AjaxController@postUploadDocument');
-    Route::post('/ajax/uploadphoto', 'AjaxController@postUploadPhoto');
-    Route::post('/ajax/deletedocument', 'AjaxController@postDeleteDocument');
-    Route::post('/ajax/deletephoto', 'AjaxController@postDeletePhoto');
-    Route::post('/ajax/loannormalemployeestep1', 'AjaxController@postLoanNormalEmployeeStep1');
-    Route::post('/ajax/getsurety', 'AjaxController@postGetSurety');
-    Route::controller('/ajax', 'AjaxController', [
-        'getBackground' => 'admin.ajax.background',
-        'getLoadmore' => 'admin.ajax.loadmore',
-        'getMembers' => 'admin.ajax.members',
-        'getMembershareholding' => 'admin.ajax.membershareholding',
-        'getDistricts' => 'admin.ajax.district',
-        'getSubdistricts' => 'admin.ajax.subdistrict',
-        'getPostcode' => 'admin.ajax.postcode',
-        'getStatus' => 'admin.ajax.status',
-        'getProfile' => 'admin.ajax.profile',
-        'getDividend' => 'admin.ajax.dividend',
-        'getDocuments' => 'admin.ajax.documents',
-        'getDocumentlists' => 'admin.ajax.documentlists',
-        'getDocumentsbytype' => 'admin.ajax.documentsbytype',
-        'getReorder' => 'admin.ajax.reorder',
-        'getReordercarousel' => 'admin.ajax.reordercarousel',
-        'getRestorefile' => 'admin.ajax.restorefile',
-        'getCarousels' => 'admin.ajax.carousels',
-    ]);
+    Route::controller('/ajax', 'AjaxController');
+
+    // Background Route...
+    Route::get('/background/{photo}', ['as' => 'website.background', 'uses' => 'BackgroundController@getBackground']);
+
+    // Carousel Route...
+    Route::get('/carousel/{image}', ['as' => 'admin.carousel', 'uses' => 'CarouselController@getCarousel']);
 
     // Profile Route...
-    Route::controller('/user', 'UserController', [
-        'getProfile' => 'admin.user.profile',
-        'getPassword' => 'admin.user.password',
-        'getAlert' => 'admin.user.alert',
-        'getNotice' => 'admin.user.notice',
-        'getMessage' => 'admin.user.message',
-    ]);
+    Route::controller('/user', 'UserController');
 
     // Management Route...
     Route::group(['prefix' => '/website'], function() {
         // Documents Route...
-        Route::resource('documents', 'DocumentController');
+        Route::resource('documents', 'DocumentController', ['only' => [ 'index' ]]);     
 
         // Carousel Route...
         Route::resource('carousels', 'CarouselController');
@@ -177,72 +112,84 @@ Route::group(['domain' => 'admin.tatcoop.dev',
         // News Route...
         Route::get('news/inactive', ['as' => 'website.news.inactive', 'uses' => 'NewsController@getInactive']);
         Route::get('news/{id}/restore', ['as' => 'website.news.restore', 'uses' => 'NewsController@postRestore']);
-        Route::get('news/{id}/delete', ['as' => 'website.news.delete', 'uses' => 'NewsController@postDelete']);
+        Route::get('news/{id}/forcedelete', ['as' => 'website.news.delete', 'uses' => 'NewsController@postForceDelete']);
         Route::resource('news', 'NewsController');
 
         // Knowledge Route...
         Route::get('knowledge/inactive', ['as' => 'website.knowledge.inactive', 'uses' => 'KnowledgeController@getInactive']);
         Route::get('knowledge/{id}/restore', ['as' => 'website.knowledge.restore', 'uses' => 'KnowledgeController@postRestore']);
-        Route::get('knowledge/{id}/delete', ['as' => 'website.knowledge.delete', 'uses' => 'KnowledgeController@postDelete']);
+        Route::get('knowledge/{id}/forcedelete', ['as' => 'website.knowledge.delete', 'uses' => 'KnowledgeController@postForceDelete']);
         Route::resource('knowledge', 'KnowledgeController');    
     });
 
-    // Carousel Route...
-    Route::get('/carousel/{image}', ['as' => 'admin.carousel', 'uses' => 'CarouselController@getCarousel']);
-
-    // Admin Route...
-    Route::get('/admin/administrator/restore', ['as' => 'admin.administrator.restore', 'uses' => 'AdminController@getRestore']);
-    Route::group(['prefix' => '/admin/administrator/{id}'], function() {
-        Route::get('erase', ['as' => 'admin.administrator.erase', 'uses' => 'AdminController@getErase']);
-        Route::get('forcedelete', ['as' => 'admin.administrator.forcedelete', 'uses' => 'AdminController@getForceDelete']);
-        Route::get('undelete', ['as' => 'admin.administrator.undelete', 'uses' => 'AdminController@getUnDelete']);
-    });
-    Route::resource('/admin/administrator', 'AdminController');
-
-    // Member Route...
-    Route::get('/admin/member/inactive', 'MemberController@getInactive');
-    Route::resource('/admin/member', 'MemberController');
-    Route::group(['prefix' => '/admin/member/{id}'], function() {
-        Route::get('leave', ['as' => 'admin.member.leave', 'uses' => 'MemberController@getLeave']);
-        Route::get('{tab}', ['as' => 'admin.member.tab', 'uses' => 'MemberController@getShowTab']);
+    // Services Route...
+    Route::group(['prefix' => '/service'], function() {
+        // Member Route...
+        Route::get('member/inactive', 'MemberController@getInactive');
+        Route::get('/member/{id}/leave', ['as' => 'admin.member.leave', 'uses' => 'MemberController@getLeave']);
+        Route::post('/member/{id}/leave', 'MemberController@postLeave');
+        Route::resource('member', 'MemberController');
 
         // Share Holding Route...
-        Route::get('shareholding/{share}/erase', 'ShareholdingController@getErase');
-        Route::resource('shareholding', 'ShareholdingController');
+        Route::get('shareholding/member', ['as' => 'service.shareholding.member', 'uses' => 'ShareholdingController@getMember']);
+        Route::get('shareholding/autoshareholding', ['as' => 'service.shareholding.auto', 'uses' => 'ShareholdingController@getAutoShareholding']);
+        Route::post('shareholding/autoshareholding', 'ShareholdingController@postAutoShareholding');
+        Route::resource('{member_id}/shareholding', 'ShareholdingController');
 
         // Loan Route...
-        Route::get('loan/createnormal', ['as' => 'admin.member.loan.createnormal', 'uses' => 'LoanController@getCreateNormal']);
-        Route::get('loan/createemerging', ['as' => 'admin.member.loan.createemerging', 'uses' => 'LoanController@getCreateEmerging']);
-        Route::get('loan/createspecial/{loantype_id}', ['as' => 'admin.member.loan.createspecial', 'uses' => 'LoanController@getCreateSpecial']);
-        Route::resource('loan', 'LoanController');
+        Route::get('loan/member', ['as' => 'service.loan.member', 'uses' => 'LoanController@getMember']);
+        Route::get('{member_id}/loan/{loantype_id}/create', ['as' => 'service.loan.create', 'uses' => 'LoanController@getCreateLoan']);
+        Route::get('{member_id}/loan/{loantype_id}/create/normal/employee', ['as' => 'service.loan.create.normal.employee', 'uses' => 'LoanController@getCreateNormalEmployeeLoan']);
+        Route::get('{member_id}/loan/{loantype_id}/create/normal/outsider', ['as' => 'service.loan.create.normal.outsider', 'uses' => 'LoanController@getCreateNormalOutsiderLoan']);
+        Route::get('{member_id}/loan/{loantype_id}/create/emerging', ['as' => 'service.loan.create.emerging', 'uses' => 'LoanController@getCreateEmergingLoan']);
+        Route::get('{member_id}/loan/{loantype_id}/create/special', ['as' => 'service.loan.create.special', 'uses' => 'LoanController@getCreateSpecialLoan']);
+        Route::resource('{member_id}/loan', 'LoanController');
+
+        // Payment Route...
+        Route::resource('{member_id}/payment', 'PaymentController');
+
+        // Dividend Route...
+        Route::get('dividend/member', ['as' => 'service.dividend.member', 'uses' => 'DividendController@getMember']);
+        Route::resource('{member_id}/dividend', 'DividendController');
+
+        // Quaruntee Route...
+        Route::get('guaruntee/member', ['as' => 'service.guaruntee.member', 'uses' => 'GuarunteeController@getMember']);
+        Route::resource('{member_id}/guaruntee', 'GuarunteeController');
     });
 
-    // Share Holding Route...
-    Route::get('/admin/autoshareholding', 'ShareholdingController@getAutoShareholding');
-    Route::post('/admin/autoshareholding', 'ShareholdingController@postAutoShareholding');
+    // Admin Route...
+    Route::group(['prefix' => '/admin'], function() {
+        // Admin Accounts Route...
+        Route::get('administrator/{id}/delete', ['as' => 'admin.administrator.delete', 'uses' => 'AdminController@getDelete']);
+        Route::get('administrator/inactive', ['as' => 'admin.administrator.inactive', 'uses' => 'AdminController@getInactive']);
+        Route::post('administrator/{id}/forcedelete', 'AdminController@postForceDelete');
+        Route::post('administrator/{id}/restore', 'AdminController@postRestore');
+        Route::resource('administrator', 'AdminController', ['except' => [ 'show' ]]);
 
-    // Loan Type Route...
-    Route::get('/admin/loantype/expire', 'LoanTypeController@getExpire');
-    Route::get('/admin/loantype/deleted', 'LoanTypeController@getDeleted');
-    Route::get('/admin/loantype/{id}/finish', 'LoanTypeController@getFinish');
-    Route::resource('/admin/loantype', 'LoanTypeController');
+        // User Account Route...
+        Route::resource('account', 'AccountController', ['only' => [ 'index' ]]);
 
-    // Dividend Route...
-    Route::get('/admin/dividend/{id}/erase', 'DividendController@getErase');
-    Route::get('/admin/dividend/{id}/export', 'DividendController@getExport');
-    Route::resource('/admin/dividend', 'DividendController');
+        // Loan Type Route...
+        Route::get('loantype/{id}/finished', ['as' => 'admin.loantype.finished', 'uses' => 'LoanTypeController@getFinished']);
+        Route::get('loantype/expired', ['as' => 'admin.loantype.expired', 'uses' => 'LoanTypeController@getExpired']);
+        Route::get('loantype/inactive', 'LoanTypeController@getInactive');
+        Route::post('loantype/{id}/forcedelete', 'LoanTypeController@postForceDelete');
+        Route::post('loantype/{id}/restore', 'LoanTypeController@postRestore');        
+        Route::resource('loantype', 'LoanTypeController');
 
-    // Statistic Route...
-    Route::controller('/admin/statistic', 'StatisticController', [
-        'getProfile' => 'admin.statistic.index',
-    ]);
+        // Dividend Route...
+        Route::get('dividend/{id}/export', 'DividendController@getExport');
+        Route::resource('dividend', 'DividendController');
 
-    // Background Route...
-    Route::get('/background/{photo}', ['as' => 'website.background', 'uses' => 'BackgroundController@getBackground']);
+        // Billing Route...
+        Route::resource('billing', 'BillingController', ['only' => [ 'index', 'edit', 'update' ]]);
+
+        // Statistic Route...
+        Route::controller('statistic', 'StatisticController', [
+            'getProfile' => 'admin.statistic.index',
+        ]);
+    });
 
     // Admin Route...
-    Route::controller('/', 'AdminController', [
-        'getIndex' => 'admin.index',
-        'getUnauthorize' => 'admin.unauthorize',
-    ]);
+    Route::controller('/', 'HomeController');
 });

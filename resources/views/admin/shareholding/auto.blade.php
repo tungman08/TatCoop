@@ -3,15 +3,15 @@
 @section('content')
     <!-- Content Header (Page header) -->
     <section class="content-header">
-    <h1>
-        จัดการสมาชิกสหกรณ์
-        <small>เพิ่ม ลบ แก้ไข บัญชีสมาชิก สอ.สรทท.</small>
-    </h1>
+        <h1>
+            จัดการทุนเรือนหุ้นของสมาชิกสหกรณ์ฯ
+            <small>เพิ่ม ลบ แก้ไข ทุนเรือนหุ้นของสมาชิก สอ.สรทท.</small>
+        </h1>
 
-    @include('admin.member.breadcrumb', ['breadcrumb' => [
-        ['item' => 'จัดการสมาชิกสหกรณ์', 'link' => '/admin/member'],
-        ['item' => 'ชำระค่าหุ้นแบบอัตโนมัติ', 'link' => ''],
-    ]])
+        @include('admin.layouts.breadcrumb', ['breadcrumb' => [
+            ['item' => 'จัดการทุนเรือนหุ้น', 'link' => 'service/shareholding/member'],
+            ['item' => 'ชำระค่าหุ้นแบบอัตโนมัติ', 'link' => ''],
+        ]])
     </section>
 
     <!-- Main content -->
@@ -43,39 +43,40 @@
 
             <div class="box-body">
                 <!-- form start -->   
-                {{ Form::open(['url' => '/admin/autoshareholding', 'method' => 'post', 'onsubmit' => 'return confirm("คุณต้องการทำการชำระค่าหุ้นแบบอัตโนมัติใช่หรือไม่?");']) }}
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label>
-                                <i class="fa fa-calendar fa-fw"></i>
-                                ปฏิทิน
-                            </label>
-                            <div class="input-group" id="datepicker" style="width: 250px;">
-                                {{ Form::text('month', Diamond::today()->format('Y-m'), [
-                                    'id'=>'month', 
-                                    'class'=>'form-control'])
-                                }}     
-                                <span class="input-group-addon">
-                                    <span class="fa fa-calendar">
+                {{ Form::open(['url' => '/service/shareholding/autoshareholding', 'method' => 'post',
+                    'onsubmit' => 'return confirm("คุณต้องการทำการชำระค่าหุ้นแบบอัตโนมัติใช่หรือไม่?");']) }}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>
+                                    <i class="fa fa-calendar fa-fw"></i>
+                                    ปฏิทิน
+                                </label>
+                                <div class="input-group" id="datepicker" style="width: 250px;">
+                                    {{ Form::text('month', Diamond::today()->format('Y-m'), [
+                                        'id'=>'month', 
+                                        'class'=>'form-control'])
+                                    }}     
+                                    <span class="input-group-addon">
+                                        <span class="fa fa-calendar">
+                                        </span>
                                     </span>
-                                </span>
+                                </div>
+                            </div>
+                            <p class="help-block">กรุณาเลือกเดือนที่ต้องการชำระค่าหุ้นอัตโนมัติ</p>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <div class="input-group pull-right">                     
+                                    {{ Form::button('<i class="fa fa-bolt"></i> ป้อนการชำระค่าหุ้นแบบอัตโนมัติ ประจำเดือน<span id="b_month">' . Diamond::today()->thai_format('F Y') . '</span>', [
+                                        'id' => 'automatic',
+                                        'type' => 'submit', 
+                                        'class'=>'btn btn-primary btn-flat'])
+                                    }}
+                                </div>
                             </div>
                         </div>
-                        <p class="help-block">กรุณาเลือกเดือนที่ต้องการชำระค่าหุ้นอัตโนมัติ</p>
                     </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <div class="input-group pull-right">                     
-                                {{ Form::button('<i class="fa fa-bolt"></i> ป้อนการชำระค่าหุ้นแบบอัตโนมัติ ประจำเดือน<span id="b_month">' . Diamond::today()->thai_format('F Y') . '</span>', [
-                                    'id' => 'automatic',
-                                    'type' => 'submit', 
-                                    'class'=>'btn btn-primary btn-flat'])
-                                }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 {{ Form::close() }}
 
                 <br />
@@ -86,7 +87,7 @@
                                 <th style="width: 10%;">รหัสสมาชิก</th>
                                 <th style="width: 30%;">ชื่อสมาชิกที่สามารถชำระแบบอัตโนมัติ</th>
                                 <th style="width: 20%;">ประเภทสมาชิก</th>
-                                <th style="width: 20%;">จำนวนหุ้นปัจจุบัน</th>
+                                <th style="width: 20%;">หุ้นรายเดือน</th>
                                 <th style="width: 20%;">ทุนเรือนหุ้นสะสม</th>
                             </tr>
                         </thead>
@@ -129,6 +130,10 @@
 
     <script>
     $(document).ready(function () {
+        $.ajaxSetup({
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+        });
+
         $('[data-tooltip="true"]').tooltip();
         $(".ajax-loading").css("display", "none"); 
 
@@ -136,7 +141,9 @@
             viewMode: 'months',
             format: 'YYYY-MM',
             minDate: moment('2015-12-31'),
-            maxDate: moment()
+            maxDate: moment(),
+            locale: moment().lang('th'),
+            useCurrent: false
         }).on("dp.change", function (e) {
             bindDataTable(e.date.format('YYYY-M-D'))
         }).on('dp.hide', function(e){
@@ -155,7 +162,7 @@
                 "processing": true,
                 "serverSide": true,
                 "url": "/ajax/membershareholding",
-                "type": "get",
+                "type": "post",
                 "data": {
                     "date": date
                 },

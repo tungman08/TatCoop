@@ -3,16 +3,16 @@
 @section('content')
     <!-- Content Header (Page header) -->
     <section class="content-header">
-    <h1>
-        จัดการสมาชิกสหกรณ์
-        <small>เพิ่ม ลบ แก้ไข บัญชีสมาชิก สอ.สรทท.</small>
-    </h1>
+        <h1>
+            จัดการสมาชิกสหกรณ์ฯ
+            <small>เพิ่ม ลบ แก้ไข บัญชีสมาชิก สอ.สรทท.</small>
+        </h1>
 
-    @include('admin.member.breadcrumb', ['breadcrumb' => [
-        ['item' => 'จัดการสมาชิกสหกรณ์', 'link' => '/admin/member'],
-        ['item' => 'ข้อมูลสมาชิกสหกรณ์', 'link' => '/admin/member/' . $member->id],
-        ['item' => 'แก้ไข', 'link' => ''],
-    ]])
+        @include('admin.layouts.breadcrumb', ['breadcrumb' => [
+            ['item' => 'จัดการสมาชิกสหกรณ์', 'link' => '/service/member'],
+            ['item' => 'ข้อมูลสมาชิกสหกรณ์', 'link' => '/service/member/' . $member->id],
+            ['item' => 'แก้ไข', 'link' => ''],
+        ]])
 
     </section>
 
@@ -40,7 +40,7 @@
             <!-- /.box-header -->
 
             <!-- form start -->
-            {{ Form::model($member, ['route' => ['admin.member.update', $member->id], 'method' => 'put', 'class' => 'form-horizontal']) }}
+            {{ Form::model($member, ['route' => ['service.member.update', $member->id], 'method' => 'put', 'class' => 'form-horizontal']) }}
                 @include('admin.member.form', ['edit' => true, 'id' => $member->id])
             {{ Form::close() }}
         </div>
@@ -79,14 +79,16 @@
     <script>
     $(document).ready(function () {
         $("[data-mask]").inputmask();
-        $('form').submit(function() {
-            $("[data-mask]").inputmask('remove');
-        });
+        // $('form').submit(function() {
+        //    $("[data-mask]").inputmask('remove');
+        //});
         
         $('#birth_date').datetimepicker({
             locale: 'th',
             viewMode: 'days',
-            format: 'YYYY-MM-DD'
+            format: 'YYYY-MM-DD',
+            locale: moment().lang('th'),
+            useCurrent: false
         });
     });
     </script>

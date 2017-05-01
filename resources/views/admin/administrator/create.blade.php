@@ -3,16 +3,15 @@
 @section('content')
     <!-- Content Header (Page header) -->
     <section class="content-header">
-    <h1>
-        จัดการผู้ดูแลระบบ
-        <small>เพิ่ม ลบ แก้ไข บัญชีของผู้ดูแลระบบ สอ.สรทท.</small>
-    </h1>
+        <h1>
+            จัดการผู้ดูแลระบบฯ
+            <small>เพิ่ม ลบ แก้ไข บัญชีของผู้ดูแลระบบ สอ.สรทท.</small>
+        </h1>
 
-    @include('admin.administrator.breadcrumb', ['breadcrumb' => [
-        ['item' => 'จัดการผู้ดูแลระบบ', 'link' => '/admin/administrator'],
-        ['item' => 'เพิ่มผู้ดูแลระบบ', 'link' => ''],
-    ]])
-
+        @include('admin.layouts.breadcrumb', ['breadcrumb' => [
+            ['item' => 'จัดการผู้ดูแลระบบ', 'link' => '/admin/administrator'],
+            ['item' => 'เพิ่ม', 'link' => ''],
+        ]])
     </section>
 
     <!-- Main content -->

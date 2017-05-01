@@ -8,7 +8,7 @@
         <small>การจัดการข่าวสารสำหรับสมาชิกของ สอ.สรทท.</small>
     </h1>
 
-    @include('admin.news.breadcrumb', ['breadcrumb' => [
+    @include('admin.layouts.breadcrumb', ['breadcrumb' => [
         ['item' => 'จัดการข่าวสารสำหรับสมาชิก', 'link' => '/website/news'],
         ['item' => 'ข่าวสารสำหรับสมาชิกที่ถูกลบ', 'link' => ''],
     ]])
@@ -55,10 +55,23 @@
                                 <td>{{ Diamond::parse($inactive->created_at)->thai_format('j M Y') }}</td>
                                 <td>{{ Diamond::parse($inactive->deleted_at)->thai_format('j M Y') }}</td>
                                 <td>
-                                    <a style="cursor: pointer;"
-                                        onclick="javascript:result = confirm('คุณต้องการคืนสภาพรายการนี้ใช่ไหม ?'); if (result) { window.location.href='/website/news/{{ $inactive->id }}/restore'; }">คืนสภาพ</a> / 
-                                    <a style="cursor: pointer;"
-                                        onclick="javascript:result = confirm('คุณต้องการลบรายการนี้อย่างถาวรใช่ไหม ?'); if (result) { window.location.href='/website/news/{{ $inactive->id }}/delete'; }">ลบถาวร</a> 
+                                    <div class="btn-group">
+                                        {{ Form::open(['url' => '/website/news/' . $inactive->id . '/restore', 'method' => 'post']) }}
+                                            {{ Form::button('<i class="fa fa-rotate-left"></i>', [
+                                                'type' => 'submit',
+                                                'class'=>'btn btn-default btn-xs btn-flat',
+                                                'onclick'=>"javascript:return confirm('คุณต้องการคืนค่าข่าวประชาสัมพันธ์นี้ใช่หรือไม่?');"])
+                                            }}
+                                        {{ Form::close() }}
+
+                                        {{ Form::open(['url' => '/website/news/' . $inactive->id . '/forcedelete', 'method' => 'post']) }}
+                                            {{ Form::button('<i class="fa fa-trash"></i>', [
+                                                'type' => 'submit',
+                                                'class'=>'btn btn-default btn-xs btn-flat', 
+                                                'onclick'=>"javascript:return confirm('คุณต้องการลบข่าวประชาสัมพันธ์นี้ออกจากระบบใช่หรือไม่?');"])
+                                            }}
+                                        {{ Form::close() }}
+                                    </div>
                                 </td>
                             </tr>
                             @endforeach

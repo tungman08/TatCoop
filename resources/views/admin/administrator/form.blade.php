@@ -74,12 +74,12 @@
     }}
     {{ Form::button('<i class="fa fa-ban"></i> ยกเลิก', [
         'class'=>'btn btn-default btn-flat', 
-        'onclick'=>'javascript:window.location = "/admin/administrator";'])
+        'onclick'=>'javascript:history.go(-1);'])
     }}
     @if ($edit)
         {{ Form::button('<i class="fa fa-trash"></i> ลบ', [
             'class'=>'btn btn-danger btn-flat pull-right', 
-            'onclick'=>'javascript:window.location = "/admin/administrator/' . $id . '/erase";'])
+            'onclick'=>'javascript:window.location = "/admin/administrator/' . $id . '/delete";'])
         }}
     @endif
 </div>

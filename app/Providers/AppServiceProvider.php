@@ -86,8 +86,8 @@ class AppServiceProvider extends ServiceProvider
             return new \App\Classes\Bing;
         });   
 
-        App::bind('loan', function() {
-            return new \App\Classes\Loan;
+        App::bind('loancalculator', function() {
+            return new \App\Classes\LoanCalculator;
         });         
     }
 }

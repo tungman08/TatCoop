@@ -34,6 +34,28 @@ class ShareholdingController extends Controller
         $this->middleware('auth:admins');
     }
 
+    public function getMember() {
+        return view('admin.shareholding.member');
+    }
+
+    public function index($id) {
+        $member = Member::find($id);
+        $shareholdings = Shareholding::where('member_id', $member->id)
+            ->select(
+                'id',
+                DB::raw('str_to_date(concat(\'1/\', month(pay_date), \'/\', year(pay_date)), \'%d/%m/%Y\') as name'),
+                DB::raw('(sum(if(member_id = ' . $member->id . ' and shareholding_type_id = 1, amount, 0))) as amount'),
+                DB::raw('(sum(if(member_id = ' . $member->id . ' and shareholding_type_id = 2, amount, 0))) as amount_cash'),
+                'remark')
+            ->groupBy(DB::raw('year(pay_date)'), DB::raw('month(pay_date)'))
+            ->get();
+
+        return view('admin.shareholding.index', [
+            'member' => $member,
+            'shareholdings' => $shareholdings
+        ]);
+    }
+
     public function create($id) {
         return view('admin.shareholding.create', [
             'member' => Member::find($id),
@@ -78,7 +100,7 @@ class ShareholdingController extends Controller
                 History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'เพิ่มข้อมูลค่าหุ้นของคุณ' . $profile->name . ' ' . $profile->lastname);
             });
 
-            return redirect()->route('admin.member.tab', ['id' => $id, 'tab' => 1])
+            return redirect()->action('Admin\ShareholdingController@index', ['id' => $id])
                 ->with('flash_message', 'ป้อนข้อมูลการชำระค่าหุ้นเรียบร้อยแล้ว')
                 ->with('callout_class', 'callout-success');
         }
@@ -128,13 +150,13 @@ class ShareholdingController extends Controller
                 History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'แก้ไขข้อมูลค่าหุ้นของคุณ' . $profile->name . ' ' . $profile->lastname);
             });
 
-            return redirect()->route('admin.member.tab', ['id' => $member_id, 'tab' => 1])
+            return redirect()->action('Admin\ShareholdingController@index', ['id' => $member_id])
                 ->with('flash_message', 'แก้ไขข้อมูลการชำระค่าหุ้นเรียบร้อยแล้ว')
                 ->with('callout_class', 'callout-success');
         }
     }
 
-    public function getErase($member_id, $id) {
+    public function destroy($member_id, $id) {
         DB::transaction(function() use ($id) {
             $shareholding = Shareholding::find($id);
 
@@ -145,7 +167,7 @@ class ShareholdingController extends Controller
             $shareholding->delete();
         });
 
-        return redirect()->route('admin.member.tab', ['id' => $member_id, 'tab' => 1])
+        return redirect()->action('Admin\ShareholdingController@index', ['id' => $member_id])
             ->with('flash_message', 'ลบข้อมูลการชำระค่าหุ้นเรียบร้อยแล้ว')
             ->with('callout_class', 'callout-success');
     }
@@ -184,7 +206,7 @@ class ShareholdingController extends Controller
             History::addAdminHistory(Auth::guard($this->guard)->id(), 'ป้อนการชำระค่าหุ้นแบบอัตโนมัติ', 'ทำรายการชำระค่าหุ้นอัตโนมัติประจำเดือน' . $date->thai_format('F Y'));
         });
 
-        return redirect()->route('admin.member.index')
+        return redirect()->action('Admin\ShareholdingController@getMember')
             ->with('flash_message', 'ทำรายการชำระค่าหุ้นอัตโนมัติประจำเดือน' . $date->thai_format('F Y') . ' จำนวน ' . $members->count() . ' คน เรียบร้อยแล้ว')
             ->with('callout_class', 'callout-success');
     }

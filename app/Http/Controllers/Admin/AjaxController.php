@@ -13,7 +13,7 @@ use DB;
 use Diamond;
 use Image;
 use File;
-use Loan;
+use LoanCalculator;
 use MemberProperty;
 use UploadDocument;
 use App\Classes\Icon;
@@ -38,6 +38,7 @@ use App\DocumentType;
 use App\Carousel;
 use App\NewsAttachment;
 use App\KnowledgeAttachment;
+use App\Loan;
 use App\LoanType;
 use Datatables;
 
@@ -59,7 +60,7 @@ class AjaxController extends Controller
         $this->middleware('auth:admins', ['except' => 'getBackground']);
     }
 
-    public function getMembers(Request $request) {
+    public function postMembers(Request $request) {
         $type = $request->input('type');
 
         if ($type == 'active') {
@@ -67,37 +68,34 @@ class AjaxController extends Controller
                 ->join('profiles', 'members.profile_id', '=', 'profiles.id')
                 ->join('employees', 'profiles.id', '=', 'employees.profile_id')
                 ->join('employee_types', 'employees.employee_type_id', '=', 'employee_types.id')
-                ->leftJoin('shareholdings', 'members.id', '=', 'shareholdings.member_id')
                 ->whereNull('members.leave_date')
-                ->groupBy(['members.id', 'profiles.name', 'profiles.lastname', 'employee_types.name', 'members.shareholding', 'members.start_date'])
                 ->select([
                     DB::raw("LPAD(members.id, 5, '0') as code"),
                     DB::raw("CONCAT('<span class=\"text-primary\"><i class=\"fa fa-user fa-fw\"></i> ', IF(profiles.name = '<ข้อมูลถูกลบ>', profiles.name, CONCAT(profiles.name, ' ', profiles.lastname)), '</span>') as fullname"),
                     'employee_types.name as typename',
-                    DB::raw("CONCAT(FORMAT(members.shareholding, 0), ' หุ้น') as shareholding"),
-                    DB::raw("CONCAT(FORMAT(COALESCE(SUM(shareholdings.amount), 0), 2), ' บาท') as amount"),
-                    'members.start_date as startdate'
+                    'members.start_date as startdate',
+                    "members.leave_date as leavedate"
                 ]);
 
             return Datatables::queryBuilder($members)
                 ->editColumn('startdate', function($member) {
                         return Diamond::parse($member->startdate)->thai_format('j M Y');
                     })
+                ->editColumn('leavedate', function($member) {
+                        return '-';
+                    }) 
                 ->make(true);
         }
         else {
             $members = DB::table('members')
                 ->join('profiles', 'members.profile_id', '=', 'profiles.id')
                 ->whereNotNull('members.leave_date')
-                ->groupBy(['members.id', 'profiles.name', 'profiles.lastname', 'members.shareholding', 'members.start_date', 'members.leave_date'])
                 ->select([
                     DB::raw("LPAD(members.id, 5, '0') as code"),
                     DB::raw("CONCAT('<span class=\"text-primary\">', IF(profiles.name = '<ข้อมูลถูกลบ>', profiles.name, CONCAT('<i class=\"fa fa-user fa-fw\"></i> ', profiles.name, ' ', profiles.lastname)), '</span>') as fullname"),
                     DB::raw("'ลาออก' as typename"),
-                    DB::raw("CONCAT(FORMAT(members.shareholding, 0), ' หุ้น') as shareholding"),
-                    DB::raw("'0 บาท' as amount"),
                     'members.start_date as startdate',
-                    'members.leave_date as leavedate',
+                    'members.leave_date as leavedate'
                 ]);
 
             return Datatables::queryBuilder($members)
@@ -111,19 +109,38 @@ class AjaxController extends Controller
         }
     }
 
-    public function getDistricts(Request $request) {
+    public function postShareholding() {
+        $members = DB::table('members')
+            ->join('profiles', 'members.profile_id', '=', 'profiles.id')
+            ->join('employees', 'profiles.id', '=', 'employees.profile_id')
+            ->join('employee_types', 'employees.employee_type_id', '=', 'employee_types.id')
+            ->leftJoin('shareholdings', 'members.id', '=', 'shareholdings.member_id')
+            ->whereNull('members.leave_date')
+            ->groupBy(['members.id', 'profiles.name', 'profiles.lastname', 'employee_types.name', 'members.shareholding', 'members.start_date'])
+            ->select([
+                DB::raw("LPAD(members.id, 5, '0') as code"),
+                DB::raw("CONCAT('<span class=\"text-primary\"><i class=\"fa fa-user fa-fw\"></i> ', IF(profiles.name = '<ข้อมูลถูกลบ>', profiles.name, CONCAT(profiles.name, ' ', profiles.lastname)), '</span>') as fullname"),
+                'employee_types.name as typename',
+                DB::raw("IF(members.shareholding > 0, CONCAT(FORMAT(members.shareholding, 0), ' หุ้น'), '-') as shareholding"),
+                DB::raw("CONCAT(FORMAT(COALESCE(SUM(shareholdings.amount), 0), 2), ' บาท') as amount")
+            ]);
+
+        return Datatables::queryBuilder($members)->make(true);
+    }
+
+    public function postDistricts(Request $request) {
         $id = $request->input('id');
 
         return District::where('province_id', $id)->orderBy('name')->get();
     }
 
-    public function getSubdistricts(Request $request) {
+    public function postSubdistricts(Request $request) {
         $id = $request->input('id');
 
         return Subdistrict::where('district_id', $id)->orderBy('name')->get();
     }
 
-    public function getPostcode(Request $request) {
+    public function postPostcode(Request $request) {
         $id = $request->input('id');
 
         $subdistrict = Subdistrict::find($id);
@@ -131,7 +148,7 @@ class AjaxController extends Controller
         return $subdistrict->postcode->code;
     }
 
-    public function getStatus(Request $request) {
+    public function postStatus(Request $request) {
         $employee = Employee::where('code', $request->input('code'))->first();
         $message = (!is_null($employee)) ? (Member::where('profile_id', $employee->profile_id)->whereNull('leave_date')->count() == 1) ? 'ยังคงเป็นสมาชิกอยู่' : '200' : '100';
         $member = null;
@@ -152,7 +169,7 @@ class AjaxController extends Controller
         return compact('message', 'member');
     }
 
-    public function getDividend(Request $request) {
+    public function postDividend(Request $request) {
         $member = Member::find($request->input('id'));
         $year = $request->input('year');
         $dividends = MemberProperty::getDividend($member->id, $year);
@@ -174,7 +191,7 @@ class AjaxController extends Controller
         return Bing::photo($date);
     }
 
-    public function getChart(Request $request) {
+    public function postChart(Request $request) {
         $date = Diamond::parse($request->input('date'));
         $web = $request->input('web');
 
@@ -245,7 +262,7 @@ class AjaxController extends Controller
         return compact('visitors', 'platforms', 'browsers');
     }
 
-    public function getDetail(Request $request) {
+    public function postDetail(Request $request) {
         $date = Diamond::parse($request->input('date'));
         $web = $request->input('web');
 
@@ -332,20 +349,20 @@ class AjaxController extends Controller
         return response()->json(implode($pass)); //turn the array into a string
     }
 
-    public function getDocuments() {
+    public function postDocuments() {
         $rules = UploadDocument::documentLists(1);
         $forms = UploadDocument::documentLists(2);
 
         return compact(['rules', 'forms']);
     }
 
-    public function getDocumentsbytype(Request $request) {
+    public function postDocumentsbytype(Request $request) {
         $documents = UploadDocument::documentLists($request->input('id'));
 
         return compact(['documents']);;
     }
 
-    public function getReorder(Request $request) {
+    public function postReorder(Request $request) {
         $id = $request->input('id');
         $index = $request->input('index');
 
@@ -358,7 +375,7 @@ class AjaxController extends Controller
         return Response::json('Success: ' . $affect);
     }
 
-    public function postUploadFile(Request $request) {
+    public function postUploadfile(Request $request) {
         $file = $request->file('File');
         $documentType = intval($request->input('DocType'));
 
@@ -378,7 +395,7 @@ class AjaxController extends Controller
         return Response::json($data);
     }
 
-    public function postUpdateFile(Request $request) {
+    public function postUpdatefile(Request $request) {
         $id = $request->input('ID');
         $file = $request->file('File');
 
@@ -398,14 +415,14 @@ class AjaxController extends Controller
         return Response::json($data);
     }
 
-    public function getRestorefile(Request $request) {
+    public function postRestorefile(Request $request) {
         $id = $request->input('id');
         $display = Document::find($id)->display;
 
         return compact('display');
     }
 
-    public function postUpdateOther(Request $request) {
+    public function postUpdateother(Request $request) {
         $id = $request->input('id');
         $file = $request->file('file');
 
@@ -421,7 +438,7 @@ class AjaxController extends Controller
         return Response::json($filename);      
     }
 
-    public function postDeleteFile(Request $request) {
+    public function postDeletefile(Request $request) {
         $id = $request->input('id');
 
         UploadDocument::reindexDocument($id);
@@ -435,7 +452,7 @@ class AjaxController extends Controller
         return Response::json($id);
     }
 
-    public function postUploadCarousel(Request $request) {
+    public function postUploadcarousel(Request $request) {
         $image = $request->file('image');
         $document_id = $request->input('document_id');
         $imagename = time() . uniqid() . '.' . $image->getClientOriginalExtension();
@@ -461,7 +478,7 @@ class AjaxController extends Controller
         return Response::json($data);
     }
 
-    public function postUpdateCarouselImage(Request $request) {
+    public function postUpdatecarouselimage(Request $request) {
         $id = $request->input('id');
         $image = $request->file('image');
         $imagename = time() . uniqid() . '.' . $image->getClientOriginalExtension();
@@ -483,7 +500,7 @@ class AjaxController extends Controller
         return Response::json($data);
     }
 
-    public function postUpdateCarouselDocument(Request $request) {
+    public function postUpdatecarouseldocument(Request $request) {
         $id = $request->input('id');
         $document_id = $request->input('document_id');
 
@@ -493,7 +510,7 @@ class AjaxController extends Controller
         return compact('id');
     }
 
-    public function postDeleteCarousel(Request $request) {
+    public function postDeletecarousel(Request $request) {
         $id = $request->input('id');
 
         UploadDocument::reindexCarousel($id);
@@ -508,7 +525,7 @@ class AjaxController extends Controller
         return Response::json($id);
     }
 
-    public function getReordercarousel(Request $request) {
+    public function postReordercarousel(Request $request) {
         $id = $request->input('id');
         $index = $request->input('index');
 
@@ -518,14 +535,14 @@ class AjaxController extends Controller
         return Response::json('Success: ' . $affect);
     }
 
-    public function getDocumentlists() {
+    public function postDocumentlists() {
         $document_types = DocumentType::where('id', '<>', 3)->get();
         $documents = Document::where('document_type_id', 1)->get();
 
         return compact('document_types', 'documents');
     }
 
-    public function postUploadPhoto(Request $request) {
+    public function postUploadphoto(Request $request) {
         $photo = $request->file('photo');
         $type = $request->input('type');
         $id = $request->input('id');
@@ -562,7 +579,7 @@ class AjaxController extends Controller
         return Response::json($data);
     }
 
-    public function postDeletePhoto(Request $request) {
+    public function postDeletephoto(Request $request) {
         $id = $request->input('id');
         $type = $request->input('type');
 
@@ -575,7 +592,7 @@ class AjaxController extends Controller
         return Response::json($id);
     }
 
-    public function postUploadDocument(Request $request) {
+    public function postUploaddocument(Request $request) {
         $document = $request->file('document');
         $type = $request->input('type');
         $id = $request->input('id');
@@ -594,7 +611,7 @@ class AjaxController extends Controller
         return Response::json($data);
     }
 
-    public function postDeleteDocument(Request $request) {
+    public function postDeletedocument(Request $request) {
         $id = $request->input('id');
         $type = $request->input('type');
 
@@ -607,7 +624,7 @@ class AjaxController extends Controller
         return Response::json($id);
     }
 
-    public function getLoadmore(Request $request) {
+    public function postLoadmore(Request $request) {
         $index = intval($request->input('index'));
         $count = History::countAdminHistory(Auth::guard($this->guard)->id());
         $histories = History::administrator(Auth::guard($this->guard)->id(), $index);
@@ -615,7 +632,7 @@ class AjaxController extends Controller
         return compact('index', 'count', 'histories');
     }
 
-    public function getMembershareholding(Request $request) {
+    public function postMembershareholding(Request $request) {
         $date = Diamond::parse($request->input('date'))->endOfMonth();
 
         $members = DB::table('members')
@@ -647,45 +664,219 @@ class AjaxController extends Controller
              ->make(true);
     }
 
-    function postLoanNormalEmployeeStep1(Request $request) {
+    public function getAccounts(Request $request) {
+        $users = DB::table('users')
+            ->join('members', 'users.member_id', '=', 'members.id')
+            ->join('profiles', 'members.profile_id', '=', 'profiles.id')
+            ->whereNull('members.leave_date')
+            ->select([
+                DB::raw("LPAD(members.id, 5, '0') as code"),
+                DB::raw("CONCAT('<span class=\"text-primary\"><i class=\"fa fa-user fa-fw\"></i> ', IF(profiles.name = '<ข้อมูลถูกลบ>', profiles.name, CONCAT(profiles.name, ' ', profiles.lastname)), '</span>') as fullname"),
+                'users.email as email',
+                'users.created_at as register_at',
+                DB::raw("IF(members.leave_date IS NULL, IF(users.confirmed = 1, '<span class=\"text-success\">ปกติ</span>', '<span class=\"text-danger\">ยังไม่ได้ยืนยันตัวตน</span>'), '<span class=\"text-danger\">ลาออกจากสมาชิก</span>') as status")
+            ]);
+
+        return Datatables::queryBuilder($users)
+            ->editColumn('register_at', function($user) {
+                    return Diamond::parse($user->register_at)->thai_format('j M Y');
+                })
+            ->make(true);
+    }
+
+    public function postClearloan(Request $request) {
+        // clear temp
+        Loan::where('member_id', $request->input('id'))
+            ->whereNull('code')->delete();
+    }
+
+    public function postChecksurety(Request $request) {
+        $loan = Loan::find($request->input('loan_id'));
+        $member = Member::find($request->input('member_id'));
+        $surety = Member::find($request->input('surety_id'));
+        $result = null;
+
+        // ตรวจสอบสมาชิก
+        if ($surety != null) {
+            // ตรวจสอบว่าเป็นพนักงาน ททท.
+            if ($surety->profile->employee->employee_type->id < 3) {
+                // ตรวจว่าค้ำประกันไม่เกิน 2 สัญญา ไม่นับค้ำด้วยหุ้นตนเอง
+                if ($surety->sureties()->whereNull('completed_at')->count() < 2) {
+                    if ($loan->sureties()->where('member_id', $surety->id)->count() == 0) {
+                        if ($surety->id != $member->id) {
+                            $result = new stdClass();
+                            $result->loan_id = $loan->id;
+                            $result->id = $surety->id;
+                            $result->memberCode = $surety->memberCode;
+                            $result->fullName = $surety->profile->fullName;
+                            $result->yourself = false;
+                        }
+                        else {
+                            $result = new stdClass();
+                            $result->loan_id = $loan->id;
+                            $result->id = $member->id;
+                            $result->memberCode = $member->memberCode;
+                            $result->fullName = $member->profile->fullName;
+                            $result->yourself = true;
+                        }
+                    }
+                    else {
+                        $result = new stdClass();
+                        $result->id = 0;
+                        $result->message = "ผู้ค้ำประกันไม่สามารถเพิ่มซ้ำได้";  
+                    }
+                }
+                else {
+                    $result = new stdClass();
+                    $result->id = 0;
+                    $result->message = "ผู้ค้ำประกันได้ใช้สิทธิ์การค้ำ 2 สัญญาเท่านั้น";
+                }
+            }
+            else {
+                $result = new stdClass();
+                $result->id = 0;
+                $result->message = "ผู้ค้ำประกันต้องเป็นพนักงานหรือลูกจ้างของ ททท. เท่านั้น";
+            }
+        }
+        else {
+            $result = new stdClass();
+            $result->id = 0;
+            $result->message = "ไม่พบข้อมูลสมาชิก";
+        }
+
+        return Response::json($result);
+    }
+
+    public function postAddsurety(Request $request) {
+        $loan = Loan::find($request->input('loan_id'));
+        $member = Member::find($request->input('member_id'));
+        $amount = $request->input('amount');
+        $yourself = $request->input('yourself');
+        $result = null;
+
+        if ($loan->outstanding >= $amount) {
+            if ($yourself) {
+                if ($member->shareholdings->sum('amount') * 0.8 >= $amount) {
+                    $loan->sureties()->attach($member->id, ['amount' => $amount, 'yourself' => $yourself]);
+
+                    $result = new stdClass();
+                    $result->id = $member->id;
+                    $result->loan_id = $loan->id;
+                    $result->name = $member->profile->fullName;
+                    $result->amount = number_format($amount, 2, '.', ',');
+                }
+                else {
+                    $result = new stdClass();
+                    $result->id = 0;
+                    $result->message = "ไม่สามารถค้ำประกันได้ เนื่องจากจำนวนหุ้นไม่พอใช้ค้ำประกัน (ใช้ 80% ของหุ้น)";
+                }
+            }
+            else {
+                $salary = $request->input('salary');
+                $netSalary = $request->input('netSalary');
+                $pmt = LoanCalculator::pmt($loan->loanType->rate, $loan->outstanding, $loan->period);
+                $max_surety = $salary * 40;
+
+                if ($loan->outstanding > $max_surety) {
+                    if ($netSalary - $pmt >= 3000) {
+                        $loan->sureties()->attach($member->id, ['amount' => $amount, 'yourself' => $yourself]);
+
+                        $result = new stdClass();
+                        $result->id = $member->id;
+                        $result->loan_id = $loan->id;
+                        $result->name = $member->profile->fullName;
+                        $result->amount = number_format($amount, 2, '.', ',');
+                    }
+                    else {
+                        $result = new stdClass();
+                        $result->id = 0;
+                        $result->message = "ไม่สามารถค้ำประกันได้ เนื่องจากเงินเดือนสุทธิผู้ค้ำไม่พอ";
+                    }
+                }
+                else {
+                    $result = new stdClass();
+                    $result->id = 0;
+                    $result->message = "ไม่สามารถค้ำประกันได้ เนื่องจาก 40 เท่าของเงินเดือนผู้ค้ำต้องมากกว่ายอดที่ยื่นกู้";
+                }
+            }
+        }
+        else {
+            $result = new stdClass();
+            $result->id = 0;
+            $result->message = "ไม่สามารถค้ำประกันได้ เนื่องจากยอดเงินที่ค้ำประกันต้องน้อยกว่าหรือเท่ากับยอดที่ต้องการกู้";
+        }
+
+        return Response::json($result);
+    }
+
+    public function postRemovesurety(Request $request) {
+        $loan = Loan::find($request->input('loan_id'));
         $member_id = $request->input('member_id');
-        $payment_type = $request->input('payment_type');
-        $outstanding = $request->input('outstanding');
-        $period = $request->input('period');
-        $salary = $request->input('salary');
-        $net_salary = $request->input('net_salary');
 
-        $loanType = LoanType::find(1);
-        $member = Member::find($member_id);
-        $shareholding = $member->shareholdings->sum('amount');
-        $percent = ($shareholding * 100) / $outstanding;
-        $rate = $loanType->rate;
-        $max_outstanding = $salary * 40;
-        $max_cash = $loanType->limits->max('cash_end');
-        $pmt = Loan::pmt($rate, $outstanding, $period);
-        $limit = $loanType->limits()->where('cash_begin', '<=', $outstanding)
-            ->where('cash_end', '>=', $outstanding)->first();
+        $loan->sureties()->detach($member_id);
 
-        if ($outstanding > $max_cash) {
-            return Response::json("ไม่สามารถกู้ได้ เนื่องจากยอดเงินที่ขอกู้มากกว่าวงเงินที่สามารถกู้ได้ (วงเงินที่กู้ได้สูงสุด " . number_format($max_cash, 2, '.', ',') . " บาท)");
-        }
+        return Response::json($member_id);
+    }
 
-        if ($outstanding > $max_outstanding) {
-            return Response::json("ไม่สามารถกู้ได้ เนื่องจากเงินเดือนน้อยกว่าวงเงินที่ขอกู้ (วงเงินที่กู้ได้สูงสุด " . number_format($max_outstanding, 2, '.', ',') . " บาท)");
-        }
+    public function postLoan(Request $request) {
+        $loan = Loan::find($request->input('loan_id'));
 
-        if ($net_salary - $pmt < 3000) {
-            return Response::json("ไม่สามารถกู้ได้ เนื่องจากเงินเดือนสุทธิไม่พอสำหรับขอกู้ (ค่างวดต่อเดือน " . number_format($pmt, 2, '.', ',') . " บาท)");
-        }
+        $payment = collect(LoanCalculator::payment($loan->loanType->rate, $loan->paymentType->id, $loan->outstanding, $loan->period));
 
-        if ($limit->period < $period) {
-            return Response::json("ไม่สามารถกู้ได้ เนื่องจากระยะเวลาผ่อนชำระนานกว่าที่กำหนด (จำนวนงวดสูงสุด " . number_format($limit->period, 0, '.', ',') . " งวด)");
-        }
+        $info = (object)[
+            'rate' => $loan->loanType->rate,
+            'payment_type' => $loan->paymentType->id,
+            'total' => ($loan->paymentType->id == 1) 
+                ? (object) [ 'total_pay' => $payment->sum('pay'), 'total_interest' => $payment->sum('interest') ] 
+                : (object) [ 'total_pay' => $payment->sum('pay') + $payment->sum('addon'), 'total_interest' => $payment->sum('interest') ]
+        ];
 
-        if ($percent < $limit->shareholding) {
-            return Response::json("ไม่สามารถกู้ได้ เนื่องจากมีทุนเรือนหุ้นไม่พอ (ต้องการหุ้น " . number_format($limit->shareholding, 1, '.', ',') . "%, ผู้กู้มี " . number_format($percent, 1, '.', ',') . "%)");
-        }
+        return compact('info', 'payment');
+    }
 
-        return Response::json(true);
+    public function postLoanlist(Request $request) {
+        $members = DB::table('members')
+            ->join('profiles', 'members.profile_id', '=', 'profiles.id')
+            ->join('employees', 'profiles.id', '=', 'employees.profile_id')
+            ->join('employee_types', 'employees.employee_type_id', '=', 'employee_types.id')
+            ->leftJoin('loans', 'members.id', '=', 'loans.member_id')
+            ->leftJoin('loan_payments', 'loans.id', '=', 'loan_payments.loan_id')
+            ->whereNull('members.leave_date')
+            ->whereNull('loans.completed_at')
+            ->groupBy(['members.id', 'profiles.name', 'profiles.lastname', 'employee_types.name', 'loans.id'])
+            ->select([
+                DB::raw("LPAD(members.id, 5, '0') as code"),
+                DB::raw("CONCAT('<span class=\"text-primary\"><i class=\"fa fa-user fa-fw\"></i> ', IF(profiles.name = '<ข้อมูลถูกลบ>', profiles.name, CONCAT(profiles.name, ' ', profiles.lastname)), '</span>') as fullname"),
+                'employee_types.name as typename',
+                DB::raw("IF(COUNT(loans.id) > 0 , CONCAT(FORMAT(COUNT(loans.id), 0), ' สัญญา'), '-') as loans"),
+                DB::raw("IF(COUNT(loans.id) > 0 , CONCAT(FORMAT(COALESCE(SUM(loans.outstanding) - IF(COUNT(loan_payments.id) > 0, SUM(loan_payments.principle), 0), 0), 2), ' บาท'), '-') as amount")
+            ]);
+
+        return Datatables::queryBuilder($members)->make(true);
+    }
+
+    public function postGuaruntee(Request $request) {
+        $members = DB::table('members')
+            ->join('profiles', 'members.profile_id', '=', 'profiles.id')
+            ->join('employees', 'profiles.id', '=', 'employees.profile_id')
+            ->join('employee_types', 'employees.employee_type_id', '=', 'employee_types.id')
+            ->leftJoin('loan_member', 'members.id', '=', 'loan_member.member_id')
+            ->leftJoin('loans', 'loan_member.loan_id', '=', 'loans.id')
+            ->whereNull('members.leave_date')
+            ->whereNull('loans.completed_at')
+            ->groupBy(['members.id', 'profiles.name', 'profiles.lastname', 'employee_types.name', 'loan_member.loan_id'])
+            ->select([
+                DB::raw("LPAD(members.id, 5, '0') as code"),
+                DB::raw("CONCAT('<span class=\"text-primary\"><i class=\"fa fa-user fa-fw\"></i> ', IF(profiles.name = '<ข้อมูลถูกลบ>', profiles.name, CONCAT(profiles.name, ' ', profiles.lastname)), '</span>') as fullname"),
+                'employee_types.name as typename',
+                DB::raw("IF(IF(loan_member.yourself = 0, COUNT(loan_member.loan_id), 0) > 0, CONCAT(FORMAT(IF(loan_member.yourself = 0, COUNT(loan_member.loan_id), 0), 0), ' สัญญา'), '-') as loans"),
+                DB::raw("IF(COALESCE(SUM(IF(loan_member.yourself = 0, loan_member.amount, 0))) > 0, CONCAT(FORMAT(COALESCE(SUM(IF(loan_member.yourself = 0, loan_member.amount, 0))), 2), ' บาท'), '-') as amount")
+            ]);
+
+        return Datatables::queryBuilder($members)->make(true);
+    }
+
+    public function postDividendlist(Request $request) {
+        
     }
 }

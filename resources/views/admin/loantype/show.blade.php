@@ -8,7 +8,7 @@
             <small>เพิ่ม ลบ แก้ไข ประเภทเงินกู้ของ สอ.สรทท.</small>
         </h1>
 
-        @include('admin.member.breadcrumb', ['breadcrumb' => [
+        @include('admin.layouts.breadcrumb', ['breadcrumb' => [
             ['item' => 'จัดการประเภทเงินกู้', 'link' => '/admin/loantype'],
             ['item' => 'ประเภทเงินกู้', 'link' => ''],
         ]])
@@ -18,30 +18,40 @@
     <section class="content">
         <!-- Info boxes -->
         <div class="well">
-            <h4>การจัดการประเภทเงินกู้ของสหกรณ์</h4>
+            {{ Form::open(['url' => '/admin/loantype/' . $loantype->id, 'method' => 'delete']) }}
+                <h4>
+                    การจัดการประเภทเงินกู้ของสหกรณ์
+
+                    @if ($loantype->id > 2)
+                        {{ Form::button('<i class="fa fa-times"></i>', [
+                            'type'=>'submit',
+                            'data-tooltip'=>"true",
+                            'title'=>"ลบ",
+                            'style'=>'margin-left: 2px;',
+                            'class'=>'btn btn-danger btn-xs btn-flat pull-right', 
+                            'onclick'=>"javascript:return confirm('คุณต้องการลบประเภทเงินกู้นี้ใช่หรือไม่?');"])
+                        }}
+                    @endif  
+
+                    {{ Form::button('<i class="fa fa-edit"></i>', [
+                        'data-tooltip'=>"true",
+                        'title'=>"แก้ไข",
+                        'class'=>'btn btn-primary btn-xs btn-flat pull-right', 
+                        'onclick'=>"javascript:window.location = '/admin/loantype/" . $loantype->id . "/edit';"])
+                    }}
+                </h4>
+            {{ Form::close() }}
 
             @include('admin.loantype.info', ['loantype' => $loantype])
-
-            <button class="btn btn-primary btn-flat"
-                title="แก้ไข"
-                onclick="javascript:window.location = '/admin/loantype/{{ $loantype->id }}/edit';">
-                <i class="fa fa-edit"></i> แก้ไข
-            </button> 
-
-            @if ($loantype->id > 2)
-                <button class="btn btn-danger btn-flat"
-                    style="width: 75px;"
-                    title="ลบ"
-                    onclick="javascript:result = confirm('คุณต้องการลบประเภทเงินกู้นี้ใช่ไหม ?'); if (result) { $('#delete_item').click(); }">
-                    <i class="fa fa-trash"></i> ลบ
-                </button>
-                
-                {{ Form::open(['url' => '/admin/loantype/' . $loantype->id]) }}
-                    {{ Form::hidden('_method', 'delete') }}
-                    {{ Form::submit('Delete', ['id' => 'delete_item', 'style' => 'display: none;']) }}
-                {{ Form::close() }} 
-            @endif  
         </div>
+
+        @if ($errors->count() > 0)
+            <div class="alert alert-danger alert-dismissible">
+                <button type="button" class="close" aria-hidden="true" data-dismiss="alert" data-toggle="tooltip" title="Close">×</button>
+                <h4><i class="icon fa fa-ban"></i>ข้อผิดพลาด!</h4>
+                {{ Html::ul($errors->all()) }}
+            </div>
+        @endif
 
         @if(Session::has('flash_message'))
             <div class="callout {{ Session::get('callout_class') }}">
@@ -61,7 +71,7 @@
                 <h3 class="box-title"><i class="fa fa-credit-card"></i> สัญญาเงินกู้ที่ใช้ประเภทเงินกู้นี้</h3>
                 <div class="btn-group pull-right">
                     <button type="button" class="btn btn-default btn-flat btn-xs"
-                        onclick="javascript:window.location.href='{{ url('/admin/loantype/' . $loantype->id . '/finish') }}';">
+                        onclick="javascript:window.location.href='{{ url('/admin/loantype/' . $loantype->id . '/finished') }}';">
                         <i class="fa fa-check-circle-o"></i> สัญญาเงินกู้ที่ชำระหมดแล้ว
                     </button>
                 </div>            
@@ -82,6 +92,23 @@
                                 <th style="width: 14%;">ชำระเงินต้นแล้ว</th>
                             </tr>
                         </thead>
+                        <tbody>
+                            @php
+                                $count = 0;
+                                $loans = $loantype->loans->filter(function ($value, $key) { return !is_null($value->code); });
+                            @endphp
+                            @foreach($loans as $loan)
+                                <tr>
+                                    <td>{{ ++$count }}</td>
+                                    <td class="text-primary"><i class="fa fa-credit-card fa-fw"></i> {{ $loan->code }}</td>
+                                    <td>{{ $loan->member->profile->fullName }}</td>
+                                    <td>{{ Diamond::parse($loan->loaned_at)->thai_format('j M Y') }}</td>
+                                    <td>{{ number_format($loan->outstanding, 2, '.', ',') }}</td>
+                                    <td>{{ number_format($loan->period, 0, '.', ',') }}</td>
+                                    <td>{{ number_format($loan->payments->sum('amount'), 2, '.', ',') }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
                     </table>
                 </div>
                 <!-- /.table-responsive -->

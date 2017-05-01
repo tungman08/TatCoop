@@ -34,6 +34,10 @@ class DividendController extends Controller
         $this->middleware('auth:admins');
     }
 
+    public function getMember() {
+        return view('admin.dividend.member');
+    }
+
     public function index() {
         return view('admin.dividend.index', ['dividends'=>Dividend::orderBy('rate_year', 'desc')->get()]);
     }
@@ -71,7 +75,7 @@ class DividendController extends Controller
                 History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'ป้อนอัตราเงินปันผล ประจำปี ' . $dividend->rate_year + 543);
             });
 
-            return redirect()->route('admin.dividend.index')
+            return redirect()->action('Admin\DividendController@index')
                 ->with('flash_message', 'ข้อมูลอัตราเงินปันผลถูกป้อนเรียบร้อยแล้ว')
                 ->with('callout_class', 'callout-success');
         }
@@ -107,13 +111,13 @@ class DividendController extends Controller
                 History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'แก้ไขอัตราเงินปันผล ประจำปี ' . $dividend->rate_year + 543);
             });
 
-            return redirect()->route('admin.dividend.index')
+            return redirect()->action('Admin\DividendController@index')
                 ->with('flash_message', 'แก้ไขข้อมูลอัตราเงินปันผลเรียบร้อยแล้ว')
                 ->with('callout_class', 'callout-success');
         }
     }
 
-    public function getErase($id) {
+    public function destroy($id) {
         DB::transaction(function() use ($id) {
             $dividend = Dividend::find($id);
 
@@ -122,7 +126,7 @@ class DividendController extends Controller
             $dividend->delete();
         });
 
-        return redirect()->route('admin.dividend.index')
+        return redirect()->action('Admin\DividendController@index')
             ->with('flash_message', 'ลบข้อมูลอัตราเงินปันผลเรียบร้อยแล้ว')
             ->with('callout_class', 'callout-success');
     }

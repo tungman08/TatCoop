@@ -1,34 +1,40 @@
-﻿$('#province_id').change(function () {
-    $.ajax({
-        url: '/ajax/districts',
-        type: "get",
-        data: {
-            'id': $('#province_id').val()
-        },
-        success: function (districts) {
-            $("#district_id").empty();
-
-            $.each(districts, function (i, district) {
-                $("#district_id").append($("<option></option>").val(this.id).html(this.name));
-            });
-
-            getSubdistrict();
-        }
+﻿$(document).ready(function() {
+    $.ajaxSetup({
+        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
     });
-});
 
-$('#district_id').change(function () {
-    getSubdistrict();
-});
+    $('#province_id').change(function () {
+        $.ajax({
+            url: '/ajax/districts',
+            type: "post",
+            data: {
+                'id': $('#province_id').val()
+            },
+            success: function (districts) {
+                $("#district_id").empty();
 
-$('#subdistrict_id').change(function () {
-    getPostcode();
+                $.each(districts, function (i, district) {
+                    $("#district_id").append($("<option></option>").val(this.id).html(this.name));
+                });
+
+                getSubdistrict();
+            }
+        });
+    });
+
+    $('#district_id').change(function () {
+        getSubdistrict();
+    });
+
+    $('#subdistrict_id').change(function () {
+        getPostcode();
+    });
 });
 
 function getSubdistrict() {
     $.ajax({
         url: '/ajax/subdistricts',
-        type: "get",
+        type: "post",
         data: {
             'id': $('#district_id').val()
         },
@@ -47,7 +53,7 @@ function getSubdistrict() {
 function getPostcode() {
     $.ajax({
         url: '/ajax/postcode',
-        type: "get",
+        type: "post",
         data: {
             'id': $('#subdistrict_id').val()
         },

@@ -23,7 +23,6 @@ class CreateLoanSuretiesTable extends Migration
             $table->foreign('member_id')->references('id')
                 ->on('members')->onDelete('cascade');
 
-            $table->boolean('myself')->default(false);
             $table->double('amount');
             $table->timestamps();
         });
@@ -38,9 +37,6 @@ class CreateLoanSuretiesTable extends Migration
     {
         Schema::table('loan_sureties', function (Blueprint $table) {
             $table->dropForeign('loan_sureties_loan_id_foreign');
-        });
-
-        Schema::table('loan_sureties', function (Blueprint $table) {
             $table->dropForeign('loan_sureties_member_id_foreign');
         });
 

@@ -221,7 +221,7 @@ return [
         'Number' => App\Facades\Number::class,
         'UploadDocument' => App\Facades\UploadDocument::class,
         'History' => App\Facades\History::class,
-        'Loan' => App\Facades\Loan::class,
+        'LoanCalculator' => App\Facades\LoanCalculator::class,
     ],
 
 ];

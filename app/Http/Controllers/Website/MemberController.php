@@ -14,6 +14,7 @@ use MemberProperty;
 use PDF;
 use Validator;
 use App\Member;
+use App\Billing;
 use App\Prefix;
 use App\Province;
 use App\District;
@@ -42,10 +43,14 @@ class MemberController extends Controller
         $this->middleware('auth:users');
     }
 
+    public function getUnauthorize() {
+        return 'unauthorize';
+    }
+
    /**
     * Responds to requests to GET /member
     */
-    public function getIndex() {
+    public function index() {
         $member = Member::find(Auth::user()->member_id);
 
         return view('website.member.index', [
@@ -57,7 +62,7 @@ class MemberController extends Controller
     /**
      * Responds to requests to GET /member/edit
      */
-     public function getEdit() {
+     public function edit() {
         $member = Member::find(Auth::user()->member_id);
         $provinces = Province::orderBy('name')->get();
         $districts = District::where('province_id', $member->profile->province_id)->orderBy('name')->get();
@@ -72,7 +77,7 @@ class MemberController extends Controller
          ]);
      }
 
-     public function putUpdate(Request $request, $id) {
+     public function update(Request $request, $id) {
         $rules = [
             'profile.birth_date' => 'required|date_format:Y-m-d', 
             'profile.address' => 'required', 
@@ -106,7 +111,7 @@ class MemberController extends Controller
                 History::addUserHistory(Auth::guard()->id(), 'แก้ไขข้อมูล', 'แก้ไขข้อมูลส่วนตัว');
             });
 
-            return redirect()->route('website.member.index', ['id' => $id])
+            return redirect()->action('Website\MemberController@getIndex', ['id' => $id])
                 ->with('flash_message', 'แก้ไขข้อมูลเรียบร้อยแล้ว')
                 ->with('callout_class', 'callout-success');
         }
@@ -117,8 +122,8 @@ class MemberController extends Controller
         $shareholdings = Shareholding::where('member_id', $member->id)
             ->select(
                 DB::raw('str_to_date(concat(\'1/\', month(pay_date), \'/\', year(pay_date)), \'%d/%m/%Y\') as name'),
-                DB::raw('(sum(if(member_id = 1190 and shareholding_type_id = 1, amount, 0))) as amount'),
-                DB::raw('(sum(if(member_id = 1190 and shareholding_type_id = 2, amount, 0))) as amount_cash'))
+                DB::raw('(sum(if(member_id = ' . $member->id . ' and shareholding_type_id = 1, amount, 0))) as amount'),
+                DB::raw('(sum(if(member_id = ' . $member->id . ' and shareholding_type_id = 2, amount, 0))) as amount_cash'))
             ->groupBy(DB::raw('year(pay_date)'), DB::raw('month(pay_date)'))
             ->get();
 
@@ -173,6 +178,7 @@ class MemberController extends Controller
 
         return view('website.member.billing', [
             'member' => $member,
+            'billing' => Billing::All()->last(),
             'shareholdings' => $shareholdings,
             'total_shareholding' => $total_shareholding,
             'billno' => $billdate->thai_format('Y') . str_pad($shareholdings->max('id'), 8, '0', STR_PAD_LEFT),
@@ -195,6 +201,7 @@ class MemberController extends Controller
 
         return view('website.member.print', [
             'member' => $member,
+            'billing' => Billing::All()->last(),
             'shareholdings' => $shareholdings,
             'total_shareholding' => $total_shareholding,
             'billno' => $billdate->thai_format('Y') . str_pad($shareholdings->max('id'), 8, '0', STR_PAD_LEFT),
@@ -215,6 +222,7 @@ class MemberController extends Controller
 
         $data = [
             'member' => $member,
+            'billing' => Billing::All()->last(),
             'shareholdings' => $shareholdings,
             'total_shareholding' => $total_shareholding,
             'billno' => $billdate->thai_format('Y') . str_pad($shareholdings->max('id'), 8, '0', STR_PAD_LEFT),
@@ -223,6 +231,7 @@ class MemberController extends Controller
 
         History::addUserHistory(Auth::guard()->id(), 'นำข้อมูลออก', 'นำข้อมูลใบเสร็จออกจากระบบ');
 
-        return PDF::loadView('website.member.pdf', $data)->download('ใบเสร็จรับเงินค่าหุ้นเดือน-' . $billdate->thai_format('M-Y') . '.pdf');
+        return PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])
+            ->loadView('website.member.pdf', $data)->download('ใบเสร็จรับเงินค่าหุ้นเดือน-' . $billdate->thai_format('M-Y') . '.pdf');
      }
 }

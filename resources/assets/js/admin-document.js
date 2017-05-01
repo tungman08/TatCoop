@@ -38,7 +38,7 @@ function display() {
     $.ajax({
         dataType: 'json',
         url: '/ajax/documents',
-        type: 'get',
+        type: 'post',
         cache: false,
         error: function(xhr, ajaxOption, thrownError) {
             console.log(xhr.responseText);
@@ -77,7 +77,7 @@ function reorder(id, index) {
     $.ajax({
         dataType: 'json',
         url: '/ajax/reorder',
-        type: 'get',
+        type: 'post',
         cache: false,
         data: {
             'id': id,
@@ -274,7 +274,7 @@ function cancelEditFile(id) {
     $.ajax({
         dataType: 'json',
         url: '/ajax/restorefile',
-        type: 'get',
+        type: 'post',
         cache: false,
         data: {
             'id': id

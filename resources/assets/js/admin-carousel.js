@@ -23,7 +23,7 @@ function createForm() {
     $.ajax({
         dataType: 'json',
         url: '/ajax/documentlists',
-        type: 'get',
+        type: 'post',
         cache: false,
         error: function(xhr, ajaxOption, thrownError) {
             console.log(xhr.responseText);
@@ -33,7 +33,7 @@ function createForm() {
             var item = '<li class="carousel-item unsortable" style="cursor: default;">';
                 item += '<div class="form-group" style="position: relative; border: 1px solid lightgray; padding: 10px;">';
                 item += '<div class="row">';
-                item += '<div class="col-md-2">';
+                item += '<div class="col-md-2 col-lg-2">';
                 item += '<div id="carousel-new" class="carousel-link" onclick="$(\'#image-new\').click();">';
                 item += '<div class="carousel-hover">';
                 item += '<div class="carousel-hover-content">';
@@ -92,7 +92,7 @@ function typeChange(id, target) {
     $.ajax({
         dataType: 'json',
         url: '/ajax/documentsbytype',
-        type: 'get',
+        type: 'post',
         cache: false,
         data: {
             'id': id
@@ -244,7 +244,7 @@ function writeItem(obj) {
     var item = '<li id="item-' + obj.id + '" class="carousel-item">';
         item += '<div class="form-group" style="position: relative; border: 1px solid lightgray; padding: 10px;">';
         item += '<div class="row">';
-        item += '<div class="col-md-2">';
+        item += '<div class="col-md-2 col-lg-2">';
         item += '<div class="carousel-link" onclick="$(\'#image-' + obj.id + '\').click();">';
         item += '<div class="carousel-hover">';
         item += '<div class="carousel-hover-content">';
@@ -415,7 +415,7 @@ function reorder(id, index) {
     $.ajax({
         dataType: 'json',
         url: '/ajax/reordercarousel',
-        type: 'get',
+        type: 'post',
         cache: false,
         data: {
             'id': id,

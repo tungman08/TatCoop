@@ -8,8 +8,9 @@
         <small>การจัดการสาระน่ารู้ในหน้าเว็บไซต์ สอ.สรทท.</small>
     </h1>
 
-    @include('admin.knowledge.breadcrumb', ['breadcrumb' => [
+    @include('admin.layouts.breadcrumb', ['breadcrumb' => [
         ['item' => 'จัดการสาระน่ารู้', 'link' => '/website/knowledge'],
+        ['item' => 'แสดงรายละเอียด', 'link' => '/website/knowledge/' . $knowledge->id],
         ['item' => 'แก้ไข', 'link' => ''],
     ]])
 
@@ -68,7 +69,7 @@
                     "font-styles": true, // Font styling, e.g. h1, h2, etc.
                     "emphasis": true, // Italics, bold, etc.
                     "lists": true, // (Un)ordered lists, e.g. Bullets, Numbers.
-                    "html": false, // Button which allows you to edit the generated HTML.
+                    "html": true, // Button which allows you to edit the generated HTML.
                     "link": true, // Button to insert a link.
                     "image": false, // Button to insert an image.
                     "color": true, // Button to change color of font

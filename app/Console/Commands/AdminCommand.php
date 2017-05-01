@@ -1,0 +1,75 @@
+<?php
+
+namespace App\Console\Commands;
+
+use Illuminate\Console\Command;
+use App\Administrator;
+use History;
+
+class AdminCommand extends Command
+{
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'admin:create {--super}';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Create super administrator for tatcoop.com';
+
+    /**
+     * Create a new command instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    /**
+     * Execute the console command.
+     *
+     * @return mixed
+     */
+    public function handle()
+    {
+        if ($this->option('super')) {
+            $exist = Administrator::where('email', 'admin@tatcoop.com')->first();
+
+            if ($exist == null) {
+                $password = $this->secret('password');
+                $confirmed = $this->secret('comfirm password');
+
+                if ($password == $confirmed) {
+                    if (strlen($password) >= 6) {
+                        $admin = ['name' => 'Administrator', 'email' => 'admin@tatcoop.com', 'password' => $password, 'password_changed' => true];
+
+                        $obj = new Administrator($admin);
+                        $obj->save();
+
+                        History::addAdminHistory($obj->id, 'สร้างบัญชีผู้ดูแลระบบ');
+                        $this->info('Super administrator was created.');
+                    }
+                    else {
+                        $this->error('ERROR: The password must be at least 6 characters.');
+                    }
+                }
+                else {
+                    $this->error('ERROR: The password confirmation does not match.');
+                }
+            }
+            else {
+                $this->error('ERROR: Super administrator already exist.');
+            }
+        }
+        else {
+            $this->error('ERROR: Require option argument.');
+        }
+    }
+}
