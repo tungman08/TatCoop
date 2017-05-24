@@ -1,6 +1,21 @@
 <h4>3.ตรวจสอบรายละเอียด</h4>
 {{ Form::hidden('step', '3') }}
 
+<div class="form-group">
+    {{ Form::label('loan_code', 'รหัสสัญญากู้ยืม', [
+        'class'=>'control-label']) 
+    }}
+    {{ Form::text('loan_code', null, [
+        'id' => 'loan_code',
+        'required' => true,
+        'placeholder' => 'กรุณาป้อนรหัสสัญญาเงินกู้',
+        'data-inputmask' => "'mask': '9999/9999','placeholder': '0','autoUnmask': false,'removeMaskOnSubmit': false",
+        'data-mask',
+        'autocomplete'=>'off',
+        'class'=>'form-control'])
+    }}
+</div>
+
 @php($loan = App\Loan::find($loan_id))
 <div class="table-responsive">
     <table class="table table-info">
@@ -69,19 +84,6 @@
 </table>
 
 <hr />
-
-<div class="form-group">
-    {{ Form::label('loan_code', 'รหัสสัญญากู้ยืม', [
-        'class'=>'control-label']) 
-    }}
-    {{ Form::text('loan_code', null, [
-        'id' => 'loan_code',
-        'required' => true,
-        'placeholder' => 'ตัวอย่าง: xxxx',
-        'autocomplete'=>'off',
-        'class'=>'form-control'])
-    }}
-</div>
 
 {{ Form::button('<i class="fa fa-file-o"></i> ตกลงทำสัญญา', [
     'id' => 'step3',

@@ -1,43 +1,78 @@
-@extends('website.member.layouts.layout')
+@extends('admin.layouts.layout')
 
 @section('content')
     <!-- Content Header (Page header) -->
     <section class="content-header">
-    <h1>
-        ข้อมูลเงินปันผล
-        <small>รายละเอียดข้อมูลเงินปันผลของสมาชิก</small>
-    </h1>
-    @include('website.member.layouts.breadcrumb', ['breadcrumb' => [
-        ['item' => 'ข้อมูลสมาชิก', 'link' => '/member'],
-        ['item' => 'เงินปันผล', 'link' => ''],
-    ]])
+        <h1>
+            ข้อมูลเงินปันผลของสมาชิกสหกรณ์ฯ
+            <small>แสดงรายละเอียดข้อมูลเงินปันผลของสมาชิก สอ.สรทท.</small>
+        </h1>
+
+        @include('admin.layouts.breadcrumb', ['breadcrumb' => [
+            ['item' => 'ข้อมูลเงินปันผล', 'link' => 'service/dividend/member'],
+            ['item' => 'เงินปันผล', 'link' => ''],
+        ]])
     </section>
 
     <!-- Main content -->
     <section class="content">
         <!-- Info boxes -->
         <div class="well">
-            <h4>ข้อมูลเงินปันผล</h4>
-            <p>แสดงเงินปันผล ของ {{ $member->profile->fullName }}</p>
+            <h4>รายละเอียดข้อมูลเงินปันผลของสมาชิกสหกรณ์</h4>
+
+            <div class="table-responsive">
+                <table class="table table-info">
+                    <tr>
+                        <th style="width:20%;">ชื่อผู้สมาชิก:</th>
+                        <td>{{ $member->profile->fullName }}</td>
+                    </tr>
+                    <tr>
+                        @php($rate = $dividend_years->last())
+                        <th>เงินปันผลปี:</th>
+                        <td><span class="year">{{ $rate->rate_year + 543 }}</span> <span id="rate">(อัตราเงินปันผล: {{ $rate->shareholding_rate }}%, อัตราเงินเฉลี่ยคืน: {{ $rate->loan_rate }}%)</span></td>
+                    </tr>  
+                    <tr>
+                        <th>จำนวนเงินปันผล:</th>
+                        <td id="grand-total">{{ number_format($dividends->sum('total'), 2, '.', ',') }} บาท</td>
+                    </tr>
+                </table>
+                <!-- /.table -->
+            </div>  
+            <!-- /.table-responsive --> 
         </div>
 
-        @if(Session::has('flash_message'))
-            <div class="callout {{ Session::get('callout_class') }}">
-                <h4>แจ้งข้อความ!</h4>
-                <p>
-                    {{ Session::get('flash_message') }}
-
-                    @if(Session::has('flash_link'))
-                        <a href="{{ Session::get('flash_link') }}">Undo</a>
-                    @endif
-                </p>
+        <div class="row margin-b-md">
+            <div class="col-md-5ths">
+                <button type="button" class="btn btn-block btn-primary btn-lg" onclick="javascript:window.location.href='{{ url('/service/member/' . $member->id) }}';">
+                    <i class="fa fa-user fa-fw"></i> ข้อมูลสมาชิก
+                </button>
             </div>
-        @endif
+            <div class="col-md-5ths">
+                <button type="button" class="btn btn-block btn-success btn-lg" onclick="javascript:window.location.href='{{ url('/service/' . $member->id . '/shareholding') }}';">
+                    <i class="fa fa-money fa-fw"></i> ทุนเรือนหุ้น
+                </button>
+            </div>            
+            <div class="col-md-5ths">
+                <button type="button" class="btn btn-block btn-danger btn-lg" onclick="javascript:window.location.href='{{ url('/service/' . $member->id . '/loan') }}';">
+                    <i class="fa fa-credit-card fa-fw"></i> การกู้ยืม
+                </button>
+            </div>
+            <div class="col-md-5ths">
+                <button type="button" class="btn btn-block btn-warning btn-lg" onclick="javascript:window.location.href='{{ url('/service/' . $member->id . '/guaruntee') }}';">
+                    <i class="fa fa-share-alt fa-fw"></i> การค้ำประกัน
+                </button>
+            </div>
+            <div class="col-md-5ths">
+                <button type="button" class="btn btn-block btn-purple btn-lg disabled">
+                    <i class="fa fa-dollar fa-fw"></i> เงินปันผล
+                </button>
+            </div>
+        </div>
+        <!-- /.row -->
 
         <div class="box box-primary">
-            @php($rate = $dividend_years->last())
             <div class="box-header with-border">
-                <h3 class="box-title"><i class="fa fa-dollar"></i> เงินปันผลปี <span class="year">{{ $rate->rate_year + 543 }}</span> <span id="rate">(อัตราเงินปันผล: {{ $rate->shareholding_rate }}%, อัตราเงินเฉลี่ยคืน: {{ $rate->loan_rate }}%)</span></h3>
+                <h3 class="box-title"><i class="fa fa-dollar"></i> เงินปันผลปี <span class="year">{{ $rate->rate_year + 543 }}</span></h3>
             </div>
             <!-- /.box-header -->
 
@@ -60,17 +95,18 @@
                     <!-- /.row -->
                 </div>
 
-                <table id="dataTables-dividend" class="table table-hover dataTable">
-                    <thead>
-                        <tr>
-                            <th style="width: 10%;">#</th>
-                            <th class="text-right" style="width: 18%;">จำนวนเงินค่าหุ้น</th>
-                            <th class="text-right" style="width: 18%;">จำนวนเงินปันผล</th>
-                            <th class="text-right" style="width: 18%;">จำนวนดอกเบี้ยเงินกู้</th>
-                            <th class="text-right" style="width: 18%;">จำนวนเงินเฉลี่ยคืน</th>
-                            <th class="text-right" style="width: 18%;">รวมทั้งสิ้น</th>
-                        </tr>
-                    </thead>
+                <div class="table-responsive" style=" margin-top: 10px;">
+                    <table id="dataTables-dividend" class="table table-hover dataTable" width="100%">
+                        <thead>
+                            <tr>
+                                <th style="width: 10%;">#</th>
+                                <th class="text-right" style="width: 18%;">จำนวนเงินค่าหุ้น</th>
+                                <th class="text-right" style="width: 18%;">จำนวนเงินปันผล</th>
+                                <th class="text-right" style="width: 18%;">จำนวนดอกเบี้ยเงินกู้</th>
+                                <th class="text-right" style="width: 18%;">จำนวนเงินเฉลี่ยคืน</th>
+                                <th class="text-right" style="width: 18%;">รวมทั้งสิ้น</th>
+                            </tr>
+                        </thead>
                         <tbody>
                             @foreach ($dividends as $dividend)
                                 <tr>
@@ -83,16 +119,19 @@
                                 </tr>
                             @endforeach
 
-                        <tr>
-                            <td class="text-primary"><strong>รวม</strong></td>
-                            <td class="text-right"><strong>{{ number_format($dividends->sum('shareholding'), 2, '.', ',') }}</strong></td>
-                            <td class="text-right"><strong>{{ number_format($dividends->sum('shareholding_dividend'), 2, '.', ',') }}</strong></td>
-                            <td class="text-right"><strong>{{ number_format($dividends->sum('interest'), 2, '.', ',') }}</strong></td>
-                            <td class="text-right"><strong>{{ number_format($dividends->sum('interest_dividend'), 2, '.', ',') }}</strong></td>
-                            <td class="text-right"><strong>{{ number_format($dividends->sum('total'), 2, '.', ',') }}</strong></td>
-                        </tr> 
-                    </tbody>
-                </table>
+                            <tr>
+                                <td class="text-primary"><strong>รวม</strong></td>
+                                <td class="text-right"><strong>{{ number_format($dividends->sum('shareholding'), 2, '.', ',') }}</strong></td>
+                                <td class="text-right"><strong>{{ number_format($dividends->sum('shareholding_dividend'), 2, '.', ',') }}</strong></td>
+                                <td class="text-right"><strong>{{ number_format($dividends->sum('interest'), 2, '.', ',') }}</strong></td>
+                                <td class="text-right"><strong>{{ number_format($dividends->sum('interest_dividend'), 2, '.', ',') }}</strong></td>
+                                <td class="text-right"><strong>{{ number_format($dividends->sum('total'), 2, '.', ',') }}</strong></td>
+                            </tr> 
+                        </tbody>
+                    </table>
+                    <!-- /.table -->
+                </div>
+                <!-- /.table-responsive -->
             </div>
             <!-- /.box-body -->
         </div>
@@ -117,13 +156,16 @@
     @parent
 
     <!-- Bootstrap DataTable JavaScript -->
-    {!! Html::script(elixir('js/moment.js')) !!}
     {!! Html::script(elixir('js/jquery.dataTables.js')) !!}
     {!! Html::script(elixir('js/dataTables.responsive.js')) !!}
     {!! Html::script(elixir('js/dataTables.bootstrap.js')) !!}
 
     <script>
     $(document).ready(function () {
+        $.ajaxSetup({
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+        });
+
         $('[data-tooltip="true"]').tooltip();
 
         $('#dataTables-dividend').dataTable({
@@ -134,12 +176,14 @@
         });     
 
         $('#selectyear').change(function() {
+            var selected = parseInt($('#selectyear').val());
+
             $.ajax({
                 url: '/ajax/dividend',
                 type: "post",
                 data: {
                     'id': {{ $member->id }},
-                    'year': $('#selectyear').val()
+                    'year': selected
                 },
                 success: function(data) {
                     $('.year').html(selected + 543);
@@ -179,6 +223,6 @@
                 }
             });
         });
-    });
+    });   
     </script>
 @endsection

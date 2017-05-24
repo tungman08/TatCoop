@@ -13,7 +13,7 @@ class MailCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'mail:send {address}';
+    protected $signature = 'mail:send {address : Destination e-mail address}';
 
     /**
      * The console command description.
@@ -47,10 +47,10 @@ class MailCommand extends Command
                     ->subject('ทดสอบระบบ e-mail ของ www.tatcoop.com');
             });
 
-            $this->line('Sent e-mail to ' . $address);
+            $this->info('Sent e-mail to ' . $address);
         }
         else {
-            $this->error('Invalid email format');
+            return $this->error('ERROR: Invalid email format');
         }
     }
 }

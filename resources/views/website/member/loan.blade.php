@@ -7,7 +7,7 @@
         ข้อมูลการกู้ยืม
         <small>รายละเอียดข้อมูลกู้ยืมของสมาชิก</small>
     </h1>
-    @include('admin.member.breadcrumb', ['breadcrumb' => [
+    @include('website.member.layouts.breadcrumb', ['breadcrumb' => [
         ['item' => 'ข้อมูลสมาชิก', 'link' => '/member'],
         ['item' => 'การกู้ยืม', 'link' => ''],
     ]])
@@ -28,7 +28,40 @@
             <!-- /.box-header -->
 
             <div class="box-body">
-                ข้อมูลการกู้ยืม (อยู่ในระหว่างการพัฒนา)
+                <div class="table-responsive">
+                    <table id="dataTables-loans" class="table table-hover dataTable" width="100%">
+                        <thead>
+                            <tr>
+                                <th style="width: 5%;">#</th>
+                                <th style="width: 15%;">เลขที่สัญญา</th>
+                                <th style="width: 15%;">ประเภทเงินกู้</th>
+                                <th style="width: 10%;">วันที่กู้</th>
+                                <th style="width: 10%;">วงเงินที่กู้</th>
+                                <th style="width: 15%;">จำนวนงวดที่ผ่อนชำระ</th>
+                                <th style="width: 15%;">จำนวนเงินที่ชำระแล้ว</th>
+                                <th style="width: 10%;">สถานะ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @php($count = 0)
+                            @foreach($loans as $loan) 
+                            <tr onclick="javascript: document.location = '{{ url('/member/' . $member->id . '/loan/' . $loan->id) }}';"
+                                style="cursor: pointer;">
+                                <td>{{ ++$count }}</td>
+                                <td class="text-primary"><i class="fa fa-file-text-o fa-fw"></i> {{ $loan->code }}</td>
+                                <td>{{ $loan->loanType->name }}</td>
+                                <td>{{ Diamond::parse($loan->loaned_at)->thai_format('j M Y') }}</td>
+                                <td>{{ number_format($loan->outstanding, 2, '.', ',') }}</td>
+                                <td>{{ number_format($loan->period, 0, '.', ',') }}</td>
+                                <td>{{ number_format($loan->payments->count(), 0, '.', ',') }}</td>
+                                <td class="{{ (!is_null($loan->completed_at)) ? 'text-success' : 'text-danger' }}">{{ (!is_null($loan->completed_at)) ? 'ปิดยอดแล้ว' : 'กำลังผ่อนชำระ' }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                    <!-- /.table -->
+                </div>
+                <!-- /.table-responsive -->
             </div>
             <!-- /.box-body -->
         </div>
@@ -43,9 +76,30 @@
 @endsection
 
 @section('styles')
+    <!-- Bootstrap DataTable CSS -->
+    {!! Html::style(elixir('css/dataTables.bootstrap.css')) !!}
+
     @parent
 @endsection
 
 @section('scripts')
     @parent
+
+    <!-- Bootstrap DataTable JavaScript -->
+    {!! Html::script(elixir('js/jquery.dataTables.js')) !!}
+    {!! Html::script(elixir('js/dataTables.responsive.js')) !!}
+    {!! Html::script(elixir('js/dataTables.bootstrap.js')) !!}
+
+
+    <script>
+    $(document).ready(function () {
+        $.ajaxSetup({
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+        });
+
+        $('#dataTables-loans').dataTable({
+            "iDisplayLength": 10
+        });
+    });   
+    </script>
 @endsection

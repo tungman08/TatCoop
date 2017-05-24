@@ -7,7 +7,7 @@
         ใบรับเงินค่าหุ้น
         <small>รายละเอียดข้อมูลใบเสร็จรับเงินค่าหุ้นของสมาชิก</small>
     </h1>
-    @include('admin.member.breadcrumb', ['breadcrumb' => [
+    @include('website.member.layouts.breadcrumb', ['breadcrumb' => [
         ['item' => 'ข้อมูลสมาชิก', 'link' => '/member'],
         ['item' => 'ทุนเรือนหุ้น', 'link' => '/member/shareholding'],
         ['item' => 'ใบเสร็จรับเงิน', 'link' => '']
@@ -170,11 +170,11 @@
             <!-- this row will not appear when printing -->
             <div class="row no-print" style="margin-top: 30px;">
                 <div class="col-xs-12">
-                    <a href="{{ url('/member/shareholding/billing/' . $date->format('Y-m-d') . '/print') }}" target="_blank" class="btn btn-default btn-flat"><i class="fa fa-print"></i> พิมพ์</a>
+                    <a href="{{ url('/member/' . $member->id . '/shareholding/billing/' . $date->format('Y-m-d') . '/print') }}" target="_blank" class="btn btn-default btn-flat"><i class="fa fa-print"></i> พิมพ์</a>
                     <button type="button"
                         class="btn btn-primary btn-flat pull-right"
                         style="margin-right: 5px;"
-                        onclick="javascript:document.location = '{{ url('/member/shareholding/billing/' . $date->format('Y-m-d') . '/pdf') }}';">
+                        onclick="javascript:document.location = '{{ url('/member/' . $member->id . '/shareholding/billing/' . $date->format('Y-m-d') . '/pdf') }}';">
                         <i class="fa fa-download"></i> บันทึกเป็น PDF
                     </button>
                 </div>

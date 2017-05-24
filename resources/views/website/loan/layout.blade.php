@@ -105,7 +105,8 @@
         <!-- Custom JavaScript -->
         {{ Html::script(elixir('js/sb-admin-2.js')) }}
         {{ Html::script(elixir('js/metisMenu.js')) }}
-
+        {!! Html::script(elixir('js/moment.js')) !!}
+        
         <script>
         $(document).ready(function () {
             $('[data-tooltip="true"]').tooltip();    

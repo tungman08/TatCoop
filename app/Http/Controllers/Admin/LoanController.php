@@ -11,6 +11,7 @@ use App\LoanType;
 use App\Member;
 use App\PaymentType;
 use App\Loan;
+use Auth;
 use Diamond;
 use History;
 use LoanCalculator;
@@ -46,6 +47,16 @@ class LoanController extends Controller
             'loans' => Loan::where('member_id', $member->id)->orderBy('id', 'desc')->get(),
             'loantypes' => LoanType::active()->get()
         ]);
+    }
+
+    public function show($id, $loan_id) {
+        $member = Member::find($id);
+        $loan = Loan::find($loan_id);
+
+         return view('admin.loan.show', [
+            'member' => $member,
+            'loan' => $loan,
+        ]);       
     }
 
     public function getCreateLoan($member_id, $loantype_id) {

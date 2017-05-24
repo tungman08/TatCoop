@@ -53,7 +53,7 @@
 
     <div class="login-box">
         <div class="login-logo">
-            <a href="{{ url(env('APP_URL', 'http://www.tatcoop.dev')) }}"><b>TAT Coopperative</b></a>
+            <a href="{{ url(env('APP_URL', 'http://www.tatcoop.com')) }}"><b>TAT Coopperative</b></a>
         </div>
         <!-- /.login-logo -->
 

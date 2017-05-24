@@ -7,7 +7,7 @@
         ข้อมูลสมาชิก
         <small>รายละเอียดของสมาชิก สอ.สรทท.</small>
     </h1>
-    @include('admin.member.breadcrumb', ['breadcrumb' => [
+    @include('website.member.layouts.breadcrumb', ['breadcrumb' => [
         ['item' => 'ข้อมูลสมาชิก', 'link' => '/member'],
         ['item' => 'แก้ไขข้อมูล', 'link' => ''],
     ]])   
@@ -27,7 +27,7 @@
             </div>
             <!-- /.box-header -->
 
-            {{ Form::model($member, ['route' => ['website.member.update', $member->id], 'method' => 'put', 'class' => 'form-horizontal']) }}
+            {{ Form::model($member, ['url' => '/member/' . $member->id, 'method' => 'put', 'class' => 'form-horizontal']) }}
                 @include('website.member.form', ['edit' => true, 'id' => $member->id])
             {{ Form::close() }}
         </div>

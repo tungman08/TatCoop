@@ -18,9 +18,56 @@
     <section class="content">
         <!-- Info boxes -->
         <div class="well">
-            <h4>ข้อมูลทุนเรือนหุ้น</h4>
-            <p>แสดงการชำระค่าหุ้นต่างๆ ของ {{ $member->profile->fullName }}</p>
+            <h4>รายละเอียดข้อมูลทุนเรือนหุ้น</h4>
+
+            <div class="table-responsive">
+                <table class="table table-info">
+                    <tr>
+                        <th style="width:20%;">ชื่อผู้สมาชิก:</th>
+                        <td>{{ $member->profile->fullName }}</td>
+                    </tr>
+                    <tr>
+                        <th>จำนวนค่าหุ้นรายเดือน:</th>
+                        <td>{{ ($member->shareholding > 0) ? number_format($member->shareholding, 0, '.', ',') . ' หุ้น': '-' }}</td>
+                    </tr>
+                    <tr>
+                        <th>จำนวนทุนเรือนหุ้นสะสม:</th>
+                        <td>{{ number_format($member->shareHoldings->sum('amount'), 2, '.', ',') }} บาท</td>
+                    </tr>        
+                </table>
+                <!-- /.table -->
+            </div>  
+            <!-- /.table-responsive --> 
         </div>
+
+        <div class="row margin-b-md">
+            <div class="col-md-5ths">
+                <button type="button" class="btn btn-block btn-primary btn-lg" onclick="javascript:window.location.href='{{ url('/service/member/' . $member->id) }}';">
+                    <i class="fa fa-user fa-fw"></i> ข้อมูลสมาชิก
+                </button>
+            </div>
+            <div class="col-md-5ths">
+                <button type="button" class="btn btn-block btn-success btn-lg disabled">
+                    <i class="fa fa-money fa-fw"></i> ทุนเรือนหุ้น
+                </button>
+            </div>            
+            <div class="col-md-5ths">
+                <button type="button" class="btn btn-block btn-danger btn-lg" onclick="javascript:window.location.href='{{ url('/service/' . $member->id . '/loan') }}';">
+                    <i class="fa fa-credit-card fa-fw"></i> การกู้ยืม
+                </button>
+            </div>
+            <div class="col-md-5ths">
+                <button type="button" class="btn btn-block btn-warning btn-lg" onclick="javascript:window.location.href='{{ url('/service/' . $member->id . '/guaruntee') }}';">
+                    <i class="fa fa-share-alt fa-fw"></i> การค้ำประกัน
+                </button>
+            </div>
+            <div class="col-md-5ths">
+                <button type="button" class="btn btn-block btn-purple btn-lg" onclick="javascript:window.location.href='{{ url('/service/' . $member->id . '/dividend') }}';">
+                    <i class="fa fa-dollar fa-fw"></i> เงินปันผล
+                </button>
+            </div>
+        </div>
+        <!-- /.row -->
 
         <div class="box box-primary">
             <div class="box-header with-border">

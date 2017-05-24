@@ -13,7 +13,7 @@ class AdminCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'admin:create {--super}';
+    protected $signature = 'admin:create {--super : Create super administrator}';
 
     /**
      * The console command description.
@@ -57,19 +57,19 @@ class AdminCommand extends Command
                         $this->info('Super administrator was created.');
                     }
                     else {
-                        $this->error('ERROR: The password must be at least 6 characters.');
+                        return $this->error('ERROR: The password must be at least 6 characters.');
                     }
                 }
                 else {
-                    $this->error('ERROR: The password confirmation does not match.');
+                    return $this->error('ERROR: The password confirmation does not match.');
                 }
             }
             else {
-                $this->error('ERROR: Super administrator already exist.');
+                return $this->error('ERROR: Super administrator already exist.');
             }
         }
         else {
-            $this->error('ERROR: Require option argument.');
+            return $this->error('ERROR: Require option argument.');
         }
     }
 }

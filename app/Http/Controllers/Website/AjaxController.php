@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Auth;
+use Diamond;
 use History;
 use Bing;
 use LoanCalculator;
@@ -82,22 +83,22 @@ class AjaxController extends Controller
 
     public function postDividend(Request $request) {
         $member = Member::find($request->input('id'));
-        $year = $request->input('year');
-        $dividends = MemberProperty::getDividend($member->id, $year);
+        $year = intval($request->input('year'));
+        $dividends = MemberProperty::getDividend($member, $year);
         $rate = Dividend::where('rate_year', $year)->first();
-        $dividend_rate = (!is_null($rate)) ? $rate->rate : 0;
         
-        return compact('member', 'dividends', 'dividend_rate');
+        return compact('member', 'dividends', 'rate');
     }
 
     public function postLoan(Request $request) {
         $loan_type_id = $request->input('loan_type');
         $outstanding = $request->input('outstanding');
         $period = $request->input('period');
+        $start = Diamond::parse($request->input('start'));
         $loanType = LoanType::find($loan_type_id);
 
-        $general = collect(LoanCalculator::payment($loanType->rate, 1, $outstanding, $period));
-        $stable = collect(LoanCalculator::payment($loanType->rate, 2, $outstanding, $period));
+        $general = collect(LoanCalculator::payment($loanType->rate, 1, $outstanding, $period, $start));
+        $stable = collect(LoanCalculator::payment($loanType->rate, 2, $outstanding, $period, $start));
 
         $info = (object)[
             'rate' => $loanType->rate,

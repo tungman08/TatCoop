@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateLoanPaymentsTable extends Migration
+class CreatePaymentsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,7 +12,7 @@ class CreateLoanPaymentsTable extends Migration
      */
     public function up()
     {
-        Schema::create('loan_payments', function (Blueprint $table) {
+        Schema::create('payments', function (Blueprint $table) {
             $table->increments('id');
 
             $table->integer('loan_id')->unsigned();
@@ -33,8 +33,8 @@ class CreateLoanPaymentsTable extends Migration
      */
     public function down()
     {
-        Schema::table('loan_payments', function (Blueprint $table) {
-            $table->dropForeign('loan_payments_loan_id_foreign');
+        Schema::table('payments', function (Blueprint $table) {
+            $table->dropForeign('payments_loan_id_foreign');
         });
 
         Schema::drop('loan_payments');

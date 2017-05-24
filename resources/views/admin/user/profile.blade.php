@@ -70,7 +70,9 @@
                             @include('admin.user.timeline', ['histories' => $histories])
                         </div>
                     </div>          
-                    <!-- /.box-body-->
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
             </div>
             <!-- /.col -->
         </div>

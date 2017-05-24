@@ -15,7 +15,8 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         Commands\AdminCommand::class,
         Commands\BingCommand::class,
-        Commands\MailCommand::class
+        Commands\MailCommand::class,
+        Commands\ViewMakeCommand::class
     ];
 
     /**

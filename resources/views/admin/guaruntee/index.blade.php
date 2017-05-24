@@ -18,7 +18,7 @@
     <section class="content">
         <!-- Info boxes -->
         <div class="well">
-            <h4>รายละเอียดข้อมูลการค้ำประกันของสมาชิกสหกรณ์</h4>
+            <h4>รายละเอียดข้อมูลการค้ำประกัน</h4>
             @php($surety = $member->sureties->filter(function ($value, $key) use ($member) { return is_null($value->completed_at) && $value->member_id != $member->id; })->count())
 
             <div class="table-responsive">
@@ -33,11 +33,49 @@
                     </tr>
                     <tr>
                         <th>ใช้หุ้นค้ำประกันตนเองไปแล้ว:</th>
-                        <td>{{ number_format($member->sureties->filter(function ($value, $key) use ($member) { return is_null($value->completed_at) && $value->member_id == $member->id; })->sum('pivot.amount'), 2, '.', ',') }}/{{ number_format($member->shareHoldings->sum('amount') * 0.8, 2, '.', ',') }} บาท (80% ของหุ้นทั้งหมด)</td>
-                    <td>        
+                        @php
+                            $available = $member->shareHoldings->sum('amount') * 0.8;
+                            $surety = $member->sureties->filter(function ($value, $key) use ($member) { return is_null($value->completed_at) && $value->member_id == $member->id; })->sum('pivot.amount');
+                        @endphp
+                        <td>
+                            {{ number_format($surety, 2, '.', ',') }}/{{ number_format($available, 2, '.', ',') }} บาท {{ ($surety > 0) ? '(ใช้ค้ำประกันไปแล้ว ' . number_format(100 * $surety / $available, 2, '.', ',') . '%)' : '' }}
+                            <span class="text-muted" style="cursor: pointer;" data-tooltip="true" title="มาจาก 80% ของเงินค่าหุ้นสะสมทั้งหมด"><i class="fa fa-info-circle"></i></span>
+                        </td>
+                    </tr>        
                 </table>
-            </div>            
+                <!-- /.table -->
+            </div>  
+            <!-- /.table-responsive -->          
         </div>
+
+        <div class="row margin-b-md">
+            <div class="col-md-5ths">
+                <button type="button" class="btn btn-block btn-primary btn-lg" onclick="javascript:window.location.href='{{ url('/service/member/' . $member->id) }}';">
+                    <i class="fa fa-user fa-fw"></i> ข้อมูลสมาชิก
+                </button>
+            </div>
+            <div class="col-md-5ths">
+                <button type="button" class="btn btn-block btn-success btn-lg" onclick="javascript:window.location.href='{{ url('/service/' . $member->id . '/shareholding') }}';">
+                    <i class="fa fa-money fa-fw"></i> ทุนเรือนหุ้น
+                </button>
+            </div>            
+            <div class="col-md-5ths">
+                <button type="button" class="btn btn-block btn-danger btn-lg" onclick="javascript:window.location.href='{{ url('/service/' . $member->id . '/loan') }}';">
+                    <i class="fa fa-credit-card fa-fw"></i> การกู้ยืม
+                </button>
+            </div>
+            <div class="col-md-5ths">
+                <button type="button" class="btn btn-block btn-warning btn-lg disabled">
+                    <i class="fa fa-share-alt fa-fw"></i> การค้ำประกัน
+                </button>
+            </div>
+            <div class="col-md-5ths">
+                <button type="button" class="btn btn-block btn-purple btn-lg" onclick="javascript:window.location.href='{{ url('/service/' . $member->id . '/dividend') }}';">
+                    <i class="fa fa-dollar fa-fw"></i> เงินปันผล
+                </button>
+            </div>
+        </div>
+        <!-- /.row -->
 
         <div class="box box-primary">
             <div class="box-header with-border">
@@ -76,6 +114,7 @@
                             @endforeach
                         </tbody>
                     </table>
+                    <!-- /.table -->
                 </div>
                 <!-- /.table-responsive -->
             </div>

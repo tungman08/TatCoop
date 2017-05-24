@@ -41,6 +41,11 @@
             <!-- /.box-header -->
 
             <div class="box-body">
+                <button class="btn btn-primary btn-flat margin-b-md" type="button" data-tooltip="true" title="ชำระค่าหุ้นอัตโนมัติ"
+                    onclick="javascript:window.location.href='{{ url('/service/loan/autopayment') }}';">
+                    <i class="fa fa-bolt"></i> ชำระเงินกู้รายเดือนแบบอัตโนมัติ
+                </button>
+
                 <div class="table-responsive" style=" margin-top: 10px;">
                     <table id="dataTables-users" class="table table-hover dataTable" width="100%">
                         <thead>
@@ -94,9 +99,9 @@
 
         $('#dataTables-users').dataTable().fnDestroy();
         $('#dataTables-users').dataTable({
+            //"processing": true,
+            //"serverSide": true,
             "ajax": {
-                "processing": true,
-                "serverSide": true,
                 "url": "/ajax/loanlist",
                 "type": "post",
                 beforeSend: function () {

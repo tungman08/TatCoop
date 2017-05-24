@@ -18,8 +18,32 @@
     <section class="content">
         <!-- Info boxes -->
         <div class="well">
-            <h4>ข้อมูลการกู้ยืม</h4>
-            <p>แสดงการสัญญาการกู้ยืมต่าง ๆ ของ {{ $member->profile->fullName }}</p>
+            <h4>รายละเอียดข้อมูลการกู้ยืม</h4>
+
+            <div class="table-responsive">
+                @php
+                    $loansCount = $member->loans->filter(function ($value, $key) { return is_null($value->completed_at); })->count();
+                    $outstanding = $member->loans->filter(function ($value, $key) { return is_null($value->completed_at); })->sum('outstanding');
+                    $principle = $member->loans->filter(function ($value, $key) { return is_null($value->completed_at); })->sum('payments.principle');
+                @endphp
+
+                <table class="table table-info">
+                    <tr>
+                        <th style="width:20%;">ชื่อผู้สมาชิก:</th>
+                        <td>{{ $member->profile->fullName }}</td>
+                    </tr>
+                    <tr>
+                        <th>วงเงินที่กู้ที่กำลังผ่อนชำระทั้งหมด:</th>
+                        <td>{{ ($loansCount > 0) ? number_format($outstanding, 2, '.', ',') . ' บาท (สัญญาเงินกู้ ' . number_format($loansCount, 0, '.', ',') . ' สัญญา)' : '-'}}</td>
+                    </tr>  
+                    <tr>
+                        <th>เงินต้นคงเหลือทั้งหมด:</th>
+                        <td>{{ ($outstanding - $principle > 0) ?number_format($outstanding - $principle, 2, '.', ',') . ' บาท' : '-' }}</td>
+                    </tr>
+                </table>
+                <!-- /.table -->
+            </div>  
+            <!-- /.table-responsive --> 
         </div>
 
         @if(Session::has('flash_message'))
@@ -34,6 +58,35 @@
                 </p>
             </div>
         @endif
+
+        <div class="row margin-b-md">
+            <div class="col-md-5ths">
+                <button type="button" class="btn btn-block btn-primary btn-lg" onclick="javascript:window.location.href='{{ url('/service/member/' . $member->id) }}';">
+                    <i class="fa fa-user fa-fw"></i> ข้อมูลสมาชิก
+                </button>
+            </div>
+            <div class="col-md-5ths">
+                <button type="button" class="btn btn-block btn-success btn-lg" onclick="javascript:window.location.href='{{ url('/service/' . $member->id . '/shareholding') }}';">
+                    <i class="fa fa-money fa-fw"></i> ทุนเรือนหุ้น
+                </button>
+            </div>            
+            <div class="col-md-5ths">
+                <button type="button" class="btn btn-block btn-danger btn-lg disabled">
+                    <i class="fa fa-credit-card fa-fw"></i> การกู้ยืม
+                </button>
+            </div>
+            <div class="col-md-5ths">
+                <button type="button" class="btn btn-block btn-warning btn-lg" onclick="javascript:window.location.href='{{ url('/service/' . $member->id . '/guaruntee') }}';">
+                    <i class="fa fa-share-alt fa-fw"></i> การค้ำประกัน
+                </button>
+            </div>
+            <div class="col-md-5ths">
+                <button type="button" class="btn btn-block btn-purple btn-lg" onclick="javascript:window.location.href='{{ url('/service/' . $member->id . '/dividend') }}';">
+                    <i class="fa fa-dollar fa-fw"></i> เงินปันผล
+                </button>
+            </div>
+        </div>
+        <!-- /.row -->
 
         <div class="box box-primary">
             <div class="box-header with-border">
@@ -79,8 +132,9 @@
                             @endforeach
                         </tbody>
                     </table>
-                    <!-- /.table-responsive -->
+                    <!-- /.table -->
                 </div>
+                <!-- /.table-responsive -->
             </div>
             <!-- /.box-body -->
         </div>

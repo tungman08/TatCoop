@@ -31,7 +31,7 @@ class Authenticate
         }
         elseif ($guard == 'users') {
             if (Auth::guard('admins')->check()) {
-                return redirect()->action('Website\MemberController@getUnauthorize');
+                return redirect()->route('website.member.unauthorize');
             }
         }
 

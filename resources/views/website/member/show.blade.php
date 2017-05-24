@@ -7,7 +7,7 @@
         ข้อมูลสมาชิก
         <small>รายละเอียดของสมาชิก สอ.สรทท.</small>
     </h1>
-    @include('admin.member.breadcrumb', ['breadcrumb' => [
+    @include('website.member.layouts.breadcrumb', ['breadcrumb' => [
         ['item' => 'ข้อมูลสมาชิก', 'link' => ''],
     ]])
     </section>
@@ -43,7 +43,7 @@
                 <button class="btn btn-primary btn-flat"
                     style="margin-bottom: 5px;"
                     title="แก้ไขข้อมูล"
-                    onclick="javascript:window.location = '/member/edit';">
+                    onclick="javascript:window.location = '/member/{{ $user->member_id }}/edit';">
                     <i class="fa fa-edit"></i> แก้ไขข้อมูล
                 </button>
 

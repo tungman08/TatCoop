@@ -7,7 +7,7 @@
         ข้อมูลทุนเรือนหุ้น
         <small>รายละเอียดข้อมูลทุนเรือนหุ้นของสมาชิก</small>
     </h1>
-    @include('admin.member.breadcrumb', ['breadcrumb' => [
+    @include('website.member.layouts.breadcrumb', ['breadcrumb' => [
         ['item' => 'ข้อมูลสมาชิก', 'link' => '/member'],
         ['item' => 'ทุนเรือนหุ้น', 'link' => ''],
     ]])
@@ -52,7 +52,7 @@
                                     <td>{{ number_format($share->amount + $share->amount_cash, 2, '.', ',') }} บาท</td>
                                     <td>
                                         @if (Diamond::parse($share->name)->gte(Diamond::create(2016, 1, 1, 0, 0, 0)))
-                                            <a href="/member/shareholding/billing/{{ $date->endOfMonth()->format('Y-m-d') }}"><i class="fa fa-file-o"></i> ใบรับเงินค่าหุ้น</a>
+                                            <a href="/member/{{ $member->id }}/shareholding/billing/{{ $date->endOfMonth()->format('Y-m-d') }}"><i class="fa fa-file-o"></i> ใบรับเงินค่าหุ้น</a>
                                         @endif
                                     </td>
                                 </tr>

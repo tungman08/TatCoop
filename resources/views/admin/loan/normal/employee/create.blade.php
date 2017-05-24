@@ -20,16 +20,29 @@
     <section class="content">
         <!-- Info boxes -->
         <div class="well">
-            <h4>ทำสัญญาการกู้ยืม</h4>
+            <h4>การทำสัญญาการกู้ยืมของ {{ ($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' :$member->profile->fullName }}</h4>
 
             @include('admin.loan.info', ['member' => $member])
         </div>
 
-        <div class="well" style="padding-bottom: 0px;">
-            <h4>รายละเอียดประเภทสินเชื่อ</h4>
+        <div class="box box-default collapsed-box">
+            <div class="box-header with-border">
+                <h3 class="box-title"><i class="fa fa-credit-card fa-fw"></i> รายละเอียดประเภทสินเชื่อเงินกู้</h3>
 
-            @include('admin.loan.loantype', ['loantype' => $loantype])
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                        <i class="fa fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- /.box-title -->
+
+            <div class="box-body">
+                @include('admin.loan.loantype', ['loantype' => $loantype])
+            </div>          
+            <!-- /.box-body -->
         </div>
+        <!-- /.box -->
 
         @if ($errors->count() > 0)
             <div class="alert alert-danger alert-dismissible">
@@ -41,7 +54,7 @@
 
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title"><i class="fa fa-file-o"></i> ทำสัญญาเงินกู้ประเภทกู้สามัญ สำหรับพนักงาน/ลูกจ้าง ททท.</h3>
+                <h3 class="box-title"><i class="fa fa-file-text-o fa-fw"></i> ทำสัญญาเงินกู้ประเภทกู้สามัญ สำหรับพนักงาน/ลูกจ้าง ททท.</h3>
             </div>
             <!-- /.box-header -->
 

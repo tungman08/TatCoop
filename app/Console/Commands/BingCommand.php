@@ -46,6 +46,6 @@ class BingCommand extends Command
                 "Nothing" : 
                 "Something went wrong!";
                 
-        $this->line($message);
+        $this->info($message);
     }
 }

@@ -32,11 +32,4 @@ class PaymentType extends Model
      * @var array
      */
     protected $dates = ['created_at', 'updated_at'];
-    
-    /**
-     * Get the members associated with the type.
-     */
-    // public function profiles() {
-    //     return $this->hasMany(Profile::class);
-    // }
 }

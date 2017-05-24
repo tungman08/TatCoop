@@ -118,8 +118,9 @@ class AuthController extends Controller
             if (Auth::guard($this->guard)->attempt($credentials, $request->has('remember'))) {
                 Statistic::user(Auth::guard($this->guard)->id());
                 History::addUserHistory(Auth::guard($this->guard)->id(), 'เข้าสู่ระบบ');
+                $user = User::find(Auth::guard($this->guard)->id());
 
-                return redirect()->action('Website\MemberController@index');
+                return redirect()->action('Website\MemberController@show', [ 'id' => $user->member_id ]);
             }
             else {
                 return redirect()->back()

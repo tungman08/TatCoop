@@ -174,6 +174,7 @@
                 formData.append('loan_type', $('#loan_type').val());
                 formData.append('outstanding', $('#outstanding').val());
                 formData.append('period', $('#period').val());
+                formData.append('start', moment().format('YYYY-M-d'));
 
             $.ajax({
                 dataType: 'json',
@@ -210,10 +211,13 @@
                     $.each(data.stable, function(index, value) {
                         stable.row.add([
                             value.month,
-                            number_format(value.pay + value.addon, 2) + ((value.addon > 0) ? 
-                            ' <span class="text-muted" style="cursor: pointer;" data-tooltip="true" title="ปัดเศษ (' + number_format(value.pay, 2) + '+' + number_format(value.addon, 2) + ') ซึ่งจะนำไปบวกกับเงินต้นที่ชำระ"><i class="fa fa-info-circle"></i>' : ''),
+                            number_format(value.pay + value.addon, 2) + ((value.addon > 0)
+                                ? ' <span class="text-muted" style="cursor: pointer;" data-tooltip="true" title="ปัดเศษ (' + number_format(value.pay, 2) + '+' + number_format(value.addon, 2) + ') ซึ่งจะนำไปบวกกับเงินต้นที่ชำระ"><i class="fa fa-info-circle"></i></span>'
+                                : ''),
                             number_format(value.interest, 2),
-                            (value.addon > 0) ? number_format(value.principle, 2) + ' <span class="text-muted">+' + number_format(value.addon, 2) + '</span>' : number_format(value.principle, 2),
+                            (value.addon > 0) 
+                                ? number_format(value.principle, 2) + ' <span class="text-muted">+' + number_format(value.addon, 2) + '</span>' 
+                                : number_format(value.principle, 2),
                             number_format(value.balance, 2)
                         ]).draw(false);
                     });

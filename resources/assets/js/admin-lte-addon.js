@@ -1,5 +1,10 @@
 ﻿$.fn.getType = function () { return this[0].tagName == "INPUT" ? this[0].type.toLowerCase() : this[0].tagName.toLowerCase(); }
 
+Number.prototype.format = function(n, x) {
+    var re = '\\d(?=(\\d{' + (x || 3) + '})+' + (n > 0 ? '\\.' : '$') + ')';
+    return this.toFixed(Math.max(0, ~~n)).replace(new RegExp(re, 'g'), '$&,');
+};
+
 function change_skin(skin) {
     $.ajax({
         url: '/ajax/skin',

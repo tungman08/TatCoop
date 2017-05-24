@@ -8,6 +8,7 @@ use Auth;
 use History;
 use DB;
 use Diamond;
+use LoanCalculator;
 use MemberProperty;
 use Validator;
 use App\Http\Requests;
@@ -26,6 +27,7 @@ use App\Dividend;
 use App\User;
 use App\LoanType;
 use App\Loan;
+use App\LoanPayment;
 
 class MemberController extends Controller
 {    
@@ -259,9 +261,21 @@ class MemberController extends Controller
         $member = Member::find($id);
 
         if (is_null($member->leave_date)) {
-            return view('admin.member.leave', [
-                'member' => $member
-            ]);
+            if ($member->sureties->filter(function ($value, $key) use ($member) { return is_null($value->completed_at) && $value->member_id != $member->id; })->count() > 0) {
+                return redirect()->back()
+                    ->with('flash_message', 'ไม่สามารถลาออกได้ เนื่องจากยังเป็นผู้ค้ำประกันการกู้ยืมของสมาชิกอื่นอยู่ กรุณาทำการเปลี่ยนผู้ค้ำประกันก่อน โดยสามารถจัดการได้ที่หัวข้อ "การค้ำประกัน"')
+                    ->with('callout_class', 'callout-danger');
+            }
+            else {
+                $payments = MemberProperty::getTotalPayment($member);
+
+                return view('admin.member.leave', [
+                    'member' => $member,
+                    'shareholdings' => $member->shareHoldings->sum('amount'),
+                    'loanCount' => $member->loans->filter(function ($value, $key) { return is_null($value->completed_at); })->count(),
+                    'payments' => ($payments->outstanding - $payments->principle) + $payments->interest
+                ]);
+            }
         }
         else {
             return redirect()->action('Admin\MemberController@show', [
@@ -306,15 +320,30 @@ class MemberController extends Controller
                 $member->leave_date = Diamond::now();
                 $member->save();
 
+                //ปิดยอดหุ้น
                 $total = Shareholding::where('member_id', $member->id)->sum('amount');
 
                 if ($total > 0) {
                     $share = new Shareholding();
                     $share->member_id = $member->id;
-                    $share->pay_date = Diamond::today();
+                    $share->pay_date = Diamond::now();
                     $share->shareholding_type_id = 2;
                     $share->amount = 0 - $total;
                     $share->save();
+                }
+
+                //ปิดยอดเงินกู้
+                $loans = $member->loans->filter(function ($value, $key) { return is_null($value->completed_at); });
+
+                foreach ($loans as $loan) {
+                    $payment = new LoanPayment();
+                    $payment->pay_date = Diamond::now();
+                    $payment->principle = $loan->outstanding - $loan->payments->sum('principle');
+                    $payment->interest = LoanCalculator::loan_interest($loan, Diamond::today());
+
+                    $loan->payments()->save($payment);
+                    $loan->completed_at = Diamond::now();
+                    $loan->save();
                 }
 
                 $user = User::where('member_id', $member->id)->first();
@@ -331,21 +360,4 @@ class MemberController extends Controller
                 ->with('callout_class', 'callout-success');      
         }
     }
-
-    // public function getShowTab($id, $tab) {
-    //     $member = Member::find($id);
-    //     $dividend_years = Shareholding::where('member_id', $member->id)
-    //             ->where('remark', '<>', 'ยอดยกมา')
-    //             ->select(DB::raw('year(pay_date) as pay_year'))
-    //             ->groupBy(DB::raw('year(pay_date)'))
-    //             ->get();
-
-    //     return view('admin.member.show', [
-    //         'member' => $member,
-    //         'histories' => Member::where('profile_id', $member->profile_id)->get(),
-    //         'dividend_years' => $dividend_years,
-    //         'dividends' => MemberProperty::getDividend($member->id, Diamond::today()->year),
-    //         'tab' => $tab
-    //     ]);
-    // }
 }

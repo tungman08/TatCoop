@@ -7,18 +7,18 @@ namespace App\Classes;
  */
 class MainMenu
 {
-    public function member($url) {
+    public function member($url, $id) {
         $menu = new Menu($url);
-        $menu->add(new MenuItem(['title' => 'หน้าหลัก', 'icon' => 'fa-home', 'url' => '/member']));
-        $menu->add(new MenuItem(['title' => 'ทุนเรือนหุ้น', 'icon' => 'fa-money', 'url' => '/member/shareholding']));
-        $menu->add(new MenuItem(['title' => 'การกู้ยืม', 'icon' => 'fa-credit-card', 'url' => '/member/loan']));
-        $menu->add(new MenuItem(['title' => 'เงินปันผล', 'icon' => 'fa-dollar', 'url' => '/member/dividend']));
-        $menu->add(new MenuItem(['title' => 'การค้ำประกัน', 'icon' => 'fa-share-alt', 'url' => '/member/guaruntee']));
+        $menu->add(new MenuItem(['title' => 'หน้าหลัก', 'icon' => 'fa-home', 'url' => "/member/$id"]));
+        $menu->add(new MenuItem(['title' => 'ทุนเรือนหุ้น', 'icon' => 'fa-money', 'url' => "/member/$id/shareholding"]));
+        $menu->add(new MenuItem(['title' => 'การกู้ยืม', 'icon' => 'fa-credit-card', 'url' => "/member/$id/loan"]));
+        $menu->add(new MenuItem(['title' => 'การค้ำประกัน', 'icon' => 'fa-share-alt', 'url' => "/member/$id/guaruntee"]));
+        $menu->add(new MenuItem(['title' => 'เงินปันผล', 'icon' => 'fa-dollar', 'url' => "/member/$id/dividend"]));
 
         return $menu->display();
     }
 
-    public function admin($super, $url) {
+    public function admin($url, $super) {
         $menu = new Menu($url);
         $menu->add(new MenuItem(['title' => 'หน้าหลัก', 'icon' => 'fa-home', 'url' => '/']));
 
@@ -33,8 +33,8 @@ class MainMenu
         $service->add(new MenuItem(['title' => 'จัดการสมาชิกสหกรณ์ฯ', 'icon' => 'fa-users', 'url' => '/service/member']));
         $service->add(new MenuItem(['title' => 'ทุนเรือนหุ้น', 'icon' => 'fa-money', 'url' => '/service/shareholding/member']));
         $service->add(new MenuItem(['title' => 'การกู้ยืม', 'icon' => 'fa-credit-card', 'url' => '/service/loan/member']));
-        $service->add(new MenuItem(['title' => 'เงินปันผล', 'icon' => 'fa-dollar', 'url' => '/service/dividend/member']));
         $service->add(new MenuItem(['title' => 'การค้ำประกัน', 'icon' => 'fa-share-alt', 'url' => '/service/guaruntee/member']));
+        $service->add(new MenuItem(['title' => 'เงินปันผล', 'icon' => 'fa-dollar', 'url' => '/service/dividend/member']));
         $menu->add($service);
 
         $admin = new MenuTree(['title' => 'ผู้ดูแลระบบ', 'icon' => 'fa-gears', 'url' => '/admin']);
@@ -138,7 +138,7 @@ class MenuItem extends Properties
 
     // display
     public function display($url) {
-        $menu = (url($url) == url($this->url)) ? '<li class="active">' : '<li>';
+        $menu = ($url == url($this->url)) ? '<li class="active">' : '<li>';
         $menu .= '<a href="' . url($this->url) . '">';
         $menu .= '<i class="fa ' . $this->icon . '"></i> <span>' . $this->title . '</span>';
 
@@ -242,7 +242,7 @@ class MenuTree extends Properties
 
     // display
     public function display($url) {
-        $menu = (str_contains(url($url), url($this->url))) ? '<li class="treeview active">' : '<li class="treeview">';
+        $menu = (str_contains($url, url($this->url))) ? '<li class="treeview active">' : '<li class="treeview">';
         $menu .= '<a href="#">';
         $menu .= '<i class="fa ' . $this->icon . '"></i> <span>' . $this->title . '</span>';
         $menu .= '<i class="fa fa-angle-left pull-right"></i>';

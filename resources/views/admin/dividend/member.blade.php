@@ -36,27 +36,17 @@
 
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title"><i class="fa fa-dollar"></i> รายละเอียดข้อมูลเงินปันผลของสมาชิกสหกรณ์</h3>
+                <h3 class="box-title"><i class="fa fa-dollar"></i> รายละเอียดข้อมูลเงินปันผลของสมาชิกสหกรณ์ ปี <span id="year">{{ $year + 543 }}</span></h3>
             </div>
             <!-- /.box-header -->
 
             <div class="box-body">
-                <div class="form-group margin-b-xl">
-                    <div class="row">
-                        <div class="col-md-2">
-                            <select class="form-control" id="selectyear" autocomplete="off">
-                                @for($i = Diamond::today()->year; $i >= 2016; $i--)
-                                    <option value="{{ $i }}">เงินปันผลปี {{ $i + 543 }}</option>                                    
-                                @endfor
-                            </select>
-                        </div>
-
-                        <div class="col-md-10">
-                            @php($rate = App\Dividend::where('rate_year', Diamond::today()->year)->first())
-                            <strong id="dividend_rate" class="col-md-10" style="margin-top: 8px;">{{ !is_null($rate) ? 'อัตราเงินปันผล ' . $rate->rate . '%' : 'ยังไม่ได้กำหนดอัตราเงินปันผล' }}</strong>
-                        </div>
-                    </div>
-                </div>
+                {{ Form::open(['url' => '/service/dividend/member/export/' . $year, 'method' => 'post']) }}
+                    {{ Form::button('<i class="fa fa-file-excel-o fa-fw"></i> สรุปการปันผลเป็นเอกสาร Excel', [
+                        'type'=>'submit',
+                        'class'=>'btn btn-primary btn-flat margin-b-md'])
+                    }}
+                {{ Form::close() }}
 
                 <div class="table-responsive" style=" margin-top: 10px;">
                     <table id="dataTables-users" class="table table-hover dataTable" width="100%">
@@ -65,9 +55,9 @@
                                 <th style="width: 10%;">รหัสสมาชิก</th>
                                 <th style="width: 25%;">ชื่อสมาชิก</th>
                                 <th style="width: 20%;">ประเภทสมาชิก</th>
-                                <th style="width: 15%;">จำนวนหุ้น</th>
-                                <th style="width: 15%;">จำนวนเงิน</th>
-                                <th style="width: 15%;">เงินปันผล</th>
+                                <th style="width: 15%;">จำนวนเงินปันผล</th>
+                                <th style="width: 15%;">จำนวนเงินเฉลี่ยคืน</th>
+                                <th style="width: 15%;">รวมเงินทั้งหมด</th>
                             </tr>
                         </thead>
                     </table>
@@ -112,11 +102,14 @@
 
         $('#dataTables-users').dataTable().fnDestroy();
         $('#dataTables-users').dataTable({
+            //"processing": true,
+            //"serverSide": true,
             "ajax": {
-                "processing": true,
-                "serverSide": true,
                 "url": "/ajax/dividendlist",
                 "type": "post",
+                "data": {
+                        "year": {{ $year }}
+                    },
                 beforeSend: function () {
                     $(".ajax-loading").css("display", "block");
                 },
@@ -133,14 +126,14 @@
                 { "data": "fullname" },
                 { "data": "typename" },
                 { "data": "shareholding" },
-                { "data": "amount" },
-                { "data": "dividends" }
+                { "data": "loan" },
+                { "data": "total" }
             ]
         });   
 
         $('#dataTables-users tbody').on('click', 'tr', function() {
             document.location = '/service/' + parseInt($(this).children("td").first().html()).toString() + '/dividend';            
-        });    
+        }); 
     });   
     </script>
 @endsection

@@ -103,9 +103,9 @@
 
         $('#dataTables-users').dataTable().fnDestroy();
         $('#dataTables-users').dataTable({
+            //"processing": true,
+            //"serverSide": true,
             "ajax": {
-                "processing": true,
-                "serverSide": true,
                 "url": "/ajax/members",
                 "type": "post",
                 "data": {

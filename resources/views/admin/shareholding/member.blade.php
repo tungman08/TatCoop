@@ -99,9 +99,9 @@
 
         $('#dataTables-users').dataTable().fnDestroy();
         $('#dataTables-users').dataTable({
+            //"processing": true,
+            //"serverSide": true,
             "ajax": {
-                "processing": true,
-                "serverSide": true,
                 "url": "/ajax/shareholding",
                 "type": "post",
                 beforeSend: function () {

@@ -36,15 +36,17 @@ Route::group(['domain' => 'www.' . env('APP_DOMAIN'),
         Route::post('reset', 'PasswordController@postReset');
     });
 
-    // Member Route...
-    Route::resource('/member', 'MemberController', ['only' => ['index', 'edit', 'update']]);
-
-    // Billing Route...
-    Route::group(['prefix' => '/member/shareholding/billing'], function() {
-        Route::get('{date}/print', ['as' => 'website.member.shareholding.billing.print', 'uses' => 'MemberController@getPrintBilling']);
-        Route::get('{date}/pdf', ['as' => 'website.member.shareholding.billing.pdf', 'uses' => 'MemberController@getPdfBilling']);
-        Route::get('{date}', ['as' => 'website.member.shareholding.billing', 'uses' => 'MemberController@getBilling']);
+    // Member Billing Route...
+    Route::group(['prefix' => '/member/{id}/shareholding/billing/{date}'], function() {
+        Route::get('/print', ['as' => 'website.member.shareholding.billing.print', 'uses' => 'MemberController@getPrintBilling']);
+        Route::get('/pdf', ['as' => 'website.member.shareholding.billing.pdf', 'uses' => 'MemberController@getPdfBilling']);
+        Route::get('/', ['as' => 'website.member.shareholding.billing', 'uses' => 'MemberController@getBilling']);
     });
+
+    // Member Route...
+    Route::get('/member/unauthorize', ['as' => 'website.member.unauthorize', 'uses' => 'MemberController@getUnauthorize']);
+    Route::resource('/member', 'MemberController', ['only' => ['index', 'show', 'edit', 'update']]);
+    Route::controller('/member/{id}', 'MemberController');
 
     // Pre Loan Route...
     Route::controller('/loan', 'LoanController');
@@ -126,8 +128,8 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
     Route::group(['prefix' => '/service'], function() {
         // Member Route...
         Route::get('member/inactive', 'MemberController@getInactive');
-        Route::get('/member/{id}/leave', ['as' => 'admin.member.leave', 'uses' => 'MemberController@getLeave']);
-        Route::post('/member/{id}/leave', 'MemberController@postLeave');
+        Route::get('member/{id}/leave', ['as' => 'admin.member.leave', 'uses' => 'MemberController@getLeave']);
+        Route::post('member/{id}/leave', 'MemberController@postLeave');
         Route::resource('member', 'MemberController');
 
         // Share Holding Route...
@@ -143,14 +145,20 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
         Route::get('{member_id}/loan/{loantype_id}/create/normal/outsider', ['as' => 'service.loan.create.normal.outsider', 'uses' => 'LoanController@getCreateNormalOutsiderLoan']);
         Route::get('{member_id}/loan/{loantype_id}/create/emerging', ['as' => 'service.loan.create.emerging', 'uses' => 'LoanController@getCreateEmergingLoan']);
         Route::get('{member_id}/loan/{loantype_id}/create/special', ['as' => 'service.loan.create.special', 'uses' => 'LoanController@getCreateSpecialLoan']);
+        Route::post('{member_id}/loan/{loantype_id}/create/normal/employee', 'LoanController@postCreateLoan');
         Route::resource('{member_id}/loan', 'LoanController');
-
+        
         // Payment Route...
-        Route::resource('{member_id}/payment', 'PaymentController');
+        Route::get('loan/autopayment', ['as' => 'service.payment.auto', 'uses' => 'PaymentController@getAutoPayment']);
+        Route::post('loan/autopayment', 'PaymentController@postAutoPayment');
+        Route::group(['prefix' => '{member_id}/loan/{loan_id}/payment'], function () {
+            Route::resource('/', 'PaymentController');    
+        });
 
         // Dividend Route...
         Route::get('dividend/member', ['as' => 'service.dividend.member', 'uses' => 'DividendController@getMember']);
-        Route::resource('{member_id}/dividend', 'DividendController');
+        Route::post('dividend/member/export/{year}', 'DividendController@postExport');
+        Route::get('{member_id}/dividend', ['as' => 'service.dividend.member.show', 'uses' => 'DividendController@getMemberDividend']);
 
         // Quaruntee Route...
         Route::get('guaruntee/member', ['as' => 'service.guaruntee.member', 'uses' => 'GuarunteeController@getMember']);
@@ -178,8 +186,7 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
         Route::resource('loantype', 'LoanTypeController');
 
         // Dividend Route...
-        Route::get('dividend/{id}/export', 'DividendController@getExport');
-        Route::resource('dividend', 'DividendController');
+        Route::resource('dividend', 'DividendController', ['except' => [ 'show' ]]);
 
         // Billing Route...
         Route::resource('billing', 'BillingController', ['only' => [ 'index', 'edit', 'update' ]]);

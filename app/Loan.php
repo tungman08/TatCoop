@@ -50,7 +50,7 @@ class Loan extends Model
      * Get the payments that uses by the loan.
      */
     public function payments() {
-        return $this->hasMany(LoanPayment::class);
+        return $this->hasMany(Payment::class);
     }
     
     /**

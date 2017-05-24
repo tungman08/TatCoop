@@ -15,7 +15,8 @@ class CreateDividendsTable extends Migration
         Schema::create('dividends', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('rate_year');
-            $table->float('rate');
+            $table->float('shareholding_rate');
+            $table->float('loan_rate');
             $table->timestamps();
         });
     }

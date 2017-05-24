@@ -3,7 +3,7 @@
     <!-- sidebar menu: : style can be found in sidebar.less -->
     <ul class="sidebar-menu">
         <li class="header">เมนูหลัก</li>
-        {!! MainMenu::member(Request::url()) !!}
+        {!! MainMenu::member(Request::url(), $user->member_id) !!}
 
         <!-- link -->
         <li class="header">บริการของ สอ.สรทท.</li>

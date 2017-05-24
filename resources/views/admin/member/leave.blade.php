@@ -20,7 +20,36 @@
         <!-- Info boxes -->
         <div class="well">
             <h4>รายละเอียดข้อมูลสมาชิกสหกรณ์</h4>
-            <p>ให้ผู้ดูแลระบบสามารถ แก้ไข ข้อมูลของ {{ ($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' : $member->profile->fullName }}</p>
+
+            <div class="table-responsive">
+                <table class="table table-info">
+                    <tr>
+                        <th style="width:20%;">ชื่อผู้สมาชิก:</th>
+                        <td>{{ $member->profile->fullName }}</td>
+                    </tr>
+                    <tr>
+                        <th>จำนวนทุนเรือนหุ้นสะสม:</th>
+                        <td>{{ number_format($shareholdings, 2, '.', ',') }} บาท</td>
+                    </tr>  
+                    <tr>
+                        <th>จำนวนเงินกู้ที่ต้องชำระทั้งหมด:</th>
+                        <td>
+                            {{ ($payments > 0) ?number_format($payments, 2, '.', ',') . ' บาท (รวมดอกเบี้ย)' : '-' }}
+                            <span class="text-muted" style="cursor: pointer;" data-tooltip="true" title="สัญญาเงินกู้ {{ $loanCount }} สัญญา"><i class="fa fa-info-circle"></i></span>
+                        </td>
+                    </tr>
+                    @if($shareholdings != $payments)
+                        <tr>
+                            <th class="{{ ($shareholdings > $payments) ? 'text-success' : 'text-danger' }}">{{ ($shareholdings > $payments) ? 'รับเงินค่าหุ้นคืน' : 'ชำระค่าเงินกู้เพิ่ม' }}:</th>
+                            <td class="{{ ($shareholdings > $payments) ? 'text-success' : 'text-danger' }}">{{ number_format(abs($shareholdings - $payments), 2, '.', ',') }} บาท</td>
+                        </tr>
+                    @endif
+                </table>
+                <!-- /.table -->
+            </div>  
+            <!-- /.table-responsive --> 
+
+            <span class="pull-right text-danger small">* กรุณารับ/จ่ายเงินให้แก่สมาชิกก่อนกดปุ่มยืนยันการลาออก</span>
         </div>
 
         @if ($errors->count() > 0)
@@ -94,6 +123,8 @@
 
     <script>
     $(document).ready(function () {
+        $('[data-tooltip="true"]').tooltip();
+
         $("[data-mask]").inputmask();
         // $('form').submit(function() {
         //    $("[data-mask]").inputmask('remove');

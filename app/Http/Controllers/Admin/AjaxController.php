@@ -171,12 +171,11 @@ class AjaxController extends Controller
 
     public function postDividend(Request $request) {
         $member = Member::find($request->input('id'));
-        $year = $request->input('year');
-        $dividends = MemberProperty::getDividend($member->id, $year);
+        $year = intval($request->input('year'));
+        $dividends = MemberProperty::getDividend($member, $year);
         $rate = Dividend::where('rate_year', $year)->first();
-        $dividend_rate = (!is_null($rate)) ? $rate->rate : 0;
         
-        return compact('member', 'dividends', 'dividend_rate');
+        return compact('member', 'dividends', 'rate');
     }
 
     /**
@@ -664,6 +663,41 @@ class AjaxController extends Controller
              ->make(true);
     }
 
+    public function postMemberpayment(Request $request) {
+        $date = Diamond::parse($request->input('date'))->endOfMonth();
+
+        $members = Db::table('members')
+            ->select('members.id')
+            ->join('profiles', 'members.profile_id', '=', 'profiles.id')
+            ->join('employees', 'profiles.id', '=', 'employees.profile_id')
+            ->join('employee_types', 'employees.employee_type_id', '=', 'employee_types.id')
+            ->join('loans', 'members.id', '=', 'loans.member_id')
+            ->where('employees.employee_type_id', '<', 3)
+            ->whereDate('members.start_date', '<', $date)
+            ->whereNull('loans.completed_at')
+            ->get();
+
+        $payments = collect([]);
+        foreach ($members as $q) {
+            $member = Member::find($q->id);
+            $payment = MemberProperty::getMonthlyPayment($member, $date);
+
+            $item = new stdClass();
+            $item->code = $member->memberCode;
+            $item->fullname = '<span class="text-primary"><i class="fa fa-user fa-fw"></i> ' . $member->profile->fullName . '</span>';
+            $item->typename = $member->profile->employee->employee_type->name;
+            $item->loanCount = number_format($member->loans->count(), 0, '.', ',');
+            $item->principle = number_format($payment->principle, 2, '.', ',');
+            $item->interest = number_format($payment->interest, 2, '.', ',');
+            $item->total = number_format($payment->principle + $payment->interest, 2, '.', ',');
+
+            $payments->push($item);
+        }
+
+        return Datatables::collection($payments)
+             ->make(true);
+    }
+
     public function getAccounts(Request $request) {
         $users = DB::table('users')
             ->join('members', 'users.member_id', '=', 'members.id')
@@ -820,8 +854,9 @@ class AjaxController extends Controller
 
     public function postLoan(Request $request) {
         $loan = Loan::find($request->input('loan_id'));
+        $start_date = Diamond::today();
 
-        $payment = collect(LoanCalculator::payment($loan->loanType->rate, $loan->paymentType->id, $loan->outstanding, $loan->period));
+        $payment = collect(LoanCalculator::payment($loan->loanType->rate, $loan->paymentType->id, $loan->outstanding, $loan->period, $start_date));
 
         $info = (object)[
             'rate' => $loan->loanType->rate,
@@ -840,7 +875,7 @@ class AjaxController extends Controller
             ->join('employees', 'profiles.id', '=', 'employees.profile_id')
             ->join('employee_types', 'employees.employee_type_id', '=', 'employee_types.id')
             ->leftJoin('loans', 'members.id', '=', 'loans.member_id')
-            ->leftJoin('loan_payments', 'loans.id', '=', 'loan_payments.loan_id')
+            ->leftJoin('payments', 'loans.id', '=', 'payments.loan_id')
             ->whereNull('members.leave_date')
             ->whereNull('loans.completed_at')
             ->groupBy(['members.id', 'profiles.name', 'profiles.lastname', 'employee_types.name', 'loans.id'])
@@ -849,7 +884,7 @@ class AjaxController extends Controller
                 DB::raw("CONCAT('<span class=\"text-primary\"><i class=\"fa fa-user fa-fw\"></i> ', IF(profiles.name = '<ข้อมูลถูกลบ>', profiles.name, CONCAT(profiles.name, ' ', profiles.lastname)), '</span>') as fullname"),
                 'employee_types.name as typename',
                 DB::raw("IF(COUNT(loans.id) > 0 , CONCAT(FORMAT(COUNT(loans.id), 0), ' สัญญา'), '-') as loans"),
-                DB::raw("IF(COUNT(loans.id) > 0 , CONCAT(FORMAT(COALESCE(SUM(loans.outstanding) - IF(COUNT(loan_payments.id) > 0, SUM(loan_payments.principle), 0), 0), 2), ' บาท'), '-') as amount")
+                DB::raw("IF(COUNT(loans.id) > 0 , CONCAT(FORMAT(COALESCE(SUM(loans.outstanding) - IF(COUNT(payments.id) > 0, SUM(payments.principle), 0), 0), 2), ' บาท'), '-') as amount")
             ]);
 
         return Datatables::queryBuilder($members)->make(true);
@@ -877,6 +912,23 @@ class AjaxController extends Controller
     }
 
     public function postDividendlist(Request $request) {
-        
+        $year = intval($request->input('year'));
+        $members = Member::active()->get();
+        $dividends = collect([]);
+
+        foreach ($members as $member) {
+            $dividend = MemberProperty::getDividendQuick($member, $year);
+
+            $item = new stdClass();
+            $item->code = $member->memberCode;
+            $item->fullname = '<span class="text-primary"><i class="fa fa-user fa-fw"></i> ' . $member->profile->fullName . '</span>';
+            $item->typename = $member->profile->employee->employee_type->name;
+            $item->shareholding = number_format($dividend->shareholding_dividend, 2, '.', ',') . ' บาท';
+            $item->loan = number_format($dividend->interest_dividend, 2, '.', ',') . ' บาท';
+            $item->total = number_format($dividend->total, 2, '.', ',') . ' บาท';
+            $dividends->push($item);
+        }
+
+        return Datatables::collection($dividends)->make(true);
     }
 }

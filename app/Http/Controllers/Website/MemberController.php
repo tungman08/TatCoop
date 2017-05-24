@@ -13,11 +13,15 @@ use Diamond;
 use MemberProperty;
 use PDF;
 use Validator;
+use Route;
 use App\Member;
 use App\Billing;
+use App\Dividend;
 use App\Prefix;
 use App\Province;
 use App\District;
+use App\Loan;
+use App\LoanType;
 use App\Subdistrict;
 use App\Postcode;
 use App\Profile;
@@ -40,20 +44,25 @@ class MemberController extends Controller
      * @return void
      */
     public function __construct() {
-        $this->middleware('auth:users');
+        $this->middleware('auth:users', ['except' => [ 'index', 'getUnauthorize' ]]);
+        $this->middleware("user", ['except' => [ 'index', 'getUnauthorize' ]]);
     }
 
     public function getUnauthorize() {
         return 'unauthorize';
     }
 
+    public function index() {
+        return redirect('/auth/login');
+    }
+
    /**
     * Responds to requests to GET /member
     */
-    public function index() {
-        $member = Member::find(Auth::user()->member_id);
+    public function show($id) {
+        $member = Member::find($id);
 
-        return view('website.member.index', [
+        return view('website.member.show', [
             'member' => $member,
             'histories' => Member::where('profile_id', $member->profile_id)->get(),
         ]);
@@ -62,7 +71,7 @@ class MemberController extends Controller
     /**
      * Responds to requests to GET /member/edit
      */
-     public function edit() {
+     public function edit($id) {
         $member = Member::find(Auth::user()->member_id);
         $provinces = Province::orderBy('name')->get();
         $districts = District::where('province_id', $member->profile->province_id)->orderBy('name')->get();
@@ -77,7 +86,7 @@ class MemberController extends Controller
          ]);
      }
 
-     public function update(Request $request, $id) {
+     public function update($id, Request $request) {
         $rules = [
             'profile.birth_date' => 'required|date_format:Y-m-d', 
             'profile.address' => 'required', 
@@ -111,14 +120,14 @@ class MemberController extends Controller
                 History::addUserHistory(Auth::guard()->id(), 'แก้ไขข้อมูล', 'แก้ไขข้อมูลส่วนตัว');
             });
 
-            return redirect()->action('Website\MemberController@getIndex', ['id' => $id])
+            return redirect()->action('Website\MemberController@show', ['id' => $id])
                 ->with('flash_message', 'แก้ไขข้อมูลเรียบร้อยแล้ว')
                 ->with('callout_class', 'callout-success');
         }
      }
 
-     public function getShareholding() {
-        $member = Member::find(Auth::user()->member_id);
+     public function getShareholding($id) {
+        $member = Member::find($id);
         $shareholdings = Shareholding::where('member_id', $member->id)
             ->select(
                 DB::raw('str_to_date(concat(\'1/\', month(pay_date), \'/\', year(pay_date)), \'%d/%m/%Y\') as name'),
@@ -133,41 +142,38 @@ class MemberController extends Controller
         ]);
      }
 
-     public function getLoan() {
-         $member = Member::find(Auth::user()->member_id);
+     public function getLoan($id) {
+        $member = Member::find($id);
 
-         return view('website.member.loan', [
-            'member' => $member
-        ]);
-     }
-
-     public function getDividend() {
-        $member = Member::find(Auth::user()->member_id);
-        $dividend_years = [];
-        $start_year = (Diamond::parse($member->start_date)->year > 2016) ? Diamond::parse($member->start_date)->year : 2016;
-
-        for ($i = $start_year; $i <= Diamond::today()->year; $i++) {
-            $dividend_years[] = (object)['pay_year' => $i];
-        }
-
-         return view('website.member.dividend', [
+        return view('website.member.loan', [
             'member' => $member,
-            'dividend_years' => $dividend_years,
-            'dividends' => MemberProperty::getDividend($member->id, Diamond::today()->year),
+            'loans' => Loan::where('member_id', $member->id)->orderBy('id', 'desc')->get(),
+            'loantypes' => LoanType::active()->get()
         ]);
      }
 
-     public function getGuaruntee() {
-        $member = Member::find(Auth::user()->member_id);
+     public function getDividend($id) {
+        $member = Member::find($id);
+        $dividend_years = Dividend::all();
+
+        return view('website.member.dividend', [
+            'member' => $member,
+            'dividend_years' => collect($dividend_years),
+            'dividends' => MemberProperty::getDividend($member, $dividend_years->last()->rate_year),
+        ]);
+     }
+
+     public function getGuaruntee($id) {
+        $member = Member::find($id);
 
         return view('website.member.guaruntee', [
             'member' => $member
         ]);
      }
 
-     public function getBilling($date) {
+     public function getBilling($id, $date) {
         $billdate = Diamond::parse($date);
-        $member = Member::find(Auth::user()->member_id);
+        $member = Member::find($id);
         $shareholdings = Shareholding::where('member_id', $member->id)
             ->whereYear('pay_date', '=', $billdate->year)
             ->whereMonth('pay_date', '=', $billdate->month)
@@ -186,9 +192,9 @@ class MemberController extends Controller
         ]);
      }
 
-     public function getPrintBilling($date) {
+     public function getPrintBilling($id, $date) {
         $billdate = Diamond::parse($date);
-        $member = Member::find(Auth::user()->member_id);
+        $member = Member::find($id);
         $shareholdings = Shareholding::where('member_id', $member->id)
             ->whereYear('pay_date', '=', $billdate->year)
             ->whereMonth('pay_date', '=', $billdate->month)
@@ -209,9 +215,9 @@ class MemberController extends Controller
         ]);
      }
 
-     public function getPdfBilling($date) {
+     public function getPdfBilling($id, $date) {
         $billdate = Diamond::parse($date);
-        $member = Member::find(Auth::user()->member_id);
+        $member = Member::find($id);
         $shareholdings = Shareholding::where('member_id', $member->id)
             ->whereYear('pay_date', '=', $billdate->year)
             ->whereMonth('pay_date', '=', $billdate->month)

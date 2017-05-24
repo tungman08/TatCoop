@@ -17,12 +17,26 @@
         </div>
     </div>
     <div class="form-group">
-        {{ Form::label('rate', 'อัตราเงินปันผล (%)', [
+        {{ Form::label('shareholding_rate', 'อัตราเงินปันผล (%)', [
             'class'=>'col-sm-2 control-label']) 
         }}
 
         <div class="col-sm-10">
-            {{ Form::text('rate', null, [
+            {{ Form::text('shareholding_rate', null, [
+                'placeholder' => 'ตัวอย่าง: 0-100',
+                'autocomplete'=>'off',
+                'class'=>'form-control'])
+            }}
+        </div>
+    </div>
+
+     <div class="form-group">
+        {{ Form::label('loan_rate', 'อัตราเงินเฉลี่ยนคืน (%)', [
+            'class'=>'col-sm-2 control-label']) 
+        }}
+
+        <div class="col-sm-10">
+            {{ Form::text('loan_rate', null, [
                 'placeholder' => 'ตัวอย่าง: 0-100',
                 'autocomplete'=>'off',
                 'class'=>'form-control'])
