@@ -34,6 +34,14 @@
         <div class="box box-primary">
             <div class="box-header with-border">
                 <h3 class="box-title">แก้อัตราเงินปันผลประจำปี</h3>
+
+                <div class="btn-group pull-right">
+                    <button type="button" class="btn btn-danger btn-xs"
+                        data-tooltip="true" title="ลบ"
+                        onclick="javascript:return confirm('คุณต้องการลบรายการนี้ใช่ไหม ?');">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
             </div>
             <!-- /.box-header -->
 

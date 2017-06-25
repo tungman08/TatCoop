@@ -1,7 +1,7 @@
 <div class="table-responsive">
     <table class="table table-info">
         <tr>
-            <th style="width:20%; border-top-color: #fff;">ประเภท:</th>
+            <th style="width:30%; border-top-color: #fff;">ประเภท:</th>
             <td style="border-top-color: #fff;">{{ $loantype->name }}</td>
         </tr>
         <tr>

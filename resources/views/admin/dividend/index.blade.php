@@ -51,40 +51,19 @@
                         <thead>
                             <tr>
                                 <th style="width: 10%;">#</th>
-                                <th style="width: 15%;">ปี พ.ศ.</th>
-                                <th style="width: 25%;">อัตราเงินปันผล</th>
-                                <th style="width: 25%;">อัตราเงินเฉลี่ยคืน</th>
-                                <th style="width: 25%;"><i class="fa fa-gear"></i></th>
+                                <th style="width: 30%;">ปี พ.ศ.</th>
+                                <th style="width: 30%;">อัตราเงินปันผล</th>
+                                <th style="width: 30%;">อัตราเงินเฉลี่ยคืน</th>
                             </tr>
                         </thead>
                         <tbody>
                             @eval($count = 0)
                             @foreach($dividends->sortByDesc('rate_year') as $dividend)
-                            <tr>
+                            <tr style="cursor: pointer;" onclick="javascript: window.location = '{{ url('/admin/dividend/' . $dividend->id . '/edit') }}';">
                                 <td>{{ ++$count }}</td>
                                 <td class="text-primary">ปี {{ $dividend->rate_year + 543 }}</td>
                                 <td>{{ number_format($dividend->shareholding_rate, 1, '.', ',') }} %</td>
                                 <td>{{ number_format($dividend->loan_rate, 1, '.', ',') }} %</td>
-                                <td>
-                                    <div class="btn-group">
-                                        {{ Form::open(['url' => '/admin/dividend/' . $dividend->id, 'method' => 'delete']) }}
-                                            {{ Form::button('<i class="fa fa-edit"></i>', [
-                                                'class'=>'btn btn-default btn-flat btn-xs', 
-                                                'data-tooltip'=>'true',
-                                                'title'=>'แก้ไข',
-                                                'onclick'=>"javascript:window.location.href = '" . url('/admin/dividend/' . $dividend->id . '/edit') . "';"])
-                                            }}
-
-                                            {{ Form::button('<i class="fa fa-trash"></i>', [
-                                                'type'=>'submit',
-                                                'class'=>'btn btn-default btn-flat btn-xs', 
-                                                'data-tooltip'=>'true',
-                                                'title'=>'ลบ',
-                                                'onclick'=>"javascript:return confirm('คุณต้องการลบรายการนี้ใช่ไหม ?');"])
-                                            }}
-                                        {{ Form::close() }}
-                                    </div>                             
-                                </td>
                             </tr>
                             @endforeach
                         </tbody>

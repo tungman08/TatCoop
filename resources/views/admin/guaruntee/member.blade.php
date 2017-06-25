@@ -48,8 +48,8 @@
                                 <th style="width: 10%;">รหัสสมาชิก</th>
                                 <th style="width: 20%;">ชื่อสมาชิก</th>
                                 <th style="width: 20%;">ประเภทสมาชิก</th>
-                                <th style="width: 25%;">จำนวนสัญญาเงินกู้ที่ค้ำ</th>
-                                <th style="width: 25%;">จำนวนเงินที่ค้ำประกัน</th>
+                                <th style="width: 25%;">จำนวนหุ้นที่ค้ำประกันตนเอง</th>
+                                <th style="width: 25%;">จำนวนหุ้นที่ค้ำประกันผู้อื่น</th>
                             </tr>
                         </thead>
                     </table>
@@ -114,8 +114,8 @@
                 { "data": "code" },
                 { "data": "fullname" },
                 { "data": "typename" },
-                { "data": "loans" },
-                { "data": "amount" }
+                { "data": "yourself" },
+                { "data": "other" }
             ]
         });   
 

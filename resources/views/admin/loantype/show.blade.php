@@ -95,10 +95,10 @@
                         <tbody>
                             @php
                                 $count = 0;
-                                $loans = $loantype->loans->filter(function ($value, $key) { return !is_null($value->code); });
+                                $loans = $loantype->loans->filter(function ($value, $key) { return !empty($value->code); });
                             @endphp
                             @foreach($loans as $loan)
-                                <tr>
+                                <tr onclick="javascript: document.location = '{{ url('/service/' . $loan->member->id . '/loan/' . $loan->id) }}';">
                                     <td>{{ ++$count }}</td>
                                     <td class="text-primary"><i class="fa fa-credit-card fa-fw"></i> {{ $loan->code }}</td>
                                     <td>{{ $loan->member->profile->fullName }}</td>

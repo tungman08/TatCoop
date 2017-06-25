@@ -40,10 +40,14 @@
             
             <div class="box-body">
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-6">
                         {{ $surety->profile->fullName }}
+
+                        @if ($surety->pivot->yourself)
+                            <span>(ค้ำประกันด้วยหุ้นตนเอง)</span>
+                        @endif
                     </div>
-                    <div class="col-md-3 text-right">
+                    <div class="col-md-6 text-right">
                         {{ number_format($surety->pivot->amount, 2, '.', ',') }} บาท
                     </div>
                 </div>

@@ -79,6 +79,10 @@
 
     <script>
     $(document).ready(function () {
+        $.ajaxSetup({
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+        });
+
         $('[data-tooltip="true"]').tooltip();
         $(".ajax-loading").css("display", "none");
 
@@ -88,7 +92,7 @@
                 "processing": true,
                 "serverSide": true,
                 "url": "/ajax/members",
-                "type": "get",
+                "type": "post",
                 "data": {
                     "type": "inactive"
                 },
@@ -113,7 +117,7 @@
         });   
 
         $('#dataTables-users tbody').on('click', 'tr', function() {
-            document.location = '/admin/member/' + parseInt($(this).children("td").first().html());            
+            document.location = '/service/member/' + parseInt($(this).children("td").first().html());           
         });           
     });
     </script>

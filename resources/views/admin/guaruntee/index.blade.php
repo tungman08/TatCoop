@@ -19,27 +19,29 @@
         <!-- Info boxes -->
         <div class="well">
             <h4>รายละเอียดข้อมูลการค้ำประกัน</h4>
-            @php($surety = $member->sureties->filter(function ($value, $key) use ($member) { return is_null($value->completed_at) && $value->member_id != $member->id; })->count())
 
             <div class="table-responsive">
                 <table class="table table-info">
                     <tr>
                         <th style="width:20%;">ชื่อผู้ค้ำประกัน:</th>
-                        <td>{{ $member->profile->fullName }}</td>
+                        <td>{{ ($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' : $member->profile->fullName }}</td>
                     </tr>
                     <tr>
-                        <th>จำนวนสัญญาเงินกู้ที่ค้ำประกัน:</th>
-                        <td>{{ ($surety > 0) ? number_format($surety, 0, '.', ',') . ' สัญญา (ที่กำลังอยู่ในระหว่างผ่อนชำระ)' : '-' }}</td>
+                        <th>จำนวนหุ้นที่ใช้ค้ำประกันตนเอง:</th>
+                        @php($sureties = $member->sureties->filter(function ($value, $key) use ($member) { return is_null($value->completed_at) && $value->member_id == $member->id; }))
+                        <td>{{ ($sureties->count()) > 0 ? number_format(LoanCalculator::sureties_balance($sureties), 2, '.', ',') . '/' . number_format($sureties->sum('pivot.amount'), 2, '.', ',') . ' บาท (จากสัญญาเงินกู้ที่อยู่ในระหว่างผ่อนชำระจำนวน ' . number_format($sureties->count(), 0, '.', ',') . ' สัญญา)' : '-' }}</td>
                     </tr>
                     <tr>
-                        <th>ใช้หุ้นค้ำประกันตนเองไปแล้ว:</th>
-                        @php
-                            $available = $member->shareHoldings->sum('amount') * 0.8;
-                            $surety = $member->sureties->filter(function ($value, $key) use ($member) { return is_null($value->completed_at) && $value->member_id == $member->id; })->sum('pivot.amount');
-                        @endphp
+                        <th>จำนวนหุ้นที่ใช้คำประกันผู้อื่น:</th>
+                        @php($sureties = $member->sureties->filter(function ($value, $key) use ($member) { return !is_null($value->code) && is_null($value->completed_at) && $value->member_id != $member->id; }))
+                        <td>{{ ($sureties->count() > 0) ? number_format(LoanCalculator::sureties_balance($sureties), 2, '.', ',') . '/' . number_format($sureties->sum('pivot.amount'), 2, '.', ',') . ' บาท (จากสัญญาเงินกู้ที่อยู่ในระหว่างผ่อนชำระจำนวน ' . number_format($sureties->count(), 0, '.', ',') . ' สัญญา)' : '-' }}</td>
+                    </tr>
+                    <tr>
+                        <th>คงเหลือหุ้นที่สามารถใช้ค้ำประกันได้:</th>
+                        @php($available = LoanCalculator::shareholding_available($member))
                         <td>
-                            {{ number_format($surety, 2, '.', ',') }}/{{ number_format($available, 2, '.', ',') }} บาท {{ ($surety > 0) ? '(ใช้ค้ำประกันไปแล้ว ' . number_format(100 * $surety / $available, 2, '.', ',') . '%)' : '' }}
-                            <span class="text-muted" style="cursor: pointer;" data-tooltip="true" title="มาจาก 80% ของเงินค่าหุ้นสะสมทั้งหมด"><i class="fa fa-info-circle"></i></span>
+                            {{ number_format($available, 2, '.', ',') }}/{{ number_format($member->shareholdings->sum('amount') * 0.8, 2, '.', ',') }} บาท
+                            <span class="text-muted" style="cursor: pointer;" data-tooltip="true" title="มาจาก 80% ของหุ้น - (ยอดที่ใช้ค้ำ * % หนี้คงเหลือ)"><i class="fa fa-info-circle"></i></span>
                         </td>
                     </tr>        
                 </table>
@@ -93,24 +95,22 @@
                                 <th style="width: 25%;">ชื่อผู้กู้</th>
                                 <th style="width: 10%;">วันที่กู้</th>
                                 <th style="width: 15%;">วงเงินที่กู้</th>
-                                <th style="width: 15%;">จำนวนเงินค้ำประกัน</th>
+                                <th style="width: 15%;">จำนวนหุ้นที่ค้ำประกันคงเหลือ</th>
                                 <th style="width: 10%;">สถานะ</th>
                             </tr>
                         </thead>
                         <tbody>
                             @php($count = 0)
                             @foreach($member->sureties as $loan)
-                                @if ($loan->member->id <> $member->id)
-                                    <tr onclick="javascript: document.location = '{{ url('service/' . $loan->member->id . '/loan/' . $loan->id) }}';" style="cursor: pointer;">
-                                        <td>{{ ++$count }}</td>
-                                        <td class="text-primary"><i class="fa fa-file-text-o fa-fw"></i> {{ $loan->code }}</td>
-                                        <td>{{ $loan->member->profile->fullName }}</td>
-                                        <td>{{ Diamond::parse($loan->loaned_at)->thai_format('j M Y') }}</td>
-                                        <td>{{ number_format($loan->outstanding, 2, '.', ',') }}</td>
-                                        <td>{{ number_format($loan->pivot->amount, 2, '.', ',') }}</td>
-                                        <td class="{{ is_null($loan->completed_at) ? 'text-danger' : 'text-success' }}">{{ is_null($loan->completed_at) ? 'กำลังผ่อนชำระ' : 'ผ่อนชำระหมดแล้ว' }}</td>
-                                    </tr>
-                                @endif
+                                <tr onclick="javascript: document.location = '{{ url('service/' . $loan->member->id . '/loan/' . $loan->id) }}';" style="cursor: pointer;">
+                                    <td>{{ ++$count }}</td>
+                                    <td class="text-primary"><i class="fa fa-file-text-o fa-fw"></i> {{ $loan->code }}</td>
+                                    <td>{{ $loan->member->profile->fullName }}</td>
+                                    <td>{{ Diamond::parse($loan->loaned_at)->thai_format('j M Y') }}</td>
+                                    <td>{{ number_format($loan->outstanding, 2, '.', ',') }}</td>
+                                    <td>{{ number_format(LoanCalculator::surety_balance($loan), 2, '.', ',') . '/' .number_format($loan->pivot->amount, 2, '.', ',') }} บาท</td>
+                                    <td>{!! (!is_null($loan->completed_at)) ? '<span class="label label-success">ปิดยอดแล้ว</span>' : '<span class="label label-danger">กำลังผ่อนชำระ</span>' !!}</td>
+                                </tr>
                             @endforeach
                         </tbody>
                     </table>

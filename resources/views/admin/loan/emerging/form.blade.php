@@ -18,19 +18,19 @@
         
     @if ($step == 1)
         <div class="row setup-content" id="step-1">
-            @include('admin.loan.normal.employee.step1')
+            @include('admin.loan.emerging.step1')
         </div>
     @endif
 
     @if ($step == 2)
         <div class="row setup-content" id="step-2">
-            @include('admin.loan.normal.employee.step2')
+            @include('admin.loan.emerging.step2')
         </div>
     @endif
 
     @if ($step == 3)
         <div class="row setup-content" id="step-3">
-            @include('admin.loan.normal.employee.step3')
+            @include('admin.loan.emerging.step3')
         </div>
     @endif
 </div>

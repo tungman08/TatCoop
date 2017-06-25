@@ -17,7 +17,7 @@
                 @forelse ($knowledges as $item)
                     <div class="col-sm-3 col-lg-3 col-md-3">
                         <div class="thumbnail">
-                            <img src="{{ ($item->attachments()->count() == 0) ? asset('images/320x150.png') : url('/attachment/' . $item->attachments()->where('attach_type', 'document')->first()->file) }}" alt="" style="max-height: 122px;">
+                            <img src="{{ ($item->attachments()->where('attach_type', 'photo')->count() == 0) ? asset('images/320x150.png') : url('/attachment/' . $item->attachments()->where('attach_type', 'photo')->first()->file) }}" alt="" style="max-height: 122px;">
                             <div class="caption">
                                 <h4 class="pull-right">&nbsp;</h4>
                                 <h4>

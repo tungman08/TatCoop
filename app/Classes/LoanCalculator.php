@@ -70,6 +70,40 @@ class LoanCalculator {
         }
     }
 
+    public function shareholding_available($member) {
+        $shareholding = $member->shareholdings->sum('amount') * 0.8;
+        $sureties = 0;
+
+        foreach ($member->sureties->filter(function ($value, $key) { return !is_null($value->code) && is_null($value->completed_at); }) as $loan) {
+            $surety = $loan->pivot->amount;
+            $outstanding = $loan->outstanding;
+            $pay = $loan->payments->sum('principle');
+            $sureties += $surety * (($outstanding - $pay) / $outstanding);
+        }
+
+        return $shareholding - $sureties;
+    }
+
+    public function sureties_balance($sureties) {
+        $balance = 0;
+
+        foreach ($sureties->filter(function ($value, $key) { return !is_null($value->code) && is_null($value->completed_at); }) as $loan) {
+            $surety = $loan->pivot->amount;
+            $outstanding = $loan->outstanding;
+            $pay = $loan->payments->sum('principle');
+            $balance += $surety * (($outstanding - $pay) / $outstanding);
+        }
+
+        return $balance;
+    }
+
+    public function surety_balance($surety) {
+        $outstanding = $surety->outstanding;
+        $pay = $surety->payments->sum('principle');
+
+        return $surety->pivot->amount * (($outstanding - $pay) / $outstanding);
+    }
+
     protected function payment_general($rate, $outstanding, $period, Diamond $start) {
         $data = [];
         $forward = $outstanding;

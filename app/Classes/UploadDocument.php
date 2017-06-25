@@ -83,6 +83,7 @@ class UploadDocument
         if ($document->position != $position) {
             $start = ($document->position > $position) ? $position : $document->position;
             $end = ($document->position > $position) ? $document->position : $position;
+            $direction = ($carousel->position > $position) ? 'down' : 'up';
 
             $friends = Document::where('document_type_id', $document->document_type_id)
                 ->whereBetween('position', [$start, $end])
@@ -90,7 +91,12 @@ class UploadDocument
                 ->get();
 
             foreach ($friends as $friend) {
-                $friend->update(['position' => ($document->position > $index) ? $friend->position + 1 : $friend->position - 1]);
+                if ($direction == 'up') {
+                    $friend->update(['position' => ($document->position > $index) ? $friend->position + 1 : $friend->position - 1]);
+                }
+                else {
+                    $friend->update(['position' => ($document->position >= $index) ? $friend->position + 1 : $friend->position - 1]);
+                }
             }
 
             $document->update(['position' => $position]);
@@ -138,13 +144,19 @@ class UploadDocument
         $position = $index + 1;
         $start = ($carousel->position > $position) ? $position : $carousel->position;
         $end = ($carousel->position > $position) ? $carousel->position : $position;
+        $direction = ($carousel->position > $position) ? 'down' : 'up';
 
         $friends = Carousel::whereBetween('position', [$start, $end])
             ->where('id', '<>', $id)
             ->get();
 
         foreach ($friends as $friend) {
-            $friend->update(['position' => ($carousel->position > $index) ? $friend->position + 1 : $friend->position - 1]);
+            if ($direction == 'up') {
+                $friend->update(['position' => ($carousel->position > $index) ? $friend->position + 1 : $friend->position - 1]);
+            }
+            else {
+                $friend->update(['position' => ($carousel->position >= $index) ? $friend->position + 1 : $friend->position - 1]);
+            }
         }
 
         $carousel->update(['position' => $position]);

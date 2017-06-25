@@ -25,25 +25,6 @@
             @include('admin.loan.info', ['member' => $member])
         </div>
 
-        <div class="box box-default collapsed-box">
-            <div class="box-header with-border">
-                <h3 class="box-title"><i class="fa fa-credit-card fa-fw"></i> รายละเอียดประเภทสินเชื่อเงินกู้</h3>
-
-                <div class="box-tools pull-right">
-                    <button type="button" class="btn btn-box-tool" data-widget="collapse">
-                        <i class="fa fa-plus"></i>
-                    </button>
-                </div>
-            </div>
-            <!-- /.box-title -->
-
-            <div class="box-body">
-                @include('admin.loan.loantype', ['loantype' => $loantype])
-            </div>          
-            <!-- /.box-body -->
-        </div>
-        <!-- /.box -->
-
         @if ($errors->count() > 0)
             <div class="alert alert-danger alert-dismissible">
                 <button type="button" class="close" aria-hidden="true" data-dismiss="alert" data-toggle="tooltip" title="Close">×</button>
@@ -52,21 +33,55 @@
             </div>
         @endif
 
-        <div class="box box-primary">
-            <div class="box-header with-border">
-                <h3 class="box-title"><i class="fa fa-file-text-o fa-fw"></i> ทำสัญญาเงินกู้ประเภทกู้สามัญ สำหรับพนักงาน/ลูกจ้าง ททท.</h3>
+        <div class="row">      
+            <div class="col-md-8">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"><i class="fa fa-file-text-o fa-fw"></i>
+                        @if ($member->profile->employee->employee_type_id < 3)
+                            ทำสัญญาเงินกู้ประเภทกู้สามัญ สำหรับพนักงาน/ลูกจ้าง ททท.
+                        @else
+                            ทำสัญญาเงินกู้ประเภทกู้สามัญ สำหรับบุคคลภายนอก
+                        @endif
+                        </h3>
+                    </div>
+                    <!-- /.box-header -->
+
+                    <!-- form start -->
+                    {{ Form::open(['url' => '/service/' . $member->id . '/loan/' . $loantype->id . '/create/normal', 'method' => 'post', 'class' => 'form-horizontal']) }}
+                        {{ Form::hidden('member_id', $member->id, ['id' => 'member_id']) }}
+                        {{ Form::hidden('loan_id', $loan_id, [ 'id' => 'loan_id' ]) }}
+
+                        @include('admin.loan.normal.form')
+                    {{ Form::close() }}
+                </div>
+                <!-- /.box -->
             </div>
-            <!-- /.box-header -->
+            <!-- ./col -->
 
-            <!-- form start -->
-            {{ Form::open(['url' => '/service/' . $member->id . '/loan/' . $loantype->id . '/create/normal/employee', 'method' => 'post', 'class' => 'form-horizontal']) }}
-                {{ Form::hidden('member_id', $member->id, ['id' => 'member_id']) }}
-                {{ Form::hidden('loan_id', $loan_id, [ 'id' => 'loan_id' ]) }}
+            <div class="col-md-4">
+                <div class="box box-default">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"><i class="fa fa-credit-card fa-fw"></i> รายละเอียดประเภทสินเชื่อเงินกู้</h3>
 
-                @include('admin.loan.normal.employee.form')
-            {{ Form::close() }}
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- /.box-title -->
+
+                    <div class="box-body">
+                        @include('admin.loan.loantype', ['loantype' => $loantype])
+                    </div>          
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- ./col -->
         </div>
-        <!-- /.box -->
+        <!-- ./row -->
 
     </section>
     <!-- /.content -->
@@ -182,9 +197,6 @@
         });
 
         $("[data-mask]").inputmask();
-        //$('form').submit(function() {
-        //    $("[data-mask]").inputmask('remove');
-        //});
 
         $('#check_surety').click(function () {
             var member_id = parseInt($('#member_id').val(), 10);
@@ -206,13 +218,13 @@
             var salary = parseInt($('#surety_salary').val(), 10);
             var netSalary = parseInt($('#surety_net_salary').val(), 10);
             var amount = parseInt($('#surety_amount').val(), 10);
-            var yourself = (parseInt($('#yourself').val(), 10) == 1) ? true : false;
+            var yourself = $('#yourself').val();
 
             if (yourself && !amount || !yourself && (!salary || !netSalary || !amount)) {
                 alert('กรุณาป้อนข้อมูลในครบก่อนก่อน');
             }
             else {
-                addSurety(loan_id, surety_id, salary, netSalary, amount, yourself);
+                addSurety(loan_id, surety_id, salary, netSalary, amount);
                 $('#addSurety').modal('hide');
             }
         });
@@ -232,13 +244,6 @@
             calculate(loan, $('#loan_id').val());
         }
     });
-
-    function isNumberKey(evt){
-        var charCode = (evt.which) ? evt.which : event.keyCode
-        if (charCode > 31 && (charCode < 48 || charCode > 57))
-            return false;
-        return true;
-    }     
 
     function checkSurety(member_id, loan_id, surety_id) {
         var formData = new FormData();
@@ -267,21 +272,21 @@
 
                 if (surety.id > 0) {
                     if (surety.yourself) {
-                        $('.salary').hide();
                         $('#surety_title').html("สมาชิกหมายเลข "  + surety.memberCode + " (" + surety.fullName + ") ค้ำประกันด้วยหุ้นตนเอง");
-                        $('#surety_loan_id').val(surety.loan_id);
-                        $('#surety_id').val(surety.id);
-                        $('#yourself').val(surety.yourself ? '1' : '0');
-                        $('#addSurety').modal('show');
+                        $('.salary').hide();
+                    }
+                    else if (!surety.employee) {
+                        $('#surety_title').html("สมาชิกหมายเลข "  + surety.memberCode + " (" + surety.fullName + ") บุคคลภายนอกใช้หุ้นค้ำ");
+                        $('.salary').hide();
                     }
                     else {
-                        $('.salary').show();
                         $('#surety_title').html("สมาชิกหมายเลข "  + surety.memberCode + " (" + surety.fullName + ")");
-                        $('#surety_loan_id').val(surety.loan_id);
-                        $('#surety_id').val(surety.id);
-                        $('#yourself').val(surety.yourself ? '1' : '0');
-                        $('#addSurety').modal('show');
+                        $('.salary').show();
                     }
+
+                    $('#surety_loan_id').val(surety.loan_id);
+                    $('#surety_id').val(surety.id);
+                    $('#addSurety').modal('show');
                 }
                 else {
                     alert(surety.message);
@@ -290,14 +295,13 @@
         });
     }
 
-    function addSurety(loan_id, member_id, salary, netSalary, amount, yourself) {
+    function addSurety(loan_id, member_id, salary, netSalary, amount) {
         var formData = new FormData();
             formData.append('loan_id', loan_id);
             formData.append('member_id', member_id);
             formData.append('salary', salary);
             formData.append('netSalary', netSalary);
             formData.append('amount', amount);
-            formData.append('yourself', yourself);
 
         $.ajax({
             dataType: 'json',
@@ -317,22 +321,33 @@
             success: function(result) {
                 $(".ajax-loading").css("display", "none");
 
-                var surety = '<div id="surety_' + result.id + '" class="box box-primary" style="border-left: 1px solid #d2d6de; border-right: 1px solid #d2d6de;">';
-                    surety += '<div class="box-header with-border">';
-                    surety += '<h4 class="box-title" style="font-size: 14px; font-weight: 700;">ผู้ค้ำประกัน</h4>';
-                    surety += '<div class="box-tools pull-right">';
-                    surety += '<button type="button" class="btn btn-box-tool" onclick="javascript:var result = confirm(\'คุณต้องการลบผู้ค้ำประกันรายนี้ใช่ไหม?\'); if (result) { removeSurety(' + result.loan_id + ', ' + result.id + '); }"><i class="fa fa-times"></i></button>';
-                    surety += '</div>';
-                    surety += '</div>';
-                    surety += '<div class="box-body">';
-                    surety += '<div class="row">';
-                    surety += '<div class="col-md-3">' + result.name + '</div>';
-                    surety += '<div class="col-md-3 text-right">' + result.amount + ' บาท</div>';
-                    surety += '</div>';
-                    surety += '</div>';
-                    surety += '</div>';
+                if (result.id > 0) {
+                    var surety = '<div id="surety_' + result.id + '" class="box box-primary" style="border-left: 1px solid #d2d6de; border-right: 1px solid #d2d6de;">';
+                        surety += '<div class="box-header with-border">';
+                        surety += '<h4 class="box-title" style="font-size: 14px; font-weight: 700;">ผู้ค้ำประกัน</h4>';
+                        surety += '<div class="box-tools pull-right">';
+                        surety += '<button type="button" class="btn btn-box-tool" onclick="javascript:var result = confirm(\'คุณต้องการลบผู้ค้ำประกันรายนี้ใช่ไหม?\'); if (result) { removeSurety(' + result.loan_id + ', ' + result.id + '); }"><i class="fa fa-times"></i></button>';
+                        surety += '</div>';
+                        surety += '</div>';
+                        surety += '<div class="box-body">';
+                        surety += '<div class="row">';
+                        surety += '<div class="col-md-6">' + result.name;
+                        
+                        if (result.yourself) {
+                            surety += ' <span>(ค้ำประกันด้วยหุ้นตนเอง)</span>';
+                        }
 
-                $('#sureties').append(surety);
+                        surety += '</div>';
+                        surety += '<div class="col-md-6 text-right">' + result.amount + ' บาท</div>';
+                        surety += '</div>';
+                        surety += '</div>';
+                        surety += '</div>';
+
+                    $('#sureties').append(surety);
+                }
+                else {
+                    alert(result.message);
+                }
             }
         });
     }
@@ -427,6 +442,13 @@
         $('#surety_net_salary').val('');
         $('#surety_amount').val('');
     }
+
+    function isNumberKey(evt){
+        var charCode = (evt.which) ? evt.which : event.keyCode
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+        return true;
+    }    
 
     function number_format(n, dp){
         var w = n.toFixed(dp), k = w|0, b = n < 0 ? 1 : 0,

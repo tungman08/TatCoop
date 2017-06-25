@@ -141,11 +141,13 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
         // Loan Route...
         Route::get('loan/member', ['as' => 'service.loan.member', 'uses' => 'LoanController@getMember']);
         Route::get('{member_id}/loan/{loantype_id}/create', ['as' => 'service.loan.create', 'uses' => 'LoanController@getCreateLoan']);
-        Route::get('{member_id}/loan/{loantype_id}/create/normal/employee', ['as' => 'service.loan.create.normal.employee', 'uses' => 'LoanController@getCreateNormalEmployeeLoan']);
-        Route::get('{member_id}/loan/{loantype_id}/create/normal/outsider', ['as' => 'service.loan.create.normal.outsider', 'uses' => 'LoanController@getCreateNormalOutsiderLoan']);
+        Route::get('{member_id}/loan/{loantype_id}/create/normal', ['as' => 'service.loan.create.normal', 'uses' => 'LoanController@getCreateNormalLoan']);
         Route::get('{member_id}/loan/{loantype_id}/create/emerging', ['as' => 'service.loan.create.emerging', 'uses' => 'LoanController@getCreateEmergingLoan']);
         Route::get('{member_id}/loan/{loantype_id}/create/special', ['as' => 'service.loan.create.special', 'uses' => 'LoanController@getCreateSpecialLoan']);
-        Route::post('{member_id}/loan/{loantype_id}/create/normal/employee', 'LoanController@postCreateLoan');
+        Route::get('{member_id}/loan/refinance', ['as' => 'service.loan.refinance', 'uses' => 'LoanController@getRefinance']);
+        Route::post('{member_id}/loan/{loantype_id}/create/normal', 'LoanController@postCreateLoan');
+        Route::post('{member_id}/loan/{loantype_id}/create/emerging', 'LoanController@postCreateLoan');
+        Route::post('{member_id}/loan/{loantype_id}/create/special', 'LoanController@postCreateLoan');
         Route::resource('{member_id}/loan', 'LoanController');
         
         // Payment Route...

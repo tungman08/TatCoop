@@ -22,15 +22,15 @@
 
             <div class="table-responsive">
                 @php
-                    $loansCount = $member->loans->filter(function ($value, $key) { return is_null($value->completed_at); })->count();
-                    $outstanding = $member->loans->filter(function ($value, $key) { return is_null($value->completed_at); })->sum('outstanding');
-                    $principle = $member->loans->filter(function ($value, $key) { return is_null($value->completed_at); })->sum('payments.principle');
+                    $loansCount = $member->loans->filter(function ($value, $key) { return !is_null($value->code) && is_null($value->completed_at); })->count();
+                    $outstanding = $member->loans->filter(function ($value, $key) { return !is_null($value->code) && is_null($value->completed_at); })->sum('outstanding');
+                    $principle = $member->loans->filter(function ($value, $key) { return !is_null($value->code) && is_null($value->completed_at); })->sum('payments.principle');
                 @endphp
 
                 <table class="table table-info">
                     <tr>
                         <th style="width:20%;">ชื่อผู้สมาชิก:</th>
-                        <td>{{ $member->profile->fullName }}</td>
+                        <td>{{ ($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' : $member->profile->fullName }}</td>
                     </tr>
                     <tr>
                         <th>วงเงินที่กู้ที่กำลังผ่อนชำระทั้งหมด:</th>
@@ -125,9 +125,9 @@
                                 <td>{{ $loan->loanType->name }}</td>
                                 <td>{{ Diamond::parse($loan->loaned_at)->thai_format('j M Y') }}</td>
                                 <td>{{ number_format($loan->outstanding, 2, '.', ',') }}</td>
-                                <td>{{ number_format($loan->period, 0, '.', ',') }}</td>
-                                <td>{{ number_format($loan->payments->count(), 0, '.', ',') }}</td>
-                                <td class="{{ (!is_null($loan->completed_at)) ? 'text-success' : 'text-danger' }}">{{ (!is_null($loan->completed_at)) ? 'ปิดยอดแล้ว' : 'กำลังผ่อนชำระ' }}</td>
+                                <td>{{ number_format($loan->payments->count(), 0, '.', ',') }}/{{ number_format($loan->period, 0, '.', ',') }}</td>
+                                <td>{{ number_format($loan->payments->sum('principle'), 2, '.', ',') }}</td>
+                                <td>{!! (!is_null($loan->completed_at)) ? '<span class="label label-success">ปิดยอดแล้ว</span>' : '<span class="label label-danger">กำลังผ่อนชำระ</span>' !!}</td>
                             </tr>
                             @endforeach
                         </tbody>

@@ -74,7 +74,7 @@
                                 <td class="text-primary"><i class="fa fa-credit-card fa-fw"></i> {{ $type->name }}</td>
                                 <td>{{ (Diamond::minValue()->diffInDays(Diamond::parse($type->start_date)) > 0) ? Diamond::parse($type->start_date)->thai_format('j M Y') : 'N/A' }}</td>
                                 <td>{{ (Diamond::maxValue()->diffInDays(Diamond::parse($type->expire_date)) > 0) ? Diamond::parse($type->expire_date)->thai_format('j M Y') : 'N/A' }}</td>
-                                <td>{{ number_format($type->loans->filter(function ($value, $key) { return !is_null($value->code); })->count()) }}</td>
+                                <td>{{ number_format($type->loans->filter(function ($value, $key) { return !empty($value->code); })->count()) }}</td>
                             </tr>
                             @endforeach
                         </tbody>
