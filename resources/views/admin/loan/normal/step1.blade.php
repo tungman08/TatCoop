@@ -41,7 +41,7 @@
     }}
 </div>
 
-@if ($member->profile->employee->employee_type_id < 3)
+@if ($member->profile->employee->employee_type_id == 1)
     <div class="form-group">
         {{ Form::label('salary', 'เงินเดือนของผู้กู้', [
             'class'=>'control-label']) 

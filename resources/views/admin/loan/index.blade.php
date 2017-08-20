@@ -122,7 +122,7 @@
                                 style="cursor: pointer;">
                                 <td>{{ ++$count }}</td>
                                 <td class="text-primary"><i class="fa fa-file-text-o fa-fw"></i> {{ $loan->code }}</td>
-                                <td>{{ $loan->loanType->name }}</td>
+                                <td><span class="label label-primary">{{ $loan->loanType->name }}</span></td>
                                 <td>{{ Diamond::parse($loan->loaned_at)->thai_format('j M Y') }}</td>
                                 <td>{{ number_format($loan->outstanding, 2, '.', ',') }}</td>
                                 <td>{{ number_format($loan->payments->count(), 0, '.', ',') }}/{{ number_format($loan->period, 0, '.', ',') }}</td>

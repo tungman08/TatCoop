@@ -75,6 +75,7 @@
        <div class="box box-primary">
             <div class="box-header with-border">
                 <h3 class="box-title"><i class="fa fa-credit-card"></i> เพิ่มการชำระเงินกู้ (คำนวณดอกเบี้ยตั้งแต่ {{ ($loan->payments->count() > 0) ? Diamond::parse($loan->payments->max('pay_date'))->thai_format('d M Y') : Diamond::parse($loan->loaned_at)->thai_format('d M Y') }} ถึง {{ Diamond::today()->thai_format('d M Y') }})</h3>
+                <input type="hidden" id="loan_id" value="{{ $loan->id }}" />
             </div>
             <!-- /.box-header -->
 
@@ -109,12 +110,56 @@
     {!! Html::script(elixir('js/bootstrap-datetimepicker.js')) !!}
 
     <script>
-    $('#datepicker').datetimepicker({
-        locale: 'th',
-        viewMode: 'days',
-        format: 'YYYY-MM-DD',
-        locale: moment().lang('th'),
-        useCurrent: false
-    });
+        $(document).ready(function () {
+            $.ajaxSetup({
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+            });
+
+            $('#datepicker').datetimepicker({
+                locale: 'th',
+                viewMode: 'days',
+                format: 'YYYY-MM-DD',
+                locale: moment().lang('th'),
+                useCurrent: false
+            });
+
+            $('#calculate').click(function () {
+                calculateLoan($(this).data('id'));
+            });
+        });
+
+        function calculateLoan(id) {
+            var date = $('#pay_date').val();
+
+            if (date != '') {
+                var formData = new FormData();
+                    formData.append('loan_id', $('#loan_id').val());
+                    formData.append('pay_date', moment(date));
+                    formData.append('pay_amount', $('#amount').val());
+
+                $.ajax({
+                    dataType: 'json',
+                    url: '/ajax/calculate',
+                    type: 'post',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    beforeSend: function() {
+                        $(".ajax-loading").css("display", "block");
+                    },
+                    success: function(result) {
+                        $(".ajax-loading").css("display", "none");
+
+                        $('#principle').val($.number(result.principle, 2));
+                        $('#interest').val($.number(result.interest, 2));
+                        $('#total').val($.number(result.total, 2));
+                        $('#remark').val(result.remark);
+                    }
+                });
+            }
+            else {
+                alert('กรุณาเลือกวันที่จากปฏิทิน');
+            }
+        }
     </script>
 @endsection

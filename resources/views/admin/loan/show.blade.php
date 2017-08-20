@@ -89,6 +89,19 @@
                         <i class="fa fa-plus-circle fa-fw"></i> ชำระเงิน
                     </button>
                 </div>
+                <div class="btn-group">
+                    <button id="create_loan" class="btn btn-primary btn-flat" style="margin-bottom: 15px;"
+                        onclick="javascript:window.location.href = '{{ url('/service/' . $member->id . '/loan/' . $loan->id . '/payment/close') }}';">
+                        <i class="fa fa-plus-circle fa-fw"></i> ปิดยอดเงินกู้
+                    </button>
+                </div>
+
+                <div class="btn-group pull-right">
+                    <button id="calculate_payment" class="btn btn-default btn-flat" style="margin-bottom: 15px;"
+                        onclick="javascript:window.location.href = '{{ url('/service/' . $member->id . '/loan/' . $loan->id . '/payment/calculate') }}';">
+                        <i class="fa fa-calculator fa-fw"></i> คำนวณยอดเงินที่ต้องการปิดยอดเงินกู้
+                    </button>
+                </div>
 
                 <div class="table-responsive" style=" margin-top: 10px;">
                     <table id="dataTables-payment" class="table table-hover dataTable" width="100%">

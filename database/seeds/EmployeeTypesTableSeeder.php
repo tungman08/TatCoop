@@ -12,9 +12,8 @@ class EmployeeTypesTableSeeder extends Seeder
     public function run()
     {
         $array = [
-            ['name' => 'พนักงาน'],
-            ['name' => 'ลูกจ้าง ททท.'],
-            ['name' => 'บุคคลภายนอก'],
+            ['name' => 'พนักงาน/ลูกจ้าง ททท.'],
+            ['name' => 'บุคคลภายนอก']
         ];
 
         // Loop through each type above and create the record for them in the database

@@ -38,7 +38,7 @@
                 <div class="box box-primary">
                     <div class="box-header with-border">
                         <h3 class="box-title"><i class="fa fa-file-text-o fa-fw"></i>
-                        @if ($member->profile->employee->employee_type_id < 3)
+                        @if ($member->profile->employee->employee_type_id == 1)
                             ทำสัญญาเงินกู้ประเภทกู้สามัญ สำหรับพนักงาน/ลูกจ้าง ททท.
                         @else
                             ทำสัญญาเงินกู้ประเภทกู้สามัญ สำหรับบุคคลภายนอก
@@ -273,6 +273,7 @@
                 if (surety.id > 0) {
                     if (surety.yourself) {
                         $('#surety_title').html("สมาชิกหมายเลข "  + surety.memberCode + " (" + surety.fullName + ") ค้ำประกันด้วยหุ้นตนเอง");
+                        $('#yourself').val(true);
                         $('.salary').hide();
                     }
                     else if (!surety.employee) {

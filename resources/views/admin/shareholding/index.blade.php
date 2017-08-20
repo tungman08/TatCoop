@@ -40,6 +40,19 @@
             <!-- /.table-responsive --> 
         </div>
 
+        @if(Session::has('flash_message'))
+            <div class="callout {{ Session::get('callout_class') }}">
+                <h4>แจ้งข้อความ!</h4>
+                <p>
+                    {{ Session::get('flash_message') }}
+
+                    @if(Session::has('flash_link'))
+                        <a href="{{ Session::get('flash_link') }}">Undo</a>
+                    @endif
+                </p>
+            </div>
+        @endif
+
         <div class="row margin-b-md">
             <div class="col-md-5ths">
                 <button type="button" class="btn btn-block btn-primary btn-lg" onclick="javascript:window.location.href='{{ url('/service/member/' . $member->id) }}';">
@@ -86,24 +99,22 @@
                         <thead>
                             <tr>
                                 <th style="width: 10%;">#</th>
-                                <th style="width: 20%;">เดือน</th>
-                                <th style="width: 15%;">ค่าหุ้นปกติ</th>
-                                <th style="width: 15%;">ค่าหุ้นเงินสด</th>
-                                <th style="width: 15%;">รวมเป็นเงิน</th>
-                                <th style="width: 25%;">หมายเหตุ</th>
+                                <th style="width: 30%;">เดือน</th>
+                                <th style="width: 20%;">ค่าหุ้นปกติ</th>
+                                <th style="width: 20%;">ค่าหุ้นเงินสด</th>
+                                <th style="width: 20%;">รวมเป็นเงิน</th>
                             </tr>
                         </thead>
                         <tbody>
                             @eval($count = 0)
                             @foreach($shareholdings->sortByDesc('name') as $share)
                                 @eval($date = Diamond::parse($share->name))
-                                <tr onclick="javascript: document.location = '{{ url('service/' . $member->id . '/shareholding/' . $share->id . '/edit') }}';" style="cursor: pointer;">
-                                    <td>{{ ++$count }}</td>
+                                <tr onclick="javascript: document.location = '{{ url('service/shareholding/' . $member->id . '/' . $share->paydate . '/editlist') }}';" style="cursor: pointer;">
+                                    <td>{{ ++$count }}.</td>
                                     <td class="text-primary"><i class="fa fa-money fa-fw"></i> {{ $date->thai_format('F Y') }}</td>
                                     <td>{{ number_format($share->amount, 2, '.', ',') }} บาท</td>
                                     <td>{{ number_format($share->amount_cash, 2, '.', ',') }} บาท</td>
                                     <td>{{ number_format($share->amount + $share->amount_cash, 2, '.', ',') }} บาท</td>
-                                    <td>{{ !empty($share->remark) ? $share->remark : '-' }}</td>
                                 </tr>
                             @endforeach
                         </tbody>

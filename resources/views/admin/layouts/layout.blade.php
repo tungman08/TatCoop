@@ -78,6 +78,9 @@
         <!-- jQuery UI -->
         {{ Html::script(elixir('js/jquery-ui.js')) }}
 
+        <!-- jQuery Number -->
+        {{ Html::script(elixir('js/jquery.number.js')) }}
+
         <!-- Bootstrap Core JavaScript -->
         {{ Html::script(elixir('js/bootstrap.js')) }}
 

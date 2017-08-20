@@ -42,7 +42,7 @@ class ShareholdingController extends Controller
         $member = Member::find($id);
         $shareholdings = Shareholding::where('member_id', $member->id)
             ->select(
-                'id',
+                DB::raw('concat(year(pay_date), \'-\', month(pay_date), \'-1\') as paydate'),
                 DB::raw('str_to_date(concat(\'1/\', month(pay_date), \'/\', year(pay_date)), \'%d/%m/%Y\') as name'),
                 DB::raw('(sum(if(member_id = ' . $member->id . ' and shareholding_type_id = 1, amount, 0))) as amount'),
                 DB::raw('(sum(if(member_id = ' . $member->id . ' and shareholding_type_id = 2, amount, 0))) as amount_cash'),
@@ -106,6 +106,17 @@ class ShareholdingController extends Controller
         }
     }
 
+    public function getEditlist($member_id, $paydate) {
+        $pay_date = Diamond::parse($paydate);
+
+        return view('admin.shareholding.editlist', [
+            'member' => Member::find($member_id),
+            'shareholding_date' => $pay_date,
+            'shareholdings' => Shareholding::where('member_id', $member_id)->whereYear('pay_date', '=', $pay_date->year)->whereMonth('pay_date', '=', $pay_date->month)->get(),
+            'shareholding_types' => ShareholdingType::all()
+        ]);
+    }
+
     public function edit($member_id, $id) {
         return view('admin.shareholding.edit', [
             'member' => Member::find($member_id),
@@ -139,10 +150,7 @@ class ShareholdingController extends Controller
                 $shareholding->pay_date = $request->input('pay_date');
                 $shareholding->shareholding_type_id = $request->input('shareholding_type_id');
                 $shareholding->amount = $request->input('amount');
-
-                if (!empty($request->input('remark')))
-                    $shareholding->remark = $request->input('remark');
-                
+                $shareholding->remark = !empty($request->input('remark')) ? $request->input('remark') : null;
                 $shareholding->save();
 
                 $profile = Profile::find(Member::find($shareholding->member_id)->profile_id);

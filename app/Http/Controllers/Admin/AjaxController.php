@@ -641,7 +641,7 @@ class AjaxController extends Controller
             ->leftJoin('shareholdings', 'members.id', '=', 'shareholdings.member_id')
             ->whereNull('members.leave_date')
             ->where('members.shareholding', '>', 0)
-            ->where('employees.employee_type_id', '<', 3)
+            ->where('employees.employee_type_id', 1)
             ->whereDate('members.start_date', '<', $date)
             ->whereNotIn('members.id', function($query) use ($date) {
                 $query->from('shareholdings')
@@ -672,7 +672,7 @@ class AjaxController extends Controller
             ->join('employees', 'profiles.id', '=', 'employees.profile_id')
             ->join('employee_types', 'employees.employee_type_id', '=', 'employee_types.id')
             ->join('loans', 'members.id', '=', 'loans.member_id')
-            ->where('employees.employee_type_id', '<', 3)
+            ->where('employees.employee_type_id', 1)
             ->whereDate('members.start_date', '<', $date)
             ->whereNull('loans.completed_at')
             ->get();
@@ -747,7 +747,7 @@ class AjaxController extends Controller
                         $result->memberCode = $surety->memberCode;
                         $result->fullName = $surety->profile->fullName;
                         $result->yourself = true;
-                        $result->employee = $surety->profile->employee->employee_type->id < 3;
+                        $result->employee = $surety->profile->employee->employee_type->id == 1;
                     }
                     else {
                         $result = new stdClass();
@@ -771,7 +771,7 @@ class AjaxController extends Controller
                         $result->memberCode = $surety->memberCode;
                         $result->fullName = $surety->profile->fullName;
                         $result->yourself = false;
-                        $result->employee = $surety->profile->employee->employee_type->id < 3;
+                        $result->employee = $surety->profile->employee->employee_type->id == 1;
                     }
                     else {
                         $result = new stdClass();
@@ -825,7 +825,7 @@ class AjaxController extends Controller
             // ค้ำผู้อื่น
             else {
                 // พนักงาน ใช้เงินเดือน
-                if ($member->profile->employee->employee_type->id < 3) {
+                if ($member->profile->employee->employee_type->id == 1) {
                     $salary = $request->input('salary');
                     $netSalary = $request->input('netSalary');
                     $pmt = LoanCalculator::pmt($loan->loanType->rate, $loan->outstanding, $loan->period);
@@ -970,5 +970,48 @@ class AjaxController extends Controller
         }
 
         return Datatables::collection($dividends)->make(true);
+    }
+
+    public function postCalculate(Request $request) {
+        $loan = Loan::find($request->input('loan_id'));
+        $member = Member::find($loan->member_id);
+        $pay_date = Diamond::parse($request->input('pay_date'));
+        $result = new stdClass();
+
+        if ($member->profile->employee->employee_type_id == 1) {
+            // พนักงาน หักบัญชีเงินเดือน
+            $last = Diamond::parse($loan->payments->max('pay_date'));
+
+            if ($pay_date->gt($last)) {
+                // คิดออกเบี้ยปกติ
+                $summary = LoanCalculator::close_payment($loan, $pay_date);
+
+                $result->principle = $summary->principle;
+                $result->interest = $summary->interest;
+                $result->total = $summary->principle + $summary->interest;
+                $result->remark = '-';
+            }
+            else {
+                // คำนวณดอกเบี้ยใหม่ แล้วคืนส่วนต่างของดอกเบี้ยที่หักอัตโนมัติคืนลูกค้า
+                $summary = LoanCalculator::close_payment_with_refund($loan, $pay_date);
+
+                $result->principle = $summary->principle;
+                $result->interest = $summary->interest;
+                $result->total = $summary->principle + $summary->interest;
+                $refund = 0;
+                $result->remark = 'คืนเงินดอกเบี้ยจำนวน ' . number_format($refund, 2, '.', ',') . ' บาท';
+            }
+        }
+        else {
+            // บุคคลภายนอก คิดออกเบี้ยปกติ
+            $summary = LoanCalculator::close_payment($loan, $pay_date);
+               
+            $result->principle = $summary->principle;
+            $result->interest = $summary->interest;
+            $result->total = $summary->principle + $summary->interest;
+            $result->remark = '-';
+        }
+
+        return Response::json($result);
     }
 }

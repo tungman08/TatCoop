@@ -40,6 +40,20 @@ class PaymentController extends Controller
         
     }
 
+    public function getClose($member_id, $loan_id) {
+        return view('admin.payment.close', [
+            'member' => Member::find($member_id),
+            'loan' => Loan::find($loan_id)
+        ]);
+    }
+
+    public function getCalculate($member_id, $loan_id) {
+        return view('admin.payment.calculate', [
+            'member' => Member::find($member_id),
+            'loan' => Loan::find($loan_id)
+        ]);
+    }
+
     public function getAutoPayment() {
         return view('admin.payment.auto');
     }

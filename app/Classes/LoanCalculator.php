@@ -26,7 +26,7 @@ class LoanCalculator {
     }
 
     public function loan_interest(Loan $loan, Diamond $date) {
-        $dayRate = $loan->loanType->rate / 100 / LoanCalculator::DAYS_IN_YEAR;
+        $dayRate = $loan->rate / 100 / LoanCalculator::DAYS_IN_YEAR;
         $balance = $loan->outstanding - $loan->payments->sum('principle');
         $lastpay = !is_null($loan->payments->max('pay_date')) ? Diamond::parse($loan->payments->max('pay_date')) : Diamond::parse($loan->loaned_at);
         $days = $lastpay->diffInDays($date);
@@ -102,6 +102,76 @@ class LoanCalculator {
         $pay = $surety->payments->sum('principle');
 
         return $surety->pivot->amount * (($outstanding - $pay) / $outstanding);
+    }
+
+    public function close_payment($loan, Diamond $date) {
+        $dayRate = $loan->rate / 100 / LoanCalculator::DAYS_IN_YEAR;
+        $balance = $loan->outstanding - $loan->payments->sum('principle');
+        $last_payment_date = !is_null($loan->payments->max('pay_date')) ? Diamond::parse($loan->payments->max('pay_date')) : Diamond::parse($loan->loaned_at);
+        $days = $last_payment_date->diffInDays($date);
+
+        $result = new stdClass();
+        $result->principle = $balance;
+        $result->interest = $balance * $dayRate * $days;
+
+        return $result;
+    }
+
+    public function close_payment_with_refund($loan, Diamond $date) {
+        $dayRate = $loan->rate / 100 / LoanCalculator::DAYS_IN_YEAR;
+        $end_month = Diamond::now()->endOfMonth();
+
+        if ($end_month->gte($date)) {
+            // จ่ายก่อนสิ้นเดือนหรือจ่ายสิ้นเดือนพอดี คำนวณดอกเบี้ยใหม่ คืนเงินดอกเบี้ยเดิม
+           
+            if ($loan->payments->count() == 0) { // ไม่เคยจ่ายมาก่อน
+                $balance = $loan->outstanding;
+                $last_payment_date = Diamond::parse($loan->loaned_at);
+                $days = $last_payment_date->diffInDays($date);
+
+                $result = new stdClass();
+                $result->principle = $balance;
+                $result->interest = $balance * $dayRate * $days;
+                $result->refund = 0;
+
+                return $result;
+            }
+            else if ($loan->payments->count() == 1) { // จ่ายแล้ว 1 งวด
+                $last_payment = Payment::where('loan_id', $loan->id)->orderBy('pay_date', 'desc')->first();
+                $balance = $loan->outstanding;
+                $last_payment_date = Diamond::parse($loan->loaned_at);
+                $days = $last_payment_date->diffInDays($date);
+
+                $result = new stdClass();
+                $result->principle = $balance;
+                $result->interest = $balance * $dayRate * $days;
+                $result->refund = $last_payment->principle + $last_payment->interest;
+            }
+            else { // จ่ายแล้วมากกว่า 2 งวด
+                $last_payment = Payment::where('loan_id', $loan->id)->orderBy('pay_date', 'desc')->first();
+                $balance = ($loan->outstanding - $loan->payments->sum('principle')) + $last_payment->principle;
+                $last_payment_date = Diamond::parse(Payment::where('loan_id', $loan->id)->where('id', '<>', $last_payment->id)->orderBy('pay_date', 'desc')->first()->pay_date);
+                $days = $last_payment_date->diffInDays($date);
+
+                $result = new stdClass();
+                $result->principle = $balance;
+                $result->interest = $balance * $dayRate * $days;
+                $result->refund = $last_payment->principle + $last_payment->interest;
+            }            
+        }
+        else {
+            // จ่ายหลังสิ้นเดือน ไม่มีต้องคืนเงินดอกเบี้ยเดิม ดำนวณดอกเบี้ยวันที่ 1 ถึงวันที่มาจ่าย
+            $balance = $loan->outstanding - $loan->payments->sum('principle');
+            $last_payment_date = !is_null($loan->payments->max('pay_date')) ? Diamond::parse($loan->payments->max('pay_date')) : Diamond::parse($loan->loaned_at);
+            $days = $last_payment_date->diffInDays($date);
+    
+            $result = new stdClass();
+            $result->principle = $balance;
+            $result->interest = $balance * $dayRate * $days;
+            $result->refund = 0;
+
+            return $result;
+        }
     }
 
     protected function payment_general($rate, $outstanding, $period, Diamond $start) {

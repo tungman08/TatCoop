@@ -27,7 +27,7 @@
                 <p>
                     {{ Session::get('flash_message') }}
 
-                    @if(Session::has('flash_link'))
+                    @if (Session::has('flash_link'))
                         <a href="{{ Session::get('flash_link') }}">Undo</a>
                     @endif
                 </p>

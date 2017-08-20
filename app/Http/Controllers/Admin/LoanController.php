@@ -183,7 +183,7 @@ class LoanController extends Controller
                         }
                         break;
                     default:
-                        $validator = ($member->profile->employee->employee_type_id < 3) 
+                        $validator = ($member->profile->employee->employee_type_id == 1) 
                             ? $this->validateNormalEmployeeStep1($member, $loanType, $request) 
                             : $this->validateNormalOutsiderStep1($member, $loanType, $request);
 

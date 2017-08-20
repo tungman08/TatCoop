@@ -72,16 +72,18 @@ class MemberController extends Controller
      */
     public function store(Request $request) {
         $rules = [
+            'start_date' => 'required|date_format:Y-m-d',
             'profile.employee.code' => 'required|digits:5', 
             'profile.name' => 'required',
             'profile.lastname' => 'required', 
             'profile.citizen_code' => 'required|digits:13', 
             'shareholding' => 'required|numeric', 
-            'profile.birth_date' => 'required|date_format:Y-m-d', 
+            'profile.birth_date' => 'date_format:Y-m-d', 
             'profile.address' => 'required'
         ];
 
         $attributeNames = [
+            'start_date' => 'วันที่สมัครเป็นสมาชิก',
             'profile.employee.code' => 'รหัสพนักงาน', 
             'profile.name' => 'ชื่อสมาชิก',
             'profile.lastname' => 'นามสกุล',
@@ -148,7 +150,7 @@ class MemberController extends Controller
                 $member->profile_id = $profile->id;
                 $member->shareholding = ($request->input('profile')['employee']['employee_type_id'] < 3) ? $request->input('shareholding') : 0;
                 $member->fee = ($is_employee) ? 200 : 100;
-                $member->start_date = Diamond::now();
+                $member->start_date = Diamond::parse($request->input('start_date'));
                 $member->save();
 
                 History::addAdminHistory(Auth::guard($this->guard)->id(), 'สร้างข้อมูลสมาชิกใหม่', 'คุณ' . $profile->name . ' ' . $profile->lastname . ' สมัครเป็นสมาชิกสหกรณ์');
@@ -193,16 +195,18 @@ class MemberController extends Controller
     public function update(Request $request, $id)
     {
         $rules = [
+            'start_date' => 'required|date_format:Y-m-d',
             'profile.employee.code' => 'required|digits:5', 
             'profile.name' => 'required',
             'profile.lastname' => 'required', 
             'profile.citizen_code' => 'required|digits:13', 
             'shareholding' => 'required|numeric', 
-            'profile.birth_date' => 'required|date_format:Y-m-d', 
+            'profile.birth_date' => 'date_format:Y-m-d', 
             'profile.address' => 'required', 
         ];
 
         $attributeNames = [
+            'start_date' => 'วันที่สมัครเป็นสมาชิก',
             'profile.employee.code' => 'รหัสพนักงาน', 
             'profile.name' => 'ชื่อสมาชิก',
             'profile.lastname' => 'นามสกุล',
@@ -225,9 +229,11 @@ class MemberController extends Controller
             DB::transaction(function() use ($request, $id) {
                 $member = Member::find($id);
                 $member->shareholding = ($request->input('profile')['employee']['employee_type_id'] < 3) ? $request->input('shareholding') : 0;
+                $member->start_date = Diamond::parse($request->input('start_date'));
                 $member->save();
 
                 $profile = Profile::find($member->profile_id);
+                $profile->citizen_code = $request->input('profile')['citizen_code'];
                 $profile->prefix_id = $request->input('profile')['prefix_id'];
                 $profile->name = $request->input('profile')['name'];
                 $profile->lastname = $request->input('profile')['lastname'];
@@ -236,11 +242,12 @@ class MemberController extends Controller
                 $profile->district_id = $request->input('profile')['district_id'];
                 $profile->subdistrict_id = $request->input('profile')['subdistrict_id'];
                 $profile->postcode_id = Postcode::where('code', $request->input('profile')['postcode']['code'])->first()->id;
-                $profile->birth_date = Diamond::parse($request->input('profile')['birth_date']);
+                $profile->birth_date = !empty($request->input('profile')['birth_date']) ? Diamond::parse($request->input('profile')['birth_date']) : null;
+
                 $profile->save();
 
                 $employee = Employee::where('profile_id', $profile->id)->first();
-                $employee->code = $request->input('profile')['employee']['code'];
+                $employee->code = $request->input('profile')['employee']['code'] != '00000' ? $request->input('profile')['employee']['code'] : '<ข้อมูลถูกลบ>';
                 $employee->employee_type_id = $request->input('profile')['employee']['employee_type_id'];
                 $employee->save();
 
@@ -289,10 +296,12 @@ class MemberController extends Controller
 
         $rules = [
             'member_code' => 'required|exists:members,id', 
+            'leave_date' => 'required|date_format:Y-m-d'
         ];
 
         $attributeNames = [
             'member_code' => 'รหัสสมาชิก', 
+            'leave_date' => 'วันที่ลาออก'
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -316,8 +325,10 @@ class MemberController extends Controller
                 ->withInput();
         }
         else {
-            DB::transaction(function() use ($member) {
-                $member->leave_date = Diamond::now();
+            $leave_date = Diamond::parse($request->input("leave_date"));
+
+            DB::transaction(function() use ($member, $leave_date) {
+                $member->leave_date = $leave_date;
                 $member->save();
 
                 //ปิดยอดหุ้น
@@ -326,7 +337,7 @@ class MemberController extends Controller
                 if ($total > 0) {
                     $share = new Shareholding();
                     $share->member_id = $member->id;
-                    $share->pay_date = Diamond::now();
+                    $share->pay_date = $leave_date;
                     $share->shareholding_type_id = 2;
                     $share->amount = 0 - $total;
                     $share->save();
@@ -334,6 +345,9 @@ class MemberController extends Controller
 
                 //ปิดยอดเงินกู้
                 $loans = $member->loans->filter(function ($value, $key) { return is_null($value->completed_at); });
+
+                //ลบบัญชี
+                $member->user()->forceDelete();
 
                 foreach ($loans as $loan) {
                     $payment = new LoanPayment();

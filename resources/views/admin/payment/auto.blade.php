@@ -45,38 +45,43 @@
                 <!-- form start -->   
                 {{ Form::open(['url' => '/service/loan/autopayment', 'method' => 'post',
                     'onsubmit' => 'return confirm("คุณต้องการทำการชำระเงินกู้แบบอัตโนมัติใช่หรือไม่?");']) }}
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>
-                                    <i class="fa fa-calendar fa-fw"></i>
-                                    ปฏิทิน
-                                </label>
-                                <div class="input-group" id="datepicker" style="width: 250px;">
-                                    {{ Form::text('month', Diamond::today()->format('Y-m'), [
-                                        'id'=>'month', 
-                                        'class'=>'form-control'])
-                                    }}     
-                                    <span class="input-group-addon">
-                                        <span class="fa fa-calendar">
-                                        </span>
-                                    </span>
-                                </div>
-                            </div>
-                            <p class="help-block">กรุณาเลือกเดือนที่ต้องการชำระเงินกู้อัตโนมัติ</p>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <div class="input-group pull-right">                     
-                                    {{ Form::button('<i class="fa fa-bolt"></i> ป้อนการชำระเงินกู้แบบอัตโนมัติ ประจำเดือน<span id="b_month">' . Diamond::today()->thai_format('F Y') . '</span>', [
-                                        'id' => 'automatic',
-                                        'type' => 'submit', 
-                                        'class'=>'btn btn-primary btn-flat'])
-                                    }}
-                                </div>
-                            </div>
+                    <div class="form-group">
+                        <label>
+                            <i class="fa fa-calendar fa-fw"></i>
+                            ปฏิทิน
+                        </label>
+                        <div>
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="input-group" id="datepicker" style="width: 250px;">
+                                                {{ Form::text('month', Diamond::today()->format('Y-m'), [
+                                                    'id'=>'month', 
+                                                    'class'=>'form-control'])
+                                                }}     
+                                                <span class="input-group-addon">
+                                                    <span class="fa fa-calendar">
+                                                    </span>
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="input-group pull-right">                     
+                                                {{ Form::button('<i class="fa fa-bolt"></i> ป้อนการชำระเงินกู้แบบอัตโนมัติ ประจำเดือน<span id="b_month">' . Diamond::today()->thai_format('F Y') . '</span>', [
+                                                    'id' => 'automatic',
+                                                    'type' => 'submit', 
+                                                    'class'=>'btn btn-primary btn-flat margin-l-sm'])
+                                                }}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <!--/.table-->
                         </div>
                     </div>
+                    <p class="help-block">กรุณาเลือกเดือนที่ต้องการชำระเงินกู้อัตโนมัติ</p>
                 {{ Form::close() }}
 
                 <br />

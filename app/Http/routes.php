@@ -154,6 +154,8 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
         Route::get('loan/autopayment', ['as' => 'service.payment.auto', 'uses' => 'PaymentController@getAutoPayment']);
         Route::post('loan/autopayment', 'PaymentController@postAutoPayment');
         Route::group(['prefix' => '{member_id}/loan/{loan_id}/payment'], function () {
+            Route::get('calculate', ['as' => 'service.payment.calculate', 'uses' => 'PaymentController@getCalculate']);
+            Route::get('close', ['as' => 'service.payment.close', 'uses' => 'PaymentController@getClose']);
             Route::resource('/', 'PaymentController');    
         });
 

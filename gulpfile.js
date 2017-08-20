@@ -46,6 +46,7 @@ elixir(function(mix) {
         .scripts('./bower_components/flot.tooltip/js/jquery.flot.tooltip.js')
         .scripts('./bower_components/jquery-circle-progress/dist/circle-progress.js')
         .scripts('./bower_components/magnific-popup/dist/jquery.magnific-popup.js')
+        .scripts('./bower_components/jquery-number/jquery.number.js')
         .scripts(['jquery.inputmask.js', 'jquery.inputmask.date.extensions.js', 'jquery.inputmask.extensions.js'], 'public/js/jquery.inputmask.js', './bower_components/AdminLTE/plugins/input-mask')
         .scripts('jquery.easing.js')
         .scripts('admin-statistics.js')
@@ -77,6 +78,7 @@ elixir(function(mix) {
         'js/jquery-ui.js',
         'js/jquery.easing.js',
         'js/jquery.inputmask.js',
+        'js/jquery.number.js',
         'js/admin-lte.js',
         'js/bootstrap3-wysihtml5.all.js',
         'js/admin-form.js',

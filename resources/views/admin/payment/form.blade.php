@@ -25,7 +25,7 @@
                 'class'=>'form-control', 
                 'placeholder'=>'ตัวอย่าง: 10000', 
                 'autocomplete'=>'off'])
-            }}        
+            }}  
         </div>
     </div>
     <div class="form-group">
@@ -33,6 +33,7 @@
             {{ Form::button('<i class="fa fa-calculator"></i> คำนวณ', [
                 'id'=>'calculate',
                 'type' => 'button', 
+                'data-id' => $loan->id,
                 'class'=>'btn btn-default btn-flat'])
             }}
         </div>

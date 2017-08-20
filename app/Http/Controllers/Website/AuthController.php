@@ -167,7 +167,7 @@ class AuthController extends Controller
             $member = Member::find($request->input('member_id'));
 
             if (!is_null($member)) {
-                if ($member->profile->citizen_code != $request->input('citizen_code')) {
+                if (str_replace('-', '', $member->profile->citizen_code) != $request->input('citizen_code')) {
                     $validator->errors()->add('citizen_code_notmatch', 'ข้อมูล เลขประจำตัวประชาชน ไม่ตรงกับข้อมูลสมาชิก');
                 }
             }

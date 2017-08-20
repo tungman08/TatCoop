@@ -11,7 +11,7 @@
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
             ['item' => 'จัดการทุนเรือนหุ้น', 'link' => '/service/shareholding/member'],
             ['item' => 'ทุนเรือนหุ้น', 'link' => '/service/' . $member->id . '/shareholding'],
-            ['item' => 'รายละเอียด', 'link' => ''],
+            ['item' => 'รายละเอียด', 'link' => '/service/shareholding/' . $member->id . '/' . $shareholding->pay_date->year . '-' . $shareholding->pay_date->month . '-1' . '/editlist'],
             ['item' => 'แก้ไข', 'link' => ''],
         ]])
 
