@@ -134,6 +134,7 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
 
         // Share Holding Route...
         Route::get('shareholding/member', ['as' => 'service.shareholding.member', 'uses' => 'ShareholdingController@getMember']);
+        Route::get('shareholding/{member_id}/{paydate}/editlist', ['as' => 'service.shareholding.editlist', 'uses' => 'ShareholdingController@getEditlist']);
         Route::get('shareholding/autoshareholding', ['as' => 'service.shareholding.auto', 'uses' => 'ShareholdingController@getAutoShareholding']);
         Route::post('shareholding/autoshareholding', 'ShareholdingController@postAutoShareholding');
         Route::resource('{member_id}/shareholding', 'ShareholdingController');
@@ -153,10 +154,11 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
         // Payment Route...
         Route::get('loan/autopayment', ['as' => 'service.payment.auto', 'uses' => 'PaymentController@getAutoPayment']);
         Route::post('loan/autopayment', 'PaymentController@postAutoPayment');
-        Route::group(['prefix' => '{member_id}/loan/{loan_id}/payment'], function () {
-            Route::get('calculate', ['as' => 'service.payment.calculate', 'uses' => 'PaymentController@getCalculate']);
-            Route::get('close', ['as' => 'service.payment.close', 'uses' => 'PaymentController@getClose']);
-            Route::resource('/', 'PaymentController');    
+        Route::group(['prefix' => '{member_id}/loan/{loan_id}'], function () {
+            Route::get('payment/calculate', ['as' => 'service.payment.calculate', 'uses' => 'PaymentController@getCalculate']);
+            Route::get('payment/close', ['as' => 'service.payment.close', 'uses' => 'PaymentController@getClose']);
+            Route::post('payment/close', 'PaymentController@postClose');
+            Route::resource('payment', 'PaymentController');    
         });
 
         // Dividend Route...
@@ -193,7 +195,7 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
         Route::resource('dividend', 'DividendController', ['except' => [ 'show' ]]);
 
         // Billing Route...
-        Route::resource('billing', 'BillingController', ['only' => [ 'index', 'edit', 'update' ]]);
+        Route::resource('billing', 'BillingController', ['only' => [ 'index', 'create', 'store', 'edit', 'update' ]]);
 
         // Statistic Route...
         Route::controller('statistic', 'StatisticController', [

@@ -68,13 +68,14 @@ class AjaxController extends Controller
                 ->join('profiles', 'members.profile_id', '=', 'profiles.id')
                 ->join('employees', 'profiles.id', '=', 'employees.profile_id')
                 ->join('employee_types', 'employees.employee_type_id', '=', 'employee_types.id')
+                ->leftJoin('users', 'members.id', '=', 'users.member_id')
                 ->whereNull('members.leave_date')
                 ->select([
                     DB::raw("LPAD(members.id, 5, '0') as code"),
                     DB::raw("CONCAT('<span class=\"text-primary\"><i class=\"fa fa-user fa-fw\"></i> ', IF(profiles.name = '<ข้อมูลถูกลบ>', profiles.name, CONCAT(profiles.name, ' ', profiles.lastname)), '</span>') as fullname"),
                     DB::raw("CONCAT('<span class=\"label label-primary\">', employee_types.name, '</span>') as typename"),
                     'members.start_date as startdate',
-                    "members.leave_date as leavedate"
+                    DB::raw("IF(users.id IS NOT NULL, '<span class=\"label label-primary\">ลงทะเบียนสมาชิกแล้ว</span>', '<span class=\"label label-danger\">ยังไม่ได้ลงทะเบียนใช้งาน</span>') as status")
                 ]);
 
             return Datatables::queryBuilder($members)
@@ -924,8 +925,8 @@ class AjaxController extends Controller
                 DB::raw("LPAD(members.id, 5, '0') as code"),
                 DB::raw("CONCAT('<span class=\"text-primary\"><i class=\"fa fa-user fa-fw\"></i> ', IF(profiles.name = '<ข้อมูลถูกลบ>', profiles.name, CONCAT(profiles.name, ' ', profiles.lastname)), '</span>') as fullname"),
                 DB::raw("CONCAT('<span class=\"label label-primary\">', employee_types.name, '</span>') as typename"),
-                DB::raw("IF(COUNT(loans.id) > 0 , CONCAT(FORMAT(COUNT(loans.id), 0), ' สัญญา'), '-') as loans"),
-                DB::raw("IF(COUNT(loans.id) > 0 , CONCAT(FORMAT(COALESCE(SUM(loans.outstanding) - IF(COUNT(payments.id) > 0, SUM(payments.principle), 0), 0), 2), ' บาท'), '-') as amount")
+                DB::raw("IF(COUNT(DISTINCT loans.id) > 0 , CONCAT(FORMAT(COUNT(DISTINCT loans.id), 0), ' สัญญา'), '-') as loans"),
+                DB::raw("IF(COUNT(DISTINCT loans.id) > 0 , CONCAT(FORMAT(COALESCE(SUM(DISTINCTROW loans.outstanding) - IF(COUNT(DISTINCT payments.id) > 0, SUM(payments.principle), 0), 0), 2), ' บาท'), '-') as amount")
             ]);
 
         return Datatables::queryBuilder($members)->make(true);
@@ -976,41 +977,28 @@ class AjaxController extends Controller
         $loan = Loan::find($request->input('loan_id'));
         $member = Member::find($loan->member_id);
         $pay_date = Diamond::parse($request->input('pay_date'));
+        $pay_amount = $request->input('pay_amount');
+        $summary = LoanCalculator::normal_payment($loan, $pay_amount, $pay_date);
+
         $result = new stdClass();
+        $result->principle = $summary->principle;
+        $result->interest = $summary->interest;
+        $result->total = $summary->principle + $summary->interest;
 
-        if ($member->profile->employee->employee_type_id == 1) {
-            // พนักงาน หักบัญชีเงินเดือน
-            $last = Diamond::parse($loan->payments->max('pay_date'));
+        return Response::json($result);
+    }
 
-            if ($pay_date->gt($last)) {
-                // คิดออกเบี้ยปกติ
-                $summary = LoanCalculator::close_payment($loan, $pay_date);
-
-                $result->principle = $summary->principle;
-                $result->interest = $summary->interest;
-                $result->total = $summary->principle + $summary->interest;
-                $result->remark = '-';
-            }
-            else {
-                // คำนวณดอกเบี้ยใหม่ แล้วคืนส่วนต่างของดอกเบี้ยที่หักอัตโนมัติคืนลูกค้า
-                $summary = LoanCalculator::close_payment_with_refund($loan, $pay_date);
-
-                $result->principle = $summary->principle;
-                $result->interest = $summary->interest;
-                $result->total = $summary->principle + $summary->interest;
-                $refund = 0;
-                $result->remark = 'คืนเงินดอกเบี้ยจำนวน ' . number_format($refund, 2, '.', ',') . ' บาท';
-            }
-        }
-        else {
-            // บุคคลภายนอก คิดออกเบี้ยปกติ
-            $summary = LoanCalculator::close_payment($loan, $pay_date);
-               
-            $result->principle = $summary->principle;
-            $result->interest = $summary->interest;
-            $result->total = $summary->principle + $summary->interest;
-            $result->remark = '-';
-        }
+    public function postClosecalculate(Request $request) {
+        $loan = Loan::find($request->input('loan_id'));
+        $member = Member::find($loan->member_id);
+        $pay_date = Diamond::parse($request->input('pay_date'));
+        $summary = LoanCalculator::close_payment($loan, $pay_date);
+        
+        $result = new stdClass();
+        $result->principle = $summary->principle;
+        $result->interest = $summary->interest;
+        $result->total = $summary->principle + $summary->interest;
+        $result->remark = $summary->refund > 0 ? 'คืนเงินจำนวน ' . number_format($summary->refund, 2, '.', ',') . ' บาท' : '-';
 
         return Response::json($result);
     }

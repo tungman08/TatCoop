@@ -4,6 +4,7 @@ namespace App\Classes;
 
 use stdClass;
 use App\Loan;
+use App\Payment;
 use App\Member;
 
 class LoanCalculator {
@@ -104,27 +105,108 @@ class LoanCalculator {
         return $surety->pivot->amount * (($outstanding - $pay) / $outstanding);
     }
 
-    public function close_payment($loan, Diamond $date) {
-        $dayRate = $loan->rate / 100 / LoanCalculator::DAYS_IN_YEAR;
-        $balance = $loan->outstanding - $loan->payments->sum('principle');
-        $last_payment_date = !is_null($loan->payments->max('pay_date')) ? Diamond::parse($loan->payments->max('pay_date')) : Diamond::parse($loan->loaned_at);
-        $days = $last_payment_date->diffInDays($date);
-
-        $result = new stdClass();
-        $result->principle = $balance;
-        $result->interest = $balance * $dayRate * $days;
-
-        return $result;
-    }
-
-    public function close_payment_with_refund($loan, Diamond $date) {
+    public function normal_payment($loan, $amount, Diamond $date) {
         $dayRate = $loan->rate / 100 / LoanCalculator::DAYS_IN_YEAR;
         $end_month = Diamond::now()->endOfMonth();
 
-        if ($end_month->gte($date)) {
-            // จ่ายก่อนสิ้นเดือนหรือจ่ายสิ้นเดือนพอดี คำนวณดอกเบี้ยใหม่ คืนเงินดอกเบี้ยเดิม
-           
-            if ($loan->payments->count() == 0) { // ไม่เคยจ่ายมาก่อน
+        if ($loan->member->profile->employee->employee_type_id == 1) {
+            // พนักงาน/ลูกจ้าง
+
+            if ($loan->payments->count() > 0) {
+                // เคยผ่อนชำระแล้ว
+                $last_payment = Payment::where('loan_id', $loan->id)->orderBy('pay_date', 'desc')->first();
+
+                if ($end_month->eq(Diamond::parse($last_payment->pay_date))) {
+                    // วันที่ผ่อนชำระล่าสุด เท่ากับวันสิ้นเดือนนี้ (คือการผ่อนชำระอัติโนมัติ) ไม่คิดดอกเบี้ย
+                    $result = new stdClass();
+                    $result->principle = $amount;
+                    $result->interest = 0;
+
+                    return $result;
+                }
+                else {
+                    // คำนวณดอกเบี้ยปกติ
+                    $balance = $loan->outstanding - $loan->payments->sum('principle');
+                    $last_payment_date = Diamond::parse($last_payment->pay_date);
+                    $days = $last_payment_date->diffInDays($date);
+                    $interest = $balance * $dayRate * $days;
+
+                    $result = new stdClass();
+                    $result->principle = $amount - $interest;
+                    $result->interest = $interest;
+
+                    return $result;
+                }
+            }
+            else {
+                // ไม่เคยผ่อนชำระมาก่อน คำนวณดอกเบี้ยปกติ
+                $balance = $loan->outstanding;
+                $last_payment_date = Diamond::parse($loan->loaned_at);
+                $days = $last_payment_date->diffInDays($date);
+                $interest = $balance * $dayRate * $days;
+
+                $result = new stdClass();
+                $result->principle = $amount - $interest;
+                $result->interest = $interest;
+
+                return $result;
+            }
+        }
+        else {
+            // บุคคลภายนอก คำนวณดอกเบี้ยปกติ
+            $balance = $loan->outstanding - $loan->payments->sum('principle');
+            $last_payment_date = !is_null($loan->payments->max('pay_date')) ? Diamond::parse($loan->payments->max('pay_date')) : Diamond::parse($loan->loaned_at);
+            $days = $last_payment_date->diffInDays($date);
+            $interest = $balance * $dayRate * $days;
+
+            $result = new stdClass();
+            $result->principle = $amount - $interest;
+            $result->interest = $interest;
+
+            return $result;
+        }
+    }
+
+    public function close_payment($loan, Diamond $date) {
+        $dayRate = $loan->rate / 100 / LoanCalculator::DAYS_IN_YEAR;
+        $end_month = Diamond::now()->endOfMonth();
+
+        if ($loan->member->profile->employee->employee_type_id == 1) {
+            // พนักงาน/ลูกจ้าง
+
+            if ($loan->payments->count() > 0) {
+                // เคยผ่อนชำระแล้ว
+                $last_payment = Payment::where('loan_id', $loan->id)->orderBy('pay_date', 'desc')->first();
+
+                if ($end_month->eq(Diamond::parse($last_payment->pay_date))) {
+                    // วันที่ผ่อนชำระล่าสุด เท่ากับวันสิ้นเดือนนี้ (คือการผ่อนชำระอัติโนมัติ) คำนวณดอกเบี้ยใหม่ แล้วคืนเงิน
+                    $balance = ($loan->outstanding - $loan->payments->sum('principle')) + $last_payment->principle;
+                    $last_payment_date = $loan->payments->count() > 1 ? Diamond::parse(Payment::where('loan_id', $loan->id)->orderBy('pay_date', 'desc')->skip(1)->take(1)->first()->pay_date) : Diamond::parse($loan->loaned_at);
+                    $days = $last_payment_date->diffInDays($date);
+    
+                    $result = new stdClass();
+                    $result->principle = $balance;
+                    $result->interest = $balance * $dayRate * $days;
+                    $result->refund = $last_payment->principle + $last_payment->interest;
+
+                    return $result;
+                }
+                else {
+                    // คำนวณดอกเบี้ยปกติ
+                    $balance = $loan->outstanding - $loan->payments->sum('principle');
+                    $last_payment_date = Diamond::parse($last_payment->pay_date);
+                    $days = $last_payment_date->diffInDays($date);
+    
+                    $result = new stdClass();
+                    $result->principle = $balance;
+                    $result->interest = $balance * $dayRate * $days;
+                    $result->refund = 0;
+
+                    return $result;
+                }
+            }
+            else {
+                // ไม่เคยผ่อนชำระมาก่อน คำนวณดอกเบี้ยปกติ
                 $balance = $loan->outstanding;
                 $last_payment_date = Diamond::parse($loan->loaned_at);
                 $days = $last_payment_date->diffInDays($date);
@@ -136,31 +218,9 @@ class LoanCalculator {
 
                 return $result;
             }
-            else if ($loan->payments->count() == 1) { // จ่ายแล้ว 1 งวด
-                $last_payment = Payment::where('loan_id', $loan->id)->orderBy('pay_date', 'desc')->first();
-                $balance = $loan->outstanding;
-                $last_payment_date = Diamond::parse($loan->loaned_at);
-                $days = $last_payment_date->diffInDays($date);
-
-                $result = new stdClass();
-                $result->principle = $balance;
-                $result->interest = $balance * $dayRate * $days;
-                $result->refund = $last_payment->principle + $last_payment->interest;
-            }
-            else { // จ่ายแล้วมากกว่า 2 งวด
-                $last_payment = Payment::where('loan_id', $loan->id)->orderBy('pay_date', 'desc')->first();
-                $balance = ($loan->outstanding - $loan->payments->sum('principle')) + $last_payment->principle;
-                $last_payment_date = Diamond::parse(Payment::where('loan_id', $loan->id)->where('id', '<>', $last_payment->id)->orderBy('pay_date', 'desc')->first()->pay_date);
-                $days = $last_payment_date->diffInDays($date);
-
-                $result = new stdClass();
-                $result->principle = $balance;
-                $result->interest = $balance * $dayRate * $days;
-                $result->refund = $last_payment->principle + $last_payment->interest;
-            }            
         }
         else {
-            // จ่ายหลังสิ้นเดือน ไม่มีต้องคืนเงินดอกเบี้ยเดิม ดำนวณดอกเบี้ยวันที่ 1 ถึงวันที่มาจ่าย
+            // บุคคลภายนอก คำนวณดอกเบี้ยปกติ
             $balance = $loan->outstanding - $loan->payments->sum('principle');
             $last_payment_date = !is_null($loan->payments->max('pay_date')) ? Diamond::parse($loan->payments->max('pay_date')) : Diamond::parse($loan->loaned_at);
             $days = $last_payment_date->diffInDays($date);

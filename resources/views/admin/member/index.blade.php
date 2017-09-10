@@ -58,7 +58,7 @@
                                 <th style="width: 20%;">ชื่อสมาชิก</th>
                                 <th style="width: 20%;">ประเภทสมาชิก</th>
                                 <th style="width: 25%;">วันที่สมัคร</th>
-                                <th style="width: 25%;">วันที่ลาออก</th>
+                                <th style="width: 25%;">สถานะ</th>
                             </tr>
                         </thead>
                     </table>
@@ -127,7 +127,7 @@
                 { "data": "fullname" },
                 { "data": "typename" },
                 { "data": "startdate" },
-                { "data": "leavedate" }
+                { "data": "status" }
             ]
         });   
 

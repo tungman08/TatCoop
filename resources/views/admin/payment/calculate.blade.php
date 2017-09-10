@@ -38,7 +38,7 @@
                     </tr>  
                     <tr>
                         <th>จำนวนงวดผ่อนชำระ:</th>
-                        <td>{{ number_format($loan->period, 0, '.', ',') }} งวด</td>
+                        <td>{{ number_format($loan->period, 0, '.', ',') }} งวด (ชำระงวดละ {{ number_format(LoanCalculator::pmt($loan->rate, $loan->outstanding, $loan->period), 2, '.', ',') }} บาท)</td>
                     </tr> 
                     <tr>
                         <th>เงินต้นคงเหลือ:</th>
@@ -185,7 +185,7 @@
 
                 $.ajax({
                     dataType: 'json',
-                    url: '/ajax/calculate',
+                    url: '/ajax/closecalculate',
                     type: 'post',
                     data: formData,
                     processData: false,

@@ -79,10 +79,18 @@
     <script>
     $(document).ready(function () {
         $("[data-mask]").inputmask();
-        // $('form').submit(function() {
-        //    $("[data-mask]").inputmask('remove');
-        //});
+        $('form').submit(function() {
+            $("[data-mask]").inputmask('remove');
+        });
         
+        $('#start_date').datetimepicker({
+            locale: 'th',
+            viewMode: 'days',
+            format: 'YYYY-MM-DD',
+            locale: moment().lang('th'),
+            useCurrent: false
+        });
+
         $('#birth_date').datetimepicker({
             locale: 'th',
             viewMode: 'days',

@@ -73,7 +73,7 @@ class MemberController extends Controller
     public function store(Request $request) {
         $rules = [
             'start_date' => 'required|date_format:Y-m-d',
-            'profile.employee.code' => 'required|digits:5', 
+            //'profile.employee.code' => 'required|digits:5', 
             'profile.name' => 'required',
             'profile.lastname' => 'required', 
             'profile.citizen_code' => 'required|digits:13', 
@@ -84,7 +84,7 @@ class MemberController extends Controller
 
         $attributeNames = [
             'start_date' => 'วันที่สมัครเป็นสมาชิก',
-            'profile.employee.code' => 'รหัสพนักงาน', 
+            //'profile.employee.code' => 'รหัสพนักงาน', 
             'profile.name' => 'ชื่อสมาชิก',
             'profile.lastname' => 'นามสกุล',
             'profile.citizen_code' => 'หมายเลขประจำตัวประชาชน',
@@ -141,7 +141,7 @@ class MemberController extends Controller
                 if (!$is_employee) {
                     $employee = new Employee();
                     $employee->profile_id = $profile->id;
-                    $employee->code = $request->input('profile')['employee']['code'];
+                    $employee->code = (!isset($request->input('profile')['employee']['code']) || trim($request->input('profile')['employee']['code']) === '') ? '<ข้อมูลถูกลบ>' : $request->input('profile')['employee']['code'];
                     $employee->employee_type_id = $request->input('profile')['employee']['employee_type_id'];
                     $employee->save();
                 }
@@ -196,7 +196,7 @@ class MemberController extends Controller
     {
         $rules = [
             'start_date' => 'required|date_format:Y-m-d',
-            'profile.employee.code' => 'required|digits:5', 
+            //'profile.employee.code' => 'required|digits:5', 
             'profile.name' => 'required',
             'profile.lastname' => 'required', 
             'profile.citizen_code' => 'required|digits:13', 
@@ -207,7 +207,7 @@ class MemberController extends Controller
 
         $attributeNames = [
             'start_date' => 'วันที่สมัครเป็นสมาชิก',
-            'profile.employee.code' => 'รหัสพนักงาน', 
+            //'profile.employee.code' => 'รหัสพนักงาน', 
             'profile.name' => 'ชื่อสมาชิก',
             'profile.lastname' => 'นามสกุล',
             'profile.citizen_code' => 'หมายเลขประจำตัวประชาชน',
@@ -247,7 +247,7 @@ class MemberController extends Controller
                 $profile->save();
 
                 $employee = Employee::where('profile_id', $profile->id)->first();
-                $employee->code = $request->input('profile')['employee']['code'] != '00000' ? $request->input('profile')['employee']['code'] : '<ข้อมูลถูกลบ>';
+                $employee->code = (!isset($request->input('profile')['employee']['code']) || trim($request->input('profile')['employee']['code']) === '') ? '<ข้อมูลถูกลบ>' : $request->input('profile')['employee']['code'];
                 $employee->employee_type_id = $request->input('profile')['employee']['employee_type_id'];
                 $employee->save();
 

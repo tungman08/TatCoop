@@ -1,5 +1,22 @@
 <div class="box-body">
     <div class="form-group">
+        {{ Form::label('start_date', 'วันที่สมัครเป็นสมาชิก', [
+            'class'=>'col-sm-2 control-label']) 
+        }}
+
+        <div class="col-sm-10 input-group" id="start_date" style="padding: 0 5px;">
+            {{ Form::text('start_date', null, [
+                'id' => 'start_date',
+                'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
+                'class'=>'form-control'])
+            }}       
+            <span class="input-group-addon">
+                <span class="fa fa-calendar">
+                </span>
+            </span> 
+        </div>
+    </div>
+    <div class="form-group">
         {{ Form::label('profile[member_code]', 'รหัสสมาชิก', [
             'class'=>'col-sm-2 control-label']) 
         }}

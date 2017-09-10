@@ -149,7 +149,7 @@
                     <table style="width: 100%;">
                         <tr>
                             <td style="white-space: nowrap; width: 1%;">ผู้จัดการ</td>
-                            <td style="border-bottom: 2px dotted #bbb; padding-left: 50px;">{{ $billing->manager }}</td>
+                            <td style="border-bottom: 2px dotted #bbb; padding-left: 50px;">{{ !empty($billing) ? $billing->manager : '-' }}</td>
                         </tr>
                     </table>
                 </div>
@@ -158,7 +158,7 @@
                     <table style="width: 100%;">
                         <tr>
                             <td style="white-space: nowrap; width: 1%;">เหรัญญิก</td>
-                            <td style="border-bottom: 2px dotted #bbb; padding-left: 50px;">{{ $billing->treasurer }}</td>
+                            <td style="border-bottom: 2px dotted #bbb; padding-left: 50px;">{{ !empty($billing) ? $billing->treasurer : '-' }}</td>
                         </tr>
                     </table>      
                 </div>
@@ -171,10 +171,17 @@
                 </div>
                 <!-- /.col -->
                 <div class="col-lg-12 text-center" style="padding-top: 20px;">
-                    <button class="btn btn-primary btn-flat" type="button" data-tooltip="true" title="เพิ่มอัตราเงินปันผลประจำปี"
-                        onclick="javascript:window.location.href='{{ url('/admin/billing/' . $billing->id . '/edit') }}';">
-                        <i class="fa fa-edit"></i> แก้ไขชื่อผู้จัดการ/เหรัญญิก
-                    </button>
+                    @if (empty($billing))
+                        <button class="btn btn-primary btn-flat" type="button" data-tooltip="true" title="เพิ่มชื่อผู้จัดการ/เหรัญญิก"
+                            onclick="javascript:window.location.href='{{ url('/admin/billing/create') }}';">
+                            <i class="fa fa-plus-circle"></i> เพิ่มชื่อผู้จัดการ/เหรัญญิก
+                        </button>
+                    @else
+                        <button class="btn btn-primary btn-flat" type="button" data-tooltip="true" title="แก้ไขชื่อผู้จัดการ/เหรัญญิก"
+                            onclick="javascript:window.location.href='{{ url('/admin/billing/' . $billing->id . '/edit') }}';">
+                            <i class="fa fa-edit"></i> แก้ไขชื่อผู้จัดการ/เหรัญญิก
+                        </button>
+                    @endif
                 </div>
                 <!-- /.col -->
             </div>

@@ -68,22 +68,27 @@ class Profile extends Model
      *
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeActive($query)
-    {
+    public function scopeActive($query) {
         return $query->whereNull('leave_date');
     }
 
-    public function getFullNameAttribute()
-    {
+    public function getFullNameAttribute() {
         return $this->prefix->name . ' ' . $this->attributes['name'] .' '. $this->attributes['lastname'];
     }
 
-    public function getFullAddressAttribute()
-    {
+    public function getFullAddressAttribute() {
         return $this->attributes['address'] . ' ' . 
             (($this->subdistrict->district->province['id'] == 1) ? 'แขวง'. $this->subdistrict['name'] : 'ต.' . $this->subdistrict['name']) . ' ' . 
             (($this->subdistrict->district->province['id'] == 1) ? 'เขต' . $this->subdistrict->district['name'] : 'อ.' . $this->subdistrict->district['name']) . ' ' . 
             (($this->subdistrict->district->province['id'] == 1) ? $this->subdistrict->district->province['name'] : 'จ.' . $this->subdistrict->district->province['name']) . ' ' . 
             $this->postcode['code'];
+    }
+
+    public function getCitizenCodeAttribute() {
+        return substr($this->attributes['citizen_code'], 0, 1) . '-' .
+            substr($this->attributes['citizen_code'], 1, 4) . '-' .
+            substr($this->attributes['citizen_code'], 5, 5) . '-' .
+            substr($this->attributes['citizen_code'], 10, 2) . '-' .
+            substr($this->attributes['citizen_code'], 12, 1);
     }
 }

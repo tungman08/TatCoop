@@ -27,7 +27,7 @@
         </tr>
         <tr>
             <th>หมายเลขบัตรประชาชน:</th>
-            <td>{{ $member->profile->citizen_code }}</td>
+            <td>{{ $member->profile->CitizenCode }}</td>
         </tr>
         <tr>
             <th>รหัสพนักงาน:</th>

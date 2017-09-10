@@ -33,6 +33,45 @@ class BillingController extends Controller
         ]);
     }
 
+    public function create() {
+        return view('admin.billing.create');  
+    }
+
+    public function store(Request $request) {
+        $rules = [
+            'manager' => 'required',
+            'treasurer' => 'required'
+        ];
+
+        $attributeNames = [
+            'manager' => 'ผู้จัดการ',
+            'treasurer' => 'เหรัญญิก'
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+        $validator->setAttributeNames($attributeNames);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+        else {
+            DB::transaction(function() use ($request) {
+                $billing = new Billing();
+                $billing->manager = $request->input('manager');
+                $billing->treasurer = $request->input('treasurer');
+                $billing->save();
+
+                History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'เพิ่มชื่อผู้จัดการและเหรัญญิก');
+            });
+
+            return redirect()->action('Admin\BillingController@index')
+                ->with('flash_message', 'เพิ่มชื่อผู้จัดการและเหรัญญิกเรียบร้อยแล้ว')
+                ->with('callout_class', 'callout-success');
+        }
+    }
+
     public function edit($id) {
         return view('admin.billing.edit', [
             'billing' => Billing::find($id)

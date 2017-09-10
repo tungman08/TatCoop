@@ -11,6 +11,7 @@ use App\LoanType;
 use App\Member;
 use App\PaymentType;
 use App\Loan;
+use DB;
 use Auth;
 use Diamond;
 use History;
@@ -440,7 +441,7 @@ class LoanController extends Controller
                 ->where('cash_end', '>=', $outstanding)->first();
             $shareholding = $member->shareholdings->sum('amount');
             $pmt = LoanCalculator::pmt($loanType->rate, $outstanding, $period);
-            $percent = ($shareholding * 100) / $outstanding;
+            $percent = ($shareholding / $outstanding) * 100; // ใช้หุ้น < เงินกู้
 
             $max_cash = $loanType->limits->max('cash_end');
             if ($outstanding > $max_cash) {
@@ -459,13 +460,17 @@ class LoanController extends Controller
             if ($net_salary - $pmt < 3000) {
                 $validator->errors()->add('pmt', "ไม่สามารถกู้ได้ เนื่องจากเงินเดือนสุทธิไม่พอสำหรับขอกู้ (ค่างวดต่อเดือน " . number_format($pmt, 2, '.', ',') . " บาท)");
             }
+            if ($limit != null) {
+                if ($limit->period < $period) {
+                    $validator->errors()->add('period', "ไม่สามารถกู้ได้ เนื่องจากระยะเวลาผ่อนชำระนานกว่าที่กำหนด (จำนวนงวดสูงสุด " . number_format($limit->period, 0, '.', ',') . " งวด)");
+                }
 
-            if ($limit->period < $period) {
-                $validator->errors()->add('period', "ไม่สามารถกู้ได้ เนื่องจากระยะเวลาผ่อนชำระนานกว่าที่กำหนด (จำนวนงวดสูงสุด " . number_format($limit->period, 0, '.', ',') . " งวด)");
+                if ($percent < $limit->shareholding) {
+                    $validator->errors()->add('shareholding', "ไม่สามารถกู้ได้ เนื่องจากมีทุนเรือนหุ้นไม่พอ (ต้องการหุ้น " . number_format($limit->shareholding, 1, '.', ',') . "%, ผู้กู้มี " . number_format($percent, 1, '.', ',') . "%)");
+                }
             }
-
-            if ($percent < $limit->shareholding) {
-                $validator->errors()->add('shareholding', "ไม่สามารถกู้ได้ เนื่องจากมีทุนเรือนหุ้นไม่พอ (ต้องการหุ้น " . number_format($limit->shareholding, 1, '.', ',') . "%, ผู้กู้มี " . number_format($percent, 1, '.', ',') . "%)");
+            else {
+                $validator->errors()->add('max_cash', "ไม่สามารถกู้ได้ เนื่องจากยอดเงินที่ขอกู้มากกว่าวงเงินที่สามารถกู้ได้ (วงเงินที่กู้ได้สูงสุด " . number_format($max_cash, 2, '.', ',') . " บาท)");                
             }
         });
 
@@ -493,7 +498,7 @@ class LoanController extends Controller
                 ->where('cash_end', '>=', $outstanding)->first();
             $shareholding = $member->shareholdings->sum('amount');
             $pmt = LoanCalculator::pmt($loanType->rate, $outstanding, $period);
-            $percent = ($shareholding * 100) / $outstanding;
+            $percent = ($outstanding / $shareholding) * 100; // ใช้หุ้น > เงินกู้
 
             $max_cash = $loanType->limits->max('cash_end');
             if ($outstanding > $max_cash) {
@@ -504,12 +509,17 @@ class LoanController extends Controller
                 $validator->errors()->add('overflow', "ไม่สามารถกู้ได้ เนื่องจากยอดที่กู้รวมกันแล้วเกิน 1,200,000 บาท");
             }
 
-            if ($limit->period < $period) {
-                $validator->errors()->add('period', "ไม่สามารถกู้ได้ เนื่องจากระยะเวลาผ่อนชำระนานกว่าที่กำหนด (จำนวนงวดสูงสุด " . number_format($limit->period, 0, '.', ',') . " งวด)");
-            }
+            if ($limit != null) {
+                if ($limit->period < $period) {
+                    $validator->errors()->add('period', "ไม่สามารถกู้ได้ เนื่องจากระยะเวลาผ่อนชำระนานกว่าที่กำหนด (จำนวนงวดสูงสุด " . number_format($limit->period, 0, '.', ',') . " งวด)");
+                }
 
-            if ($percent < $limit->shareholding) {
-                $validator->errors()->add('shareholding', "ไม่สามารถกู้ได้ เนื่องจากมีทุนเรือนหุ้นไม่พอ (ต้องการหุ้น " . number_format($limit->shareholding, 1, '.', ',') . "%, ผู้กู้มี " . number_format($percent, 1, '.', ',') . "%)");
+                if ($percent > 80.0) {
+                    $validator->errors()->add('shareholding', "ไม่สามารถกู้ได้ เนื่องจากมีทุนเรือนหุ้นไม่พอ (วงเงินที่กู้ต้องไม่เกิน 80% ของหุ้น, ผู้กู้กู้ไป " . number_format($percent, 1, '.', ',') . "%)");
+                }
+            }
+            else {
+                $validator->errors()->add('max_cash', "ไม่สามารถกู้ได้ เนื่องจากยอดเงินที่ขอกู้มากกว่าวงเงินที่สามารถกู้ได้ (วงเงินที่กู้ได้สูงสุด " . number_format($max_cash, 2, '.', ',') . " บาท)");
             }
         });
 
@@ -614,5 +624,49 @@ class LoanController extends Controller
         $validator->setAttributeNames($attributeNames);
 
         return $validator;
+    }
+
+    public function edit($id, $loan_id) {
+        $member = Member::find($id);
+        $loan = Loan::find($loan_id);
+
+        return view('admin.loan.edit', [
+            'member' => $member,
+            'loan' => $loan,
+        ]);  
+    }
+
+    public function update($id, $loan_id, Request $request) {
+        $rules = [
+            'code' => 'required'
+        ];
+        
+        $attributeNames = [
+            'code' => 'เลขที่สัญญา'
+        ];    
+
+        $validator = Validator::make($request->all(), $rules);
+        $validator->setAttributeNames($attributeNames);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+        else {
+            DB::transaction(function() use ($request, $loan_id) {
+                $code = $request->input('code');
+
+                $loan = Loan::find($loan_id);
+                $loan->code = $code;
+                $loan->save();
+
+                History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'แก้ไขข้อมูลสัญญาเงินกู้เลขที่ ' . $request->input('code'));
+            });
+
+            return redirect()->action('Admin\LoanController@show', ['id' => $id, 'loan_id' => $loan_id])
+                ->with('flash_message', 'แก้ไขสัญญาเงินกู้เลขที่ ' . $request->input('code') . ' เรียบร้อยแล้ว')
+                ->with('callout_class', 'callout-success');
+        }
     }
 }
