@@ -8,7 +8,6 @@
         <small>รายละเอียดข้อมูลทุนเรือนหุ้นของสมาชิก</small>
     </h1>
     @include('website.member.layouts.breadcrumb', ['breadcrumb' => [
-        ['item' => 'ข้อมูลสมาชิก', 'link' => '/member'],
         ['item' => 'ทุนเรือนหุ้น', 'link' => ''],
     ]])
     </section>
@@ -43,7 +42,7 @@
                         <tbody>
                             @eval($count = 0)
                             @foreach($shareholdings->sortByDesc('name') as $share)
-                                @eval($date = Diamond::parse($share->name))
+                                @php($date = Diamond::parse($share->name))
                                 <tr>
                                     <td>{{ ++$count }}</td>
                                     <td class="text-primary"><i class="fa fa-money fa-fw"></i> {{ $date->thai_format('F Y') }}</td>

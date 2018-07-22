@@ -24,9 +24,10 @@ class HistoryTypesTableSeeder extends Seeder
             ['name' => 'ลบข้อมูลอย่างถาวร', 'icon' => 'fa-times', 'color' => 'bg-red'],
             ['name' => 'สร้างข้อมูลสมาชิกใหม่', 'icon' => 'fa-user-plus', 'color' => 'bg-olive'],
             ['name' => 'บันทึกการลาออกของสมาชิก', 'icon' => 'fa-user-times', 'color' => 'bg-maroon'],
-            ['name' => 'ลาออก', 'icon' => 'minus', 'color' => 'fa-bg-maroon'],
+            ['name' => 'ลาออก', 'icon' => 'fa-minus', 'color' => 'bg-maroon'],
             ['name' => 'ป้อนการชำระค่าหุ้นแบบอัตโนมัติ', 'icon' => 'fa-clipboard', 'color' => 'bg-aqua'],
-            ['name' => 'นำข้อมูลออก', 'icon' => 'fa-share-square-o', 'color' => 'bg-yellow']
+            ['name' => 'นำข้อมูลออก', 'icon' => 'fa-share-square-o', 'color' => 'bg-yellow'],
+            ['name' => 'ป้อนการชำระเงินกู้แบบอัตโนมัติ', 'icon' => 'fa-clipboard', 'color' => 'bg-aqua']
         ];
 
         // Loop through each prefix above and create the record for them in the database

@@ -41,7 +41,9 @@ class MainMenu
         if ($super) $admin->add(new MenuItem(['title' => 'จัดการบัญชีผู้ดูแลระบบฯ', 'icon' => 'fa-user-circle-o', 'url' => '/admin/administrator']));
         $admin->add(new MenuItem(['title' => 'จัดการบัญชีผู้ใช้งานระบบฯ', 'icon' => 'fa-user-circle-o', 'url' => '/admin/account']));
         $admin->add(new MenuItem(['title' => 'จัดการประเภทเงินกู้', 'icon' => 'fa-credit-card', 'url' => '/admin/loantype']));
+        $admin->add(new MenuItem(['title' => 'ตรวจสอบสัญญาเงินกู้ฯ', 'icon' => 'fa-money', 'url' => '/admin/activeloan']));
         $admin->add(new MenuItem(['title' => 'จัดการอัตราเงินปันผล', 'icon' => 'fa-dollar', 'url' => '/admin/dividend']));
+        $admin->add(new MenuItem(['title' => 'จัดการเงินปันผลของสมาชิก', 'icon' => 'fa-baht', 'url' => '/admin/dividendmember/year']));
         $admin->add(new MenuItem(['title' => 'จัดการใบรับเงินค่าหุ้น', 'icon' => 'fa-file-text-o', 'url' => '/admin/billing']));
         $admin->add(new MenuItem(['title' => 'สถิติการเข้าใช้งาน', 'icon' => 'fa-bar-chart', 'url' => '/admin/statistic']));
         $menu->add($admin);

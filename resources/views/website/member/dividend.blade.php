@@ -8,7 +8,6 @@
         <small>รายละเอียดข้อมูลเงินปันผลของสมาชิก</small>
     </h1>
     @include('website.member.layouts.breadcrumb', ['breadcrumb' => [
-        ['item' => 'ข้อมูลสมาชิก', 'link' => '/member'],
         ['item' => 'เงินปันผล', 'link' => ''],
     ]])
     </section>
@@ -74,12 +73,12 @@
                         <tbody>
                             @foreach ($dividends as $dividend)
                                 <tr>
-                                    <td class="text-primary">{{ $dividend->name }}</td>
+                                    <td class="text-primary">{{ $dividend->dividend_name }}</td>
                                     <td class="text-right">{{ number_format($dividend->shareholding, 2, '.', ',') }}</td>
                                     <td class="text-right">{{ number_format($dividend->shareholding_dividend, 2, '.', ',') }}</td>
                                     <td class="text-right">{{ number_format($dividend->interest, 2, '.', ',') }}</td>
                                     <td class="text-right">{{ number_format($dividend->interest_dividend, 2, '.', ',') }}</td>
-                                    <td class="text-right">{{ number_format($dividend->total, 2, '.', ',') }}</td>
+                                    <td class="text-right">{{ number_format($dividend->shareholding_dividend + $dividend->interest_dividend, 2, '.', ',') }}</td>
                                 </tr>
                             @endforeach
 
@@ -89,7 +88,7 @@
                             <td class="text-right"><strong>{{ number_format($dividends->sum('shareholding_dividend'), 2, '.', ',') }}</strong></td>
                             <td class="text-right"><strong>{{ number_format($dividends->sum('interest'), 2, '.', ',') }}</strong></td>
                             <td class="text-right"><strong>{{ number_format($dividends->sum('interest_dividend'), 2, '.', ',') }}</strong></td>
-                            <td class="text-right"><strong>{{ number_format($dividends->sum('total'), 2, '.', ',') }}</strong></td>
+                            <td class="text-right"><strong>{{ number_format($dividends->sum('shareholding_dividend') + $dividends->sum('interest_dividend'), 2, '.', ',') }}</strong></td>
                         </tr> 
                     </tbody>
                 </table>
@@ -124,6 +123,10 @@
 
     <script>
     $(document).ready(function () {
+        $.ajaxSetup({
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+        });
+
         $('[data-tooltip="true"]').tooltip();
 
         $('#dataTables-dividend').dataTable({
@@ -142,8 +145,8 @@
                     'year': $('#selectyear').val()
                 },
                 success: function(data) {
-                    $('.year').html(selected + 543);
-                    $('#rate').html('(อัตราเงินปันผล: ' + data.rate.shareholding_rate.format() + '%, อัตราเงินเฉลี่ยคืน: ' + data.rate.loan_rate.format() + '%)');
+                    $('.year').html(parseInt($('#selectyear').val()) + 543);
+                    $('#rate').html('(อัตราเงินปันผล: ' + data.dividend.shareholding_rate + '%, อัตราเงินเฉลี่ยคืน: ' + data.dividend.loan_rate + '%)');
                     $('#dataTables-dividend tbody>tr').remove();
 
                     var total_shareholding = 0;
@@ -153,27 +156,28 @@
                     var grand_total = 0;
 
                     jQuery.each(data.dividends, function(i, val) {
-                        $("#dataTables-dividend tbody").append('<tr><td class="text-primary">' + 
-                            val.name + '</td><td class="text-right">' + 
-                            val.shareholding.format(2) + '</td><td class="text-right">' + 
-                            val.shareholding_dividend.format(2) + '</td><td class="text-right">' + 
-                            val.interest.format(2) + '</td><td class="text-right">' +
-                            val.interest_dividend.format(2) + '</td><td class="text-right">' +
-                            val.total.format(2) + '</td></tr>');
+                        var total = val.shareholding_dividend + val.interest_dividend;
+
+                        $("#dataTables-dividend tbody").append('<tr><td class="text-primary">' + val.dividend_name + '</td>' + 
+                            '<td class="text-right">' + val.shareholding.format(2) + '</td>' + 
+                            '<td class="text-right">' + val.shareholding_dividend.format(2) + '</td>' + 
+                            '<td class="text-right">' + val.interest.format(2) + '</td>' +
+                            '<td class="text-right">' + val.interest_dividend.format(2) + '</td>' +
+                            '<td class="text-right">' + total.format(2) + '</td></tr>');
 
                         total_shareholding += val.shareholding;
                         total_shareholding_dividend += val.shareholding_dividend;
                         total_interest += val.interest;
                         total_interest_dividend += val.interest_dividend;
-                        grand_total += val.total;
+                        grand_total += total;
                     });
 
-                    $("#dataTables-dividend tbody").append('<tr><td class="text-primary"><strong>รวม</strong></td><td><strong>' + 
-                        total_shareholding.format(2) + '</strong></td><td class="text-right"><strong>' + 
-                        total_shareholding_dividend.format(2) + ' </strong></td><td class="text-right"><strong>' + 
-                        total_interest.format(2) + ' </strong></td><td class="text-right"><strong>' + 
-                        total_interest_dividend.format(2) + ' </strong></td><td class="text-right"><strong>' + 
-                        grand_total.format(2) + ' </strong></td></tr>');
+                    $("#dataTables-dividend tbody").append('<tr><td class="text-primary"><strong>รวม</strong></td>' + 
+                        '<td class="text-right"><strong>' + total_shareholding.format(2) + '</strong></td>' + 
+                        '<td class="text-right"><strong>' + total_shareholding_dividend.format(2) + ' </strong></td>' + 
+                        '<td class="text-right"><strong>' + total_interest.format(2) + ' </strong></td>' + 
+                        '<td class="text-right"><strong>' + total_interest_dividend.format(2) + ' </strong></td>' + 
+                        '<td class="text-right"><strong>' + grand_total.format(2) + ' </strong></td></tr>');
 
                     $('#grand-total').html(grand_total.format(2) + ' บาท');
                 }

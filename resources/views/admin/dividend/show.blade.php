@@ -27,13 +27,21 @@
                         <td>{{ ($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' : $member->profile->fullName }}</td>
                     </tr>
                     <tr>
-                        @php($rate = $dividend_years->last())
+                        @php($rate = (!is_null($dividend_years)) ? $dividend_years->last() : 0)
                         <th>เงินปันผลปี:</th>
-                        <td><span class="year">{{ $rate->rate_year + 543 }}</span> <span id="rate">(อัตราเงินปันผล: {{ $rate->shareholding_rate }}%, อัตราเงินเฉลี่ยคืน: {{ $rate->loan_rate }}%)</span></td>
+                        <td><span class="year">{{ $rate->rate_year + 543 }}</span></td>
                     </tr>  
                     <tr>
-                        <th>จำนวนเงินปันผล:</th>
-                        <td id="grand-total">{{ number_format($dividends->sum('total'), 2, '.', ',') }} บาท</td>
+                        <th>เงินปันผลรวม (อัตรา {{ $rate->shareholding_rate }}%):</th>
+                        <td>{{ number_format($dividends->sum('shareholding_dividend'), 2, '.', ',') }} บาท</td>
+                    </tr>
+                    <tr>
+                        <th>เงินเฉลี่ยคืนรวม (อัตรา {{ $rate->loan_rate }}%)</td>
+                        <td>{{ number_format($dividends->sum('interest_dividend'), 2, '.', ',') }} บาท</td>
+                    </tr>
+                    <tr>
+                        <th>รวมทั้งสิ้น</td>
+                        <td id="grand-total">{{ number_format($dividends->sum('shareholding_dividend') + $dividends->sum('interest_dividend'), 2, '.', ',') }} บาท</td>
                     </tr>
                 </table>
                 <!-- /.table -->
@@ -110,12 +118,12 @@
                         <tbody>
                             @foreach ($dividends as $dividend)
                                 <tr>
-                                    <td class="text-primary">{{ $dividend->name }}</td>
+                                    <td class="text-primary">{{ $dividend->dividend_name }}</td>
                                     <td class="text-right">{{ number_format($dividend->shareholding, 2, '.', ',') }}</td>
                                     <td class="text-right">{{ number_format($dividend->shareholding_dividend, 2, '.', ',') }}</td>
                                     <td class="text-right">{{ number_format($dividend->interest, 2, '.', ',') }}</td>
                                     <td class="text-right">{{ number_format($dividend->interest_dividend, 2, '.', ',') }}</td>
-                                    <td class="text-right">{{ number_format($dividend->total, 2, '.', ',') }}</td>
+                                    <td class="text-right">{{ number_format($dividend->shareholding_dividend + $dividend->interest_dividend, 2, '.', ',') }}</td>
                                 </tr>
                             @endforeach
 

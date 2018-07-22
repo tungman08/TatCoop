@@ -78,7 +78,7 @@
                     <div class="form-group">
                         <label for="pay_date" class="col-sm-2 control-label">วันที่ชำระ</label>
                         <div class="col-sm-10 input-group" id="datepicker" style="padding: 0 5px;">
-                            <input type="text" id="pay_date" value="{{ Diamond::today()->format('Y-m-d') }}"
+                            <input type="text" name="pay_date" id="pay_date"
                                 placeholder="กรุณาเลือกจากปฏิทิน..."
                                 autocomplete="off" class="form-control" />  
                             <span class="input-group-addon">
@@ -163,10 +163,10 @@
         $('[data-tooltip="true"]').tooltip();
         $(".ajax-loading").css("display", "none"); 
 
-        $('#pay_date').datetimepicker({
+        $('#datepicker').datetimepicker({
             viewMode: 'days',
             format: 'YYYY-MM-D',
-            minDate: moment(),
+            //minDate: moment(),
             locale: moment().lang('th'),
             useCurrent: false
         }).on('dp.hide', function(e){
@@ -176,7 +176,7 @@
         });
 
         $('#calculate').click(function () {
-            var date = $('#pay_date').val();
+            var date = $("#pay_date").val();
 
             if (date != '') {
                 var formData = new FormData();

@@ -65,7 +65,16 @@ class Member extends Model
      */
     public function sureties() {
         return $this->belongsToMany(Loan::class)
-            ->withPivot('amount', 'yourself')
+            ->withPivot('amount', 'yourself', 'salary')
+            ->withTimestamps();
+    }
+
+    /**
+     * Get the dividends that uses by the members.
+     */
+    public function dividends() {
+        return $this->belongsToMany(Member::class)
+            ->withPivot('dividend_name', 'shareholding', 'shareholding_dividend', 'interest', 'interest_dividend')
             ->withTimestamps();
     }
 

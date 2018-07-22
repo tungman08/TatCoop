@@ -19,7 +19,7 @@ class Loan extends Model
      * @var array
      */
     protected $fillable = [
-        'member_id', 'loan_type_id', 'payment_type_id', 'code', 'loaned_at', 'outstanding', 'rate', 'period', 'completed_at'
+        'member_id', 'loan_type_id', 'payment_type_id', 'code', 'loaned_at', 'outstanding', 'rate', 'period', 'shareholding', 'completed_at', 'step'
     ];
 
     /**
@@ -34,7 +34,7 @@ class Loan extends Model
      */
     public function sureties() {
         return $this->belongsToMany(Member::class)
-            ->withPivot('amount', 'yourself')
+            ->withPivot('amount', 'yourself', 'salary')
             ->withTimestamps();
     }
 

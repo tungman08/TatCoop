@@ -16,10 +16,12 @@ class CreateLoansTable extends Migration
             $table->increments('id');
             $table->string('code')->nullable();
             $table->date('loaned_at')->nullable();
-            $table->double('outstanding');
-            $table->float('rate');
-            $table->integer('period');
+            $table->double('outstanding')->nullable();
+            $table->float('rate')->nullable();
+            $table->integer('period')->nullable();
+            $table->boolean('shareholding');
             $table->dateTime('completed_at')->nullable();
+            $table->integer('step');
             $table->timestamps();
         });
     }

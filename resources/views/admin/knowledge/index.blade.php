@@ -67,7 +67,7 @@
                                 style="cursor: pointer;">
                                 <td>{{ $index + 1 }}.</td>
                                 <td class="text-primary"><i class="fa fa-commenting fa-fw"></i> {{ $knowledge->title }}</td>
-                                <td>{{ Diamond::parse($knowledge->created_at)->thai_format('j M Y') }}</td>
+                                <td>{{ Diamond::parse($knowledge->created_at)->thai_format('Y-m-d') }}</td>
                             </tr>
                             @endforeach
                         </tbody>                     

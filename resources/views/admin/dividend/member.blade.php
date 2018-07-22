@@ -126,7 +126,7 @@
                 { "data": "fullname" },
                 { "data": "typename" },
                 { "data": "shareholding" },
-                { "data": "loan" },
+                { "data": "interest" },
                 { "data": "total" }
             ]
         });   

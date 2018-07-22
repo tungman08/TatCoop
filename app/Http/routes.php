@@ -36,17 +36,40 @@ Route::group(['domain' => 'www.' . env('APP_DOMAIN'),
         Route::post('reset', 'PasswordController@postReset');
     });
 
-    // Member Billing Route...
+    // Member Shareholding Billing Route...
     Route::group(['prefix' => '/member/{id}/shareholding/billing/{date}'], function() {
-        Route::get('/print', ['as' => 'website.member.shareholding.billing.print', 'uses' => 'MemberController@getPrintBilling']);
-        Route::get('/pdf', ['as' => 'website.member.shareholding.billing.pdf', 'uses' => 'MemberController@getPdfBilling']);
-        Route::get('/', ['as' => 'website.member.shareholding.billing', 'uses' => 'MemberController@getBilling']);
+        Route::get('/print', ['as' => 'website.member.shareholding.billing.print', 'uses' => 'MemberController@getPrintShareholdingBilling']);
+        Route::get('/pdf', ['as' => 'website.member.shareholding.billing.pdf', 'uses' => 'MemberController@getPdfShareholdingBilling']);
+        Route::get('/', ['as' => 'website.member.shareholding.billing', 'uses' => 'MemberController@getShareholdingBilling']);
     });
+
+    // Member Shareholding Route...
+    Route::group(['prefix' => '/member/{id}/shareholding'], function() {
+        Route::get('/', ['as' => 'website.member.shareholding', 'uses' => 'MemberController@getShareholding']);
+    });
+
+    // Member Shareholding Billing Route...
+    Route::group(['prefix' => '/member/{id}/loan/{loan_id}/{payment_id}/billing/{date}'], function() {
+        Route::get('/print', ['as' => 'website.member.loan.billing.print', 'uses' => 'MemberController@getPrintLoanBilling']);
+        Route::get('/pdf', ['as' => 'website.member.loan.billing.pdf', 'uses' => 'MemberController@getPdfLoanBilling']);
+        Route::get('/', ['as' => 'website.member.loan.billing', 'uses' => 'MemberController@getLoanBilling']);
+    });
+
+    // Member Loan Route...
+    Route::group(['prefix' => '/member/{id}/loan'], function() {
+        Route::get('/{loan_id}', ['as' => 'website.member.loan.show', 'uses' => 'MemberController@getShowLoan']);
+        Route::get('/', ['as' => 'website.member.loan', 'uses' => 'MemberController@getLoan']);
+    });
+
+    // Member Guaruntee Route...
+    Route::get('/member/{id}/guaruntee', ['as' => 'website.member.guaruntee', 'uses' => 'MemberController@getGuaruntee']);
+
+    // Member Dividend Route...
+    Route::get('/member/{id}/dividend', ['as' => 'website.member.dividend', 'uses' => 'MemberController@getDividend']);
 
     // Member Route...
     Route::get('/member/unauthorize', ['as' => 'website.member.unauthorize', 'uses' => 'MemberController@getUnauthorize']);
     Route::resource('/member', 'MemberController', ['only' => ['index', 'show', 'edit', 'update']]);
-    Route::controller('/member/{id}', 'MemberController');
 
     // Pre Loan Route...
     Route::controller('/loan', 'LoanController');
@@ -141,14 +164,25 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
 
         // Loan Route...
         Route::get('loan/member', ['as' => 'service.loan.member', 'uses' => 'LoanController@getMember']);
+        Route::get('{member_id}/loan/calsurety', ['as' => 'service.loan.calsurety', 'uses' => 'LoanController@getCalSurety']);
         Route::get('{member_id}/loan/{loantype_id}/create', ['as' => 'service.loan.create', 'uses' => 'LoanController@getCreateLoan']);
-        Route::get('{member_id}/loan/{loantype_id}/create/normal', ['as' => 'service.loan.create.normal', 'uses' => 'LoanController@getCreateNormalLoan']);
-        Route::get('{member_id}/loan/{loantype_id}/create/emerging', ['as' => 'service.loan.create.emerging', 'uses' => 'LoanController@getCreateEmergingLoan']);
-        Route::get('{member_id}/loan/{loantype_id}/create/special', ['as' => 'service.loan.create.special', 'uses' => 'LoanController@getCreateSpecialLoan']);
-        Route::get('{member_id}/loan/refinance', ['as' => 'service.loan.refinance', 'uses' => 'LoanController@getRefinance']);
-        Route::post('{member_id}/loan/{loantype_id}/create/normal', 'LoanController@postCreateLoan');
-        Route::post('{member_id}/loan/{loantype_id}/create/emerging', 'LoanController@postCreateLoan');
-        Route::post('{member_id}/loan/{loantype_id}/create/special', 'LoanController@postCreateLoan');
+        Route::get('{member_id}/loan/create/normal/employee', ['as' => 'service.loan.create.normal.employee', 'uses' => 'NormalLoanController@getCreateEmployeeLoan']);
+        Route::get('{member_id}/loan/create/normal/outsider', ['as' => 'service.loan.create.normal.outsider', 'uses' => 'NormalLoanController@getCreateOutsiderLoan']);
+        Route::get('{member_id}/loan/create/emerging/employee', ['as' => 'service.loan.create.emerging.employee', 'uses' => 'EmergingLoanController@getCreateEmployeeLoan']);
+        Route::get('{member_id}/loan/create/emerging/outsider', ['as' => 'service.loan.create.emerging.outsider', 'uses' => 'EmergingLoanController@getCreateOutsiderLoan']);
+        Route::get('{member_id}/loan/create/special/employee', ['as' => 'service.loan.create.special.employee', 'uses' => 'SpecialLoanController@getCreateEmployeeLoan']);
+        Route::get('{member_id}/loan/create/special/outsider', ['as' => 'service.loan.create.special.outsider', 'uses' => 'SpecialLoanController@getCreateOutsiderLoan']);
+        Route::get('{member_id}/loan/create/refinance/employee', ['as' => 'service.loan.create.refinance.employee', 'uses' => 'RefinanceController@getCreateEmployeeRefinance']);
+        Route::get('{member_id}/loan/create/refinance/outsider', ['as' => 'service.loan.create.refinance.outsider', 'uses' => 'RefinanceController@getCreateOutsiderRefinance']);
+        Route::get('{member_id}/loan/{loan_id}/sureties/edit', ['as' => 'service.loan.sureties.edit', 'uses' => 'LoanController@getEditSureties']);
+        Route::post('{member_id}/loan/create/normal/employee', 'NormalLoanController@postCreateEmployeeLoan');
+        Route::post('{member_id}/loan/create/normal/outsider', 'NormalLoanController@postCreateOutsiderLoan');
+        Route::post('{member_id}/loan/create/emerging/employee', 'EmergingLoanController@postCreateEmployeeLoan');
+        Route::post('{member_id}/loan/create/emerging/outsider', 'EmergingLoanController@postCreateOutsiderLoan');
+        Route::post('{member_id}/loan/create/special/employee', 'SpecialLoanController@postCreateEmployeeLoan');
+        Route::post('{member_id}/loan/create/special/outsider', 'SpecialLoanController@postCreateOutsiderLoan');
+        Route::post('{member_id}/loan/create/refinance/employee', 'RefinanceController@getCreateEmployeeRefinance');
+        Route::post('{member_id}/loan/create/refinance/outsider', 'RefinanceController@getCreateOutsiderRefinance');
         Route::resource('{member_id}/loan', 'LoanController');
         
         // Payment Route...
@@ -186,16 +220,28 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
         // Loan Type Route...
         Route::get('loantype/{id}/finished', ['as' => 'admin.loantype.finished', 'uses' => 'LoanTypeController@getFinished']);
         Route::get('loantype/expired', ['as' => 'admin.loantype.expired', 'uses' => 'LoanTypeController@getExpired']);
+        Route::get('loantype/expired/{id}', ['as' => 'admin.loantype.expired.detail', 'uses' => 'LoanTypeController@getExpiredDetail']);
         Route::get('loantype/inactive', 'LoanTypeController@getInactive');
         Route::post('loantype/{id}/forcedelete', 'LoanTypeController@postForceDelete');
         Route::post('loantype/{id}/restore', 'LoanTypeController@postRestore');        
         Route::resource('loantype', 'LoanTypeController');
+
+        // Active Loan Route...
+        Route::resource('activeloan', 'ActiveloanController', ['only' => [ 'index' ]]);
+        Route::get('inactiveloan', ['as' => 'admin.activeloan.inactiveloan', 'uses' => 'ActiveloanController@getInactiveloan']);
 
         // Dividend Route...
         Route::resource('dividend', 'DividendController', ['except' => [ 'show' ]]);
 
         // Billing Route...
         Route::resource('billing', 'BillingController', ['only' => [ 'index', 'create', 'store', 'edit', 'update' ]]);
+
+        // Dividend Member Route...
+        Route::get('dividendmember/year', ['as' => 'admin.dividendmember.year', 'uses' => 'DividendmemberController@getYear']);
+        Route::get('dividendmember/{dividend_id}', ['as' => 'admin.dividendmember.index', 'uses' => 'DividendmemberController@getIndex']);
+        Route::get('dividendmember/{dividend_id}/{member_id}', ['as' => 'admin.dividendmember.show', 'uses' => 'DividendmemberController@getShow']);
+        Route::get('dividendmember/{dividend_id}/{member_id}/{m_dividend_id}/edit', ['as' => 'admin.dividendmember.edit', 'uses' => 'DividendmemberController@getEdit']);
+        Route::post('dividendmember/{dividend_id}/{member_id}/{m_dividend_id}', ['as' => 'admin.dividendmember.update', 'uses' => 'DividendmemberController@postUpdate']);  
 
         // Statistic Route...
         Route::controller('statistic', 'StatisticController', [

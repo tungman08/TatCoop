@@ -56,7 +56,7 @@
                             @foreach($shareholdings->sortByDesc('name') as $share)
                                 <tr onclick="javascript: document.location = '{{ url('service/' . $member->id . '/shareholding/' . $share->id . '/edit') }}';" style="cursor: pointer;">
                                     <td>{{ ++$count }}.</td>
-                                    <td class="text-primary"><i class="fa fa-money fa-fw"></i> {{ Diamond::parse($share->pay_date)->thai_format('j M Y') }}</td>
+                                    <td class="text-primary"><i class="fa fa-money fa-fw"></i> {{ Diamond::parse($share->pay_date)->thai_format('Y-m-d') }}</td>
                                     <td><span class="label label-primary">{{ $share->shareholding_type->name }}</td>
                                     <td>{{ number_format($share->amount, 2, '.', ',') }} บาท</td>
                                     <td>{{ !empty($share->remark) ? $share->remark : '-' }}</td>

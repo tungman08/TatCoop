@@ -1,6 +1,6 @@
 <ol class="breadcrumb">   
     @if(count($breadcrumb) > 0)
-        <li><a href="/"><i class="fa fa-home"></i> หน้าหลัก</a></li>   
+        <li><a href="{{ '/member/' . $user->member_id }}"><i class="fa fa-home"></i> หน้าหลัก</a></li>   
   
         @foreach ($breadcrumb as $header)
             @if (empty($header['link']))

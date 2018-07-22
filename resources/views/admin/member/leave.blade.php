@@ -34,10 +34,43 @@
                     <tr>
                         <th>จำนวนเงินกู้ที่ต้องชำระทั้งหมด:</th>
                         <td>
-                            {{ ($payments > 0) ?number_format($payments, 2, '.', ',') . ' บาท (รวมดอกเบี้ย)' : '-' }}
-                            <span class="text-muted" style="cursor: pointer;" data-tooltip="true" title="สัญญาเงินกู้ {{ $loanCount }} สัญญา"><i class="fa fa-info-circle"></i></span>
+                            {{ ($payments > 0) ? number_format($payments, 2, '.', ',') . ' บาท (รวมดอกเบี้ย)' : '-' }}
                         </td>
                     </tr>
+                    @if($payments > 0)
+                        <tr>
+                            <th>&nbsp;</th>
+                            <td>
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>เลขที่สัญญา</th>
+                                            <th>ประเภทเงินกู้</th>
+                                            <th>วงเงินที่กู้</th>
+                                            <th>เงินต้นคงเหลือ</th>
+                                            <th>ดอกเบี้ย ณ ปัจจุบัน</th>
+                                            <th>รวมที่ต้องชำระ</th>
+                                        <tr>
+                                    </thead>
+                                    <tbody>
+                                    @php($count = 0)
+                                    @foreach($loans as $loan)
+                                        @php($payment = MemberProperty::getClosePayment($loan))
+                                        <tr>
+                                            <td>{{ ++$count }}.</td>
+                                            <td>{{ $loan->code }}</td>
+                                            <td>{{ $loan->loanType->name }}</td>
+                                            <td>{{ number_format($loan->outstanding, 2, '.', ',') }}</td>
+                                            <td>{{ number_format($loan->outstanding - $payment->principle, 2, '.', ',') }}</td>
+                                            <td>{{ number_format($payment->interest, 2, '.', ',') }}</td>
+                                            <td>{{ number_format(($loan->outstanding - $payment->principle) + $payment->interest, 2, '.', ',') }}
+                                    @endforeach
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    @endif
                     @if($shareholdings != $payments)
                         <tr>
                             <th class="{{ ($shareholdings > $payments) ? 'text-success' : 'text-danger' }}">{{ ($shareholdings > $payments) ? 'รับเงินค่าหุ้นคืน' : 'ชำระค่าเงินกู้เพิ่ม' }}:</th>
@@ -49,7 +82,7 @@
             </div>  
             <!-- /.table-responsive --> 
 
-            <span class="pull-right text-danger small">* กรุณารับ/จ่ายเงินให้แก่สมาชิกก่อนกดปุ่มยืนยันการลาออก</span>
+            <span class="pull-right text-danger small">* ระบบจะทำการเคลียร์ยอดหุ้นและเงินกู้จนเป็นศูนย์ กรุณารับ/จ่ายเงินให้แก่สมาชิกก่อนกดปุ่มยืนยันการลาออก</span>
         </div>
 
         @if ($errors->count() > 0)
@@ -80,9 +113,19 @@
                             'data-mask',
                             'autocomplete'=>'off',
                             'class'=>'form-control'])
-                        }}
+                        }} 
                     </div>
 
+                    <div class="form-group padding-l-md padding-r-md">
+                        {{ Form::label('leave_date', 'วันที่ลาออก', [
+                            'class'=>'control-label']) 
+                        }}
+                        {{ Form::text('leave_date', null, [
+                            'id' => 'leave_date',
+                            'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
+                            'class'=>'form-control'])
+                        }} 
+                    </div>
                 </div>
                 <!-- /.box-body -->
 
@@ -112,11 +155,18 @@
 @endsection
 
 @section('styles')
+    <!-- Bootstrap DateTime Picker CSS -->
+    {!! Html::style(elixir('css/bootstrap-datetimepicker.css')) !!}
+
     @parent
 @endsection
 
 @section('scripts')
     @parent
+
+    <!-- Bootstrap DateTime Picker JavaScript -->
+    {!! Html::script(elixir('js/moment.js')) !!}
+    {!! Html::script(elixir('js/bootstrap-datetimepicker.js')) !!}
 
     <!-- InputMask JavaScript -->
     {{ Html::script(elixir('js/jquery.inputmask.js')) }}
@@ -129,6 +179,14 @@
         // $('form').submit(function() {
         //    $("[data-mask]").inputmask('remove');
         //});
+
+        $('#leave_date').datetimepicker({
+            locale: 'th',
+            viewMode: 'days',
+            format: 'YYYY-MM-DD',
+            locale: moment().lang('th'),
+            useCurrent: false
+        });
     });
     </script>
 @endsection

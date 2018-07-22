@@ -352,7 +352,7 @@ class ProvincesTableSeeder extends Seeder
                     [ 'name' => 'บางไผ่', 'postcode' => '11000' ],
                     [ 'name' => 'สวนใหญ่', 'postcode' => '11000' ],
                     [ 'name' => 'ตลาดขวัญ', 'postcode' => '11000' ],
-                    [ 'name' => 'บางเขต', 'postcode' => '11000' ],
+                    [ 'name' => 'บางเขน', 'postcode' => '11000' ],
                     [ 'name' => 'บางกระสอ', 'postcode' => '11000' ],
                     [ 'name' => 'ท่าทราย', 'postcode' => '11000' ],
                     [ 'name' => 'บางศรีเมือง', 'postcode' => '11000' ],

@@ -27,7 +27,7 @@ use App\Dividend;
 use App\User;
 use App\LoanType;
 use App\Loan;
-use App\LoanPayment;
+use App\Payment;
 
 class MemberController extends Controller
 {    
@@ -148,7 +148,7 @@ class MemberController extends Controller
 
                 $member = new Member();
                 $member->profile_id = $profile->id;
-                $member->shareholding = ($request->input('profile')['employee']['employee_type_id'] < 3) ? $request->input('shareholding') : 0;
+                $member->shareholding = ($request->input('profile')['employee']['employee_type_id'] == 1) ? $request->input('shareholding') : 0;
                 $member->fee = ($is_employee) ? 200 : 100;
                 $member->start_date = Diamond::parse($request->input('start_date'));
                 $member->save();
@@ -228,7 +228,7 @@ class MemberController extends Controller
         else {
             DB::transaction(function() use ($request, $id) {
                 $member = Member::find($id);
-                $member->shareholding = ($request->input('profile')['employee']['employee_type_id'] < 3) ? $request->input('shareholding') : 0;
+                $member->shareholding = ($request->input('profile')['employee']['employee_type_id'] == 1) ? $request->input('shareholding') : 0;
                 $member->start_date = Diamond::parse($request->input('start_date'));
                 $member->save();
 
@@ -279,7 +279,7 @@ class MemberController extends Controller
                 return view('admin.member.leave', [
                     'member' => $member,
                     'shareholdings' => $member->shareHoldings->sum('amount'),
-                    'loanCount' => $member->loans->filter(function ($value, $key) { return is_null($value->completed_at); })->count(),
+                    'loans' => $member->loans->filter(function ($value, $key) { return is_null($value->completed_at); }),
                     'payments' => ($payments->outstanding - $payments->principle) + $payments->interest
                 ]);
             }
@@ -328,9 +328,6 @@ class MemberController extends Controller
             $leave_date = Diamond::parse($request->input("leave_date"));
 
             DB::transaction(function() use ($member, $leave_date) {
-                $member->leave_date = $leave_date;
-                $member->save();
-
                 //ปิดยอดหุ้น
                 $total = Shareholding::where('member_id', $member->id)->sum('amount');
 
@@ -346,19 +343,24 @@ class MemberController extends Controller
                 //ปิดยอดเงินกู้
                 $loans = $member->loans->filter(function ($value, $key) { return is_null($value->completed_at); });
 
-                //ลบบัญชี
-                $member->user()->forceDelete();
-
                 foreach ($loans as $loan) {
-                    $payment = new LoanPayment();
-                    $payment->pay_date = Diamond::now();
+                    $payment = new Payment();
+                    $payment->pay_date = $leave_date;
                     $payment->principle = $loan->outstanding - $loan->payments->sum('principle');
                     $payment->interest = LoanCalculator::loan_interest($loan, Diamond::today());
-
+        
                     $loan->payments()->save($payment);
-                    $loan->completed_at = Diamond::now();
+                    $loan->completed_at = $leave_date;
+                    $loan->shareholding = 0;
                     $loan->save();
                 }
+
+                //บันทึกการลาออก
+                $member->leave_date = $leave_date;
+                $member->save();
+
+                //ลบบัญชี
+                $member->user()->forceDelete();
 
                 $user = User::where('member_id', $member->id)->first();
 

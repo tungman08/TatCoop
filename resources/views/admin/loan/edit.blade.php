@@ -55,6 +55,20 @@
                             }}        
                         </div>
                     </div>
+                    
+                    <div class="form-group">
+                        {{ Form::label('loaned_at', 'วันที่ทำสัญญา', [
+                            'class'=>'col-sm-2 control-label']) 
+                        }}
+
+                        <div class="col-sm-10">
+                            {{ Form::text('loaned_at', $loan->loaned_at, [
+                                'id' => 'loaned_at',
+                                'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
+                                'class'=>'form-control'])
+                            }}             
+                        </div>
+                    </div>
                 </div>
 
                 <!-- /.box-body -->
@@ -82,9 +96,28 @@
 @endsection
 
 @section('styles')
+    <!-- Bootstrap DateTime Picker CSS -->
+    {!! Html::style(elixir('css/bootstrap-datetimepicker.css')) !!}
+
     @parent
 @endsection
 
 @section('scripts')
     @parent
+
+    <!-- Bootstrap DateTime Picker JavaScript -->
+    {!! Html::script(elixir('js/moment.js')) !!}
+    {!! Html::script(elixir('js/bootstrap-datetimepicker.js')) !!}
+
+    <script>
+    $(document).ready(function () {
+        $('#loaned_at').datetimepicker({
+            locale: 'th',
+            viewMode: 'days',
+            format: 'YYYY-MM-DD',
+            locale: moment().lang('th'),
+            useCurrent: false
+        });
+    });
+    </script>
 @endsection

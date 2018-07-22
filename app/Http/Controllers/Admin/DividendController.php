@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Dividend;
+use App\Dividendmember;
 use App\Member;
 use Auth;
 use DB;
@@ -44,19 +45,25 @@ class DividendController extends Controller
     }
 
     public function getMemberDividend($member_id) {
-        $member = Member::find($member_id);
         $dividend_years = Dividend::all();
+
+        $member = Member::find($member_id);
+        $dividend = $dividend_years->last();
+
+        $dividends = Dividendmember::where('dividend_id', $dividend->id)
+            ->where('member_id', $member->id)
+            ->get();
 
         return view('admin.dividend.show', [
             'member' => $member,
             'dividend_years' => collect($dividend_years),
-            'dividends' => MemberProperty::getDividend($member, $dividend_years->last()->rate_year),
+            'dividends' => $dividends,
         ]);
     }
 
     public function index() {
         return view('admin.dividend.index', [
-            'dividends'=>Dividend::orderBy('rate_year', 'desc')->get()
+            'dividends' => Dividend::orderBy('rate_year', 'desc')->get()
         ]);
     }
 
@@ -68,13 +75,15 @@ class DividendController extends Controller
         $rules = [
             'rate_year' => 'required|digits:4|unique:dividends,rate_year', 
             'shareholding_rate' => 'required|numeric|between:0,100',
-            'loan_rate' => 'required|numeric|between:0,100'
+            'loan_rate' => 'required|numeric|between:0,100',
+            'release_date' => 'required|date_format:Y-m-d',
         ];
 
         $attributeNames = [
             'rate_year' => 'ปี ค.ศ.', 
             'shareholding_rate' => 'อัตราเงินปันผล',
-            'loan_rate' => 'อัตราเงินเฉลี่ยคืน'
+            'loan_rate' => 'อัตราเงินเฉลี่ยคืน',
+            'release_date' => 'วันที่เผยแพร่'
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -91,9 +100,10 @@ class DividendController extends Controller
                 $dividend->rate_year = $request->input('rate_year');
                 $dividend->shareholding_rate = $request->input('shareholding_rate');
                 $dividend->loan_rate = $request->input('loan_rate');
+                $dividend->release_date = Diamond::parse($request->input('release_date'));
                 $dividend->save();
     
-                History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'ป้อนอัตราเงินปันผล ประจำปี ' . $dividend->rate_year + 543);
+                History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'ป้อนอัตราเงินปันผล ประจำปี ' . $dividend->rate_year);
             });
 
             return redirect()->action('Admin\DividendController@index')
@@ -190,12 +200,14 @@ class DividendController extends Controller
                     $data[] = $member->memberCode;
                     $data[] = $member->profile->fullName;
 
-                    $m_dividends = MemberProperty::getDividend($member, $dividend->rate_year);
+                    $m_dividends = Dividendmember::where('dividend_id', $dividend->id)
+                        ->where('member_id', $member->id)
+                        ->get();
 
                     $index = 0;
                     $column = 3;
                     foreach ($m_dividends as $m_dividend) {
-                        $pointer = ($index > 0) ? Diamond::parse($m_dividend->name)->month : 0;
+                        $pointer = ($index > 0) ? Diamond::parse($m_dividend->dividend_name)->month : 0;
 
                         if ($index == 0) {
                             $data[] = $m_dividend->shareholding_dividend;
@@ -214,7 +226,7 @@ class DividendController extends Controller
                             }
 
                             $data[] = $m_dividend->shareholding_dividend;
-                            $data[] = "=" . $this->getExcelColumn($column) . "$row*B2*(" . strval(12 - Diamond::parse($m_dividend->name)->month) . "/12)";
+                            $data[] = "=" . $this->getExcelColumn($column) . "$row*B2*(" . strval(12 - Diamond::parse($m_dividend->dividend_name)->month) . "/12)";
                             $column += 2;
                         }
 
@@ -236,8 +248,8 @@ class DividendController extends Controller
                         $this->getExcelColumn(20) . "$row+" . $this->getExcelColumn(22) . "$row+" .
                         $this->getExcelColumn(24) . "$row+" . $this->getExcelColumn(26) . "$row+" .
                         $this->getExcelColumn(28) . "$row";
-
-                    $data[] = $m_dividends.sum('interest_dividend');
+                        
+                    $data[] = $m_dividends->sum('interest_dividend');
 
                     $data[] = "=" .  $this->getExcelColumn(29) . "$row+" . $this->getExcelColumn(30) . "$row";
 

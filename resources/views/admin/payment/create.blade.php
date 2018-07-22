@@ -76,31 +76,13 @@
             @php
                 $header = '';
 
-                if ($member->profile->employee->employee_type_id == 1) {
-                    // พนักงาน/ลูกจ้าง
-                    if ($loan->payments->count() > 0) {
-                        // ผ่อนแล้ว
-                        $last_pay_date = Diamond::parse($loan->payments->max('pay_date'));
-
-                        if ($last_pay_date->gt(Diamond::today())) {
-                            // หักบัญชีอัตโนมัติในเดือนนี้ไปแล้ว
-                            $start = $loan->payments->count() > 1 ? Diamond::parse($loan->payments->orderBy('pay_date')->skip(1)->take(1)->first()->pay_date)->thai_format('d M Y') : Diamond::parse($loan->loaned_at)->thai_format('d M Y');
-                            $header = $start . ' ถึงวันที่มาชำระ';
-                        }
-                        else {
-                            // ยังไม่ได้หักบัญชีอัตโนมัติในเดือนนี้
-                            $header = Diamond::parse($loan->payments->max('pay_date'))->thai_format('d M Y') . ' ถึงวันที่มาชำระ';
-                        }
-                    }
-                    else {
-                        // ยังไม่เคยผ่อน
-                        $header = Diamond::parse($loan->loaned_at)->thai_format('d M Y') . ' ถึงวันที่มาชำระ';
-                    }
+                if ($loan->payments->count() > 0) {
+                    // ผ่อนแล้ว
+                    $header = Diamond::parse($loan->payments->max('pay_date'))->thai_format('d M Y') . ' ถึงวันที่มาชำระ';
                 }
                 else {
-                    // บุคคลภายนอก
-                    $start = $loan->payments->count() > 0 ? Diamond::parse($loan->payments->max('pay_date'))->thai_format('d M Y') : Diamond::parse($loan->loaned_at)->thai_format('d M Y');
-                    $header = $start . ' ถึงวันที่มาชำระ';
+                    // ยังไม่เคยผ่อน
+                    $header = Diamond::parse($loan->loaned_at)->thai_format('d M Y') . ' ถึงวันที่มาชำระ';
                 }
             @endphp
 
@@ -138,7 +120,8 @@
                             {{ Form::text('amount', null, [
                                 'class'=>'form-control', 
                                 'placeholder'=>'ตัวอย่าง: 10000', 
-                                'autocomplete'=>'off'])
+                                'autocomplete'=>'off',
+                                'onkeypress' => 'javascript:return isNumberKey(event);'])
                             }}  
                         </div>
                     </div>
@@ -159,10 +142,11 @@
 
                         <div class="col-sm-10">
                             {{ Form::text('principle', null, [
-                                'readonly' => true,
+                                'readonly' => false,
                                 'class'=>'form-control', 
                                 'placeholder'=>'กรุณากดปุมคำนวณ...', 
-                                'autocomplete'=>'off'])
+                                'autocomplete'=>'off',
+                                'onkeypress' => 'javascript:return isNumberKey(event);'])
                             }}        
                         </div>
                     </div>
@@ -173,10 +157,11 @@
 
                         <div class="col-sm-10">
                             {{ Form::text('interest', null, [
-                                'readonly' => true,
+                                'readonly' => false,
                                 'class'=>'form-control', 
                                 'placeholder'=>'กรุณากดปุมคำนวณ...', 
-                                'autocomplete'=>'off'])
+                                'autocomplete'=>'off',
+                                'onkeypress' => 'javascript:return isNumberKey(event);'])
                             }}        
                         </div>
                     </div>
@@ -186,7 +171,7 @@
                 <div class="box-footer">
                     {{ Form::button('<i class="fa fa-save"></i> บันทึก', [
                         'id'=>'save',
-                        'disabled' => true,
+                        'disabled' => false,
                         'type' => 'submit', 
                         'class'=>'btn btn-primary btn-flat'])
                     }}
@@ -271,7 +256,9 @@
                         $('#interest').val($.number(result.interest, 2));
                         $('#total').val($.number(result.total, 2));
 
-                        $('#save').removeAttr("disabled");
+                        if (result.interest >= 0) {
+                            $('#save').removeAttr("disabled");
+                        }              
                     }
                 });
             }
@@ -279,5 +266,12 @@
                 alert('กรุณาเลือกวันที่จากปฏิทิน');
             }
         }
+        
+        function isNumberKey(evt){
+            var charCode = (evt.which) ? evt.which : event.keyCode
+            if (charCode != 8 && charCode != 127 && charCode != 46 && (charCode < 48 || charCode > 57))
+                return false;
+            return true;
+        }   
     </script>
 @endsection

@@ -13,7 +13,13 @@
                 </div>
                 <div class="panel-body">
                     <p>สามารถแก้ไขข้อมูลส่วนตัว และเรียกดูข้อมูลทุนเรือนหุ้น เงินปันผลประจำปี การกู้ยืม รวมถึงสถานะการค้ำประกัน</p>
-                    <button class="btn btn-primary" onclick="javascript:window.location.href='{{ url('/member') }}'">เข้าใช้งาน</button>
+					@if (Auth::guard('users')->check())
+						@php($member_id = App\User::find(Auth::guard('users')->id())->member_id)
+
+	                    <a href="{{ url('/member/' . $member_id ) }}" class="btn btn-primary" target="_blank">เข้าใช้งาน</a>
+					@else
+	                    <a href="{{ url('/member') }}" class="btn btn-primary" target="_blank">เข้าใช้งาน</a>
+					@endif
                 </div>
             </div>
         </div>
@@ -26,7 +32,7 @@
                 </div>
                 <div class="panel-body">
                     <p>สำหรับใช้คำนวณการผ่อนชำระค่างวดเงินกู้เบื้องต้น สำหรับสมาชิกก่อนทำการกู้ยืม</p>
-                    <button class="btn btn-success" onclick="javascript:window.location.href='{{ url('/loan') }}'">เข้าใช้งาน</button>
+                    <a href="{{ url('/loan') }}" class="btn btn-success">เข้าใช้งาน</a>
                 </div>
             </div>
         </div>

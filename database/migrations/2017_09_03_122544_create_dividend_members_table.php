@@ -12,9 +12,28 @@ class CreateDividendMembersTable extends Migration
      */
     public function up()
     {
-        Schema::create('dividend_members', function (Blueprint $table) {
+        Schema::create('dividend_member', function (Blueprint $table) {
             $table->increments('id');
+
+            $table->integer('dividend_id')->unsigned();
+            $table->foreign('dividend_id')->references('id')
+                ->on('dividends')->onDelete('cascade');
+
+            $table->integer('member_id')->unsigned();
+            $table->foreign('member_id')->references('id')
+                ->on('members')->onDelete('cascade');
+
+            $table->string('dividend_name');
+            $table->float('shareholding');
+            $table->float('shareholding_dividend');
+            $table->float('interest');
+            $table->float('interest_dividend');
+
             $table->timestamps();
+        });
+
+        Schema::table('dividends', function (Blueprint $table) {
+            $table->date('release_date')->after('loan_rate');
         });
     }
 
@@ -25,6 +44,15 @@ class CreateDividendMembersTable extends Migration
      */
     public function down()
     {
+        Schema::table('dividends', function (Blueprint $table) {
+            $table->dropColumn('release_date');
+        });
+
+        Schema::table('dividend_members', function (Blueprint $table) {
+            $table->dropForeign('dividend_members_dividend_id_foreign');
+            $table->dropForeign('dividend_members_member_id_foreign');
+        });
+
         Schema::drop('dividend_members');
     }
 }

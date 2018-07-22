@@ -160,17 +160,17 @@
         </div>
     </div>
     <div class="form-group">
-        {{ Form::label('profile[subdistrict_id]', 'ตำบล/แขวง', [
+        {{ Form::label('profile[province_id]', 'จังหวัด', [
             'class'=>'col-sm-2 control-label']) 
         }}
 
         <div class="col-sm-10">
-            {{ Form::select('profile[subdistrict_id]', $subdistricts->lists('name', 'id'), null, [
-                'id' => 'subdistrict_id',
+            {{ Form::select('profile[province_id]', $provinces->lists('name', 'id'), null, [
+                'id' => 'province_id',
                 'class' => 'form-control']) 
             }}
         </div>
-    </div>
+    </div>    
     <div class="form-group">
         {{ Form::label('profile[district_id]', 'อำเภอ/เขต', [
             'class'=>'col-sm-2 control-label']) 
@@ -184,13 +184,13 @@
         </div>
     </div>
     <div class="form-group">
-        {{ Form::label('profile[province_id]', 'จังหวัด', [
+        {{ Form::label('profile[subdistrict_id]', 'ตำบล/แขวง', [
             'class'=>'col-sm-2 control-label']) 
         }}
 
         <div class="col-sm-10">
-            {{ Form::select('profile[province_id]', $provinces->lists('name', 'id'), null, [
-                'id' => 'province_id',
+            {{ Form::select('profile[subdistrict_id]', $subdistricts->lists('name', 'id'), null, [
+                'id' => 'subdistrict_id',
                 'class' => 'form-control']) 
             }}
         </div>

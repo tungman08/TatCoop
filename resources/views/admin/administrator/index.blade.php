@@ -67,7 +67,7 @@
                                 <td>{{ $index + 1 }}.</td>
                                 <td class="text-primary"><i class="fa fa-user-secret fa-fw"></i> {{ $adminx->email }}</td>
                                 <td>{{ $adminx->name }}</td>
-                                <td>{{ Diamond::parse($adminx->created_at)->thai_format('j M Y') }}</td>
+                                <td>{{ Diamond::parse($adminx->created_at)->thai_format('Y-m-d') }}</td>
                             </tr>
                             @endforeach
                         </tbody>

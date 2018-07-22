@@ -52,8 +52,8 @@
                             <tr>
                                 <td>{{ $index + 1 }}.</td>
                                 <td class="text-primary"><i class="fa fa-commenting fa-fw"></i> {{ $inactive->title }}</td>
-                                <td>{{ Diamond::parse($inactive->created_at)->thai_format('j M Y') }}</td>
-                                <td>{{ Diamond::parse($inactive->deleted_at)->thai_format('j M Y') }}</td>
+                                <td>{{ Diamond::parse($inactive->created_at)->thai_format('Y-m-d') }}</td>
+                                <td>{{ Diamond::parse($inactive->deleted_at)->thai_format('Y-m-d') }}</td>
                                 <td>
                                     <div class="btn-group">
                                         {{ Form::open(['url' => '/website/knowledge/' . $inactive->id . '/restore', 'method' => 'post']) }}

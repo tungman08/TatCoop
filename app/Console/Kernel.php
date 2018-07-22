@@ -16,7 +16,8 @@ class Kernel extends ConsoleKernel
         Commands\AdminCommand::class,
         Commands\BingCommand::class,
         Commands\MailCommand::class,
-        Commands\ViewMakeCommand::class
+        Commands\ViewMakeCommand::class,
+        Commands\DividendCommand::class
     ];
 
     /**

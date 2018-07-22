@@ -82,7 +82,7 @@
                         </tr>
                         <tr>
                             <th>วันเกิด:</th>
-                            <td>{{ (!empty($member->profile->birth_date)) ? Diamond::parse($member->profile->birth_date)->thai_format('j M Y') : '-' }}</td>
+                            <td>{{ (!empty($member->profile->birth_date)) ? Diamond::parse($member->profile->birth_date)->thai_format('Y-m-d') : '-' }}</td>
                         </tr>
                         <tr>
                             <th>ที่อยู่:</th>
@@ -90,12 +90,12 @@
                         </tr>
                         <tr>
                             <th>เป็นสมาชิกเมื่อ:</th>
-                            <td>{{ Diamond::parse($member->start_date)->thai_format('j M Y') }}</td>
+                            <td>{{ Diamond::parse($member->start_date)->thai_format('Y-m-d') }}</td>
                         </tr>
                         @if (!is_null($member->leave_date))
                             <tr>
                                 <th>ออกจากสมาชิกเมื่อ:</th>
-                                <td>{{ Diamond::parse($member->leave_date)->thai_format('j M Y') }}</td>
+                                <td>{{ Diamond::parse($member->leave_date)->thai_format('Y-m-d') }}</td>
                             </tr>
                         @endif
                         <tr>
@@ -113,8 +113,8 @@
                                         @foreach ($histories as $history)
                                             <tr>
                                                 <td>{{ $history->memberCode }}</td>
-                                                <td>{{ Diamond::parse($history->start_date)->thai_format('j M Y') }}</td>
-                                                <td>{{ is_null($history->leave_date) ? '-' : Diamond::parse($history->leave_date)->thai_format('j M Y') }}</td>
+                                                <td>{{ Diamond::parse($history->start_date)->thai_format('Y-m-d') }}</td>
+                                                <td>{{ is_null($history->leave_date) ? '-' : Diamond::parse($history->leave_date)->thai_format('Y-m-d') }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>

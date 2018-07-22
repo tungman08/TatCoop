@@ -81,8 +81,16 @@
             useCurrent: false
         }).on('dp.hide', function(e){
             setTimeout(function() {
-                $('#rate_year').data('DateTimePicker').viewMode('months');
+                $('#rate_year').data('DateTimePicker').viewMode('years');
             }, 1);
+        });
+
+        $('#release_date').datetimepicker({
+                locale: 'th',
+                viewMode: 'days',
+                format: 'YYYY-MM-DD',
+                locale: moment().lang('th'),
+                useCurrent: false
         });
     </script>
 @endsection

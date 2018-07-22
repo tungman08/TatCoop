@@ -24,7 +24,7 @@
                 @php
                     $loansCount = $member->loans->filter(function ($value, $key) { return !is_null($value->code) && is_null($value->completed_at); })->count();
                     $outstanding = $member->loans->filter(function ($value, $key) { return !is_null($value->code) && is_null($value->completed_at); })->sum('outstanding');
-                    $principle = $member->loans->filter(function ($value, $key) { return !is_null($value->code) && is_null($value->completed_at); })->sum('payments.principle');
+                    $principle = $member->loans->filter(function ($value, $key) { return !is_null($value->code) && is_null($value->completed_at); })->sum(function ($value) { return $value->payments->sum('principle'); });
                 @endphp
 
                 <table class="table table-info">
@@ -95,13 +95,19 @@
             <!-- /.box-header -->
 
             <div class="box-body">
-                <div class="btn-group">
-                    <button id="create_loan" class="btn btn-primary btn-flat" style="margin-bottom: 15px;">
-                        <i class="fa fa-plus-circle fa-fw"></i> ทำสัญญาเงินกู้ใหม่
+                <button id="create_loan" class="btn btn-primary btn-flat" style="margin-bottom: 15px;">
+                    <i class="fa fa-plus-circle fa-fw"></i> ทำสัญญาเงินกู้ใหม่
+                </button>
+                <button id="cal_loan" class="btn btn-default btn-flat margin-b-md pull-right" type="button" data-tooltip="true" title="คำนวณความสามารถในการกู้">
+                    <i class="fa fa-calculator"></i> ความสามารถในกู้
+                </button>
+                @if ($member->profile->employee->employee_type_id == 1)
+                    <button id="cal_surety" class="btn btn-default btn-flat margin-b-md pull-right margin-r-sm" type="button" data-tooltip="true" title="คำนวณความสามารถในการค้ำประกัน">
+                        <i class="fa fa-calculator"></i> ความสามารถในการค้ำ
                     </button>
-                </div>
+                @endif
 
-                <div class="table-responsive">
+                <div class="table-responsive" style=" margin-top: 10px;">
                     <table id="dataTables-loans" class="table table-hover dataTable" width="100%">
                         <thead>
                             <tr>
@@ -118,17 +124,17 @@
                         <tbody>
                             @php($count = 0)
                             @foreach($loans as $loan) 
-                            <tr onclick="javascript: document.location = '{{ url('service/' . $member->id . '/loan/' . $loan->id) }}';"
-                                style="cursor: pointer;">
-                                <td>{{ ++$count }}</td>
-                                <td class="text-primary"><i class="fa fa-file-text-o fa-fw"></i> {{ $loan->code }}</td>
-                                <td><span class="label label-primary">{{ $loan->loanType->name }}</span></td>
-                                <td>{{ Diamond::parse($loan->loaned_at)->thai_format('j M Y') }}</td>
-                                <td>{{ number_format($loan->outstanding, 2, '.', ',') }}</td>
-                                <td>{{ number_format($loan->payments->count(), 0, '.', ',') }}/{{ number_format($loan->period, 0, '.', ',') }}</td>
-                                <td>{{ number_format($loan->payments->sum('principle'), 2, '.', ',') }}</td>
-                                <td>{!! (!is_null($loan->completed_at)) ? '<span class="label label-success">ปิดยอดแล้ว</span>' : '<span class="label label-danger">กำลังผ่อนชำระ</span>' !!}</td>
-                            </tr>
+                                <tr onclick="javascript: document.location = '{{ url('service/' . $member->id . '/loan/' . $loan->id) }}';"
+                                    style="cursor: pointer;">
+                                    <td>{{ ++$count }}</td>
+                                    <td class="text-primary"><i class="fa fa-file-text-o fa-fw"></i> {{ $loan->code }}</td>
+                                    <td><span class="label label-primary">{{ $loan->loanType->name }}</span></td>
+                                    <td>{{ Diamond::parse($loan->loaned_at)->thai_format('Y-m-d') }}</td>
+                                    <td>{{ number_format($loan->outstanding, 2, '.', ',') }}</td>
+                                    <td>{{ number_format($loan->payments->count(), 0, '.', ',') }}/{{ number_format($loan->period, 0, '.', ',') }}</td>
+                                    <td>{{ number_format($loan->payments->sum('principle'), 2, '.', ',') }}</td>
+                                    <td>{!! (!is_null($loan->completed_at)) ? '<span class="label label-success">ปิดยอดแล้ว</span>' : '<span class="label label-danger">กำลังผ่อนชำระ</span>' !!}</td>
+                                </tr>
                             @endforeach
                         </tbody>
                     </table>
@@ -147,7 +153,7 @@
         <i class="fa fa-spinner fa-3x fa-spin"></i>
     </div>
 
-    <!-- Special Load Modal -->
+    <!-- Special Loan Modal -->
     <div id="loanModal" class="modal fade" role="dialog">
         <div class="modal-dialog">
 
@@ -171,6 +177,26 @@
             </div>
         </div>
     </div>
+
+    <!-- Salary Modal -->
+    <div id="salaryModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header panel-heading">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">กรุณากรอกเงินเดือน</h4>
+                </div>
+                <div class="modal-body text-center">
+                    <button class="btn btn-primary btn-flat margin-t-lg margin-b-lg"
+                        onclick="javascript:void(0);">
+                        <i class="fa fa-file-o"></i> คำนวณ
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>  
 @endsection
 
 @section('styles')
@@ -217,7 +243,15 @@
                     $('#loanModal').modal('show');
                 }
             });
-        }) 
+        });
+        
+        $('#cal_loan').click(function () {
+            $('#salaryModal').modal('show');
+        });
+
+        $('#cal_surety').click(function () {
+            $('#salaryModal').modal('show');
+        });
     });   
     </script>
 @endsection

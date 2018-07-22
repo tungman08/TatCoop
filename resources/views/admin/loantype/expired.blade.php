@@ -49,12 +49,13 @@
                         <tbody>
                             @eval($count = 0)
                             @foreach($loantypes as $type)
-                            <tr>
+                            <tr onclick="javascript: document.location = '{{ url('/admin/loantype/expired/' . $type->id) }}';"
+                                style="cursor: pointer;">
                                 <td>{{ ++$count }}</td>
                                 <td class="text-primary"><i class="fa fa-credit-card fa-fw"></i> {{ $type->name }}</td>
-                                <td>{{ Diamond::parse($type->start_date)->thai_format('j M Y') }}</td>
-                                <td>{{ Diamond::parse($type->expire_date)->thai_format('j M Y') }}</td>
-                                <td>0</td>
+                                <td>{{ Diamond::parse($type->start_date)->thai_format('Y-m-d') }}</td>
+                                <td>{{ Diamond::parse($type->expire_date)->thai_format('Y-m-d') }}</td>
+                                <td>{{ number_format($type->loans->filter(function ($value, $key) { return !empty($value->code); })->count()) }}</td>
                             </tr>
                             @endforeach
                         </tbody>

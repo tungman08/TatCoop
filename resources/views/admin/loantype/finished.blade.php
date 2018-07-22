@@ -45,11 +45,11 @@
                         <tboby>
                             @php ($index = 0)
                             @foreach($loans as $loan)
-                                <tr>
+                                <tr style="cursor: pointer;" onclick="javascript: document.location = '/service/{{ $loan->member->id }}/loan/{{ $loan->id }}';">
                                     <td>{{ ++$index }}</td>
                                     <td class="text-primary"><i class="fa fa-credit-card fa-fw"></i>{{ $loan->code }}</td>
                                     <td>{{ $loan->member->profile->fullName }}</td>
-                                    <td>{{ Diamond::parse($loan->loaned_at)->thai_format('j M y') }}</td>
+                                    <td>{{ Diamond::parse($loan->loaned_at)->thai_format('Y-m-d') }}</td>
                                     <td>{{ number_format($loan->outstanding, 2, '.', ',') }}</td>
                                     <td>{{ number_format($loan->period, 0, '.', ',') }}</td>
                                 </tr>

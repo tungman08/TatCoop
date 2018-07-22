@@ -40,7 +40,7 @@
                             <li class="list-group-item">
                                 <b>เข้าระบบครั้งล่าสุด</b> 
                                 <a class="pull-right display-number">
-                                    {{ Diamond::parse($admin->administrator_statistics->max('create_at'))->thai_format('j M Y') }}
+                                    {{ Diamond::parse($admin->administrator_statistics->max('create_at'))->thai_format('Y-m-d') }}
                                 </a>
                             </li>
                         </ul>

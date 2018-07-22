@@ -37,6 +37,6 @@ class CreatePaymentsTable extends Migration
             $table->dropForeign('payments_loan_id_foreign');
         });
 
-        Schema::drop('loan_payments');
+        //Schema::drop('loan_payments');
     }
 }

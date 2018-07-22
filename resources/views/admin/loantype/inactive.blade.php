@@ -53,8 +53,8 @@
                             <tr>
                                 <td>{{ ++$count }}</td>
                                 <td class="text-primary"><i class="fa fa-credit-card fa-fw"></i> {{ $type->name }}</td>
-                                <td>{{ Diamond::parse($type->start_date)->thai_format('j M Y') }}</td>
-                                <td>{{ Diamond::parse($type->deleted_at)->thai_format('j M Y') }}</td>
+                                <td>{{ Diamond::parse($type->start_date)->thai_format('Y-m-d') }}</td>
+                                <td>{{ Diamond::parse($type->deleted_at)->thai_format('Y-m-d') }}</td>
                                 <td>
                                     <div class="btn-group">
                                         {{ Form::open(['url' => '/admin/loantype/' . $type->id . '/restore', 'method' => 'post']) }}

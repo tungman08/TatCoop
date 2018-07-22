@@ -218,4 +218,10 @@ class LoanTypeController extends Controller
             ->with('flash_message', 'คืนค่าประเภทเงินกู้เรียบร้อยแล้ว')
             ->with('callout_class', 'callout-success');
     }
+
+    public function getExpiredDetail($id) {
+        return view('admin.loantype.expireddetail', [
+            'loantype' => LoanType::find($id)
+        ]);
+    }
 }

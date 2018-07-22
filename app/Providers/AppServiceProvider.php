@@ -88,6 +88,14 @@ class AppServiceProvider extends ServiceProvider
 
         App::bind('loancalculator', function() {
             return new \App\Classes\LoanCalculator;
-        });         
+        }); 
+        
+        App::bind('loanmanager', function() {
+            return new \App\Classes\LoanManager;
+        });    
+
+        App::bind('dividendcalculator', function() {
+            return new \App\Classes\DividendCalculator;
+        });    
     }
 }

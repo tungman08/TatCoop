@@ -17,7 +17,7 @@
                     </div>
                     <div class="ratings">
                         <p class="pull-right">อ่าน: {{ number_format($item->viewer, 0, '.', ',') }}</p>
-                        <p><i class="fa fa-clock-o"></i> {{ (Diamond::now()->diff(Diamond::parse($item->created_at))->days > 2) ? Diamond::parse($item->created_at)->thai_format('j M Y') : Diamond::parse($item->created_at)->thai_diffForHumans() }}</p>
+                        <p><i class="fa fa-clock-o"></i> {{ (Diamond::now()->diff(Diamond::parse($item->created_at))->days > 2) ? Diamond::parse($item->created_at)->thai_format('Y-m-d') : Diamond::parse($item->created_at)->thai_diffForHumans() }}</p>
                     </div>      
                 </div>
             </div>

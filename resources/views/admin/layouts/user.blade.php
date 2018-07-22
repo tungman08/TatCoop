@@ -12,7 +12,7 @@
             <p>
                 {{ $admin->email }}<br />
                 {{ $admin->name }}
-                <small>ลงทะเบียนเมื่อ: {{ Diamond::parse($admin->create_at)->thai_format('j M Y') }}</small>
+                <small>ลงทะเบียนเมื่อ: {{ Diamond::parse($admin->create_at)->thai_format('Y-m-d') }}</small>
             </p>
         </li>
 

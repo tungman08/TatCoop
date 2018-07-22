@@ -8,6 +8,10 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
 use App\Billing;
+use Auth;
+use DB;
+use History;
+use Validator;
 
 class BillingController extends Controller
 {

@@ -17,6 +17,7 @@ use App\District;
 use App\Subdistrict;
 use App\Member;
 use App\Dividend;
+use App\Dividendmember;
 use App\LoanType;
 
 class AjaxController extends Controller
@@ -84,21 +85,23 @@ class AjaxController extends Controller
     public function postDividend(Request $request) {
         $member = Member::find($request->input('id'));
         $year = intval($request->input('year'));
-        $dividends = MemberProperty::getDividend($member, $year);
-        $rate = Dividend::where('rate_year', $year)->first();
+        $dividend = Dividend::where('rate_year', $year)->first();
+
+        $dividends = Dividendmember::where('dividend_id', $dividend->id)
+            ->where('member_id', $member->id)
+            ->get();
         
-        return compact('member', 'dividends', 'rate');
+        return compact('member', 'dividends', 'dividend');
     }
 
     public function postLoan(Request $request) {
         $loan_type_id = $request->input('loan_type');
         $outstanding = $request->input('outstanding');
         $period = $request->input('period');
-        $start = Diamond::parse($request->input('start'));
         $loanType = LoanType::find($loan_type_id);
 
-        $general = collect(LoanCalculator::payment($loanType->rate, 1, $outstanding, $period, $start));
-        $stable = collect(LoanCalculator::payment($loanType->rate, 2, $outstanding, $period, $start));
+        $general = collect(LoanCalculator::payment($loanType->rate, 1, $outstanding, $period, Diamond::parse($request->input('start'))));
+        $stable = collect(LoanCalculator::payment($loanType->rate, 2, $outstanding, $period, Diamond::parse($request->input('start'))));
 
         $info = (object)[
             'rate' => $loanType->rate,

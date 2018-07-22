@@ -222,6 +222,7 @@ return [
         'UploadDocument' => App\Facades\UploadDocument::class,
         'History' => App\Facades\History::class,
         'LoanCalculator' => App\Facades\LoanCalculator::class,
+        'LoanManager' => App\Facades\LoanManager::class,
         'DividendCalculator' => App\Facades\DividendCalculator::class,
     ],
 

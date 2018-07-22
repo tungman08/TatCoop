@@ -51,9 +51,10 @@
                         <thead>
                             <tr>
                                 <th style="width: 10%;">#</th>
-                                <th style="width: 30%;">ปี พ.ศ.</th>
-                                <th style="width: 30%;">อัตราเงินปันผล</th>
-                                <th style="width: 30%;">อัตราเงินเฉลี่ยคืน</th>
+                                <th style="width: 15%;">ปี พ.ศ.</th>
+                                <th style="width: 25%;">อัตราเงินปันผล</th>
+                                <th style="width: 25%;">อัตราเงินเฉลี่ยคืน</th>
+                                <th style="width: 25%;">วันที่เผยแพร่</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -64,6 +65,7 @@
                                 <td class="text-primary">ปี {{ $dividend->rate_year + 543 }}</td>
                                 <td>{{ number_format($dividend->shareholding_rate, 1, '.', ',') }} %</td>
                                 <td>{{ number_format($dividend->loan_rate, 1, '.', ',') }} %</td>
+                                <td>{{ Diamond::parse($dividend->release_date)->thai_format('Y-m-d') }}</td>
                             </tr>
                             @endforeach
                         </tbody>

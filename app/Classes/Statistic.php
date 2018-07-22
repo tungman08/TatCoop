@@ -57,7 +57,7 @@ class Statistic
         $statistics->lastWeek = VisitorStatistic::whereBetween('created_at', [Diamond::today()->subWeek()->startOfWeek(), Diamond::today()->subWeek()->endOfWeek()])->count();
         $statistics->thisMonth = VisitorStatistic::whereBetween('created_at', [Diamond::today()->startOfMonth(), Diamond::today()->endOfDay()])->count();
         $statistics->lastMonth = VisitorStatistic::whereBetween('created_at', [Diamond::today()->subMonth()->startOfMonth(), Diamond::today()->subMonth()->endOfMonth()])->count();
-        $statistics->start = Diamond::parse(VisitorStatistic::min('created_at'))->thai_format('j M Y');
+        $statistics->start = Diamond::parse(VisitorStatistic::min('created_at'))->thai_format('Y-m-d');
 
         $statistics->ip_address = $this->info->ip_address;
         $statistics->platform = $this->info->platform;
@@ -75,7 +75,7 @@ class Statistic
         $statistics->lastWeek = UserStatistic::whereBetween('created_at', [Diamond::today()->subWeek()->startOfWeek(), Diamond::today()->subWeek()->endOfWeek()])->count();
         $statistics->thisMonth = UserStatistic::whereBetween('created_at', [Diamond::today()->startOfMonth(), Diamond::today()->endOfDay()])->count();
         $statistics->lastMonth = UserStatistic::whereBetween('created_at', [Diamond::today()->subMonth()->startOfMonth(), Diamond::today()->subMonth()->endOfMonth()])->count();
-        $statistics->start = Diamond::parse(UserStatistic::min('created_at'))->thai_format('j M Y');
+        $statistics->start = Diamond::parse(UserStatistic::min('created_at'))->thai_format('Y-m-d');
 
         $statistics->ip_address = $this->info->ip_address;
         $statistics->platform = $this->info->platform;
@@ -93,7 +93,7 @@ class Statistic
         $statistics->lastWeek = AdministratorStatistic::whereBetween('created_at', [Diamond::today()->subWeek()->startOfWeek(), Diamond::today()->subWeek()->endOfWeek()])->count();
         $statistics->thisMonth = AdministratorStatistic::whereBetween('created_at', [Diamond::today()->startOfMonth(), Diamond::today()->endOfDay()])->count();
         $statistics->lastMonth = AdministratorStatistic::whereBetween('created_at', [Diamond::today()->subMonth()->startOfMonth(), Diamond::today()->subMonth()->endOfMonth()])->count();
-        $statistics->start = Diamond::parse(AdministratorStatistic::min('created_at'))->thai_format('j M Y');
+        $statistics->start = Diamond::parse(AdministratorStatistic::min('created_at'))->thai_format('Y-m-d');
 
         return $statistics;
     }

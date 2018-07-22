@@ -99,10 +99,10 @@
                         }}
 
                         <div class="col-sm-10 input-group" id="datepicker" style="padding: 0 5px;">
-                            {{ Form::text('pay_date', Diamond::today()->format('Y-m-d'), [
+                            {{ Form::text('pay_date', null, [
                                 'readonly' => true,
-                                'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
-                                'class'=>'form-control'])
+                                'placeholder' => 'กรุณาเลือกจากปฏิทิน...', 
+                                'class' => 'form-control'])
                             }}       
                             <span class="input-group-addon">
                                 <span class="fa fa-calendar">
@@ -117,9 +117,11 @@
 
                         <div class="col-sm-10">
                             {{ Form::text('principle', null, [
+                                'readonly' => false,
                                 'class'=>'form-control', 
                                 'placeholder'=>'ตัวอย่าง: 100000', 
-                                'autocomplete'=>'off'])
+                                'autocomplete' =>'off',
+                                'onkeypress' => 'javascript:return isNumberKey(event);'])
                             }}        
                         </div>
                     </div>
@@ -130,10 +132,11 @@
 
                         <div class="col-sm-10">
                             {{ Form::text('interest', null, [
-                                'readonly' => true,
+                                'readonly' => false,
                                 'class'=>'form-control', 
                                 'placeholder'=>'กรุณากดปุมคำนวณ...', 
-                                'autocomplete'=>'off'])
+                                'autocomplete'=>'off',
+                                'onkeypress' => 'javascript:return isNumberKey(event);'])
                             }}        
                         </div>
                     </div>
@@ -193,5 +196,12 @@
                 useCurrent: false
             });
         });
+
+        function isNumberKey(evt){
+            var charCode = (evt.which) ? evt.which : event.keyCode
+            if (charCode != 8 && charCode != 127 && charCode != 46 && (charCode < 48 || charCode > 57))
+                return false;
+            return true;
+        }    
     </script>
 @endsection

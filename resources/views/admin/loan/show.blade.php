@@ -47,25 +47,37 @@
                         <th>ดอกเบี้ยสะสม:</th>
                         <td>{{ number_format($loan->payments->sum('interest'), 2, '.', ',') }} บาท</td>
                     </tr>
-                    <tr>
-                        <th>ผู้ค้ำประกัน:</th>
-                        <td>
-                            <ul class="list-info">
-                                @foreach($loan->sureties as $item)
-                                    <li>{{ $item->profile->fullName }} (ค้ำประกันจำนวน {{ number_format($item->pivot->amount, 2, '.', ',')  }}  บาท)</li>
-                                @endforeach
-                            </ul>
-                        </td>
-                    </tr>
+                    
+                    @if ($loan->loan_type_id == 1)
+                        <tr>
+                            <th>ผู้ค้ำประกัน:</th>
+                            <td>
+                                <ul class="list-info">
+                                    @foreach($loan->sureties as $item)
+                                        <li>{{ $item->profile->fullName }} (ค้ำประกันจำนวน {{ number_format($item->pivot->amount, 2, '.', ',')  }}  บาท)</li>
+                                    @endforeach
+                                </ul>
+                            </td>
+                        </tr>
+                    @endif
                 </table>
                 <!-- /.table -->
             </div>  
             <!-- /.table-responsive --> 
 
-            <button type="button" class="btn btn-primary btn-flat"
-                onclick="javascript:window.location.href = '{{ url('/service/' . $member->id . '/loan/' . $loan->id . '/edit') }}';">
-                <i class="fa fa-pencil"></i> แก้ไขสัญญา
-            </button>
+            @if (is_null($loan->completed_at))
+                <button type="button" class="btn btn-primary btn-flat"
+                    onclick="javascript:window.location.href = '{{ url('/service/' . $member->id . '/loan/' . $loan->id . '/edit') }}';">
+                    <i class="fa fa-pencil"></i> แก้ไขสัญญา
+                </button>
+
+                @if ($loan->loan_type_id == 1 && !$loan->shareholding)
+                    <button type="button" class="btn btn-primary btn-flat"
+                        onclick="javascript:window.location.href = '{{ url('/service/' . $member->id . '/loan/' . $loan->id . '/sureties/edit') }}';">
+                        <i class="fa fa-pencil"></i> แก้ไขผู้ค้ำประกัน
+                    </button>
+                @endif
+            @endif
         </div>
 
         @if(Session::has('flash_message'))

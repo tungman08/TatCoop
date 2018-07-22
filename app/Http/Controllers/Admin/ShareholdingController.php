@@ -190,7 +190,7 @@ class ShareholdingController extends Controller
         $members = Member::active()
             ->join('employees', 'members.profile_id', '=', 'employees.profile_id')
             ->where('members.shareholding', '>', 0)
-            ->where('employees.employee_type_id', '<', 3)
+            ->where('employees.employee_type_id', 1)
             ->whereDate('members.start_date', '<', $date)
             ->whereNotIn('members.id', function($query) use ($date) {
                 $query->from('shareholdings')

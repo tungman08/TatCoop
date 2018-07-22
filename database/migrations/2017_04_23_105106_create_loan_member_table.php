@@ -28,6 +28,7 @@ class CreateLoanMemberTable extends Migration
             $table->foreign('member_id')->references('id')
                 ->on('members')->onDelete('cascade');
 
+            $table->double('salary');
             $table->double('amount');
             $table->boolean('yourself');
             $table->timestamps();

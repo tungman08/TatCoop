@@ -28,10 +28,9 @@
                 'class'=>'form-control'])
             }}
         </div>
-    </div>
-
-     <div class="form-group">
-        {{ Form::label('loan_rate', 'อัตราเงินเฉลี่ยนคืน (%)', [
+    </div> 
+    <div class="form-group">
+        {{ Form::label('loan_rate', 'อัตราเงินเฉลี่ยคืน (%)', [
             'class'=>'col-sm-2 control-label']) 
         }}
 
@@ -41,6 +40,22 @@
                 'autocomplete'=>'off',
                 'class'=>'form-control'])
             }}
+        </div>
+    </div>
+    <div class="form-group">
+        {{ Form::label('release_date', 'วันที่เผยแพร่', [
+            'class'=>'col-sm-2 control-label']) 
+        }}
+
+        <div class="col-sm-10 input-group" id="release_date" style="padding: 0 5px;">
+            {{ Form::text('release_date', null, [
+                'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
+                'class'=>'form-control'])
+            }}       
+            <span class="input-group-addon">
+                <span class="fa fa-calendar">
+                </span>
+            </span> 
         </div>
     </div>
 </div>

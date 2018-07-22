@@ -27,5 +27,14 @@ class Dividend extends Model
      *
      * @var array
      */
-    protected $dates = ['created_at', 'updated_at'];
+    protected $dates = ['release_date', 'created_at', 'updated_at'];
+
+    /**
+     * Get the members that uses by the dividend.
+     */
+    public function members() {
+        return $this->belongsToMany(Member::class)
+            ->withPivot('dividend_name', 'shareholding', 'shareholding_dividend', 'interest', 'interest_dividend')
+            ->withTimestamps();
+    }
 }

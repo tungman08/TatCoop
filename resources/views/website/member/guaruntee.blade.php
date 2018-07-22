@@ -8,7 +8,6 @@
         <small>รายละเอียดข้อมูลทุนเรือนหุ้นของสมาชิก</small>
     </h1>
     @include('website.member.layouts.breadcrumb', ['breadcrumb' => [
-        ['item' => 'ข้อมูลสมาชิก', 'link' => '/member'],
         ['item' => 'การค้ำประกัน', 'link' => ''],
     ]])
     </section>
@@ -33,25 +32,27 @@
                         <thead>
                             <tr>
                                 <th style="width: 5%;">#</th>
-                                <th style="width: 15%;">เลขที่สัญญา</th>
-                                <th style="width: 25%;">ชื่อผู้กู้</th>
+                                <th style="width: 10%;">เลขที่สัญญา</th>
+                                <th style="width: 26%;">ชื่อผู้กู้</th>
                                 <th style="width: 15%;">วันที่กู้</th>
-                                <th style="width: 15%;">วงเงินที่กู้</th>
-                                <th style="width: 15%;">จำนวนเงินค้ำประกัน</th>
+                                <th style="width: 10%;">วงเงินที่กู้</th>
+                                <th style="width: 12%;">จำนวนเงินค้ำประกัน</th>
+                                <th style="width: 12%;">เงินค้ำประกันคงเหลือ</th>
                                 <th style="width: 10%;">สถานะ</th>
                             </tr>
                         </thead>
                         <tbody>
                             @php($count = 0)
-                            @foreach($member->sureties as $loan)
+                            @foreach($member->sureties->filter(function ($value, $key) { return !is_null($value->code) && is_null($value->completed_at); }) as $loan)
                                 @if ($loan->member->id <> $member->id)
-                                    <tr onclick="javascript: document.location = '{{ url('/member/' . $member->id . '/quaruntee/' . $loan->id) }}';" style="cursor: pointer;">
+                                    <tr>
                                         <td>{{ ++$count }}</td>
                                         <td class="text-primary"><i class="fa fa-file-text-o fa-fw"></i> {{ $loan->code }}</td>
                                         <td>{{ $loan->member->profile->fullName }}</td>
-                                        <td>{{ Diamond::parse($loan->loaned_at)->thai_format('j M Y') }}</td>
+                                        <td>{{ Diamond::parse($loan->loaned_at)->thai_format('Y-m-d') }}</td>
                                         <td>{{ number_format($loan->outstanding, 2, '.', ',') }}</td>
                                         <td>{{ number_format($loan->pivot->amount, 2, '.', ',') }}</td>
+                                        <td>{{ number_format(LoanCalculator::surety_balance($loan), 2, '.', ',') }}</td>
                                         <td class="{{ is_null($loan->completed_at) ? 'text-danger' : 'text-success' }}">{{ is_null($loan->completed_at) ? 'กำลังผ่อนชำระ' : 'ผ่อนชำระหมดแล้ว' }}</td>
                                     </tr>
                                 @endif

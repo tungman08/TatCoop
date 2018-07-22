@@ -158,20 +158,25 @@ class PaymentController extends Controller
             ->join('employees', 'profiles.id', '=', 'employees.profile_id')
             ->join('employee_types', 'employees.employee_type_id', '=', 'employee_types.id')
             ->join('loans', 'members.id', '=', 'loans.member_id')
-            ->where('employees.employee_type_id', '<', 3)
+            ->where('employees.employee_type_id', 1)
             ->whereDate('members.start_date', '<', $date)
             ->whereNull('loans.completed_at')
             ->get();
 
         DB::transaction(function() use ($members, $date) {
             foreach($members as $member) {
-                foreach($member->loans->filter(function ($value, $key) { return is_null($value->completed_at); }) as $loan) {
+                $loans = Loan::where('member_id', $member->member_id)
+                    ->whereNull('completed_at')
+                    ->get();
+
+                foreach($loans as $loan) {
                     $pay = LoanCalculator::monthly_payment($loan, $date);
 
                     $payment = new Payment();
                     $payment->pay_date = $date;
                     $payment->principle = $pay->principle;
                     $payment->interest = $pay->interest;
+
                     $loan->payments()->save($payment);
                 }
             }

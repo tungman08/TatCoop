@@ -32,6 +32,7 @@ use App\Subdistrict;
 use App\Province;
 use App\Postcode;
 use App\Dividend;
+use App\Dividendmember;
 use App\Shareholding;
 use App\Document;
 use App\DocumentType;
@@ -80,7 +81,7 @@ class AjaxController extends Controller
 
             return Datatables::queryBuilder($members)
                 ->editColumn('startdate', function($member) {
-                        return Diamond::parse($member->startdate)->thai_format('j M Y');
+                        return Diamond::parse($member->startdate)->thai_format('Y-m-d');
                     })
                 ->editColumn('leavedate', function($member) {
                         return '-';
@@ -101,10 +102,10 @@ class AjaxController extends Controller
 
             return Datatables::queryBuilder($members)
                 ->editColumn('startdate', function($member) {
-                        return Diamond::parse($member->startdate)->thai_format('j M Y');
+                        return Diamond::parse($member->startdate)->thai_format('Y-m-d');
                     })
                 ->editColumn('leavedate', function($member) {
-                        return Diamond::parse($member->leavedate)->thai_format('j M Y');
+                        return Diamond::parse($member->leavedate)->thai_format('Y-m-d');
                     })
                 ->make(true);
         }
@@ -714,7 +715,7 @@ class AjaxController extends Controller
 
         return Datatables::queryBuilder($users)
             ->editColumn('register_at', function($user) {
-                    return Diamond::parse($user->register_at)->thai_format('j M Y');
+                    return Diamond::parse($user->register_at)->thai_format('Y-m-d');
                 })
             ->make(true);
     }
@@ -735,55 +736,53 @@ class AjaxController extends Controller
         if ($surety != null) {
             // ตรวจสอบว่าค้ำตัวเองหรือไม่
             if ($surety->id == $member->id) {
-                $total_outstanding = $surety->loans->filter(function ($value, $key) { return !is_null($value->code) && is_null($value->completed_at); })->sum('outstanding');
-                $total_principle = $surety->loans->filter(function ($value, $key) { return !is_null($value->code) && is_null($value->completed_at); })->sum('payments.principle');
-                $available = ($surety->shareholdings->sum('amount') * 0.8) - ($total_outstanding - $total_principle);
-
-                // ตรวจสอบว่ามีหุ้นพอค้ำไหม
-                if ($available >= $loan->outstanding) {
-                    if ($loan->sureties()->where('member_id', $surety->id)->count() == 0) {
-                        $result = new stdClass();
-                        $result->loan_id = $loan->id;
-                        $result->id = $surety->id;
-                        $result->memberCode = $surety->memberCode;
-                        $result->fullName = $surety->profile->fullName;
-                        $result->yourself = true;
-                        $result->employee = $surety->profile->employee->employee_type->id == 1;
-                    }
-                    else {
-                        $result = new stdClass();
-                        $result->id = 0;
-                        $result->message = "ผู้ค้ำประกันไม่สามารถเพิ่มซ้ำได้";  
-                    }
+                // ตรวจสอบว่าได้ใช้ค้ำในสัญญานี้แล้วหรือไม่
+                if ($loan->sureties->where('member_id', $surety->id)->count() == 0) {
+                    $result = new stdClass();
+                    $result->loan_id = $loan->id;
+                    $result->id = $surety->id;
+                    $result->memberCode = $surety->memberCode;
+                    $result->fullName = $surety->profile->fullName;
+                    $result->yourself = true;
+                    $result->employee = $surety->profile->employee->employee_type->id == 1;
                 }
                 else {
                     $result = new stdClass();
                     $result->id = 0;
-                    $result->message = "จำนวนหุ้นที่เหลืออยู่ไม่เพียงพอที่จะกู้";  
+                    $result->message = "ผู้ค้ำประกันไม่สามารถเพิ่มซ้ำได้";  
                 }
             }
             else {
-                // ตรวจว่าค้ำประกันไม่เกิน 2 สัญญา ไม่นับค้ำด้วยหุ้นตนเอง
-                if ($surety->sureties()->where('yourself', false)->whereNull('completed_at')->count() < 2) {
-                    if ($loan->sureties()->where('member_id', $surety->id)->count() == 0) {
-                        $result = new stdClass();
-                        $result->loan_id = $loan->id;
-                        $result->id = $surety->id;
-                        $result->memberCode = $surety->memberCode;
-                        $result->fullName = $surety->profile->fullName;
-                        $result->yourself = false;
-                        $result->employee = $surety->profile->employee->employee_type->id == 1;
+                // ต้องเป็นพนักงานเท่ากัน
+                if ($surety->profile->employee->employee_type_id == 1) {
+                    // ตรวจว่าค้ำประกันไม่เกิน 2 สัญญา ไม่นับค้ำด้วยหุ้นตนเอง
+                    if ($surety->sureties->filter(function ($value, $key) use ($surety) { return !is_null($value->code) && is_null($value->completed_at) && $value->member_id != $surety->id; })->count() < 2) {
+                        // ตรวจสอบว่าได้ใช้ค้ำในสัญญานี้แล้วหรือไม่
+                        if ($loan->sureties->where('member_id', $surety->id)->count() == 0) {
+                            $result = new stdClass();
+                            $result->loan_id = $loan->id;
+                            $result->id = $surety->id;
+                            $result->memberCode = $surety->memberCode;
+                            $result->fullName = $surety->profile->fullName;
+                            $result->yourself = false;
+                            $result->employee = $surety->profile->employee->employee_type->id == 1;
+                        }
+                        else {
+                            $result = new stdClass();
+                            $result->id = 0;
+                            $result->message = "ผู้ค้ำประกันไม่สามารถเพิ่มซ้ำได้";  
+                        }
                     }
                     else {
                         $result = new stdClass();
                         $result->id = 0;
-                        $result->message = "ผู้ค้ำประกันไม่สามารถเพิ่มซ้ำได้";  
+                        $result->message = "ผู้ค้ำประกันได้ใช้สิทธิ์การค้ำ 2 สัญญาเท่านั้น";
                     }
                 }
                 else {
                     $result = new stdClass();
                     $result->id = 0;
-                    $result->message = "ผู้ค้ำประกันได้ใช้สิทธิ์การค้ำ 2 สัญญาเท่านั้น";
+                    $result->message = "ผู้ค้ำประกันต้องเป็นพนักงานเท่านั้น";  
                 }
             }
         }
@@ -803,84 +802,83 @@ class AjaxController extends Controller
         $result = null;
 
         if ($loan->outstanding >= $amount) {
-            // ค้ำตนเอง คำนวณหุ้นที่เหลือ
+            // ค้ำตัวเอง (ใช้หุ้น)
             if ($loan->member_id == $member->id) {
-                $available = LoanCalculator::shareholding_available($member);
+                if ($member->profile->employee->employee_type->id == 1) { // พนักงาน/ลูกจ้าง ททท.
+                    $available = ($member->shareholdings->sum('amount') * 0.9 < 1200000) ? $member->shareholdings->sum('amount') * 0.9 : 1200000;
 
-                if ($available >= $amount) {
-                    $loan->sureties()->attach($member->id, ['amount' => $amount, 'yourself' => true]);
-
-                    $result = new stdClass();
-                    $result->id = $member->id;
-                    $result->loan_id = $loan->id;
-                    $result->name = $member->profile->fullName;
-                    $result->amount = number_format($amount, 2, '.', ',');
-                    $result->yourself = true;
-                }
-                else {
-                    $result = new stdClass();
-                    $result->id = 0;
-                    $result->message = "ไม่สามารถค้ำประกันได้ เนื่องจากจำนวนหุ้นที่เหลือไม่พอใช้ค้ำประกัน (80% ของหุ้น - (ยอดที่ใช้ค้ำ * % หนี้คงเหลือ))";
-                }
-            }
-            // ค้ำผู้อื่น
-            else {
-                // พนักงาน ใช้เงินเดือน
-                if ($member->profile->employee->employee_type->id == 1) {
-                    $salary = $request->input('salary');
-                    $netSalary = $request->input('netSalary');
-                    $pmt = LoanCalculator::pmt($loan->loanType->rate, $loan->outstanding, $loan->period);
-                    $max_surety = $salary * 40;
-
-                    if ($max_surety > $loan->outstanding) {
-                        if ($netSalary - $pmt >= 3000) {
-                            $loan->sureties()->attach($member->id, ['amount' => $amount, 'yourself' => false]);
-
-                            $result = new stdClass();
-                            $result->id = $member->id;
-                            $result->loan_id = $loan->id;
-                            $result->name = $member->profile->fullName;
-                            $result->amount = number_format($amount, 2, '.', ',');
-                            $result->yourself = false;
-                        }
-                        else {
-                            $result = new stdClass();
-                            $result->id = 0;
-                            $result->message = "ไม่สามารถค้ำประกันได้ เนื่องจากเงินเดือนสุทธิผู้ค้ำไม่พอ";
-                        }
+                    if ($available >= $amount) {
+                        $loan->sureties()->attach($member->id, ['salary' => 0, 'amount' => $amount, 'yourself' => true]);
+    
+                        $result = new stdClass();
+                        $result->id = $member->id;
+                        $result->loan_id = $loan->id;
+                        $result->name = $member->profile->fullName;
+                        $result->amount = number_format($amount, 2, '.', ',');
+                        $result->available = number_format($available, 2, '.', ',');
+                        $result->yourself = true;
                     }
                     else {
                         $result = new stdClass();
                         $result->id = 0;
-                        $result->message = "ไม่สามารถค้ำประกันได้ เนื่องจาก 40 เท่าของเงินเดือนผู้ค้ำต้องมากกว่ายอดที่ยื่นกู้";
+                        $result->message = "ไม่สามารถค้ำประกันได้ เนื่องจากจำนวนหุ้นไม่พอใช้ค้ำประกัน (90% ของหุ้น แต่ไม่เกิน 1,200,000 บาท)";
                     }
                 }
-                // บุคคลภายนอก ใช้หุ้น
-                else {
+                else { // บุคคลภายนอก
                     $available = LoanCalculator::shareholding_available($member);
 
                     if ($available >= $amount) {
-                        $loan->sureties()->attach($member->id, ['amount' => $amount, 'yourself' => true]);
+                        $loan->sureties()->attach($member->id, ['salary' => 0, 'amount' => $amount, 'yourself' => true]);
 
                         $result = new stdClass();
                         $result->id = $member->id;
                         $result->loan_id = $loan->id;
                         $result->name = $member->profile->fullName;
                         $result->amount = number_format($amount, 2, '.', ',');
+                        $result->available = number_format($available, 2, '.', ',');
                         $result->yourself = false;
                     }
                     else {
                         $result = new stdClass();
                         $result->id = 0;
-                        $result->message = "ไม่สามารถค้ำประกันได้ เนื่องจากจำนวนหุ้นที่ใช้ค้ำประกันผู้อื่นไม่พอ (80% ของหุ้น - (ยอดที่ใช้ค้ำ * % หนี้คงเหลือ))";
+                        $result->message = "ไม่สามารถค้ำประกันได้ เนื่องจากจำนวนหุ้นไม่พอใช้ค้ำประกัน (80% ของหุ้น แต่ไม่เกิน 1,200,000 บาท)";
                     }
+                }
+            }
+            // ค้ำผู้อื่น (ต้องเป็นพนักงาน/ลูกจ้าง ททท. เท่านั้น ใช้เงินเดือนค้ำ)
+            else {
+                $salary = $request->input('salary');
+                $netSalary = $request->input('netSalary');
+                $available = LoanCalculator::salary_available($member, $salary);
+
+                if ($netSalary < 3000) {
+                    $result = new stdClass();
+                    $result->id = 0;
+                    $result->message = "ไม่สามารถค้ำประกันได้ เนื่องจากเงินเดือนสุทธิผู้ค้ำ น้อยกว่า 3,000 บาท";
+
+                }
+                else if ($available < $amount) {
+                    $result = new stdClass();
+                    $result->id = 0;
+                    $result->message = "ไม่สามารถค้ำประกันได้ เงินเดือนไม่พอที่ใช้ค้ำประกัน (สามารถค้ำได้ " . number_format($available, 2, '.', ',') . " บาท)";
+                }
+                else {
+                    $loan->sureties()->attach($member->id, ['salary' => $salary, 'amount' => $amount, 'yourself' => false]);
+
+                    $result = new stdClass();
+                    $result->id = $member->id;
+                    $result->loan_id = $loan->id;
+                    $result->name = $member->profile->fullName;
+                    $result->amount = number_format($amount, 2, '.', ',');
+                    $result->available = number_format($available, 2, '.', ',');
+                    $result->yourself = false;
                 }
             }
         }
         else {
             $result = new stdClass();
             $result->id = 0;
-            $result->message = "ไม่สามารถค้ำประกันได้ เนื่องจากยอดเงินที่ค้ำประกันต้องน้อยกว่าหรือเท่ากับยอดที่ต้องการกู้";
+            $result->message = "ไม่สามารถค้ำประกันได้ เนื่องจากยอดเงินที่ค้ำประกันต้องไม่เกินยอดที่ต้องการกู้";
         }
 
         return Response::json($result);
@@ -897,9 +895,8 @@ class AjaxController extends Controller
 
     public function postLoan(Request $request) {
         $loan = Loan::find($request->input('loan_id'));
-        $start_date = Diamond::today();
 
-        $payment = collect(LoanCalculator::payment($loan->loanType->rate, $loan->paymentType->id, $loan->outstanding, $loan->period, $start_date));
+        $payment = collect(LoanCalculator::payment($loan->loanType->rate, $loan->paymentType->id, $loan->outstanding, $loan->period, Diamond::today()));
 
         $info = (object)[
             'rate' => $loan->loanType->rate,
@@ -917,7 +914,7 @@ class AjaxController extends Controller
             ->join('profiles', 'members.profile_id', '=', 'profiles.id')
             ->join('employees', 'profiles.id', '=', 'employees.profile_id')
             ->join('employee_types', 'employees.employee_type_id', '=', 'employee_types.id')
-            ->leftJoin(DB::raw('(select * from loans where loans.code is not null and loans.completed_at is null) loans'), 'members.id', '=', 'loans.member_id')
+            ->leftJoin(DB::raw('(SELECT * FROM loans WHERE loans.code IS NOT NULL AND loans.completed_at IS NULL) loans'), 'members.id', '=', 'loans.member_id')
             ->leftJoin('payments', 'loans.id', '=', 'payments.loan_id')
             ->whereNull('members.leave_date')
             ->groupBy(['members.id', 'profiles.name', 'profiles.lastname', 'employee_types.name'])
@@ -925,8 +922,8 @@ class AjaxController extends Controller
                 DB::raw("LPAD(members.id, 5, '0') as code"),
                 DB::raw("CONCAT('<span class=\"text-primary\"><i class=\"fa fa-user fa-fw\"></i> ', IF(profiles.name = '<ข้อมูลถูกลบ>', profiles.name, CONCAT(profiles.name, ' ', profiles.lastname)), '</span>') as fullname"),
                 DB::raw("CONCAT('<span class=\"label label-primary\">', employee_types.name, '</span>') as typename"),
-                DB::raw("IF(COUNT(DISTINCT loans.id) > 0 , CONCAT(FORMAT(COUNT(DISTINCT loans.id), 0), ' สัญญา'), '-') as loans"),
-                DB::raw("IF(COUNT(DISTINCT loans.id) > 0 , CONCAT(FORMAT(COALESCE(SUM(DISTINCTROW loans.outstanding) - IF(COUNT(DISTINCT payments.id) > 0, SUM(payments.principle), 0), 0), 2), ' บาท'), '-') as amount")
+                DB::raw("IF(COUNT(DISTINCT loans.id) > 0, CONCAT(FORMAT(COUNT(DISTINCT loans.id), 0), ' สัญญา'), '-') as loans"),
+                DB::raw("IF(COUNT(DISTINCT loans.id) > 0, CONCAT(FORMAT(COALESCE((SELECT SUM(loans.outstanding) FROM loans WHERE loans.member_id = members.id AND loans.code IS NOT NULL AND loans.completed_at IS NULL) - IF(COUNT(DISTINCT payments.id) > 0, SUM(payments.principle), 0), 0), 2), ' บาท'), '-') as amount")
             ]);
 
         return Datatables::queryBuilder($members)->make(true);
@@ -938,15 +935,15 @@ class AjaxController extends Controller
             ->join('employees', 'profiles.id', '=', 'employees.profile_id')
             ->join('employee_types', 'employees.employee_type_id', '=', 'employee_types.id')
             ->leftJoin('loan_member', 'members.id', '=', 'loan_member.member_id')
-            ->leftJoin(DB::raw('(select * from loans where loans.code is not null and loans.completed_at is null) loans'), 'members.id', '=', 'loans.member_id')
+            ->leftJoin('loans', 'loan_member.loan_id', '=', 'loans.id')
             ->whereNull('members.leave_date')
             ->groupBy(['members.id', 'profiles.name', 'profiles.lastname', 'employee_types.name'])
             ->select([
                 DB::raw("LPAD(members.id, 5, '0') as code"),
                 DB::raw("CONCAT('<span class=\"text-primary\"><i class=\"fa fa-user fa-fw\"></i> ', IF(profiles.name = '<ข้อมูลถูกลบ>', profiles.name, CONCAT(profiles.name, ' ', profiles.lastname)), '</span>') as fullname"),
                 DB::raw("CONCAT('<span class=\"label label-primary\">', employee_types.name, '</span>') as typename"),
-                DB::raw("IF(COALESCE(SUM(IF(loan_member.yourself = 1, loan_member.amount, 0))) > 0, CONCAT(FORMAT(COALESCE(SUM(IF(loan_member.yourself = 1, loan_member.amount, 0))), 2), ' บาท'), '-') as yourself"),
-                DB::raw("IF(COALESCE(SUM(IF(loan_member.yourself = 0, loan_member.amount, 0))) > 0, CONCAT(FORMAT(COALESCE(SUM(IF(loan_member.yourself = 0, loan_member.amount, 0))), 2), ' บาท'), '-') as other")
+                DB::raw("IF(COALESCE(SUM(IF(loan_member.yourself = 1 AND loans.code IS NOT NULL AND loans.completed_at IS NULL, loan_member.amount, 0))) > 0, CONCAT(FORMAT(COALESCE(SUM(IF(loan_member.yourself = 1 AND loans.code IS NOT NULL AND loans.completed_at IS NULL, loan_member.amount, 0))), 2), ' บาท'), '-') as yourself"),
+                DB::raw("IF(COALESCE(SUM(IF(loan_member.yourself = 0 AND loans.code IS NOT NULL AND loans.completed_at IS NULL, loan_member.amount, 0))) > 0, CONCAT(FORMAT(COALESCE(SUM(IF(loan_member.yourself = 0 AND loans.code IS NOT NULL AND loans.completed_at IS NULL, loan_member.amount, 0))), 2), ' บาท'), '-') as other")
             ]);
 
         return Datatables::queryBuilder($members)->make(true);
@@ -954,19 +951,25 @@ class AjaxController extends Controller
 
     public function postDividendlist(Request $request) {
         $year = intval($request->input('year'));
+        $dividend_id = Dividend::where('rate_year', $year)->first()->id;
         $members = Member::active()->get();
         $dividends = collect([]);
 
         foreach ($members as $member) {
-            $dividend = MemberProperty::getDividendQuick($member, $year);
+            $dividend = Dividendmember::where('dividend_id', $dividend_id)
+                ->where('member_id', $member->id)
+                ->get();
+
+            $shareholding_dividend = $dividend->sum('shareholding_dividend');
+            $interest_dividend = $dividend->sum('interest_dividend');
 
             $item = new stdClass();
             $item->code = $member->memberCode;
             $item->fullname = '<span class="text-primary"><i class="fa fa-user fa-fw"></i> ' . $member->profile->fullName . '</span>';
             $item->typename = '<span class=\"label label-primary\">' . $member->profile->employee->employee_type->name . '</span>';
-            $item->shareholding = number_format($dividend->shareholding_dividend, 2, '.', ',') . ' บาท';
-            $item->loan = number_format($dividend->interest_dividend, 2, '.', ',') . ' บาท';
-            $item->total = number_format($dividend->total, 2, '.', ',') . ' บาท';
+            $item->shareholding = number_format($shareholding_dividend, 2, '.', ',') . ' บาท';
+            $item->interest = number_format($interest_dividend, 2, '.', ',') . ' บาท';
+            $item->total = number_format($shareholding_dividend + $interest_dividend, 2, '.', ',') . ' บาท';
             $dividends->push($item);
         }
 
@@ -976,7 +979,7 @@ class AjaxController extends Controller
     public function postCalculate(Request $request) {
         $loan = Loan::find($request->input('loan_id'));
         $member = Member::find($loan->member_id);
-        $pay_date = Diamond::parse($request->input('pay_date'));
+        $pay_date = Diamond::parse($request->input('pay_date'))->format('Y-m-j');
         $pay_amount = $request->input('pay_amount');
         $summary = LoanCalculator::normal_payment($loan, $pay_amount, $pay_date);
 
@@ -991,7 +994,7 @@ class AjaxController extends Controller
     public function postClosecalculate(Request $request) {
         $loan = Loan::find($request->input('loan_id'));
         $member = Member::find($loan->member_id);
-        $pay_date = Diamond::parse($request->input('pay_date'));
+        $pay_date = Diamond::parse($request->input('pay_date'))->format('Y-m-j');
         $summary = LoanCalculator::close_payment($loan, $pay_date);
         
         $result = new stdClass();
@@ -1001,5 +1004,85 @@ class AjaxController extends Controller
         $result->remark = $summary->refund > 0 ? 'คืนเงินจำนวน ' . number_format($summary->refund, 2, '.', ',') . ' บาท' : '-';
 
         return Response::json($result);
+    }
+
+    public function postCalculateavailable(Request $request) {
+        $member = Member::find($request->input('member_id'));
+        $salary = $request->input('salary');
+
+        if ($member != null) {
+            if ($member->profile->employee->employee_type_id == 1) {
+                if ($member->sureties->filter(function ($value, $key) { return !is_null($value->code) && is_null($value->completed_at); })->count() < 2) {
+                    $available = LoanCalculator::salary_available($member, $salary);
+
+                    return Response::json($member->profile->fullName . ' มีความสามารถในการค้ำประกันจำนวน ' . (($available > 1200000) ? number_format(1200000, 2, '.', ',') : number_format($available, 2, '.', ',')) . ' บาท');
+                }
+                else {
+                    return Response::json('ผู้ค้ำใช้สิทธิ์ค้ำประกันครบ 2 สัญญาแล้ว');
+                }
+            }
+            else {
+                return Response::json('สมาชิกต้องเป็นพนักงาน หรือลูกจ้างของ ททท. จึงจะสามารถใช้เงินเดือนค้ำประกันได้');
+            }
+        }
+        else {
+            return Response::json('ไม่พบสมาชิกรหัสนี้');
+        }
+    }
+
+    public function postActiveloan() {
+        $loans = Loan::whereNull('completed_at')
+            ->whereNotNull('code')
+            ->orderBy('loan_type_id')
+            ->get();
+
+        $count = 0;
+        $collection = collect([]);
+        foreach ($loans as $loan) {
+            $item = new stdClass();
+            $item->index = ++$count;
+            $item->loantype = '<span class="text-primary"><i class="fa fa-meney fa-fw"></i> ' . $loan->loanType->name . '</span>';
+            $item->loanid = $loan->id;
+            $item->loancode = $loan->code;
+            $item->memberid = $loan->member->id;
+            $item->membercode = $loan->member->memberCode;
+            $item->membername = $loan->member->profile->fullName;
+            $item->loandate = Diamond::parse($loan->loaned_at)->thai_format('Y-m-d');
+            $item->outstanding = number_format($loan->outstanding, 2, '.', ',');
+            $item->period = $loan->payments->count() . '/' . $loan->period;
+            $item->priciple = number_format($loan->outstanding - $loan->payments->sum('principle'), 2, '.', ',');
+            $collection->push($item);
+        }
+
+        return Datatables::collection($collection)
+            ->make(true);
+    }
+
+    public function postInactiveloan() {
+        $loans = Loan::whereNotNull('completed_at')
+            ->whereNotNull('code')
+            ->orderBy('loan_type_id')
+            ->get();
+
+        $count = 0;
+        $collection = collect([]);
+        foreach ($loans as $loan) {
+            $item = new stdClass();
+            $item->index = ++$count;
+            $item->loantype = '<span class="text-primary"><i class="fa fa-meney fa-fw"></i> ' . $loan->loanType->name . '</span>';
+            $item->loanid = $loan->id;
+            $item->loancode = $loan->code;
+            $item->memberid = $loan->member->id;
+            $item->membercode = $loan->member->memberCode;
+            $item->membername = $loan->member->profile->fullName;
+            $item->loandate = Diamond::parse($loan->loaned_at)->thai_format('Y-m-d');
+            $item->outstanding = number_format($loan->outstanding, 2, '.', ',');
+            $item->period = $loan->payments->count() . '/' . $loan->period;
+            $item->priciple = number_format($loan->outstanding - $loan->payments->sum('principle'), 2, '.', ',');
+            $collection->push($item);
+        }
+
+        return Datatables::collection($collection)
+            ->make(true);
     }
 }

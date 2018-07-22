@@ -8,7 +8,6 @@
         <small>รายละเอียดข้อมูลกู้ยืมของสมาชิก</small>
     </h1>
     @include('website.member.layouts.breadcrumb', ['breadcrumb' => [
-        ['item' => 'ข้อมูลสมาชิก', 'link' => '/member'],
         ['item' => 'การกู้ยืม', 'link' => ''],
     ]])
     </section>
@@ -50,7 +49,7 @@
                                 <td>{{ ++$count }}</td>
                                 <td class="text-primary"><i class="fa fa-file-text-o fa-fw"></i> {{ $loan->code }}</td>
                                 <td>{{ $loan->loanType->name }}</td>
-                                <td>{{ Diamond::parse($loan->loaned_at)->thai_format('j M Y') }}</td>
+                                <td>{{ Diamond::parse($loan->loaned_at)->thai_format('Y-m-d') }}</td>
                                 <td>{{ number_format($loan->outstanding, 2, '.', ',') }}</td>
                                 <td>{{ number_format($loan->period, 0, '.', ',') }}</td>
                                 <td>{{ number_format($loan->payments->count(), 0, '.', ',') }}</td>
