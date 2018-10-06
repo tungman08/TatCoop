@@ -108,18 +108,15 @@ class LoanManager {
         $loans = Loan::where('member_id', $loan->member_id)
             ->where('loan_type_id', '<>', 2)
             ->whereNotNull('code')
-            ->whereNull('completed_at');
+            ->whereNull('completed_at')
+            ->get();
         $total_outstanding = $loans->sum('outstanding');
-        $total_payments = 0;
+        $total_payments = $loans->sum(function($value) { return $value->payments->sum('principle'); });
 
-        foreach($loans as $l) {
-            $total_payments += $l->payments()->sum('principle');
-        }
-
-        $balance = $total_payments - $total_payments;
+        $balance = $total_outstanding - $total_payments;
 
         if ($outstanding + $balance > 1200000) {
-            $validator->errors()->add('overflow', "ไม่สามารถกู้ได้ เนื่องจากผลรวมยอดเงินกู้สามัญ + กู้เฉพาะกิจอื่นๆ รวมกันแล้วเกิน 1,200,000 บาท (มียอดที่ต้องชำระคงเหลือ " . number_format($loans->count(), 2, '.', ',') . " บาท)");
+            $validator->errors()->add('overflow', "ไม่สามารถกู้ได้ เนื่องจากผลรวมยอดเงินกู้สามัญ + กู้เฉพาะกิจอื่นๆ รวมกันแล้วเกิน 1,200,000 บาท (สามารถกู้สูงสุดได้ " . number_format(1200000 - $balance, 2, '.', ',') . " บาท)");
         }
     }
 

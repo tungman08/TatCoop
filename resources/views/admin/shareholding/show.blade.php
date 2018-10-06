@@ -21,7 +21,7 @@
         <!-- Info boxes -->
         <div class="well">
             <h4>ข้อมูลทุนเรือนหุ้น</h4>
-            <p>แก้ไขข้อมูลชำระค่าหุ้นต่างๆ ของ {{ $member->profile->fullName }}</p>
+            <p>รายละเอียดข้อมูลชำระค่าหุ้นต่างๆ ของ {{ $member->profile->fullName }}</p>
         </div>
 
         @if ($errors->count() > 0)
@@ -40,6 +40,10 @@
             <!-- /.box-header -->
 
             <div class="box-body">
+                <button class="btn btn-primary btn-flat margin-b-sm" onclick="javascript:window.location.href='{{ url('/service/shareholding/' . $member->id . '/' . Diamond::parse($shareholding_date)->format('Y-n-j') . '/billing') }}';">
+                    <i class="fa fa-file-text-o"></i> ใบเสร็จรับเงินค่าหุ้น
+                </button>
+
                 <div class="table-responsive" style="margin-top: 15px;">
                     <table id="dataTables-shareholding" class="table table-hover dataTable" width="100%">
                         <thead>

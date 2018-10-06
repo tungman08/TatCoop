@@ -43,6 +43,7 @@ class DividendmemberController extends Controller
                 DB::raw('sum(dividend_member.shareholding_dividend) as shareholding_dividend'), 
                 'dividends.loan_rate', 
                 DB::raw('sum(dividend_member.interest_dividend) as interest_dividend'))
+            ->orderBy('dividends.rate_year', 'desc')
             ->get();
 
         return view('admin.dividendmember.year', [

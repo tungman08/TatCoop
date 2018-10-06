@@ -98,12 +98,12 @@
                 <button id="create_loan" class="btn btn-primary btn-flat" style="margin-bottom: 15px;">
                     <i class="fa fa-plus-circle fa-fw"></i> ทำสัญญาเงินกู้ใหม่
                 </button>
-                <button id="cal_loan" class="btn btn-default btn-flat margin-b-md pull-right" type="button" data-tooltip="true" title="คำนวณความสามารถในการกู้">
-                    <i class="fa fa-calculator"></i> ความสามารถในกู้
+                <button id="cal_loan" class="btn btn-default btn-flat margin-b-md pull-right" type="button" data-tooltip="true" title="คำนวณความสามารถในการกู้สามัญ">
+                    <i class="fa fa-calculator"></i> ความสามารถในกู้สามัญ
                 </button>
                 @if ($member->profile->employee->employee_type_id == 1)
-                    <button id="cal_surety" class="btn btn-default btn-flat margin-b-md pull-right margin-r-sm" type="button" data-tooltip="true" title="คำนวณความสามารถในการค้ำประกัน">
-                        <i class="fa fa-calculator"></i> ความสามารถในการค้ำ
+                    <button id="cal_surety" class="btn btn-default btn-flat margin-b-md pull-right margin-r-sm" type="button" data-tooltip="true" title="คำนวณความสามารถในการค้ำประกันผู้อื่น">
+                        <i class="fa fa-calculator"></i> ความสามารถในการค้ำผู้อื่น
                     </button>
                 @endif
 
@@ -179,20 +179,27 @@
     </div>
 
     <!-- Salary Modal -->
-    <div id="salaryModal" class="modal fade" role="dialog">
+    <div id="calsuretyModal" class="modal fade" role="dialog">
         <div class="modal-dialog">
 
             <!-- Modal content-->
             <div class="modal-content">
                 <div class="modal-header panel-heading">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">กรุณากรอกเงินเดือน</h4>
+                    <h4 class="modal-title">คำนวณความสามารถในการค้ำประกันผู้อื่น</h4>
                 </div>
-                <div class="modal-body text-center">
-                    <button class="btn btn-primary btn-flat margin-t-lg margin-b-lg"
-                        onclick="javascript:void(0);">
-                        <i class="fa fa-file-o"></i> คำนวณ
-                    </button>
+                <div class="modal-body">
+                    <label for="calsuretysalary">เงินเดือน</label>
+                    <input type="text" id="calsuretysalary" class="form-control margin-b-sm" />
+
+                    <label for="calsuretynetsalary">เงินเดือนสุทธิ</label>
+                    <input type="text" id="calsuretynetsalary" class="form-control margin-b-lg" />
+
+                    <div class="text-center">
+                        <button id="calsurety" class="btn btn-primary btn-flat margin-b-lg">
+                            <i class="fa fa-file-o"></i> คำนวณ
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -246,11 +253,52 @@
         });
         
         $('#cal_loan').click(function () {
-            $('#salaryModal').modal('show');
+            $.ajax({
+                url: '/ajax/checkloanavailable',
+                type: "post",
+                data: {
+                    'id': {{ $member->id }}
+                },
+                success: function(message) {
+                    alert(message);
+                } 
+            });
         });
 
         $('#cal_surety').click(function () {
-            $('#salaryModal').modal('show');
+            $.ajax({
+                url: '/ajax/countsurety',
+                type: "post",
+                data: {
+                    'id': {{ $member->id }}
+                },
+                success: function(loans) {
+                    if (loans.length < 2) {
+                        $('#calsuretyModal').modal('show');
+                    }
+                    else {
+                        alert('ผู้ค้ำประกันได้ใช้สิทธิ์การค้ำ 2 สัญญาเท่านั้น');
+                    }
+                }
+            });
+        });
+
+        $('#calsurety').click(function () {
+            $.ajax({
+                url: '/ajax/checksuretyavailable',
+                type: "post",
+                data: {
+                    'id': {{ $member->id }},
+                    'salary': $('#calsuretysalary').val(),
+                    'netsalary': $('#calsuretynetsalary').val()
+                },
+                success: function(message) {
+                    alert(message);
+                },
+                complete: function(){
+                    $('#calsuretyModal').modal('hide');
+                }  
+            });
         });
     });   
     </script>

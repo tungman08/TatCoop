@@ -7,8 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
-use App\Member;
-use App\Shareholding;
+use Dashboard;
 
 class HomeController extends Controller
 {
@@ -32,9 +31,17 @@ class HomeController extends Controller
      * Responds to requests to GET /
      */
     public function getIndex() {
+        $info = Dashboard::info();
+
         return view('admin.home.index', [
-            'member_amount' => Member::whereNull('leave_date')->count(),
-            'member_shareholding' => Shareholding::all()->sum('amount')
+            'info' => $info
         ]);
+    }
+
+    public function postDashboard() {
+        $summary = Dashboard::summary();
+        $chart = Dashboard::chart();
+
+        return compact('summary', 'chart');
     }
 }

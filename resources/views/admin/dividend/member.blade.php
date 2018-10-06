@@ -41,13 +41,6 @@
             <!-- /.box-header -->
 
             <div class="box-body">
-                {{ Form::open(['url' => '/service/dividend/member/export/' . $year, 'method' => 'post']) }}
-                    {{ Form::button('<i class="fa fa-file-excel-o fa-fw"></i> สรุปการปันผลเป็นเอกสาร Excel', [
-                        'type'=>'submit',
-                        'class'=>'btn btn-primary btn-flat margin-b-md'])
-                    }}
-                {{ Form::close() }}
-
                 <div class="table-responsive" style=" margin-top: 10px;">
                     <table id="dataTables-users" class="table table-hover dataTable" width="100%">
                         <thead>

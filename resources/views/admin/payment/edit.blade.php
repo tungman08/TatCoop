@@ -12,7 +12,8 @@
             ['item' => 'จัดการการกู้ยืม', 'link' => '/service/loan/member'],
             ['item' => 'การกู้ยืม', 'link' => '/service/' . $member->id . '/loan'],
             ['item' => 'สัญญากู้ยืม', 'link' => '/service/' . $member->id . '/loan/' . $loan->id],
-            ['item' => 'แก้ไขรายการผ่อนชำระ', 'link' => ''],
+            ['item' => 'รายการผ่อนชำระ', 'link' => '/service/' . $member->id . '/loan/' . $loan->id . '/payment/' . $payment->id],
+            ['item' => 'แก้ไข', 'link' => ''],
         ]])
     </section>
 
@@ -100,7 +101,7 @@
 
                         <div class="col-sm-10 input-group" id="datepicker" style="padding: 0 5px;">
                             {{ Form::text('pay_date', null, [
-                                'readonly' => true,
+                                'readonly' => false,
                                 'placeholder' => 'กรุณาเลือกจากปฏิทิน...', 
                                 'class' => 'form-control'])
                             }}       

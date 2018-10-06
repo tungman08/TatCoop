@@ -129,11 +129,15 @@ class LoanTypeController extends Controller
 
     public function update(Request $request, $id) {
         $rules = [
-            'rate' => 'required|numeric|between:0,100'
+            'rate' => 'required|numeric|between:0,100',
+            'start_date' => 'required|date_format:Y-m-d', 
+            'expire_date' => 'required|date_format:Y-m-d',
         ];
 
         $attributeNames = [
-            'rate' => 'อัตราดอกเบี้ย'        
+            'rate' => 'อัตราดอกเบี้ย'  ,
+            'start_date' => 'วันที่เริ่มใช้', 
+            'expire_date' => 'วันที่หมดอายุ',      
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -148,6 +152,8 @@ class LoanTypeController extends Controller
             DB::transaction(function() use ($request, $id) {
                 $loanType = LoanType::find($id);
                 $loanType->rate = $request->input('rate');
+                $loanType->start_date = Diamond::parse($request->input('start_date'));
+                $loanType->expire_date = Diamond::parse($request->input('expire_date'));
                 $loanType->save();
 
                 History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'แก้ไขข้อมูลประเภทเงินกู้');

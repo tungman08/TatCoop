@@ -157,7 +157,10 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
 
         // Share Holding Route...
         Route::get('shareholding/member', ['as' => 'service.shareholding.member', 'uses' => 'ShareholdingController@getMember']);
-        Route::get('shareholding/{member_id}/{paydate}/editlist', ['as' => 'service.shareholding.editlist', 'uses' => 'ShareholdingController@getEditlist']);
+        Route::get('shareholding/{member_id}/{paydate}/show', ['as' => 'service.shareholding.show', 'uses' => 'ShareholdingController@getShow']);
+        Route::get('shareholding/{member_id}/{paydate}/billing', ['as' => 'service.shareholding.billing', 'uses' => 'ShareholdingController@getBilling']);
+        Route::get('shareholding/{member_id}/{paydate}/print', ['as' => 'service.shareholding.print', 'uses' => 'ShareholdingController@getPrintBilling']);
+        Route::get('shareholding/{member_id}/{paydate}/pdf', ['as' => 'service.shareholding.pdf', 'uses' => 'ShareholdingController@getPdfBilling']);
         Route::get('shareholding/autoshareholding', ['as' => 'service.shareholding.auto', 'uses' => 'ShareholdingController@getAutoShareholding']);
         Route::post('shareholding/autoshareholding', 'ShareholdingController@postAutoShareholding');
         Route::resource('{member_id}/shareholding', 'ShareholdingController');
@@ -192,12 +195,14 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
             Route::get('payment/calculate', ['as' => 'service.payment.calculate', 'uses' => 'PaymentController@getCalculate']);
             Route::get('payment/close', ['as' => 'service.payment.close', 'uses' => 'PaymentController@getClose']);
             Route::post('payment/close', 'PaymentController@postClose');
+            Route::get('payment/billing/{payment_id}/{paydate}', ['as' => 'service.payment.billing', 'uses' => 'PaymentController@getBilling']);
+            Route::get('payment/print/{payment_id}/{paydate}', ['as' => 'service.payment.print', 'uses' => 'PaymentController@getPrintBilling']);
+            Route::get('payment/pdf/{payment_id}/{paydate}', ['as' => 'service.payment.pdf', 'uses' => 'PaymentController@getPdfBilling']);
             Route::resource('payment', 'PaymentController');    
         });
 
         // Dividend Route...
         Route::get('dividend/member', ['as' => 'service.dividend.member', 'uses' => 'DividendController@getMember']);
-        Route::post('dividend/member/export/{year}', 'DividendController@postExport');
         Route::get('{member_id}/dividend', ['as' => 'service.dividend.member.show', 'uses' => 'DividendController@getMemberDividend']);
 
         // Quaruntee Route...
@@ -242,6 +247,10 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
         Route::get('dividendmember/{dividend_id}/{member_id}', ['as' => 'admin.dividendmember.show', 'uses' => 'DividendmemberController@getShow']);
         Route::get('dividendmember/{dividend_id}/{member_id}/{m_dividend_id}/edit', ['as' => 'admin.dividendmember.edit', 'uses' => 'DividendmemberController@getEdit']);
         Route::post('dividendmember/{dividend_id}/{member_id}/{m_dividend_id}', ['as' => 'admin.dividendmember.update', 'uses' => 'DividendmemberController@postUpdate']);  
+
+        // Reports Route...
+        Route::post('report/export', ['as' => 'admin.report.export', 'uses' => 'ReportController@postExport']); 
+        Route::get('report', ['as' => 'admin.report.index', 'uses' => 'ReportController@getIndex']);
 
         // Statistic Route...
         Route::controller('statistic', 'StatisticController', [

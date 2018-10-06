@@ -34,7 +34,7 @@
         <div class="col-sm-10 input-group" id="start_date" style="padding: 0 5px;">
             {{ Form::text('start_date', null, [
                 'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
-                'readonly'=>$edit,
+                'autocomplete'=>'off',
                 'class'=>'form-control'])
             }}       
             <span class="input-group-addon">
@@ -51,7 +51,7 @@
         <div class="col-sm-10 input-group" id="expire_date" style="padding: 0 5px;">
             {{ Form::text('expire_date', null, [
                 'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
-                'readonly'=>$edit,
+                'autocomplete'=>'off',
                 'class'=>'form-control'])
             }}       
             <span class="input-group-addon">

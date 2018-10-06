@@ -95,8 +95,8 @@
                         </thead>
                         <tbody>
                             @php($count = 0)
-                            @foreach($loantype->loans->filter(function ($value, $key) { return !empty($value->code); })->sortByDesc('loaned_at') as $loan)
-                                <tr onclick="javascript: document.location = '{{ url('/service/' . $loan->member->id . '/loan/' . $loan->id) }}';">
+                            @foreach($loantype->loans->filter(function ($value, $key) { return !empty($value->code) && is_null($value->completed_at); })->sortByDesc('loaned_at') as $loan)
+                                <tr onclick="javascript: document.location = '{{ url('/service/' . $loan->member->id . '/loan/' . $loan->id) }}';" style="cursor: pointer;">
                                     <td>{{ ++$count }}.</td>
                                     <td class="text-primary"><i class="fa fa-credit-card fa-fw"></i> {{ $loan->code }}</td>
                                     <td>{{ $loan->member->profile->fullName }}</td>

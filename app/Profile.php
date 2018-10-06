@@ -85,10 +85,9 @@ class Profile extends Model
     }
 
     public function getCitizenCodeAttribute() {
-        return substr($this->attributes['citizen_code'], 0, 1) . '-' .
-            substr($this->attributes['citizen_code'], 1, 4) . '-' .
-            substr($this->attributes['citizen_code'], 5, 5) . '-' .
-            substr($this->attributes['citizen_code'], 10, 2) . '-' .
-            substr($this->attributes['citizen_code'], 12, 1);
+        return (mb_substr($this->attributes['citizen_code'], 0, 1)  != '<') ? (mb_substr($this->attributes['citizen_code'], 0, 1) . '-' .
+            mb_substr($this->attributes['citizen_code'], 1, 4) . '-' . mb_substr($this->attributes['citizen_code'], 5, 5) . '-' .
+            mb_substr($this->attributes['citizen_code'], 10, 2) . '-' . mb_substr($this->attributes['citizen_code'], 12, 1)) :
+            $this->attributes['citizen_code'];
     }
 }

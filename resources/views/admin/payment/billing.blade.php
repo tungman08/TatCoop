@@ -4,36 +4,26 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
         <h1>
-            จัดการใบรับเงินค่าหุ้น
-            <small>รายละเอียดข้อมูลใบเสร็จรับเงินค่าหุ้นของสมาชิก</small>
+            จัดการการกู้ยืมของสมาชิกสหกรณ์ฯ
+            <small>เพิ่ม ลบ แก้ไข การกู้ยืมของสมาชิก สอ.สรทท.</small>
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการใบรับเงินค่าหุ้น', 'link' => ''],
+            ['item' => 'จัดการการกู้ยืม', 'link' => '/service/loan/member'],
+            ['item' => 'การกู้ยืม', 'link' => '/service/' . $member->id . '/loan'],
+            ['item' => 'สัญญากู้ยืม', 'link' => '/service/' . $member->id . '/loan/' . $loan->id],
+            ['item' => 'รายการผ่อนชำระ', 'link' => '/service/' . $member->id . '/loan/' . $loan->id . '/payment/' . $payment->id],
+            ['item' => 'ใบเสร็จรับเงิน', 'link' => '']
         ]])
-
     </section>
 
     <!-- Main content -->
     <section class="content">
         <!-- Info boxes -->
         <div class="well">
-            <h4>จัดการใบรับเงินค่าหุ้น</h4>
-            <p>ให้ผู้ดูแลระบบสามารถ แก้ไข ชื่อผู้จัดการและเหรัญญิกได้</p>
+            <h4>ใบรับเงินค่างวด</h4>
+            <p>ใบรับเงินค่างวดเดือน {{ $date->thai_format('F Y') }} ของ {{ $member->profile->fullName }}</p>
         </div>
-
-        @if(Session::has('flash_message'))
-            <div class="callout {{ Session::get('callout_class') }}">
-                <h4>แจ้งข้อความ!</h4>
-                <p>
-                    {{ Session::get('flash_message') }}
-
-                    @if(Session::has('flash_link'))
-                        <a href="{{ Session::get('flash_link') }}">Undo</a>
-                    @endif
-                </p>
-            </div>
-        @endif
 
         <!-- Main content -->
         <section class="invoice">
@@ -42,7 +32,7 @@
             <div class="row">
                 <div class="col-xs-12">
                     <h2 class="page-header">
-                        <i class="fa fa-file-text-o"></i> ตัวอย่างใบรับเงินค่าหุ้น
+                        <i class="fa fa-file-text-o"></i> ใบรับเงินค่างวด
                         <small class="pull-right">วันที่: {{ Diamond::today()->thai_format('d M Y') }}</small>
                     </h2>
                 </div>
@@ -59,7 +49,7 @@
                         </div>
                         <div class="col-xs-10 text-center">
                             <h3 style="font-size: 18px; margin: 5px 0px;"><strong>สหกรณ์ออมทรัพย์ สหภาพแรงงานรัฐวิสาหกิจการท่องเที่ยวแห่งประเทศไทย จำกัด</strong></h3><br>
-                            <h3 style="font-size: 18px; margin: 0px;">ใบรับเงินค่าหุ้น</h3>
+                            <h3 style="font-size: 18px; margin: 0px;">ใบรับเงินค่างวด {{ $loan->loanType->name }}</h3>
                         </div>
                     </div>
                 </div>
@@ -74,11 +64,11 @@
                         <table class="table table-bordered" style="margin-bottom: 0px;">
                             <tr>
                                 <th style="width:20%">เลขที่:</th>
-                                <td>000000000000</td>
+                                <td>{{ $billno }}</td>
                             </tr>
                             <tr>
                                 <th>ได้รับเงินจาก:</th>
-                                <td>ร.ต.อ.วศิน มีปรีชา</td>
+                                <td>{{ $member->profile->fullName }}</td>
                             </tr>
                             <tr>
                                 <th>หน่วยงาน:</th>
@@ -93,15 +83,15 @@
                         <table class="table table-bordered" style="margin-bottom: 0px;">
                             <tr>
                                 <th style="width:20%">วันที่:</th>
-                                <td>{{ Diamond::today()->thai_format('d/m/Y') }}</td>
+                                <td>{{ $date->thai_format('d/m/Y') }}</td>
                             </tr>
                             <tr>
                                 <th>เลขทะเบียน:</th>
-                                <td>00000</td>
+                                <td>{{ str_pad($member->member_code, 5, "0", STR_PAD_LEFT) }}</td>
                             </tr>
                             <tr>
-                                <th>ทุนเรือนหุ้นสะสม:</th>
-                                <td>0.00</td>
+                                <th>วงเงินที่กู้:</th>
+                                <td>{{ number_format($loan->outstanding, 2,'.', ',') }}</td>
                             </tr>
                         </table>
                     </div>
@@ -119,22 +109,37 @@
                                 <th class="text-center" style="width: 40%">รายการ/สัญญา</th>
                                 <th class="text-center" style="width: 10%">เดือนที่</th>
                                 <th class="text-center" style="width: 25%">จำนวนเงิน</th>
-                                <th class="text-center" style="width: 25%">ทุนเรือนหุ้นสะสม</th>
+                                <th class="text-center" style="width: 25%">เงินต้นคงเหลือ</th>
                             </tr>
                         </thead>
                         <tfoot>
                             <tr>
-                                <td colspan="2">ศุนย์บาทถ้วน</td>
-                                <td class="text-right">0.00</td>
+                                <td colspan="2">{{ Number::toBaht($payment->principle + $payment->interest) }}</td>
+                                <td class="text-right">{{ number_format($payment->principle + $payment->interest, 2,'.', ',') }}</td>
                                 <td>&nbsp;</td>
                             </tr>
                         </tfoot>
                         <tbody>
                             <tr>
-                                <td>รับเงินค่าหุ้น</td>
-                                <td class="text-center">{{ Diamond::today()->thai_format('m/y') }}</td>
-                                <td class="text-right">0.00</td>
-                                <td class="text-right">0.00</td>
+                                <td>สัญญาเงินกู้เลขที่ {{ $loan->code }}</td>
+                                <td class="text-center">{{ $date->thai_format('m/y') }}</td>
+                                <td class="text-right">
+                                    <table class="table table-borderless" style="margin-bottom: 0px;">
+                                        <tr>
+                                            <td class="text-left">เงินต้น</td>
+                                            <td>{{ number_format($payment->principle, 2,'.', ',') }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left">ดอกเบี้ย</td>
+                                            <td>{{ number_format($payment->interest, 2,'.', ',') }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" style="border-top: 1px solid #f4f4f4;">รวม</td>
+                                            <td style="border-top: 1px solid #f4f4f4;">{{ number_format($payment->principle + $payment->interest, 2,'.', ',') }}</td>
+                                        </tr>
+                                    </table>                                   
+                                </td>
+                                <td class="text-right">{{ number_format($loan->outstanding - $loan->payments->sum('principle'), 2,'.', ',') }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -149,7 +154,7 @@
                     <table style="width: 100%;">
                         <tr>
                             <td style="white-space: nowrap; width: 1%;">ผู้จัดการ</td>
-                            <td style="border-bottom: 2px dotted #bbb; padding-left: 50px;">{{ !empty($billing) ? $billing->manager : '-' }}</td>
+                            <td style="border-bottom: 2px dotted #bbb; padding-left: 50px;">{{ $billing->manager }}</td>
                         </tr>
                     </table>
                 </div>
@@ -158,7 +163,7 @@
                     <table style="width: 100%;">
                         <tr>
                             <td style="white-space: nowrap; width: 1%;">เหรัญญิก</td>
-                            <td style="border-bottom: 2px dotted #bbb; padding-left: 50px;">{{ !empty($billing) ? $billing->treasurer : '-' }}</td>
+                            <td style="border-bottom: 2px dotted #bbb; padding-left: 50px;">{{ $billing->treasurer }}</td>
                         </tr>
                     </table>      
                 </div>
@@ -171,29 +176,27 @@
                 </div>
                 <!-- /.col -->
                 <div class="col-lg-12 text-center" style="padding-top: 20px;">
-                    @if (empty($billing))
-                        <button class="btn btn-primary btn-flat" type="button" data-tooltip="true" title="เพิ่มชื่อผู้จัดการ/เหรัญญิก"
-                            onclick="javascript:window.location.href='{{ url('/admin/billing/create') }}';">
-                            <i class="fa fa-plus-circle"></i> เพิ่มชื่อผู้จัดการ/เหรัญญิก
-                        </button>
-                    @else
-                        <button class="btn btn-primary btn-flat" type="button" data-tooltip="true" title="แก้ไขชื่อผู้จัดการ/เหรัญญิก"
-                            onclick="javascript:window.location.href='{{ url('/admin/billing/' . $billing->id . '/edit') }}';">
-                            <i class="fa fa-edit"></i> แก้ไขชื่อผู้จัดการ/เหรัญญิก
-                        </button>
-                    @endif
+                    <span>ใบรับเงินประจำเดือนจะสมบูรณ์ต่อเมื่อสหกรณ์ได้รับเงินที่เรียกเก็บครบถ้วนแล้ว</span>
                 </div>
                 <!-- /.col -->
             </div>
+
+            <!-- this row will not appear when printing -->
+            <div class="row no-print" style="margin-top: 30px;">
+                <div class="col-xs-12">
+                    <a href="{{ url('/service/' . $member->id . '/loan/' . $loan->id . '/payment/print/' . $payment->id . '/' . $date->format('Y-n-j')) }}" target="_blank" class="btn btn-default btn-flat"><i class="fa fa-print"></i> พิมพ์</a>
+                    <button type="button"
+                        class="btn btn-primary btn-flat pull-right"
+                        style="margin-right: 5px;"
+                        onclick="javascript:document.location = '{{ url('/service/' . $member->id . '/loan/' . $loan->id . '/payment/pdf/' . $payment->id . '/' . $date->format('Y-m-d')) }}';">
+                        <i class="fa fa-download"></i> บันทึกเป็น PDF
+                    </button>
+                </div>
+            </div>
         </section>
-        <!-- /.invoice -->
+        <!-- /.content -->
     </section>
     <!-- /.content -->
-
-    <!-- Ajax Loading Status -->
-    <div class="ajax-loading">
-        <i class="fa fa-spinner fa-3x fa-spin"></i>
-    </div>
 @endsection
 
 @section('styles')

@@ -150,7 +150,7 @@ class MemberController extends Controller
 
         return view('website.member.loan', [
             'member' => $member,
-            'loans' => Loan::where('member_id', $member->id)->orderBy('id', 'desc')->get(),
+            'loans' => Loan::where('member_id', $member->id)->whereNotNull('code')->orderBy('id', 'desc')->get(),
             'loantypes' => LoanType::active()->get()
         ]);
      }

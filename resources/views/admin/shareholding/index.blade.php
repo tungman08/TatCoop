@@ -109,7 +109,7 @@
                             @eval($count = 0)
                             @foreach($shareholdings->sortByDesc('name') as $share)
                                 @eval($date = Diamond::parse($share->name))
-                                <tr onclick="javascript: document.location = '{{ url('service/shareholding/' . $member->id . '/' . $share->paydate . '/editlist') }}';" style="cursor: pointer;">
+                                <tr onclick="javascript: document.location = '{{ url('service/shareholding/' . $member->id . '/' . $share->paydate . '/show') }}';" style="cursor: pointer;">
                                     <td>{{ ++$count }}.</td>
                                     <td class="text-primary"><i class="fa fa-money fa-fw"></i> {{ $date->thai_format('F Y') }}</td>
                                     <td>{{ number_format($share->amount, 2, '.', ',') }} บาท</td>

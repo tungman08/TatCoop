@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
+use App\Billing;
 use App\Member;
 use App\Loan;
 use App\Payment;
@@ -16,6 +17,7 @@ use DB;
 use Diamond;
 use History;
 use Auth;
+use PDF;
 
 class PaymentController extends Controller
 {
@@ -86,6 +88,17 @@ class PaymentController extends Controller
                 ->with('flash_message', 'ข้อมูลการชำระเงินกู้ถูกป้อนเรียบร้อยแล้ว')
                 ->with('callout_class', 'callout-success');
         }
+    }
+
+    public function show($member_id, $loan_id, $payment_id) {
+        $loan = Loan::find($loan_id);
+        $payment = Payment::find($payment_id);
+
+        return view('admin.payment.show', [
+            'member' => $loan->member,
+            'loan' => $loan,
+            'payment' => $payment
+        ]);
     }
 
     public function getClose($member_id, $loan_id) {
@@ -199,11 +212,15 @@ class PaymentController extends Controller
 
     public function update($member_id, $loan_id, $payment_id, Request $request) {
         $rules = [
-            'principle' => 'required', 
+            'pay_date' => 'required',
+            'principle' => 'required',
+            'interest' => 'required'
         ];
 
         $attributeNames = [
+            'pay_date' => 'วันที่ชำระ', 
             'principle' => 'เงินต้น',
+            'interest' => 'ดอกเบี้ย'
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -215,9 +232,11 @@ class PaymentController extends Controller
                 ->withInput();
         }
         else {
-            DB::transaction(function() use ($request, $loan_id) {
+            DB::transaction(function() use ($request, $loan_id, $payment_id) {
                 $payment = Payment::find($payment_id);
+                $payment->pay_date = Diamond::parse($request->input('pay_date'));
                 $payment->principle = floatval(str_replace(',', '', $request->input('principle')));
+                $payment->interest = floatval(str_replace(',', '', $request->input('interest')));
                 $payment->save();
 
                 $loan = Loan::find($loan_id); 
@@ -233,7 +252,7 @@ class PaymentController extends Controller
                 History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'การผ่อนชำระเงินกู้ ' . $loan->code);
             });
 
-            return redirect()->action('Admin\LoanController@show', [ 'member' => $member_id, 'loan' => $loan_id ])
+            return redirect()->action('Admin\PaymentController@show', [ 'member' => $member_id, 'loan' => $loan_id, 'payment' => $payment_id])
                 ->with('flash_message', 'แก้ไขข้อมูลการชำระเงินกู้เรียบร้อยแล้ว')
                 ->with('callout_class', 'callout-success');
         }
@@ -249,8 +268,60 @@ class PaymentController extends Controller
             History::addAdminHistory(Auth::guard($this->guard)->id(), 'ลบข้อมูล', 'ลบข้อมูลการผ่อนชำระเงินกู้ ' . $loan->code);
         });
 
-        return redirect()->action('Admin\LoanController@show', [ 'member' => $member_id, 'loan' => $loan_id ])
+        return redirect()->action('Admin\LoanController@show', [ 'member' => $member_id, 'loan' => $loan_id])
             ->with('flash_message', 'ลบข้อมูลการชำระเงินกู้เรียบร้อยแล้ว')
             ->with('callout_class', 'callout-success');
     }
+
+    
+    public function getBilling($member_id, $loan_id, $payment_id, $paydate) {
+        $billdate = Diamond::parse($paydate);
+        $member = Member::find($member_id);
+        $loan = Loan::find($loan_id);
+        $payment = Payment::find($payment_id);
+
+        return view('admin.payment.billing', [
+            'member' => $member,
+            'loan' => $loan,
+            'billing' => Billing::latest()->first(),
+            'payment' => $payment,
+            'billno' => $billdate->thai_format('Y') . str_pad($payment->loan->id, 8, '0', STR_PAD_LEFT),
+            'date' => $billdate
+        ]);
+     }
+
+     public function getPrintBilling($member_id, $loan_id, $payment_id, $paydate) {
+        $billdate = Diamond::parse($paydate);
+        $member = Member::find($member_id);
+        $loan = Loan::find($loan_id);
+        $payment = Payment::find($payment_id);
+
+        return view('admin.payment.print', [
+            'member' => $member,
+            'loan' => $loan,
+            'billing' => Billing::latest()->first(),
+            'payment' => $payment,
+            'billno' => $billdate->thai_format('Y') . str_pad($payment->loan->id, 8, '0', STR_PAD_LEFT),
+            'date' => $billdate
+        ]);
+     }
+
+     public function getPdfBilling($member_id, $loan_id, $payment_id, $paydate) {
+        $billdate = Diamond::parse($paydate);
+        $member = Member::find($member_id);
+        $loan = Loan::find($loan_id);
+        $payment = Payment::find($payment_id);
+
+        $data = [
+            'member' => $member,
+            'loan' => $loan,
+            'billing' => Billing::latest()->first(),
+            'payment' => $payment,
+            'billno' => $billdate->thai_format('Y') . str_pad($payment->loan->id, 8, '0', STR_PAD_LEFT),
+            'date' => $billdate
+        ];
+
+        return PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])
+            ->loadView('admin.payment.pdf', $data)->download('ใบเสร็จรับเงินค่างวด สัญญาเลขที่ ' . $loan->code . ' เดือน-' . $billdate->thai_format('M-Y') . '.pdf');
+     }
 }

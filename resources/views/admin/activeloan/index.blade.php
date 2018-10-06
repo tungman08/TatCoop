@@ -24,7 +24,8 @@
         <div class="box box-primary">
             <div class="box-header with-border">
                 <h3 class="box-title"><i class="fa fa-money"></i> สัญญาเงินกู้ที่กำลังผ่อนชำระ</h3>
-                <div class="btn-group pull-right">
+
+                <div class="btn-group pull-right" style="padding-top: 1px;">
                     <button type="button" class="btn btn-default btn-flat btn-xs"
                         onclick="javascript:window.location.href='{{ url('/admin/inactiveloan/') }}';">
                         <i class="fa fa-check-circle-o"></i> สัญญาเงินกู้ที่ชำระหมดแล้ว

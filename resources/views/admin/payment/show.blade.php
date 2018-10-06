@@ -10,8 +10,9 @@
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
             ['item' => 'จัดการการกู้ยืม', 'link' => '/service/loan/member'],
-            ['item' => 'การกู้ยืม', 'link' => 'service/' . $member->id . '/loan'],
-            ['item' => 'สัญญากู้ยืม', 'link' => ''],
+            ['item' => 'การกู้ยืม', 'link' => '/service/' . $member->id . '/loan'],
+            ['item' => 'สัญญากู้ยืม', 'link' => '/service/' . $member->id . '/loan/' . $loan->id],
+            ['item' => 'รายการผ่อนชำระ', 'link' => ''],
         ]])
     </section>
 
@@ -64,20 +65,6 @@
                 <!-- /.table -->
             </div>  
             <!-- /.table-responsive --> 
-
-            @if (is_null($loan->completed_at))
-                <button type="button" class="btn btn-primary btn-flat"
-                    onclick="javascript:window.location.href = '{{ url('/service/' . $member->id . '/loan/' . $loan->id . '/edit') }}';">
-                    <i class="fa fa-pencil"></i> แก้ไขสัญญา
-                </button>
-
-                @if ($loan->loan_type_id == 1 && !$loan->shareholding)
-                    <button type="button" class="btn btn-primary btn-flat"
-                        onclick="javascript:window.location.href = '{{ url('/service/' . $member->id . '/loan/' . $loan->id . '/sureties/edit') }}';">
-                        <i class="fa fa-pencil"></i> แก้ไขผู้ค้ำประกัน
-                    </button>
-                @endif
-            @endif
         </div>
 
         @if(Session::has('flash_message'))
@@ -100,53 +87,33 @@
             <!-- /.box-header -->
 
             <div class="box-body">
-                @if (is_null($loan->completed_at))
-                    <div class="btn-group">
-                        <button id="create_loan" class="btn btn-primary btn-flat" style="margin-bottom: 15px;"
-                            onclick="javascript:window.location.href = '{{ url('/service/' . $member->id . '/loan/' . $loan->id . '/payment/create') }}';">
-                            <i class="fa fa-plus-circle fa-fw"></i> ชำระเงิน
-                        </button>
-                    </div>
+                <button class="btn btn-primary btn-flat margin-b-sm" onclick="javascript:window.location.href='{{ url('/service/' . $member->id . '/loan/' . $loan->id . '/payment/billing/' . $payment->id . '/' . Diamond::parse($payment->pay_date)->format('Y-n-j')) }}';">
+                    <i class="fa fa-file-text-o"></i> ใบเสร็จรับเงินการชำระเงินกู้
+                </button>
 
-                    @if ($loan->payments->sum('principle') >= ($loan->outstanding / 10))
-                        <div class="btn-group">
-                            <button id="create_loan" class="btn btn-primary btn-flat" style="margin-bottom: 15px;"
-                                onclick="javascript:window.location.href = '{{ url('/service/' . $member->id . '/loan/' . $loan->id . '/payment/close') }}';">
-                                <i class="fa fa-plus-circle fa-fw"></i> ปิดยอดเงินกู้
-                            </button>
-                        </div>
-
-                        <div class="btn-group pull-right">
-                            <button id="calculate_payment" class="btn btn-default btn-flat" style="margin-bottom: 15px;"
-                                onclick="javascript:window.location.href = '{{ url('/service/' . $member->id . '/loan/' . $loan->id . '/payment/calculate') }}';">
-                                <i class="fa fa-calculator fa-fw"></i> คำนวณยอดเงินที่ต้องการปิดยอดเงินกู้
-                            </button>
-                        </div>
-                    @endif
-                @endif
+                <button class="btn btn-primary btn-flat margin-b-sm pull-right" onclick="javascript:document.location = '{{ url('/service/' . $member->id . '/loan/' . $loan->id . '/payment/' . $payment->id . '/edit') }}';">
+                    <i class="fa fa-pencil"></i> แก้ไข
+                </button>
 
                 <div class="table-responsive" style=" margin-top: 10px;">
-                    <table id="dataTables-payment" class="table table-hover dataTable" width="100%">
-                        <thead>
+                    <table class="table" width="100%">
+                        <tbody>
                             <tr>
-                                <th style="width: 10%;">#</th>
-                                <th style="width: 30%;">วันที่ชำระ</th>
-                                <th style="width: 20%;">เงินต้น</th>
-                                <th style="width: 20%;">ดอกเบี้ย</th>
-                                <th style="width: 20%;">รวม</th>
+                                <th style="width:20%; border-top: none;">วันที่ชำระ</th>
+                                <td style="border-top: none;">{{ Diamond::parse($payment->pay_date)->thai_format('j M Y') }}</td>
                             </tr>
-                        </thead>
-                        <tboby>
-                            @php($count = 0)
-                            @foreach($loan->payments->sortByDesc('pay_date') as $payment)
-                                <tr onclick="javascript: document.location = '{{ url('/service/' . $member->id . '/loan/' . $loan->id . '/payment/' . $payment->id) }}';" style="cursor: pointer;">
-                                    <td>{{ ++$count }}.</td>
-                                    <td class="text-primary"><i class="fa fa-credit-card fa-fw"></i> {{ Diamond::parse($payment->pay_date)->thai_format('d M Y') }}</td>
-                                    <td>{{ number_format($payment->principle, 2, '.', ',') }} บาท</td>
-                                    <td>{{ number_format($payment->interest, 2, '.', ',') }} บาท</td>
-                                    <td>{{ number_format($payment->principle + $payment->interest, 2, '.', ',') }} บาท</td>
-                                </tr>
-                            @endforeach
+                            <tr>
+                                <th>เงินต้น</th>
+                                <td>{{ number_format($payment->principle, 2, '.', ',') }} บาท</td>
+                            </tr>
+                            <tr>
+                                <th>ดอกเบี้ย</th>
+                                <td>{{ number_format($payment->interest, 2, '.', ',') }} บาท</td>
+                            </tr>
+                            <tr>
+                                <th>รวม</th>
+                                <td>{{ number_format($payment->principle + $payment->interest, 2, '.', ',') }} บาท</td>
+                            </tr>
                         </tbody>
                     </table>
                     <!-- /.table -->
@@ -166,19 +133,11 @@
 @endsection
 
 @section('styles')
-    <!-- Bootstrap DataTable CSS -->
-    {!! Html::style(elixir('css/dataTables.bootstrap.css')) !!}
-
     @parent
 @endsection
 
 @section('scripts')
     @parent
-
-    <!-- Bootstrap DataTable JavaScript -->
-    {!! Html::script(elixir('js/jquery.dataTables.js')) !!}
-    {!! Html::script(elixir('js/dataTables.responsive.js')) !!}
-    {!! Html::script(elixir('js/dataTables.bootstrap.js')) !!}
 
     <script>
     $(document).ready(function () {
@@ -186,11 +145,7 @@
             headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
         });
 
-        $('[data-tooltip="true"]').tooltip();
-
-        $('#dataTables-payment').dataTable({
-            "iDisplayLength": 25
-        });   
+        $('[data-tooltip="true"]').tooltip(); 
     });   
     </script>  
 @endsection

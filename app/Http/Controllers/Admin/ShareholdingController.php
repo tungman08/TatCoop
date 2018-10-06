@@ -10,7 +10,9 @@ use Auth;
 use History;
 use DB;
 use Diamond;
+use PDF;
 use Validator;
+use App\Billing;
 use App\Member;
 use App\Profile;
 use App\Shareholding;
@@ -106,10 +108,10 @@ class ShareholdingController extends Controller
         }
     }
 
-    public function getEditlist($member_id, $paydate) {
+    public function getShow($member_id, $paydate) {
         $pay_date = Diamond::parse($paydate);
 
-        return view('admin.shareholding.editlist', [
+        return view('admin.shareholding.show', [
             'member' => Member::find($member_id),
             'shareholding_date' => $pay_date,
             'shareholdings' => Shareholding::where('member_id', $member_id)->whereYear('pay_date', '=', $pay_date->year)->whereMonth('pay_date', '=', $pay_date->month)->get(),
@@ -218,4 +220,69 @@ class ShareholdingController extends Controller
             ->with('flash_message', 'ทำรายการชำระค่าหุ้นอัตโนมัติประจำเดือน' . $date->thai_format('F Y') . ' จำนวน ' . $members->count() . ' คน เรียบร้อยแล้ว')
             ->with('callout_class', 'callout-success');
     }
+
+    function getBilling($member_id, $paydate) {
+        $billdate = Diamond::parse($paydate);
+        $member = Member::find($member_id);
+        $shareholdings = Shareholding::where('member_id', $member->id)
+            ->whereYear('pay_date', '=', $billdate->year)
+            ->whereMonth('pay_date', '=', $billdate->month)
+            ->get();
+        $total_shareholding = $shareholdings->sum('amount');
+
+        return view('admin.shareholding.billing', [
+            'member' => $member,
+            'billing' => Billing::latest()->first(),
+            'shareholdings' => $shareholdings,
+            'total_shareholding' => $total_shareholding,
+            'billno' => $billdate->thai_format('Y') . str_pad($shareholdings->max('id'), 8, '0', STR_PAD_LEFT),
+            'date' => $billdate
+        ]);
+    }
+
+    
+    public function getPrintBilling($member_id, $paydate) {
+        $billdate = Diamond::parse($paydate);
+        $member = Member::find($member_id);
+        $shareholdings = Shareholding::where('member_id', $member->id)
+            ->whereYear('pay_date', '=', $billdate->year)
+            ->whereMonth('pay_date', '=', $billdate->month)
+            ->get();
+        $total_shareholding = Shareholding::where('member_id', $member->id)
+            ->where('pay_date', '<=', $billdate)
+            ->sum('amount');
+
+        return view('admin.shareholding.print', [
+            'member' => $member,
+            'billing' => Billing::latest()->first(),
+            'shareholdings' => $shareholdings,
+            'total_shareholding' => $total_shareholding,
+            'billno' => $billdate->thai_format('Y') . str_pad($shareholdings->max('id'), 8, '0', STR_PAD_LEFT),
+            'date' => $billdate
+        ]);
+     }
+
+     public function getPdfBilling($member_id, $paydate) {
+        $billdate = Diamond::parse($paydate);
+        $member = Member::find($member_id);
+        $shareholdings = Shareholding::where('member_id', $member->id)
+            ->whereYear('pay_date', '=', $billdate->year)
+            ->whereMonth('pay_date', '=', $billdate->month)
+            ->get();
+        $total_shareholding = Shareholding::where('member_id', $member->id)
+            ->where('pay_date', '<=', $billdate)
+            ->sum('amount');
+
+        $data = [
+            'member' => $member,
+            'billing' => Billing::latest()->first(),
+            'shareholdings' => $shareholdings,
+            'total_shareholding' => $total_shareholding,
+            'billno' => $billdate->thai_format('Y') . str_pad($shareholdings->max('id'), 8, '0', STR_PAD_LEFT),
+            'date' => $billdate
+        ];
+
+        return PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])
+            ->loadView('admin.shareholding.pdf', $data)->download('ใบเสร็จรับเงินค่าหุ้นเดือน-' . $billdate->thai_format('M-Y') . '.pdf');
+     }
 }

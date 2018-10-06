@@ -1085,4 +1085,53 @@ class AjaxController extends Controller
         return Datatables::collection($collection)
             ->make(true);
     }
+
+    public function postCountsurety(Request $request) {
+        $member = Member::find($request->input('id'));
+        $result = $member->sureties->filter(function ($value, $key) {
+            return !is_null($value->code) && is_null($value->completed_at); 
+        });
+
+        return Response::json($result);
+    }
+
+    public function postChecksuretyavailable(Request $request) {
+        $member = Member::find($request->input('id'));
+        $salary = $request->input('salary');
+        $netSalary = $request->input('netSalary');
+        $available = LoanCalculator::salary_available($member, $salary);
+
+        if ($netSalary < 3000) {
+            $message = "ไม่สามารถค้ำประกันได้ เนื่องจากเงินเดือนสุทธิผู้ค้ำ น้อยกว่า 3,000 บาท";
+
+        }
+        else if ($available < $amount) {
+            $message = "ไม่สามารถค้ำประกันได้ เงินเดือนไม่พอที่ใช้ค้ำประกัน (สามารถค้ำได้ " . number_format($available, 2, '.', ',') . " บาท)";
+        }
+        else {
+            $message = "สามารถค้ำได้ " . number_format($available, 2, '.', ',') . " บาท";
+        }
+
+        return Response::json($result);
+    }
+
+    public function postCheckloanavailable(Request $request) {
+        $member = Member::find($request->input('id'));
+
+        $loans = Loan::where('member_id', $member->id)
+            ->where('loan_type_id', '<>', 2)
+            ->whereNotNull('code')
+            ->whereNull('completed_at');
+        $total_outstanding = $loans->sum('outstanding');
+        $total_payments = 0;
+
+        foreach($loans as $loan) {
+            $total_payments += $loan->payments()->sum('principle');
+        }
+
+        $balance = 1200000 - ($total_outstanding - $total_payments);
+        $result = "สามารถกู้สามัญได้อีก " . number_format($balance, 2, '.', ',') . " บาท (ยอดเงินกู้สามัญ + กู้เฉพาะกิจอื่นๆ รวมกันแล้วเกิน 1,200,000 บาท)";
+
+        return Response::json($result);
+    }
 }

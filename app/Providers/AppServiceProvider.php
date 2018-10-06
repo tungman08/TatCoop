@@ -97,5 +97,9 @@ class AppServiceProvider extends ServiceProvider
         App::bind('dividendcalculator', function() {
             return new \App\Classes\DividendCalculator;
         });    
+
+        App::bind('dashboard', function() {
+            return new \App\Classes\Dashboard;
+        });    
     }
 }
