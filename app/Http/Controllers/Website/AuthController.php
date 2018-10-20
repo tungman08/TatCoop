@@ -180,11 +180,15 @@ class AuthController extends Controller
         }
         else {
             DB::transaction(function() use ($request) {
-                $user = new User($request->only('email', 'password'));
+                $user = new User([
+                    'email' => strtolower($request->input('email')),
+                    'password' => $request->input('password')
+                ]);
+
                 $member = Member::find($request->input('member_id'));
                 $member->user()->save($user);
 
-                $id = User::where('email', $request->input('email'))->first()->id;
+                $id = User::where('email', strtolower($request->input('email')))->first()->id;
                 History::addUserHistory($id, 'สร้างบัญชีผู้ใช้');
 
                 $token = hash_hmac('sha256', str_random(40), config('app.key'));
@@ -200,7 +204,7 @@ class AuthController extends Controller
             });
 
             return redirect()->back()
-                ->with('registed', 'ลงทะเบียนเรียบร้อยแล้ว คุณต้องเข้ายืนยันการใช้งานจากลิงก์ที่ส่งไปยังอีเมล ' . $request->input('email'));
+                ->with('registed', 'ลงทะเบียนเรียบร้อยแล้ว คุณต้องเข้ายืนยันการใช้งานจากลิงก์ที่ส่งไปยังอีเมล ' . strtolower($request->input('email')));
         }
     }
 
@@ -209,7 +213,7 @@ class AuthController extends Controller
      */
     public function getVerify($token) {
         if(!$token) {
-            return redirect()->action('HomeController@getIndex');
+            return redirect()->action('Website\HomeController@getIndex');
         }
 
         $confirm = DB::table('user_confirmations')
@@ -217,7 +221,7 @@ class AuthController extends Controller
             ->first();
 
         if (!$confirm) {
-            return redirect()->action('HomeController@getIndex');
+            return redirect()->action('Website\HomeController@getIndex');
         }
 
         DB::transaction(function() use ($confirm) {

@@ -93,7 +93,7 @@ class AdminController extends Controller
             DB::transaction(function() use ($request) {
                 $admin = new Administrator();
                 $admin->name = $request->input('name');
-                $admin->email = $request->input('email');
+                $admin->email = strtolower($request->input('email'));
                 $admin->password = $request->input('new_password');
                 $admin->save();
 

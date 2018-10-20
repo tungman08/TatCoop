@@ -32,18 +32,19 @@
                         <thead>
                             <tr>
                                 <th style="width: 5%;">#</th>
-                                <th style="width: 15%;">เลขที่สัญญา</th>
-                                <th style="width: 15%;">ประเภทเงินกู้</th>
+                                <th style="width: 12%;">เลขที่สัญญา</th>
+                                <th style="width: 12%;">ประเภทเงินกู้</th>
                                 <th style="width: 10%;">วันที่กู้</th>
-                                <th style="width: 10%;">วงเงินที่กู้</th>
-                                <th style="width: 15%;">จำนวนงวดที่ผ่อนชำระ</th>
-                                <th style="width: 15%;">จำนวนเงินที่ชำระแล้ว</th>
-                                <th style="width: 10%;">สถานะ</th>
+                                <th style="width: 12%;">วงเงินที่กู้</th>
+                                <th style="width: 12%;">จำนวนงวด</th>
+                                <th style="width: 12%;">ชำระแล้ว</th>
+                                <th style="width: 12%;">คงเหลือ</th>
+                                <th style="width: 8%;">สถานะ</th>
                             </tr>
                         </thead>
                         <tbody>
                             @php($count = 0)
-                            @foreach($loans as $loan) 
+                            @foreach($loans->sortByDesc('loaned_at') as $loan) 
                             <tr onclick="javascript: document.location = '{{ url('/member/' . $member->id . '/loan/' . $loan->id) }}';"
                                 style="cursor: pointer;">
                                 <td>{{ ++$count }}</td>
@@ -51,8 +52,9 @@
                                 <td>{{ $loan->loanType->name }}</td>
                                 <td>{{ Diamond::parse($loan->loaned_at)->thai_format('Y-m-d') }}</td>
                                 <td>{{ number_format($loan->outstanding, 2, '.', ',') }}</td>
-                                <td>{{ number_format($loan->period, 0, '.', ',') }}</td>
-                                <td>{{ number_format($loan->payments->count(), 0, '.', ',') }}</td>
+                                <td>{{ number_format($loan->payments->count(), 0, '.', ',') }}/{{ number_format($loan->period, 0, '.', ',') }}</td>
+                                <td>{{ number_format($loan->payments->sum('principle'), 2, '.', ',') }}</td>
+                                <td>{{ number_format(round($loan->outstanding - $loan->payments->sum('principle'), 2), 2, '.', ',') }}</td>
                                 <td class="{{ (!is_null($loan->completed_at)) ? 'text-success' : 'text-danger' }}">{{ (!is_null($loan->completed_at)) ? 'ปิดยอดแล้ว' : 'กำลังผ่อนชำระ' }}</td>
                             </tr>
                             @endforeach

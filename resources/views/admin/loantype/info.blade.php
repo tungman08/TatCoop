@@ -10,11 +10,11 @@
         </tr>
         <tr>
             <th>วันที่เริ่มใช้:</th>
-            <td>{{ (Diamond::minValue()->diffInDays(Diamond::parse($loantype->start_date)) > 0) ? Diamond::parse($loantype->start_date)->thai_format('j F Y') : 'N/A' }}</td>
+            <td>{{ (Diamond::minValue()->diffInDays(Diamond::parse($loantype->start_date)) > 0) ? Diamond::parse($loantype->start_date)->thai_format('j M Y') : 'N/A' }}</td>
         </tr>
         <tr>
             <th>วันที่สิ้นสุดการใช้:</th>
-            <td>{{ (Diamond::maxValue()->diffInDays(Diamond::parse($loantype->expire_date)) > 0) ? Diamond::parse($loantype->expire_date)->thai_format('j F Y') : 'N/A' }}</td>
+            <td>{{ (Diamond::maxValue()->diffInDays(Diamond::parse($loantype->expire_date)) > 0) ? Diamond::parse($loantype->expire_date)->thai_format('j M Y') : 'N/A' }}</td>
         </tr>
         <tr>
             <th>เงื่อนไข:</th>

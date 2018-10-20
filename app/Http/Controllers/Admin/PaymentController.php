@@ -76,7 +76,7 @@ class PaymentController extends Controller
     
                 $loan = Loan::find($loan_id);        
             
-                if ($loan->outstanding <= $loan->payments->sum('principle')) {
+                if (abs($loan->outstanding - $loan->payments->sum('principle')) < 0.01) {
                     $loan->completed_at = Diamond::parse($request->input('pay_date'));
                     $loan->save();
                 }
@@ -240,7 +240,7 @@ class PaymentController extends Controller
                 $payment->save();
 
                 $loan = Loan::find($loan_id); 
-                if ($loan->outstanding <= $loan->payments->sum('principle')) {
+                if (abs($loan->outstanding - $loan->payments->sum('principle')) < 0.01) {
                     $loan->completed_at = Diamond::parse($request->input('pay_date'));
                     $loan->save();
                 }
@@ -264,7 +264,15 @@ class PaymentController extends Controller
             $payment->delete();
 
             $loan = Loan::find($loan_id); 
-
+            if (abs($loan->outstanding - $loan->payments->sum('principle')) < 0.01) {
+                $loan->completed_at = Diamond::parse($request->input('pay_date'));
+                $loan->save();
+            }
+            else {
+                $loan->completed_at = null;
+                $loan->save();
+            }
+            
             History::addAdminHistory(Auth::guard($this->guard)->id(), 'ลบข้อมูล', 'ลบข้อมูลการผ่อนชำระเงินกู้ ' . $loan->code);
         });
 

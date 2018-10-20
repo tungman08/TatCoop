@@ -3,7 +3,7 @@
     @foreach($histories as $history)
         <!-- timeline time label -->
         <li class="time-label">
-            <span class="bg-red">{{ Diamond::parse($history->date)->thai_format('Y-m-d') }}</span>
+            <span class="bg-red">{{ Diamond::parse($history->date)->thai_format('j M Y') }}</span>
         </li>
         <!-- /.timeline-label -->
 

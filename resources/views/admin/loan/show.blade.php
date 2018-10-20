@@ -41,7 +41,7 @@
                     </tr> 
                     <tr>
                         <th>เงินต้นคงเหลือ:</th>
-                        <td>{{ number_format($loan->outstanding - $loan->payments->sum('principle'), 2, '.', ',') }} บาท</td>
+                        <td>{{ number_format(round($loan->outstanding - $loan->payments->sum('principle'), 2), 2, '.', ',') }} บาท</td>
                     </tr>
                     <tr>
                         <th>ดอกเบี้ยสะสม:</th>

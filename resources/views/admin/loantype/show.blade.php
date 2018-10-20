@@ -83,13 +83,14 @@
                     <table id="dataTables-loans" class="table table-hover dataTable" width="100%">
                         <thead>
                             <tr>
-                                <th style="width: 10%;">#</th>
-                                <th style="width: 12%;">เลขที่สัญญา</th>
-                                <th style="width: 20%;">ชื่อผู้กู้</th>
-                                <th style="width: 12%;">วันที่ทำสัญญา</th>
+                                <th style="width: 8%;">#</th>
+                                <th style="width: 10%;">เลขที่สัญญา</th>
+                                <th style="width: 18%;">ชื่อผู้กู้</th>
+                                <th style="width: 10%;">วันที่ทำสัญญา</th>
                                 <th style="width: 12%;">วงเงินที่กู้</th>
-                                <th style="width: 12%;">จำนวนงวดที่ผ่อนชำระ</th>
-                                <th style="width: 12%;">ชำระเงินต้นแล้ว</th>
+                                <th style="width: 8%;">จำนวนงวด</th>
+                                <th style="width: 12%;">ชำระแล้ว</th>
+                                <th style="width: 12%;">คงเหลือ</th>
                                 <th style="width: 10%;">สถานะ</th>
                             </tr>
                         </thead>
@@ -102,8 +103,9 @@
                                     <td>{{ $loan->member->profile->fullName }}</td>
                                     <td>{{ Diamond::parse($loan->loaned_at)->thai_format('Y-m-d') }}</td>
                                     <td>{{ number_format($loan->outstanding, 2, '.', ',') }}</td>
-                                    <td>{{ number_format($loan->period, 0, '.', ',') }}</td>
+                                    <td>{{ number_format($loan->payments->count(), 0, '.', ',') }}/{{ number_format($loan->period, 0, '.', ',') }}</td>
                                     <td>{{ number_format($loan->payments->sum('principle'), 2, '.', ',') }}</td>
+                                    <td>{{ number_format(round($loan->outstanding - $loan->payments->sum('principle'), 2), 2, '.', ',') }}</td>
                                     <td>{!! (!is_null($loan->completed_at)) ? '<span class="label label-success">ปิดยอดแล้ว</span>' : '<span class="label label-danger">กำลังผ่อนชำระ</span>' !!}</td>
                                 </tr>
                             @endforeach
