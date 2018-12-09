@@ -61,7 +61,25 @@
         </div>
     </div>
     <div class="form-group">
-        {{ Form::label('limits', 'เงื่อนไข', [
+        {{ Form::label('salarytimes', 'กู้ได้ไม่เกิน', [
+            'class'=>'col-sm-2 control-label']) 
+        }}
+
+        <div class="col-sm-10 input-group" id="expire_date" style="padding: 0 5px;">
+            <div class="row">
+                <div class="col-sm-1">
+                    {{ Form::text('salarytimes', null, [
+                        'placeholder' => 'ตัวอย่าง: 10',
+                        'autocomplete'=>'off',
+                        'class'=>'form-control'])
+                    }}   
+                </div>
+                <div class="col-sm-11" style="padding-top: 7px;">เท่าของเงินเดือน</div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        {{ Form::label('limits', 'เงื่อนไขอื่นๆ', [
             'class'=>'col-sm-2 control-label']) 
         }}
 
@@ -81,15 +99,21 @@
                         @if (!$edit)
                             @if (!is_null(old('limits')))
                                 @foreach(old('limits') as $key => $limit)
-                                    @include('admin.loantype.limits', ['edit' => $edit, 'key' => $key, 'limit' => $limit])
+                                    @include('admin.loantype.limits', ['key' => $key, 'limit' => $limit])
                                 @endforeach
                             @else
-                                @include('admin.loantype.limits', ['edit' => $edit, 'key' => 0, 'limit' => null])
+                                @include('admin.loantype.limits', ['key' => 0, 'limit' => null])
                             @endif
                         @else
-                            @foreach($loantype->limits as $key => $limit)
-                                @include('admin.loantype.limits', ['edit' => $edit, 'key' => $key, 'limit' => $limit])
-                            @endforeach
+                            @if (!is_null(old('limits')))
+                                @foreach(old('limits') as $key => $limit)
+                                    @include('admin.loantype.limits', ['key' => $key, 'limit' => $limit])
+                                @endforeach
+                            @else
+                                @foreach($loantype->limits as $key => $limit)
+                                    @include('admin.loantype.limits', ['key' => $key, 'limit' => $limit])
+                                @endforeach
+                            @endif
                         @endif
                     </tbody>
                 </table>  

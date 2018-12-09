@@ -34,24 +34,33 @@
                     <table id="dataTables-finished" class="table table-hover dataTable" width="100%">
                         <thead>
                             <tr>
-                                <th style="width: 10%;">#</th>
-                                <th style="width: 15%;">เลขที่สัญญา</th>
-                                <th style="width: 30%;">ชื่อผู้กู้</th>
-                                <th style="width: 15%;">วันที่ทำสัญญา</th>
-                                <th style="width: 15%;">วงเงินที่กู้</th>
-                                <th style="width: 15%;">จำนวนงวดที่ผ่อนชำระ</th>
+                                <th style="width: 8%;">#</th>
+                                <th style="width: 8%;">เลขที่สัญญา</th>
+                                <th style="width: 18%;">ชื่อผู้กู้</th>
+                                <th style="width: 10%;">วันที่ทำสัญญา</th>
+                                <th style="width: 12%;">วงเงินที่กู้</th>
+                                <th style="width: 12%;">เงินต้น</th>
+                                <th style="width: 12%;">ดอกเบี้ยรวม</th>
+                                <th style="width: 12%;">จำนวนงวดที่ผ่อนชำระ</th>
+                                <th style="width: 8%;">สถานะ</th>
                             </tr>
                         </thead>
-                        <tboby>
+                        <tbody>
                             @php ($index = 0)
-                            @foreach($loans as $loan)
+                            @foreach($loans->sortByDesc(function ($value, $key) {
+                                    $code = explode('/', $value->code);
+                                    return $code[1] . $code[0];
+                                }) as $loan)
                                 <tr style="cursor: pointer;" onclick="javascript: document.location = '/service/{{ $loan->member->id }}/loan/{{ $loan->id }}';">
                                     <td>{{ ++$index }}</td>
                                     <td class="text-primary"><i class="fa fa-credit-card fa-fw"></i>{{ $loan->code }}</td>
                                     <td>{{ $loan->member->profile->fullName }}</td>
                                     <td>{{ Diamond::parse($loan->loaned_at)->thai_format('Y-m-d') }}</td>
                                     <td>{{ number_format($loan->outstanding, 2, '.', ',') }}</td>
-                                    <td>{{ number_format($loan->period, 0, '.', ',') }}</td>
+                                    <td>{{ number_format($loan->payments->sum('principle'), 2, '.', ',') }}</td>
+                                    <td>{{ number_format($loan->payments->sum('interest'), 2, '.', ',') }}</td>
+                                    <td>{{ number_format($loan->payments->count(), 0, '.', ',') }}/{{ number_format($loan->period, 0, '.', ',') }}</td>
+                                    <td>{!! (!is_null($loan->completed_at)) ? '<span class="label label-success">ปิดยอดแล้ว</span>' : '<span class="label label-danger">กำลังผ่อนชำระ</span>' !!}</td>
                                 </tr>
                             @endforeach
                         </tbody>

@@ -14,10 +14,11 @@ class CreateLoanTypesTable extends Migration
     {
         Schema::create('loan_types', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
-            $table->float('rate');
-            $table->date('start_date');
-            $table->date('expire_date');
+            $table->string('name')->nullable();
+            $table->float('rate')->nullable();
+            $table->integer('salarytimes')->nullable();
+            $table->date('start_date')->nullable();
+            $table->date('expire_date')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

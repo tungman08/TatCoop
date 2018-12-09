@@ -48,6 +48,7 @@ class LoanTypeController extends Controller
         $rules = [
             'name' => 'required',
             'rate' => 'required|numeric|between:0,100',
+            'salarytimes' => 'required|numeric|between:1,100',
             'start_date' => 'required|date_format:Y-m-d', 
             'expire_date' => 'required|date_format:Y-m-d',
             'limits.*.cash_begin' => 'required|numeric|min:1',
@@ -60,6 +61,7 @@ class LoanTypeController extends Controller
         $attributeNames = [
             'name' => 'ชื่อประเภทเงินกู้พิเศษ',
             'rate' => 'อัตราดอกเบี้ย',
+            'salarytimes' => 'จำนวนเท่าของเงินเดือน',
             'start_date' => 'วันที่เริ่มใช้', 
             'expire_date' => 'วันที่หมดอายุ',
             'limits.*.cash_begin' => 'วงเงินกู้เริ่มต้น',
@@ -92,6 +94,7 @@ class LoanTypeController extends Controller
                 $loanType = new LoanType();
                 $loanType->name = $request->input('name');
                 $loanType->rate = $request->input('rate');
+                $loanType->salarytimes = $request->input('salarytimes');
                 $loanType->start_date = Diamond::parse($request->input('start_date'));
                 $loanType->expire_date = Diamond::parse($request->input('expire_date'));
                 $loanType->save();
@@ -130,14 +133,26 @@ class LoanTypeController extends Controller
     public function update(Request $request, $id) {
         $rules = [
             'rate' => 'required|numeric|between:0,100',
+            'salarytimes' => 'required|numeric|between:1,100',
             'start_date' => 'required|date_format:Y-m-d', 
             'expire_date' => 'required|date_format:Y-m-d',
+            'limits.*.cash_begin' => 'required|numeric|min:1',
+            'limits.*.cash_end' => 'required|numeric',
+            'limits.*.shareholding' => 'required|numeric|min:0',
+            'limits.*.surety' => 'required',
+            'limits.*.period' => 'required|numeric|min:1',
         ];
 
         $attributeNames = [
-            'rate' => 'อัตราดอกเบี้ย'  ,
+            'rate' => 'อัตราดอกเบี้ย',
+            'salarytimes' => 'จำนวนเท่าของเงินเดือน',
             'start_date' => 'วันที่เริ่มใช้', 
-            'expire_date' => 'วันที่หมดอายุ',      
+            'expire_date' => 'วันที่หมดอายุ',    
+            'limits.*.cash_begin' => 'วงเงินกู้เริ่มต้น',
+            'limits.*.cash_end' => 'วงเงินกู้สูงสุด',
+            'limits.*.shareholding' => 'จำนวนหุ้นที่ใช้ขอกู้',
+            'limits.*.surety' => 'จำนวนผู้ค้ำประกัน',
+            'limits.*.period' => 'จำนวนงวดผ่อนชำระสูงสุด',  
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -152,9 +167,21 @@ class LoanTypeController extends Controller
             DB::transaction(function() use ($request, $id) {
                 $loanType = LoanType::find($id);
                 $loanType->rate = $request->input('rate');
+                $loanType->salarytimes = $request->input('salarytimes');
                 $loanType->start_date = Diamond::parse($request->input('start_date'));
                 $loanType->expire_date = Diamond::parse($request->input('expire_date'));
+                $loanType->limits()->delete();
                 $loanType->save();
+
+                foreach ($request->input('limits') as $item) {
+                    $limit = new LoanTypeLimit();
+                    $limit->cash_begin = $item['cash_begin'];
+                    $limit->cash_end = $item['cash_end'];
+                    $limit->shareholding = $item['shareholding'];
+                    $limit->surety = $item['surety'];
+                    $limit->period = $item['period'];
+                    $loanType->limits()->save($limit);
+                }
 
                 History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'แก้ไขข้อมูลประเภทเงินกู้');
             });
@@ -198,7 +225,7 @@ class LoanTypeController extends Controller
 
     public function getInactive() {
         return view('admin.loantype.inactive', [
-            'loantypes' => LoanType::deletedType()->get()
+            'loantypes' => LoanType::deletedtype()->get()
         ]);
     }
 

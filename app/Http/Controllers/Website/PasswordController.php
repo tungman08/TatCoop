@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ResetsPasswords;
+use App\User;
 use Password;
 use History;
 
@@ -73,11 +74,13 @@ class PasswordController extends Controller
 
         switch ($response) {
             case Password::RESET_LINK_SENT:
-                return $this->getSendResetLinkEmailSuccessResponse($response);
+                return (!$this->isNewAccount($request->input('email'))) ? 
+                    redirect()->back()->with('email', 'ส่งอีเมลสำหรับตั้งค่ารหัสผ่านแล้ว') : 
+                    redirect()->back()->withErrors(['email' => 'ไม่สามารถส่งอีเมลสำหรับตั้งค่ารหัสผ่าน']);;
 
             case Password::INVALID_USER:
             default:
-                return $this->getSendResetLinkEmailFailureResponse($response);
+                return redirect()->back()->withErrors(['email' => 'ไม่สามารถส่งอีเมลสำหรับตั้งค่ารหัสผ่าน']);;
         }
     }
 
@@ -107,5 +110,11 @@ class PasswordController extends Controller
         $user->forceFill(['password' => $password])->save();
 
         History::addUserHistory($user->id, 'ตั้งค่ารหัสผ่านใหม่');
+    }
+
+    protected function isNewAccount($email) {
+        $user = User::where('email', $email)->first();
+
+        return $user->newaccount;
     }
 }

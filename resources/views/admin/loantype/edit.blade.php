@@ -11,7 +11,7 @@
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
             ['item' => 'ข้อมูลประเภทเงินกู้', 'link' => '/admin/loantype'],
             ['item' => 'ประเภทเงินกู้', 'link' => '/admin/loantype/' . $loantype->id],
-            ['item' => 'แก้ไข', 'link' => ''],
+            ['item' => 'แก้ไขประเภทสัญญา', 'link' => ''],
         ]])
 
     </section>
@@ -65,11 +65,11 @@
     {!! Html::script(elixir('js/moment.js')) !!}
     {!! Html::script(elixir('js/bootstrap-datetimepicker.js')) !!}
 
-    <!-- Custom JavaScript -->
-    {!! Html::script(elixir('js/member-form.js')) !!}
-
     <script>
         $(document).ready(function() {
+            $('#add_limit').prop("disabled", false);
+            $('#delete_limit').prop("disabled", $('#limits tbody tr').length == 1);
+
             $('#start_date').datetimepicker({
                 locale: 'th',
                 viewMode: 'days',
@@ -85,20 +85,88 @@
                 locale: moment().lang('th'),
                 useCurrent: false
             });
+
+            $('#add_limit').click(function () {
+                var childs = $('#limits tbody tr').length;
+                var begin = parseInt($('#limits tbody tr:last-child td:eq(1) input:text').val(), 10) + 1;
+
+                var row = '<tr>';
+                    row += '<td style="padding-left: 0px;">';
+                    row += '<input name="limits[' + childs + '][cash_begin]" placeholder="ตัวอย่าง: 1" ';
+                    row += 'class="form-control limits" value="' + begin + '" type="text" onkeyup="javascript:check_limits();" ';
+                    row += 'onkeypress="javascript:return isNumberKey(event);" autocomplete="off" readonly>';
+                    row += '</td>';
+                    row += '<td style="padding-left: 0px;">';
+                    row += '<input name="limits[' + childs + '][cash_end]" placeholder="ตัวอย่าง: 1000000" ';
+                    row += 'class="form-control limits" type="text" onkeyup="javascript:check_limits_sp(this);" ';
+                    row += 'onkeypress="javascript:return isNumberKey(event);" autocomplete="off">';   
+                    row += '</td>';
+                    row += '<td style="padding-left: 0px;">';
+                    row += '<input name="limits[' + childs + '][shareholding]" placeholder="ตัวอย่าง: 25 (กรณีไม่ต้องใช้หุ้นให้ใส่ 0)" ';
+                    row += 'class="form-control limits" type="text" onkeyup="javascript:check_limits();" ';
+                    row += 'onkeypress="javascript:return isNumberKey(event);" autocomplete="off">';  
+                    row += '</td>';
+                    row += '<td style="padding-left: 0px;">';
+                    row += '<input name="limits[' + childs + '][surety]" placeholder="ตัวอย่าง: 1-2 (กรณีไม่ต้องใช้ผู้ค้ำให้ใส่ 0)" ';
+                    row += 'class="form-control limits" type="text" onkeyup="javascript:check_limits();" autocomplete="off">';  
+                    row += '</td>';
+                    row += '<td style="padding-left: 0px;">';
+                    row += '<input name="limits[' + childs + '][period]" placeholder="ตัวอย่าง: 36" ';
+                    row += 'class="form-control limits" type="text" onkeyup="javascript:check_limits();" ';
+                    row += 'onkeypress="javascript:return isNumberKey(event);" autocomplete="off">';
+                    row += '</td>';                    
+                    row += '</tr>';
+
+                $('#limits tbody').append(row);
+                $(this).prop("disabled", true);
+                childs = $('#limits tbody tr').length;
+
+                if (childs > 1) {
+                    $('#delete_limit').prop("disabled", false);
+                }
+            });
+
+            $('#delete_limit').click(function () {
+                $('#limits tbody tr:last-child').remove();
+                childs = $('#limits tbody tr').length;
+                check_limits(false);
+
+                if (childs < 2) {
+                    $('#delete_limit').prop("disabled", true);
+                }
+            });
         });
-  
-        function check_limits(editmode) {
-            if (!editmode) {
-                var empty = 0;
 
-                $('.limits').each(function () {
-                    if (this.value == "") {
-                        empty++;
-                    } 
-                });
+        function check_limits() {
+            var empty = 0;
 
-                $('#add_limit').prop("disabled", (empty != 0));
+            $('.limits').each(function () {
+                if (this.value == "") {
+                    empty++;
+                } 
+            });
+
+            $('#add_limit').prop("disabled", (empty != 0));
+        }
+
+        function check_limits_sp(element,) {
+            var tr = $(element).closest('tr');
+
+            if (!tr.is(':last-child')) {
+                var cash = parseInt(tr.children().eq(1).children('input:text').val(), 10);
+                    cash = (!isNaN(cash)) ? cash : 0; 
+                    
+                tr.next().children().eq(0).children('input:text').val(cash + 1);
             }
+
+            check_limits();
+        }
+
+        function isNumberKey(evt){
+            var charCode = (evt.which) ? evt.which : event.keyCode
+            if (charCode > 31 && (charCode < 48 || charCode > 57))
+                return false;
+            return true;
         }
     </script>
 @endsection

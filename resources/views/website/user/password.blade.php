@@ -43,7 +43,7 @@
                 <div class="box-body">
                     <div class="panel-body">
                         <div class="row">
-                            <div class="col-md-3 col-lg-3 " align="center">
+                            <div class="col-md-3 col-lg-3 align-center">
                                 <img class="profile-user-img img-circle img-responsive" style="width: 200px; height: 200px; margin-bottom: 30px;" src="{{ asset('images/user.png') }}" alt="User Pic">
                             </div>
                             <div class=" col-md-9 col-lg-9 ">

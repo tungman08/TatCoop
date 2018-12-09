@@ -20,6 +20,8 @@
             <th>เงื่อนไข:</th>
             <td>
                 <ul class="list-info">
+                    <li>กู้สูงสุดได้ไม่เกิน <strong>{{ $loantype->salarytimes }}</strong> เท่าของเงินเดือน หรือไม่เกิน <strong>{{ number_format($loantype->limits->max('cash_end'), 2, '.', ',') }}</strong> บาท</li>
+
                     @foreach($loantype->limits as $limit)
                         <li>
                             จำนวนเงินกู้ <strong>{{ number_format($limit->cash_begin, 2, '.', ',') }} - {{ number_format($limit->cash_end, 2, '.', ',') }}</strong> บาท 
@@ -34,10 +36,6 @@
                     @endforeach
                 </ul>
             </td>
-        </tr>
-        <tr>
-            <th>จำนวนสัญญาเงินกู้:</th>
-            <td>{{ number_format($loantype->loans->filter(function ($value, $key) { return !empty($value->code); })->count()) }}</td>
         </tr>
     </table>
 </div>

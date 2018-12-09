@@ -24,7 +24,7 @@ class LoanType extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'rate', 'start_date', 'expire_date',
+        'name', 'rate', 'salarytimes', 'start_date', 'expire_date',
     ];
 
     /**
@@ -84,8 +84,8 @@ class LoanType extends Model
      *
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeDeletedType($query)
+    public function scopeDeletedtype($query)
     {
-        return $query->whereNotNull('deleted_at');
+        return $query->onlyTrashed();
     }
 }

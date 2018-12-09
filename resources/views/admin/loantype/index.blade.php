@@ -66,7 +66,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @eval($count = 0)
+                            @php($count = 0)
                             @foreach($loantypes as $type)
                             <tr onclick="javascript: document.location = '{{ url('/admin/loantype/' . $type->id) }}';"
                                 style="cursor: pointer;">
@@ -112,10 +112,10 @@
     <script>
     $(document).ready(function () {
         $('[data-tooltip="true"]').tooltip();
-    });
 
-    $('#dataTables-loantypes').dataTable({
-        "iDisplayLength": 25
+        $('#dataTables-loantypes').dataTable({
+            "iDisplayLength": 25
+        });
     });
     </script>
 @endsection

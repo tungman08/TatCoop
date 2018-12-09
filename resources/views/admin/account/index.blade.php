@@ -102,7 +102,7 @@
         });   
 
         $('#dataTables-users tbody').on('click', 'tr', function() {
-            document.location = '/service/member/' + parseInt($(this).children("td").first().html());            
+            document.location = '/admin/account/' + parseInt($(this).children("td").first().html());            
         });         
     });   
     </script>

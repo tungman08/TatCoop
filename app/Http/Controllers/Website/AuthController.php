@@ -120,6 +120,11 @@ class AuthController extends Controller
                 History::addUserHistory(Auth::guard($this->guard)->id(), 'เข้าสู่ระบบ');
                 $user = User::find(Auth::guard($this->guard)->id());
 
+                if ($user->newaccount) {
+                    $user->newaccount = false;
+                    $user->save();
+                }
+
                 return redirect()->action('Website\MemberController@show', [ 'id' => $user->member_id ]);
             }
             else {

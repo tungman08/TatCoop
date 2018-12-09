@@ -41,6 +41,7 @@ use App\NewsAttachment;
 use App\KnowledgeAttachment;
 use App\Loan;
 use App\LoanType;
+use App\User;
 use Datatables;
 
 class AjaxController extends Controller
@@ -1133,5 +1134,11 @@ class AjaxController extends Controller
         $result = "สามารถกู้สามัญได้อีก " . number_format($balance, 2, '.', ',') . " บาท (ยอดเงินกู้สามัญ + กู้เฉพาะกิจอื่นๆ รวมกันแล้วเกิน 1,200,000 บาท)";
 
         return Response::json($result);
+    }
+
+    public function postUnlockresetpassword(Request $request) {
+        $user = User::find($request->input('id'));
+        $user->newaccount = false;
+        $user->save();
     }
 }

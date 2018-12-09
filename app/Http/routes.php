@@ -220,15 +220,15 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
         Route::resource('administrator', 'AdminController', ['except' => [ 'show' ]]);
 
         // User Account Route...
-        Route::resource('account', 'AccountController', ['only' => [ 'index' ]]);
+        Route::resource('account', 'AccountController', ['only' => [ 'index', 'show', 'edit', 'update' ]]);
 
         // Loan Type Route...
         Route::get('loantype/{id}/finished', ['as' => 'admin.loantype.finished', 'uses' => 'LoanTypeController@getFinished']);
         Route::get('loantype/expired', ['as' => 'admin.loantype.expired', 'uses' => 'LoanTypeController@getExpired']);
         Route::get('loantype/expired/{id}', ['as' => 'admin.loantype.expired.detail', 'uses' => 'LoanTypeController@getExpiredDetail']);
-        Route::get('loantype/inactive', 'LoanTypeController@getInactive');
+        Route::get('loantype/inactive', ['as' => 'admin.loantype.inactive', 'uses' => 'LoanTypeController@getInactive']);
         Route::post('loantype/{id}/forcedelete', 'LoanTypeController@postForceDelete');
-        Route::post('loantype/{id}/restore', 'LoanTypeController@postRestore');        
+        Route::post('loantype/{id}/restore', 'LoanTypeController@postRestore');       
         Route::resource('loantype', 'LoanTypeController');
 
         // Active Loan Route...

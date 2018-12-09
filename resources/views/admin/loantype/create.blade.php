@@ -64,9 +64,6 @@
     {!! Html::script(elixir('js/moment.js')) !!}
     {!! Html::script(elixir('js/bootstrap-datetimepicker.js')) !!}
 
-    <!-- Custom JavaScript -->
-    {!! Html::script(elixir('js/member-form.js')) !!}
-
     <script>
         $(document).ready(function() {
             $('#add_limit').prop("disabled", true);
@@ -95,26 +92,26 @@
                 var row = '<tr>';
                     row += '<td style="padding-left: 0px;">';
                     row += '<input name="limits[' + childs + '][cash_begin]" placeholder="ตัวอย่าง: 1" ';
-                    row += 'class="form-control limits" value="' + begin + '" type="text" onkeyup="javascript:check_limits(false);" ';
+                    row += 'class="form-control limits" value="' + begin + '" type="text" onkeyup="javascript:check_limits();" ';
                     row += 'onkeypress="javascript:return isNumberKey(event);" autocomplete="off" readonly>';
                     row += '</td>';
                     row += '<td style="padding-left: 0px;">';
                     row += '<input name="limits[' + childs + '][cash_end]" placeholder="ตัวอย่าง: 1000000" ';
-                    row += 'class="form-control limits" type="text" onkeyup="javascript:check_limits_sp(this, false);" ';
+                    row += 'class="form-control limits" type="text" onkeyup="javascript:check_limits_sp(this);" ';
                     row += 'onkeypress="javascript:return isNumberKey(event);" autocomplete="off">';   
                     row += '</td>';
                     row += '<td style="padding-left: 0px;">';
                     row += '<input name="limits[' + childs + '][shareholding]" placeholder="ตัวอย่าง: 25 (กรณีไม่ต้องใช้หุ้นให้ใส่ 0)" ';
-                    row += 'class="form-control limits" type="text" onkeyup="javascript:check_limits(false);" ';
+                    row += 'class="form-control limits" type="text" onkeyup="javascript:check_limits();" ';
                     row += 'onkeypress="javascript:return isNumberKey(event);" autocomplete="off">';  
                     row += '</td>';
                     row += '<td style="padding-left: 0px;">';
                     row += '<input name="limits[' + childs + '][surety]" placeholder="ตัวอย่าง: 1-2 (กรณีไม่ต้องใช้ผู้ค้ำให้ใส่ 0)" ';
-                    row += 'class="form-control limits" type="text" onkeyup="javascript:check_limits(false);" autocomplete="off">';  
+                    row += 'class="form-control limits" type="text" onkeyup="javascript:check_limits();" autocomplete="off">';  
                     row += '</td>';
                     row += '<td style="padding-left: 0px;">';
                     row += '<input name="limits[' + childs + '][period]" placeholder="ตัวอย่าง: 36" ';
-                    row += 'class="form-control limits" type="text" onkeyup="javascript:check_limits(false);" ';
+                    row += 'class="form-control limits" type="text" onkeyup="javascript:check_limits();" ';
                     row += 'onkeypress="javascript:return isNumberKey(event);" autocomplete="off">';
                     row += '</td>';                    
                     row += '</tr>';
@@ -139,21 +136,19 @@
             });
         });
 
-        function check_limits(editmode) {
-            if (!editmode) {
-                var empty = 0;
+        function check_limits() {
+            var empty = 0;
 
-                $('.limits').each(function () {
-                    if (this.value == "") {
-                        empty++;
-                    } 
-                });
+            $('.limits').each(function () {
+                if (this.value == "") {
+                    empty++;
+                } 
+            });
 
-                $('#add_limit').prop("disabled", (empty != 0));
-            }
+            $('#add_limit').prop("disabled", (empty != 0));
         }
 
-        function check_limits_sp(element, editmode) {
+        function check_limits_sp(element,) {
             var tr = $(element).closest('tr');
 
             if (!tr.is(':last-child')) {
@@ -163,7 +158,7 @@
                 tr.next().children().eq(0).children('input:text').val(cash + 1);
             }
 
-            check_limits(editmode);
+            check_limits();
         }
 
         function isNumberKey(evt){

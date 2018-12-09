@@ -56,23 +56,28 @@
                                 <td>{{ Diamond::parse($type->start_date)->thai_format('Y-m-d') }}</td>
                                 <td>{{ Diamond::parse($type->deleted_at)->thai_format('Y-m-d') }}</td>
                                 <td>
-                                    <div class="btn-group">
-                                        {{ Form::open(['url' => '/admin/loantype/' . $type->id . '/restore', 'method' => 'post']) }}
-                                            {{ Form::button('<i class="fa fa-rotate-left"></i>', [
-                                                'type' => 'submit',
-                                                'class'=>'btn btn-default btn-xs btn-flat',
-                                                'onclick'=>"javascript:return confirm('คุณต้องการคืนค่าประเภทเงินกู้นี้ใช่หรือไม่?');"])
-                                            }}
-                                        {{ Form::close() }}
-
-                                        {{ Form::open(['url' => '/admin/loantype/' . $type->id . '/forcedelete', 'method' => 'post']) }}
-                                            {{ Form::button('<i class="fa fa-trash"></i>', [
-                                                'type' => 'submit',
-                                                'class'=>'btn btn-default btn-xs btn-flat', 
-                                                'onclick'=>"javascript:return confirm('คุณต้องการลบประเภทเงินกู้ออกจากระบบใช่หรือไม่?');"])
-                                            }}
-                                        {{ Form::close() }}
-                                    </div>
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                {{ Form::open(['url' => '/admin/loantype/' . $type->id . '/restore', 'method' => 'post']) }}
+                                                    {{ Form::button('<i class="fa fa-rotate-left"></i>', [
+                                                        'type' => 'submit',
+                                                        'class'=>'btn btn-default btn-xs btn-flat',
+                                                        'onclick'=>"javascript:return confirm('คุณต้องการคืนค่าประเภทเงินกู้นี้ใช่หรือไม่?');"])
+                                                    }}
+                                                {{ Form::close() }}
+                                            </td>
+                                            <td>
+                                                {{ Form::open(['url' => '/admin/loantype/' . $type->id . '/forcedelete', 'method' => 'post']) }}
+                                                    {{ Form::button('<i class="fa fa-trash"></i>', [
+                                                        'type' => 'submit',
+                                                        'class'=>'btn btn-default btn-xs btn-flat', 
+                                                        'onclick'=>"javascript:return confirm('คุณต้องการลบประเภทเงินกู้ออกจากระบบใช่หรือไม่?');"])
+                                                    }}
+                                                {{ Form::close() }}
+                                            </td>
+                                        </tr>
+                                    </table>
                                 </td>
                             </tr>
                             @endforeach

@@ -22,7 +22,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'email', 'password', 'confirmed',
+        'email', 'password', 'confirmed', 'newaccount',
     ];
 
     /**
@@ -62,11 +62,25 @@ class User extends Authenticatable
         return $this->hasMany(UserStatistic::class);
     }
 
+        /**
+     * Get the histories for the user action.
+     */
+    public function user_histories() {
+        return $this->hasMany(UserHistory::class);
+    }
+
     /**
      * Get the theme profile of the user.
      */
     public function theme() {
         return $this->belongsTo(Theme::class);
+    }
+
+    /**
+     * Get the old emails of the user.
+     */
+    public function old_emails() {
+        return $this->hasMany(OldEmail::class);
     }
 
     /**

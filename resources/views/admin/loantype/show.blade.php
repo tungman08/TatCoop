@@ -35,7 +35,7 @@
 
                     {{ Form::button('<i class="fa fa-edit"></i>', [
                         'data-tooltip'=>"true",
-                        'title'=>"แก้ไข",
+                        'title'=>"แก้ไขประเภทสัญญา",
                         'class'=>'btn btn-primary btn-xs btn-flat pull-right', 
                         'onclick'=>"javascript:window.location = '/admin/loantype/" . $loantype->id . "/edit';"])
                     }}
@@ -68,7 +68,7 @@
 
        <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title"><i class="fa fa-credit-card"></i> สัญญาเงินกู้ที่ใช้ประเภทเงินกู้นี้</h3>
+                <h3 class="box-title"><i class="fa fa-credit-card"></i> สัญญาเงินกู้ที่ใช้ประเภทเงินกู้นี้ (กำลังผ่อนชำระจำนวน {{ number_format($loantype->loans->filter(function ($value, $key) { return !empty($value->code) && empty($value->completed_at); })->count()) }} สัญญา)</h3>
                 <div class="btn-group pull-right">
                     <button type="button" class="btn btn-default btn-flat btn-xs"
                         onclick="javascript:window.location.href='{{ url('/admin/loantype/' . $loantype->id . '/finished') }}';">
@@ -96,7 +96,12 @@
                         </thead>
                         <tbody>
                             @php($count = 0)
-                            @foreach($loantype->loans->filter(function ($value, $key) { return !empty($value->code) && is_null($value->completed_at); })->sortByDesc('loaned_at') as $loan)
+                            @foreach($loantype->loans->filter(function ($value, $key) { 
+                                    return !empty($value->code) && is_null($value->completed_at); 
+                                })->sortByDesc(function ($value, $key) {
+                                    $code = explode('/', $value->code);
+                                    return $code[1] . $code[0];
+                                }) as $loan)
                                 <tr onclick="javascript: document.location = '{{ url('/service/' . $loan->member->id . '/loan/' . $loan->id) }}';" style="cursor: pointer;">
                                     <td>{{ ++$count }}.</td>
                                     <td class="text-primary"><i class="fa fa-credit-card fa-fw"></i> {{ $loan->code }}</td>
