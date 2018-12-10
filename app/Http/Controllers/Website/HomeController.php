@@ -26,7 +26,7 @@ class HomeController extends Controller
     /**
      * Responds to requests to GET /
      */
-    public function getIndex() {
+    public function index() {
         return view('website.home.index', [
             'carousels' => Carousel::all(),
             'news' => News::orderBy('id', 'desc')->take(6)->get(),

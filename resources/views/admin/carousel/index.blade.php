@@ -43,8 +43,7 @@
                                                 </div>
                                             </div>
                                             <img id="preview-{{ $carousel->id }}" 
-                                                src="{{ url('/carousel/' . 'thumbnail_' . $carousel->image) }}" 
-                                                class="img-responsive" alt="" />
+                                                src="{{ FileManager::get('carousels', 'thumbnail_' . $carousel->image) }}" class="img-responsive" alt="" />
                                         </div>
                                     </div>
                                     <div class="col-md-10">

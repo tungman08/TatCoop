@@ -25,8 +25,8 @@
         </div>
     </div>
 </div>
-
 <!-- /.box-body -->
+
 <div class="box-footer">
     {{ Form::button('<i class="fa fa-save"></i> บันทึก', [
         'type' => 'submit', 

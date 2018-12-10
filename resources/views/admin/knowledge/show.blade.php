@@ -87,7 +87,7 @@
                                 onclick="javascript:$('#uploadimage').click();">
                                 <i class="fa fa-plus-circle fa-fw"></i> เพิ่มรูปประกอบ
                             </button>
-                            <input type="file" id="uploadimage" name="image-uploadimage" class="file-upload" accept="image/jpeg"
+                            <input type="file" id="uploadimage" name="image-uploadimage" class="file-upload" accept="image/*"
                                 onchange="javascript:uploadImage($(this), 'knowledge', {{ $knowledge->id }});" />
                         </div>
                     </div>
@@ -98,7 +98,7 @@
                             @foreach ($knowledge->attachments()->where('attach_type', 'photo')->get() as $item)
                                 <div id="photo-{{ $item->id }}" class="col-lg-4 col-md-6 padding-sm">
                                     <div class="thumbnail margin-b-sm text-center">
-                                        <img src="{{ 'data:image/jpeg;base64,' . base64_encode(Storage::disk('attachments')->get($item->file)) }}" class="img-responsive" style="max-height: 130px;" alt="" />
+                                        <img src="{{ FileManager::get('attachments', $item->file) }}" class="img-responsive" style="max-height: 130px;" alt="" />
                                         <hr class="margin-xs" />
                                         <button type="button" class="btn btn-danger btn-flat btn-xs"
                                             onclick="javascript:var result = confirm('คุณต้องการลบรูปนี้ใช่หรือไม่ ?'); if (result) { deleteImage('knowledge', {{ $item->id }}); }">

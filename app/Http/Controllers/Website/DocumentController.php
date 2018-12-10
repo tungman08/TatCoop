@@ -24,14 +24,14 @@ class DocumentController extends Controller
             $documents = Document::where('display', $key)->first();
 
             if (!is_null($documents)) {
-                return view('website.documents.index', [
+                return view('website.documents.show', [
                     'header' => $header,
                     'link' => '/documents/rules',
                     'files' => $documents,
                 ]);
             }
             else {
-                return view('website.documents.index', [
+                return view('website.documents.show', [
                     'header' => $header,
                     'link' => '',
                     'files' => null,
@@ -39,7 +39,7 @@ class DocumentController extends Controller
             }
         }
         else {
-            return view('website.documents.index', [
+            return view('website.documents.show', [
                 'header' => $header,
                 'link' => '',
                 'files' => Document::where('document_type_id', 1)
@@ -59,14 +59,14 @@ class DocumentController extends Controller
             $documents = Document::where('display', $key)->first();
 
             if (!is_null($documents)) {
-                return view('website.documents.index', [
+                return view('website.documents.show', [
                     'header' => $header,
                     'link' => '/documents/forms',
                     'files' => $documents,
                 ]);
             }
             else {
-                return view('website.documents.index', [
+                return view('website.documents.show', [
                     'header' => $header,
                     'link' => '',
                     'files' => null,
@@ -74,7 +74,7 @@ class DocumentController extends Controller
             }
         }
         else {
-            return view('website.documents.index', [
+            return view('website.documents.show', [
                 'header' => $header,
                 'link' => '',
                 'files' => Document::where('document_type_id', 2)
@@ -114,32 +114,10 @@ class DocumentController extends Controller
 
         $document = DocumentType::find(3)->documents->where('display', $header)->first();
 
-        return view('website.documents.index', [
+        return view('website.documents.show', [
             'header' => $header,
             'link' => '',
             'files' => $document,
         ]);
-    }
-
-    public function getDocument($document) {
-        $path = storage_path('app/documents') . '/' . $document;
-
-        if (!File::exists($path)) abort(404);
-
-        $file = File::get($path);
-        $header = File::mimeType($path);
-
-        $response = response()->make($file, 200);
-        $response->header("Content-Type", $header);
-
-        return $response; 
-    }
-
-    public function getDownloadDocument($document, $display) {
-        $path = storage_path('app/documents') . '/' . $document . '.pdf';
-
-        if (!File::exists($path)) abort(404);
-
-        return response()->download($path, $display, ['Content-Type: application/pdf']); 
     }
 }

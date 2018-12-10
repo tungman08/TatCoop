@@ -33,10 +33,10 @@
         @else
             @if (!is_null($files))
                 <i class="fa fa-download fa-fw"></i> ดาวน์โหลด: 
-                <a download="{{ $files->display }}" href="{{ url('/document/' . substr($files->file, 0, strlen($files->file) - 4) . '/' . $files->display . '.pdf') }}">
+                <a download="{{ $files->display }}" href="{{ url('/storage/download/documents/' . substr($files->file, 0, strlen($files->file) - 4) . '/' . $files->display . '.pdf') }}">
                     {{ $files->display }}.pdf
                 </a>
-                <object data="{{ url('/document/' . $files->file) }}" type="application/pdf" width="100%" height="1110" style="margin-top: 20px;"></object>
+                <object data="{{ url('/storage/file/documents/' . $files->file) }}" type="application/pdf" width="100%" height="1110" style="margin-top: 20px;"></object>
             @else
                 <div class="well bg-danger">
                     <i class="fa fa-ban"></i> ไม่พบเอกสาร

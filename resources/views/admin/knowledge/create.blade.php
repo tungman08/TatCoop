@@ -44,6 +44,7 @@
             {{ Form::close() }}          
         </div>
         <!-- /.box -->
+        
     </section>
     <!-- /.content -->
 
@@ -62,6 +63,10 @@
 
     <script>
         $(document).ready(function() {
+            $.ajaxSetup({
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+            });
+
             //bootstrap WYSIHTML5 - text editor
             $(".textarea").wysihtml5({
                 toolbar: {
@@ -77,5 +82,7 @@
                 }
             });
         });
+
+        var attach_type = 'knowledge';
     </script>  
 @endsection

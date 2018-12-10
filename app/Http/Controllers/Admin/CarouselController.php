@@ -38,18 +38,4 @@ class CarouselController extends Controller
             'carousels' => $carousels
         ]);
     }
-
-    public function getCarousel($image) {
-        $path = storage_path('app/carousels') . '/' . $image;
-
-        if(!File::exists($path)) abort(404);
-
-        $file = File::get($path);
-        $header = File::mimeType($path);
-
-        $response = response()->make($file, 200);
-        $response->header("Content-Type", $header);
-
-        return $response;
-    }
 }

@@ -77,21 +77,18 @@ Route::group(['domain' => 'www.' . env('APP_DOMAIN'),
     // Profile Route...
     Route::controller('/user', 'UserController');
 
-    // Carousel Route...
-    Route::get('/carousel/{image}', ['as' => 'website.carousel', 'uses' => 'CarouselController@getCarousel']);
-
-    // Attachment Route...
-    Route::get('/attachment/{file}', ['as' => 'website.attachment', 'uses' => 'AttachmentController@getAttachment']);
+    // Storage Route...
+    Route::get('/storage/file/{directory}/{filename}', ['as' => 'website.storage.file', 'uses' => 'StorageController@getFile']);
+    Route::get('/storage/download/{directory}/{filename}/{displayname}', ['as' => 'website.storage.download', 'uses' => 'StorageController@getDownload']);
 
     // Document Route...
-    Route::get('/document/{document}/{display}', ['as' => 'website.document.download', 'uses' => 'DocumentController@getDownloadDocument']);
-    Route::get('/document/{document}', ['as' => 'website.document', 'uses' => 'DocumentController@getDocument']);
     Route::group(['prefix' => '/documents'], function() {
         Route::get('rules', ['as' => 'website.documents.rules', 'uses' => 'DocumentController@getRules']);
         Route::get('rules/{key}', ['as' => 'website.documents.rules.file', 'uses' => 'DocumentController@getRules']);
         Route::get('forms', ['as' => 'website.documents.forms', 'uses' => 'DocumentController@getForms']);
         Route::get('forms/{key}', ['as' => 'website.documents.forms.file', 'uses' => 'DocumentController@getForms']);
         Route::get('{key}', ['as' => 'website.documents.other', 'uses' => 'DocumentController@getOthers']);
+        Route::get('/', function() { return redirect('/'); });
     });
 
     // News Route...
@@ -101,7 +98,7 @@ Route::group(['domain' => 'www.' . env('APP_DOMAIN'),
     Route::resource('knowledges', 'KnowledgeController');
 
     // Homepage Route...
-    Route::controller('/', 'HomeController');
+    Route::resource('/', 'HomeController', ['only' => [ 'index' ]]);  
 });
 
 /* ====================================================================== */

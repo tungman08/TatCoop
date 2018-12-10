@@ -42,21 +42,6 @@ class KnowledgeController extends Controller
         return view('admin.knowledge.create');
     }
 
-    public function show($id) {
-        $knowledge = Knowledge::find($id);
-
-        return view('admin.knowledge.show', [
-            'knowledge' => $knowledge
-        ]);
-    }
-
-    public function edit($id) {
-        $knowledge = Knowledge::find($id);
-
-        return view('admin.knowledge.edit', [
-            'knowledge' => $knowledge
-        ]);
-    }
 
     public function store(Request $request) {
         $rules = [
@@ -71,6 +56,12 @@ class KnowledgeController extends Controller
 
         $validator = Validator::make($request->all(), $rules);
         $validator->setAttributeNames($attributeNames);
+
+        $validator->after(function($validator) use ($request) {
+            if ($this->isHotLink($request->input('content'))) {
+                $validator->errors()->add('hotlisk', 'ไม่สามารถใช้รูปภาพจากเว็บไซต์อื่นได้');
+            }
+        });
 
         if ($validator->fails()) {
             return redirect()->back()
@@ -90,10 +81,26 @@ class KnowledgeController extends Controller
                 History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'เพิ่มสาระน่ารู้บนเว็บไซต์');
             });
 
-            return redirect()->action('Website\KnowledgeController@index')
+            return redirect()->action('Admin\KnowledgeController@index')
                 ->with('flash_message', 'เพิ่มสาระน่ารู้เรียบร้อยแล้ว')
                 ->with('callout_class', 'callout-success');
         }
+    }
+
+    public function show($id) {
+        $knowledge = Knowledge::find($id);
+
+        return view('admin.knowledge.show', [
+            'knowledge' => $knowledge
+        ]);
+    }
+
+    public function edit($id) {
+        $knowledge = Knowledge::find($id);
+
+        return view('admin.knowledge.edit', [
+            'knowledge' => $knowledge
+        ]);
     }
 
     public function update(Request $request, $id) {
@@ -109,6 +116,12 @@ class KnowledgeController extends Controller
 
         $validator = Validator::make($request->all(), $rules);
         $validator->setAttributeNames($attributeNames);
+
+        $validator->after(function($validator) use ($request) {
+            if ($this->isHotLink($request->input('content'))) {
+                $validator->errors()->add('hotlisk', 'ไม่สามารถใช้รูปภาพจากเว็บไซต์อื่นได้');
+            }
+        });
 
         if ($validator->fails()) {
             return redirect()->back()
@@ -128,7 +141,7 @@ class KnowledgeController extends Controller
                 History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'แก้ไขสาระน่ารู้บนเว็บไซต์');
             });
 
-            return redirect()->action('Website\KnowledgeController@show', ['id' => $id])
+            return redirect()->action('Admin\KnowledgeController@show', ['id' => $id])
                 ->with('flash_message', 'แก้ไขสาระน่ารู้เรียบร้อยแล้ว')
                 ->with('callout_class', 'callout-success');
         }
@@ -184,5 +197,20 @@ class KnowledgeController extends Controller
         return redirect()->action('Website\KnowledgeController@index')
             ->with('flash_message', 'ลบสาระน่ารู้เรียบร้อยแล้ว')
             ->with('callout_class', 'callout-success');
+    }
+
+    private function isHotLink($content) {
+        $images = [];
+        preg_match_all( '/src="([^"]*)"/i', $content, $images);
+
+        if (count($images[1]) > 0) {
+            foreach($images[1] as $image) {
+                if (!preg_match('/https?\:\/\/(www|admin)\.tatcoop\.com/', $image)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

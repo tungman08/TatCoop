@@ -48,8 +48,8 @@
                         @foreach ($knowledge->attachments()->where('attach_type', 'photo')->get() as $item)
                             <div class="col-sm-3 col-md-3 col-ld-3">
                                 <div class="thumbnail" style="border-radius: 0px;">
-                                    <a href="{{ url('/attachment/' . $item->file) }}">
-                                        <img src="{{ url('/attachment/' . $item->file) }}" style="max-height: 200px; max-width: 100%;" alt="" />
+                                    <a href="{{ url('/storage/file/attachments/' . $item->file) }}">
+                                        <img src="{{ url('/storage/file/attachments/' . $item->file) }}" style="max-height: 200px; max-width: 100%;" alt="" />
                                     </a>
                                 </div>    
                             </div>

@@ -14,14 +14,9 @@
             @php ($index = 0)
 
             @forelse ($carousels as $carousel)
-                @php
-                    $document = App\Document::find($carousel->document_id);
-                    $document_type = App\DocumentType::find($document->document_type_id);
-                @endphp
-                
                 <div class="item{{ ($index == 0) ? ' active' : '' }}">
-                    <a href="{{ url('/documents/' . str_plural(strtolower($document_type->name)) . '/' . $document->display) }}">
-                        <img class="slide-image" src="{{ url('/carousel/' . $carousel->image) }}" alt="">
+                    <a href="{{ url('/documents/' . str_plural(strtolower($carousel->document->document_type->name)) . '/' . $carousel->document->display) }}">
+                        <img class="slide-image" src="{{ url('/storage/file/carousels/' . $carousel->image) }}" alt="">
                     </a>
                 </div>
 

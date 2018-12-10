@@ -100,6 +100,10 @@ class AppServiceProvider extends ServiceProvider
 
         App::bind('dashboard', function() {
             return new \App\Classes\Dashboard;
-        });    
+        });  
+        
+        App::bind('filemanager', function() {
+            return new \App\Classes\FileManager;
+        }); 
     }
 }

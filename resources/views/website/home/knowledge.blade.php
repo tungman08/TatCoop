@@ -4,10 +4,12 @@
             <h2 class="section-heading">สาระน่ารู้เกี่ยวกับสหกรณ์</h2>
             <h3 class="section-subheading text-muted">สาระน่ารู้หรือข่าวสารที่เกี่ยวกับสหกรณ์ออมทรัพย์</h3>
         </div>
+        
         @forelse ($knowledges as $item)
             <div class="col-sm-3 col-lg-3 col-md-3">
                 <div class="thumbnail">
-                    <img src="{{ ($item->attachments()->where('attach_type', 'photo')->count() == 0) ? asset('images/320x150.png') : url('/attachment/' . $item->attachments()->where('attach_type', 'photo')->first()->file) }}" alt="" style="max-height: 122px;">
+                    @php($files = $item->attachments()->where('attach_type', 'photo'))
+                    <img src="{{ ($files->count() == 0) ? asset('images/320x150.png') : url('/storage/file/attachments/' . $files->first()->file) }}" alt="" style="max-height: 122px;">
                     <div class="caption">
                         <h4 class="pull-right">&nbsp;</h4>
                         <h4>

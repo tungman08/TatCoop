@@ -56,7 +56,7 @@
         <div class="row">
 
             <div class="col-md-3 sidebar">
-                @include('website.homepage.menu')
+                @include('website.home.menu')
             </div>
 
             <div class="col-md-9">
