@@ -167,30 +167,35 @@ class PaymentController extends Controller
     public function postAutoPayment(Request $request) {
         $date = Diamond::parse($request->input('month') . '-1')->endOfMonth();
 
-        $members = Member::join('profiles', 'members.profile_id', '=', 'profiles.id')
+        $members = Db::table('members')
+            ->join('profiles', 'members.profile_id', '=', 'profiles.id')
             ->join('employees', 'profiles.id', '=', 'employees.profile_id')
             ->join('employee_types', 'employees.employee_type_id', '=', 'employee_types.id')
             ->join('loans', 'members.id', '=', 'loans.member_id')
             ->where('employees.employee_type_id', 1)
             ->whereDate('members.start_date', '<', $date)
             ->whereNull('loans.completed_at')
+            ->groupBy('members.id')
+            ->select('members.id')
             ->get();
 
         DB::transaction(function() use ($members, $date) {
             foreach($members as $member) {
-                $loans = Loan::where('member_id', $member->member_id)
+                $loans = Loan::where('member_id', $member->id)
                     ->whereNull('completed_at')
                     ->get();
 
                 foreach($loans as $loan) {
                     $pay = LoanCalculator::monthly_payment($loan, $date);
 
-                    $payment = new Payment();
-                    $payment->pay_date = $date;
-                    $payment->principle = $pay->principle;
-                    $payment->interest = $pay->interest;
-
-                    $loan->payments()->save($payment);
+                    if ($pay->principle > 0 && $pay->interest > 0) {
+                        $payment = new Payment();
+                        $payment->pay_date = $date;
+                        $payment->principle = $pay->principle;
+                        $payment->interest = $pay->interest;
+    
+                        $loan->payments()->save($payment);
+                    }
                 }
             }
 

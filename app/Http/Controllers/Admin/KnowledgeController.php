@@ -59,7 +59,7 @@ class KnowledgeController extends Controller
 
         $validator->after(function($validator) use ($request) {
             if ($this->isHotLink($request->input('content'))) {
-                $validator->errors()->add('hotlisk', 'ไม่สามารถใช้รูปภาพจากเว็บไซต์อื่นได้');
+                $validator->errors()->add('hotlink', 'ไม่สามารถใช้รูปภาพจากเว็บไซต์อื่นได้');
             }
         });
 
@@ -119,7 +119,7 @@ class KnowledgeController extends Controller
 
         $validator->after(function($validator) use ($request) {
             if ($this->isHotLink($request->input('content'))) {
-                $validator->errors()->add('hotlisk', 'ไม่สามารถใช้รูปภาพจากเว็บไซต์อื่นได้');
+                $validator->errors()->add('hotlink', 'ไม่สามารถใช้รูปภาพจากเว็บไซต์อื่นได้');
             }
         });
 
@@ -155,7 +155,7 @@ class KnowledgeController extends Controller
             History::addAdminHistory(Auth::guard($this->guard)->id(), 'ลบข้อมูล', 'ลบสาระน่ารู้บนเว็บไซต์');
         });
 
-        return redirect()->action('Website\KnowledgeController@index')
+        return redirect()->action('Admin\KnowledgeController@index')
             ->with('flash_message', 'ลบสาระน่ารู้เรียบร้อยแล้ว')
             ->with('callout_class', 'callout-success');
     }
@@ -168,6 +168,14 @@ class KnowledgeController extends Controller
         ]);
     }
 
+	public function getShowInactive($id) {
+		$knowledge = Knowledge::inactive()->find($id);
+
+		return view('admin.knowledge.showinactive', [
+            'knowledge' => $knowledge
+        ]);
+	}
+
     public function postRestore($id) {
         DB::transaction(function() use ($id) {
             $knowledge = Knowledge::withTrashed()->where('id', $id)->first();
@@ -176,7 +184,7 @@ class KnowledgeController extends Controller
             History::addAdminHistory(Auth::guard($this->guard)->id(), 'คืนสภาพข้อมูล', 'คืนสภาพสาระน่ารู้บนเว็บไซต์');
         });
 
-        return redirect()->action('Website\KnowledgeController@index')
+        return redirect()->action('Admin\KnowledgeController@index')
             ->with('flash_message', 'คืนสภาพสาระน่ารู้เรียบร้อยแล้ว')
             ->with('callout_class', 'callout-success');
     }
@@ -194,7 +202,7 @@ class KnowledgeController extends Controller
             History::addAdminHistory(Auth::guard($this->guard)->id(), 'ลบข้อมูลอย่างถาวร', 'ลบสาระน่ารู้บนเว็บไซต์อย่างถาวร');
         });
 
-        return redirect()->action('Website\KnowledgeController@index')
+        return redirect()->action('Admin\KnowledgeController@index')
             ->with('flash_message', 'ลบสาระน่ารู้เรียบร้อยแล้ว')
             ->with('callout_class', 'callout-success');
     }

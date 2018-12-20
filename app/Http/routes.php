@@ -133,14 +133,16 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
 
         // News Route...
         Route::get('news/inactive', ['as' => 'website.news.inactive', 'uses' => 'NewsController@getInactive']);
-        Route::get('news/{id}/restore', ['as' => 'website.news.restore', 'uses' => 'NewsController@postRestore']);
-        Route::get('news/{id}/forcedelete', ['as' => 'website.news.delete', 'uses' => 'NewsController@postForceDelete']);
+		Route::get('news/inactive/{id}', ['as' => 'website.news.showinactive', 'uses' => 'NewsController@getShowInactive']);
+        Route::post('news/{id}/restore', ['as' => 'website.news.restore', 'uses' => 'NewsController@postRestore']);
+        Route::post('news/{id}/forcedelete', ['as' => 'website.news.delete', 'uses' => 'NewsController@postForceDelete']);
         Route::resource('news', 'NewsController');
 
         // Knowledge Route...
         Route::get('knowledge/inactive', ['as' => 'website.knowledge.inactive', 'uses' => 'KnowledgeController@getInactive']);
-        Route::get('knowledge/{id}/restore', ['as' => 'website.knowledge.restore', 'uses' => 'KnowledgeController@postRestore']);
-        Route::get('knowledge/{id}/forcedelete', ['as' => 'website.knowledge.delete', 'uses' => 'KnowledgeController@postForceDelete']);
+		Route::get('knowledge/inactive/{id}', ['as' => 'website.knowledge.showinactive', 'uses' => 'KnowledgeController@getShowInactive']);
+        Route::post('knowledge/{id}/restore', ['as' => 'website.knowledge.restore', 'uses' => 'KnowledgeController@postRestore']);
+        Route::post('knowledge/{id}/forcedelete', ['as' => 'website.knowledge.delete', 'uses' => 'KnowledgeController@postForceDelete']);
         Route::resource('knowledge', 'KnowledgeController');    
     });
 

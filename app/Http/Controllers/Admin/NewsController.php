@@ -58,7 +58,7 @@ class NewsController extends Controller
 
         $validator->after(function($validator) use ($request) {
             if ($this->isHotLink($request->input('content'))) {
-                $validator->errors()->add('hotlisk', 'ไม่สามารถใช้รูปภาพจากเว็บไซต์อื่นได้');
+                $validator->errors()->add('hotlink', 'ไม่สามารถใช้รูปภาพจากเว็บไซต์อื่นได้');
             }
         });
 
@@ -118,7 +118,7 @@ class NewsController extends Controller
 
         $validator->after(function($validator) use ($request) {
             if ($this->isHotLink($request->input('content'))) {
-                $validator->errors()->add('hotlisk', 'ไม่สามารถใช้รูปภาพจากเว็บไซต์อื่นได้');
+                $validator->errors()->add('hotlink', 'ไม่สามารถใช้รูปภาพจากเว็บไซต์อื่นได้');
             }
         });
 
@@ -154,7 +154,7 @@ class NewsController extends Controller
             History::addAdminHistory(Auth::guard($this->guard)->id(), 'ลบข้อมูล', 'ลบข้อมูลข่าวสารสำหรับสมาชิกบนหน้าเว็บไซต์');
         });
 
-        return redirect()->action('Website\NewsController@index')
+        return redirect()->action('Admin\NewsController@index')
             ->with('flash_message', 'ลบข่าวสารสำหรับสมาชิกเรียบร้อยแล้ว')
             ->with('callout_class', 'callout-success');
     }
@@ -167,6 +167,14 @@ class NewsController extends Controller
         ]);
     }
 
+	public function getShowInactive($id) {
+		$news = News::inactive()->find($id);
+
+		return view('admin.news.showinactive', [
+            'news' => $news
+        ]);
+	}
+
     public function postRestore($id) {
         DB::transaction(function() use ($id) {
             $news = News::withTrashed()->where('id', $id)->first();
@@ -175,7 +183,7 @@ class NewsController extends Controller
             History::addAdminHistory(Auth::guard($this->guard)->id(), 'คืนสภาพข้อมูล', 'คืนสภาพข้อมูลข่าวสารสำหรับสมาชิกบนหน้าเว็บไซต์');
         });
 
-        return redirect()->action('Website\NewsController@index')
+        return redirect()->action('Admin\NewsController@index')
             ->with('flash_message', 'คืนสภาพข่าวสารสำหรับสมาชิกเรียบร้อยแล้ว')
             ->with('callout_class', 'callout-success');
     }
@@ -193,7 +201,7 @@ class NewsController extends Controller
             History::addAdminHistory(Auth::guard($this->guard)->id(), 'ลบข้อมูลอย่างถาวร', 'ลบข้อมูลข่าวสารสำหรับสมาชิกบนหน้าเว็บไซต์อย่างถาวร');
         });
 
-        return redirect()->action('Website\NewsController@index')
+        return redirect()->action('Admin\NewsController@index')
             ->with('flash_message', 'ลบข่าวสารสำหรับสมาชิกเรียบร้อยแล้ว')
             ->with('callout_class', 'callout-success');
     }

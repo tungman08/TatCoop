@@ -670,7 +670,6 @@ class AjaxController extends Controller
         $date = Diamond::parse($request->input('date'))->endOfMonth();
 
         $members = Db::table('members')
-            ->select('members.id')
             ->join('profiles', 'members.profile_id', '=', 'profiles.id')
             ->join('employees', 'profiles.id', '=', 'employees.profile_id')
             ->join('employee_types', 'employees.employee_type_id', '=', 'employee_types.id')
@@ -678,18 +677,20 @@ class AjaxController extends Controller
             ->where('employees.employee_type_id', 1)
             ->whereDate('members.start_date', '<', $date)
             ->whereNull('loans.completed_at')
+            ->groupBy('members.id')
+            ->select('members.id')
             ->get();
 
         $payments = collect([]);
-        foreach ($members as $q) {
-            $member = Member::find($q->id);
+        foreach ($members as $query) {
+            $member = Member::find($query->id);
             $payment = MemberProperty::getMonthlyPayment($member, $date);
 
             $item = new stdClass();
             $item->code = $member->memberCode;
             $item->fullname = '<span class="text-primary"><i class="fa fa-user fa-fw"></i> ' . $member->profile->fullName . '</span>';
             $item->typename = '<span class="label label-primary">' . $member->profile->employee->employee_type->name . '</span>';
-            $item->loanCount = number_format($member->loans->count(), 0, '.', ',');
+            $item->loanCount = number_format($member->loans->filter(function ($value, $key) { return is_null($value->completed_at); })->count(), 0, '.', ',');
             $item->principle = number_format($payment->principle, 2, '.', ',');
             $item->interest = number_format($payment->interest, 2, '.', ',');
             $item->total = number_format($payment->principle + $payment->interest, 2, '.', ',');

@@ -127,8 +127,8 @@
                                             <td>{{ number_format($payment->principle, 2,'.', ',') }}</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-left">ดอกเบี้ย</td>
-                                            <td>{{ number_format($payment->interest, 2,'.', ',') }}</td>
+                                            <td class="text-left" style="border-top: 1px solid #f4f4f4;">ดอกเบี้ย</td>
+                                            <td style="border-top: 1px solid #f4f4f4;">{{ number_format($payment->interest, 2,'.', ',') }}</td>
                                         </tr>
                                         <tr>
                                             <td class="text-left" style="border-top: 1px solid #f4f4f4;">รวม</td>
@@ -212,7 +212,7 @@
         .table-borderless > thead > tr > td,
         .table-borderless > thead > tr > th {
             border: none;
-            padding: 0px 0px 8px 0px;
+            padding: 6px 0px;
         }
     </style>
 @endsection

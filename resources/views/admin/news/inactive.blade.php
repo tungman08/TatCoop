@@ -55,23 +55,35 @@
                                 <td>{{ Diamond::parse($inactive->created_at)->thai_format('Y-m-d') }}</td>
                                 <td>{{ Diamond::parse($inactive->deleted_at)->thai_format('Y-m-d') }}</td>
                                 <td>
-                                    <div class="btn-group">
-                                        {{ Form::open(['url' => '/website/news/' . $inactive->id . '/restore', 'method' => 'post']) }}
-                                            {{ Form::button('<i class="fa fa-rotate-left"></i>', [
-                                                'type' => 'submit',
-                                                'class'=>'btn btn-default btn-xs btn-flat',
-                                                'onclick'=>"javascript:return confirm('คุณต้องการคืนค่าข่าวประชาสัมพันธ์นี้ใช่หรือไม่?');"])
-                                            }}
-                                        {{ Form::close() }}
+                                    {{ Form::open(['url' => '/website/news/' . $inactive->id . '/restore', 'method' => 'post', 'class' => 'btn-group']) }}
+									    {{ Form::button('<i class="fa fa-search"></i>', [
+                                            'type' => 'button',
+                                            'class'=>'btn btn-default btn-xs btn-flat',
+											'data-tooltip'=>true,
+											'title'=>'รายละเอียด',
+                                            'onclick'=>"javascript:window.location.href='/website/news/inactive/" . $inactive->id . "';"])
+                                        }}
+                                        {{ Form::button('<i class="fa fa-rotate-left"></i>', [
+                                            'type' => 'submit',
+                                            'class'=>'btn btn-default btn-xs btn-flat',
+											'class'=>'btn btn-default btn-xs btn-flat',
+											'data-tooltip'=>true,
+											'title'=>'กู้คืน',
+                                            'onclick'=>"javascript:return confirm('คุณต้องการคืนค่าข่าวประชาสัมพันธ์นี้ใช่หรือไม่?');"])
+                                        }}
+										{{ Form::hidden('hidden1-' . $inactive->id, null, ['class' => 'btn']) }}
+                                    {{ Form::close() }}
 
-                                        {{ Form::open(['url' => '/website/news/' . $inactive->id . '/forcedelete', 'method' => 'post']) }}
-                                            {{ Form::button('<i class="fa fa-trash"></i>', [
-                                                'type' => 'submit',
-                                                'class'=>'btn btn-default btn-xs btn-flat', 
-                                                'onclick'=>"javascript:return confirm('คุณต้องการลบข่าวประชาสัมพันธ์นี้ออกจากระบบใช่หรือไม่?');"])
-                                            }}
-                                        {{ Form::close() }}
-                                    </div>
+                                    {{ Form::open(['url' => '/website/news/' . $inactive->id . '/forcedelete', 'method' => 'post', 'class' => 'btn-group']) }}
+										{{ Form::hidden('hidden-' . $inactive->id, null, ['class' => 'btn']) }}
+                                        {{ Form::button('<i class="fa fa-trash"></i>', [
+                                            'type' => 'submit',
+                                            'class'=>'btn btn-default btn-xs btn-flat', 
+											'data-tooltip'=>true,
+											'title'=>'ลบข้อมูลแบบถาวร',
+                                            'onclick'=>"javascript:return confirm('คุณต้องการลบข่าวประชาสัมพันธ์นี้ออกจากระบบใช่หรือไม่?');"])
+                                        }}
+                                    {{ Form::close() }}
                                 </td>
                             </tr>
                             @endforeach
@@ -95,6 +107,12 @@
 @section('styles')
     <!-- Bootstrap DataTable CSS -->
     {!! Html::style(elixir('css/dataTables.bootstrap.css')) !!}
+
+	<style>
+		form.btn-group + form.btn-group {
+			margin-left: -5px;
+		}
+	</style>
 
     @parent
 @endsection

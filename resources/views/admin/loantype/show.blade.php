@@ -32,17 +32,14 @@
                             'onclick'=>"javascript:return confirm('คุณต้องการลบประเภทเงินกู้นี้ใช่หรือไม่?');"])
                         }}
                     @endif  
-
-                    {{ Form::button('<i class="fa fa-edit"></i>', [
-                        'data-tooltip'=>"true",
-                        'title'=>"แก้ไขประเภทสัญญา",
-                        'class'=>'btn btn-primary btn-xs btn-flat pull-right', 
-                        'onclick'=>"javascript:window.location = '/admin/loantype/" . $loantype->id . "/edit';"])
-                    }}
                 </h4>
             {{ Form::close() }}
 
             @include('admin.loantype.info', ['loantype' => $loantype])
+
+            <button class="btn btn-primary btn-flat" onclick="javascript:window.location = '/admin/loantype/{{ $loantype->id }}/edit';">
+                <i class="fa fa-edit"></i> แก้ไขประเภทสัญญา
+            </button>
         </div>
 
         @if ($errors->count() > 0)

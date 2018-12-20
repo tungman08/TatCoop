@@ -8,6 +8,7 @@ use App\Member;
 use App\Shareholding;
 use App\Loan;
 use stdClass;
+use LoanCalculator;
 
 /**
  * MemberProperty short summary.
@@ -101,7 +102,7 @@ class MemberProperty
         $payment = new stdClass();
         $payment->outstanding = $member->loans->filter(function ($value, $key) { return is_null($value->completed_at); })->sum('outstanding');
         $payment->principle = $member->loans->filter(function ($value, $key) { return is_null($value->completed_at); })->sum(function ($value) { return $value->payments->sum('principle'); } );
-        $payment->interest = (new LoanCalculator)->total_interest($member, Diamond::today());
+        $payment->interest = LoanCalculator::total_interest($member, Diamond::today());
 
         return $payment;
     }
@@ -110,7 +111,7 @@ class MemberProperty
         $payment = new stdClass();
         $payment->outstanding = $loan->outstanding;
         $payment->principle = $loan->payments->sum('principle');
-        $payment->interest = (new LoanCalculator)->loan_interest($loan, Diamond::today());
+        $payment->interest = LoanCalculator::loan_interest($loan, Diamond::today());
 
         return $payment;
     }
@@ -120,10 +121,12 @@ class MemberProperty
         $interest = 0;
 
         foreach($member->loans->filter(function ($value, $key) { return is_null($value->completed_at); }) as $loan) {
-            $monthly = (new LoanCalculator)->monthly_payment($loan, $date);
+            if (!is_null($loan->rate)) {
+                $monthly = LoanCalculator::monthly_payment($loan, $date);
 
-            $principle += $monthly->principle;
-            $interest += $monthly->interest;
+                $principle += $monthly->principle;
+                $interest += $monthly->interest;
+            }
         }
 
         $payment = new stdClass();

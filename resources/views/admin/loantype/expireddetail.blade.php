@@ -24,6 +24,10 @@
             </h4>
 
             @include('admin.loantype.info', ['loantype' => $loantype])
+
+            <button class="btn btn-primary btn-flat" onclick="javascript:window.location = '/admin/loantype/{{ $loantype->id }}/edit';">
+                <i class="fa fa-edit"></i> แก้ไขประเภทสัญญา
+            </button>
         </div>
 
         @if ($errors->count() > 0)

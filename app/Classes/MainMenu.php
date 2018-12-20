@@ -44,7 +44,7 @@ class MainMenu
         $admin->add(new MenuItem(['title' => 'ตรวจสอบสัญญาเงินกู้ฯ', 'icon' => 'fa-money', 'url' => '/admin/activeloan']));
         $admin->add(new MenuItem(['title' => 'จัดการอัตราเงินปันผล', 'icon' => 'fa-dollar', 'url' => '/admin/dividend']));
         $admin->add(new MenuItem(['title' => 'จัดการเงินปันผลของสมาชิก', 'icon' => 'fa-baht', 'url' => '/admin/dividendmember/year']));
-        $admin->add(new MenuItem(['title' => 'จัดการใบรับเงินค่าหุ้น', 'icon' => 'fa-file-text-o', 'url' => '/admin/billing']));
+        $admin->add(new MenuItem(['title' => 'จัดการใบรับเงิน', 'icon' => 'fa-file-text-o', 'url' => '/admin/billing']));
         $admin->add(new MenuItem(['title' => 'รายงานต่างๆ', 'icon' => 'fa-file-excel-o', 'url' => '/admin/report']));
         $admin->add(new MenuItem(['title' => 'สถิติการเข้าใช้งาน', 'icon' => 'fa-bar-chart', 'url' => '/admin/statistic']));
         $menu->add($admin);

@@ -4,12 +4,12 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
         <h1>
-            จัดการใบรับเงินค่าหุ้น
-            <small>รายละเอียดข้อมูลใบเสร็จรับเงินค่าหุ้นของสมาชิก</small>
+            จัดการใบรับเงิน
+            <small>รายละเอียดข้อมูลใบเสร็จรับเงินของสมาชิก</small>
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการใบรับเงินค่าหุ้น', 'link' => 'admin/billing'],
+            ['item' => 'จัดการใบรับเงิน', 'link' => 'admin/billing'],
             ['item' => 'แก้ไข', 'link' => '']
         ]])
     </section>
@@ -18,7 +18,7 @@
     <section class="content">
         <!-- Info boxes -->
         <div class="well">
-            <h4>จัดการใบรับเงินค่าหุ้น</h4>
+            <h4>จัดการใบรับเงินค่าหุ้น/ค่างวด</h4>
             <p>ให้ผู้ดูแลระบบสามารถ เพิ่ม แก้ไข ชื่อผู้จัดการและเหรัญญิกได้</p>
         </div>
 

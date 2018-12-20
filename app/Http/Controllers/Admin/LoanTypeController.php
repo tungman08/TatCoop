@@ -186,9 +186,17 @@ class LoanTypeController extends Controller
                 History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'แก้ไขข้อมูลประเภทเงินกู้');
             });
 
-            return redirect()->action('Admin\LoanTypeController@show', [ 'loantype' => LoanType::find($id) ])
-                ->with('flash_message', 'แก้ไขประเภทเงินกู้ชื่อ ' . $request->input('name') . ' เรียบร้อยแล้ว')
-                ->with('callout_class', 'callout-success');
+            if (Diamond::parse($request->input('expire_date'))->greaterThan(Diamond::now())) {
+                return redirect()->action('Admin\LoanTypeController@show', [ 'loantype' => LoanType::find($id) ])
+                    ->with('flash_message', 'แก้ไขประเภทเงินกู้ชื่อ ' . $request->input('name') . ' เรียบร้อยแล้ว')
+                    ->with('callout_class', 'callout-success');
+
+            }
+            else {
+                return redirect()->action('Admin\LoanTypeController@getExpiredDetail', [ 'loantype' => LoanType::find($id) ])
+                    ->with('flash_message', 'แก้ไขประเภทเงินกู้ชื่อ ' . $request->input('name') . ' เรียบร้อยแล้ว')
+                    ->with('callout_class', 'callout-success');
+            }
         }
     }
 
