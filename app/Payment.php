@@ -35,4 +35,11 @@ class Payment extends Model
     public function loan() {
         return $this->belongsTo(Loan::class);
     }
+
+    /**
+     * Get the attach files that uses by the payment.
+     */
+    public function attachments() {
+        return $this->hasMany(PaymentAttachment::class);
+    }
 }

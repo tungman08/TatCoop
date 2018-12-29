@@ -99,22 +99,24 @@
                         <thead>
                             <tr>
                                 <th style="width: 10%;">#</th>
-                                <th style="width: 30%;">เดือน</th>
-                                <th style="width: 20%;">ค่าหุ้นปกติ</th>
-                                <th style="width: 20%;">ค่าหุ้นเงินสด</th>
-                                <th style="width: 20%;">รวมเป็นเงิน</th>
+                                <th style="width: 18%;">เดือน</th>
+                                <th style="width: 18%;">ค่าหุ้นปกติ</th>
+                                <th style="width: 18%;">ค่าหุ้นเงินสด</th>
+                                <th style="width: 18%;">รวมเป็นเงิน</th>
+								<th style="width: 18%;">ทุนเรือนหุ้นสะสม</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @eval($count = 0)
+                            @php($count = 0)
                             @foreach($shareholdings->sortByDesc('name') as $share)
-                                @eval($date = Diamond::parse($share->name))
+                                @php($date = Diamond::parse($share->name))
                                 <tr onclick="javascript: document.location = '{{ url('service/shareholding/' . $member->id . '/' . $share->paydate . '/show') }}';" style="cursor: pointer;">
                                     <td>{{ ++$count }}.</td>
                                     <td class="text-primary"><i class="fa fa-money fa-fw"></i> {{ $date->thai_format('F Y') }}</td>
                                     <td>{{ number_format($share->amount, 2, '.', ',') }} บาท</td>
                                     <td>{{ number_format($share->amount_cash, 2, '.', ',') }} บาท</td>
                                     <td>{{ number_format($share->amount + $share->amount_cash, 2, '.', ',') }} บาท</td>
+									<td>{{ number_format($share->total_shareholding + $share->amount + $share->amount_cash, 2, '.', ',') }} บาท</td>
                                 </tr>
                             @endforeach
                         </tbody>

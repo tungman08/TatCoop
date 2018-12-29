@@ -11,13 +11,18 @@ use App\Billing;
 use App\Member;
 use App\Loan;
 use App\Payment;
+use App\PaymentAttachment;
 use LoanCalculator;
 use Validator;
+use FileManager;
 use DB;
 use Diamond;
 use History;
 use Auth;
 use PDF;
+use Response;
+use Storage;
+use stdClass;
 
 class PaymentController extends Controller
 {
@@ -79,6 +84,20 @@ class PaymentController extends Controller
                 if (abs($loan->outstanding - $loan->payments->sum('principle')) < 0.01) {
                     $loan->completed_at = Diamond::parse($request->input('pay_date'));
                     $loan->save();
+                }
+
+                if ($request->hasFile('attachment')) {
+                    $file = $request->file('attachment');
+                    $display = mb_ereg_replace('\s+', ' ', basename($file->getClientOriginalName(), '.' . $file->getClientOriginalExtension()));
+                    $filename = time() . uniqid() . '.' . $file->getClientOriginalExtension();
+                    $path = ($file->getRealPath() != false) ? $file->getRealPath() : $file->getPathname();
+                    Storage::disk('attachments')->put($filename, file_get_contents($path));
+    
+                    $attachment = new PaymentAttachment([
+                        'file' => $filename,
+                        'display' => $display
+                    ]);
+                    $payment->attachments()->save($attachment);
                 }
 
                 History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'ป้อนการชำระเงินกู้ ' . $loan->code);
@@ -266,6 +285,11 @@ class PaymentController extends Controller
     public function destroy($member_id, $loan_id, $payment_id) {
         DB::transaction(function() use ($payment_id, $loan_id) {
             $payment = Payment::find($payment_id);
+
+            foreach ($payment->attachments as $attachment) {
+                Storage::disk('attachments')->delete($attachment->file);
+            }
+
             $payment->delete();
 
             $loan = Loan::find($loan_id); 
@@ -301,25 +325,25 @@ class PaymentController extends Controller
             'billno' => $billdate->thai_format('Y') . str_pad($payment->loan->id, 8, '0', STR_PAD_LEFT),
             'date' => $billdate
         ]);
-     }
+    }
 
-     public function getPrintBilling($member_id, $loan_id, $payment_id, $paydate) {
-        $billdate = Diamond::parse($paydate);
-        $member = Member::find($member_id);
-        $loan = Loan::find($loan_id);
-        $payment = Payment::find($payment_id);
+	public function getPrintBilling($member_id, $loan_id, $payment_id, $paydate) {
+		$billdate = Diamond::parse($paydate);
+		$member = Member::find($member_id);
+		$loan = Loan::find($loan_id);
+		$payment = Payment::find($payment_id);
 
-        return view('admin.payment.print', [
-            'member' => $member,
-            'loan' => $loan,
-            'billing' => Billing::latest()->first(),
-            'payment' => $payment,
-            'billno' => $billdate->thai_format('Y') . str_pad($payment->loan->id, 8, '0', STR_PAD_LEFT),
-            'date' => $billdate
-        ]);
-     }
+		return view('admin.payment.print', [
+			'member' => $member,
+			'loan' => $loan,
+			'billing' => Billing::latest()->first(),
+			'payment' => $payment,
+			'billno' => $billdate->thai_format('Y') . str_pad($payment->loan->id, 8, '0', STR_PAD_LEFT),
+			'date' => $billdate
+		]);
+    }
 
-     public function getPdfBilling($member_id, $loan_id, $payment_id, $paydate) {
+    public function getPdfBilling($member_id, $loan_id, $payment_id, $paydate) {
         $billdate = Diamond::parse($paydate);
         $member = Member::find($member_id);
         $loan = Loan::find($loan_id);
@@ -336,5 +360,47 @@ class PaymentController extends Controller
 
         return PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])
             ->loadView('admin.payment.pdf', $data)->download('ใบเสร็จรับเงินค่างวด สัญญาเลขที่ ' . $loan->code . ' เดือน-' . $billdate->thai_format('M-Y') . '.pdf');
-     }
+    }
+
+    public function postUploadFile(Request $request) {
+		$id = $request->input('payment_id');
+		$file = $request->file('file');
+
+		$display = mb_ereg_replace('\s+', ' ', basename($file->getClientOriginalName(), '.' . $file->getClientOriginalExtension()));
+        $filename = time() . uniqid() . '.' . $file->getClientOriginalExtension();
+		$path = ($file->getRealPath() != false) ? $file->getRealPath() : $file->getPathname();
+
+        Storage::disk('attachments')->put($filename, file_get_contents($path));
+    
+        $attachment = new PaymentAttachment([
+            'file' => $filename,
+            'display' => $display
+        ]);
+
+		$payment = Payment::find($id);
+        $payment->attachments()->save($attachment);
+
+		$data = new stdClass();
+        $data->id = PaymentAttachment::where('file',$filename)->first()->id;
+		$data->href = FileManager::get('attachments', $filename);
+        $data->display = $display;
+
+        return Response::json($data);
+    }
+
+	public function postDeleteFile(Request $request) {
+		$id = $request->input('id');
+		$attachment = PaymentAttachment::find($id);
+		$payment_id = $attachment->payment_id;
+
+		Storage::disk('attachments')->delete($attachment->file);
+        $attachment->delete();
+
+		$payment = Payment::find($payment_id);
+		$data = new stdClass();
+		$data->id = $id;
+        $data->count = $payment->attachments->count();
+
+        return Response::json($data);
+    }
 }

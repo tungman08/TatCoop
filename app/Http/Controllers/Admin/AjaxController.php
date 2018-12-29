@@ -755,7 +755,7 @@ class AjaxController extends Controller
                 }
             }
             else {
-                // ต้องเป็นพนักงานเท่ากัน
+                // ต้องเป็นพนักงานเท่านั้น
                 if ($surety->profile->employee->employee_type_id == 1) {
                     // ตรวจว่าค้ำประกันไม่เกิน 2 สัญญา ไม่นับค้ำด้วยหุ้นตนเอง
                     if ($surety->sureties->filter(function ($value, $key) use ($surety) { return !is_null($value->code) && is_null($value->completed_at) && $value->member_id != $surety->id; })->count() < 2) {
@@ -807,7 +807,8 @@ class AjaxController extends Controller
             // ค้ำตัวเอง (ใช้หุ้น)
             if ($loan->member_id == $member->id) {
                 if ($member->profile->employee->employee_type->id == 1) { // พนักงาน/ลูกจ้าง ททท.
-                    $available = ($member->shareholdings->sum('amount') * 0.9 < 1200000) ? $member->shareholdings->sum('amount') * 0.9 : 1200000;
+                    $rule = Bailsman::find(1);
+                    $available = ($member->shareholdings->sum('amount') * $rule->self_rate < $rule->self_maxguaruntee) ? $member->shareholdings->sum('amount') * $rule->self_rate : $rule->self_maxguaruntee;
 
                     if ($available >= $amount) {
                         $loan->sureties()->attach($member->id, ['salary' => 0, 'amount' => $amount, 'yourself' => true]);
@@ -823,11 +824,12 @@ class AjaxController extends Controller
                     else {
                         $result = new stdClass();
                         $result->id = 0;
-                        $result->message = "ไม่สามารถค้ำประกันได้ เนื่องจากจำนวนหุ้นไม่พอใช้ค้ำประกัน (90% ของหุ้น แต่ไม่เกิน 1,200,000 บาท)";
+                        $result->message = "ไม่สามารถค้ำประกันได้ เนื่องจากจำนวนหุ้นไม่พอใช้ค้ำประกัน (" . number_format($rule->self_rate * 100, 0, '.', ',') . "% ของหุ้น แต่ไม่เกิน " . number_format($rule->self_maxguaruntee, 2, '.', ',') . " บาท)";
                     }
                 }
                 else { // บุคคลภายนอก
-                    $available = LoanCalculator::shareholding_available($member);
+                    $rule = Bailsman::find(2);
+                    $available = ($member->shareholdings->sum('amount') * $rule->self_rate < $rule->self_maxguaruntee) ? $member->shareholdings->sum('amount') * $rule->self_rate : $rule->self_maxguaruntee;
 
                     if ($available >= $amount) {
                         $loan->sureties()->attach($member->id, ['salary' => 0, 'amount' => $amount, 'yourself' => true]);
@@ -843,37 +845,66 @@ class AjaxController extends Controller
                     else {
                         $result = new stdClass();
                         $result->id = 0;
-                        $result->message = "ไม่สามารถค้ำประกันได้ เนื่องจากจำนวนหุ้นไม่พอใช้ค้ำประกัน (80% ของหุ้น แต่ไม่เกิน 1,200,000 บาท)";
+                        $result->message = "ไม่สามารถค้ำประกันได้ เนื่องจากจำนวนหุ้นไม่พอใช้ค้ำประกัน (" . number_format($rule->self_rate * 100, 0, '.', ',') . "% ของหุ้น แต่ไม่เกิน " . number_format($rule->self_maxguaruntee, 2, '.', ',') . " บาท)";
                     }
                 }
             }
             // ค้ำผู้อื่น (ต้องเป็นพนักงาน/ลูกจ้าง ททท. เท่านั้น ใช้เงินเดือนค้ำ)
             else {
-                $salary = $request->input('salary');
-                $netSalary = $request->input('netSalary');
-                $available = LoanCalculator::salary_available($member, $salary);
+                if ($member->profile->employee->employee_type->id == 1) { // พนักงาน/ลูกจ้าง ททท.   
+                    $rule = Bailsman::find(2); 
+                    $salary = $request->input('salary');
+                    $netSalary = $request->input('netSalary');
 
-                if ($netSalary < 3000) {
-                    $result = new stdClass();
-                    $result->id = 0;
-                    $result->message = "ไม่สามารถค้ำประกันได้ เนื่องจากเงินเดือนสุทธิผู้ค้ำ น้อยกว่า 3,000 บาท";
+                    $limit = ($salary * $rule->other_rate < $rule->other_maxguaruntee) ? $salary * $rule->other_rate : $rule->other_maxguaruntee;
+                    $gaurantee = $member->sureties->filter(function ($value, $key) { return !is_null($value->code) && is_null($value->completed_at); })->sum(function ($value) { return $value->sureties->filter(function ($value, $key) { return $value->yourself; })->sum('amount'); });
+                    $outstanding = $member->sureties->filter(function ($value, $key) { return !is_null($value->code) && is_null($value->completed_at); })->sum('outstanding');
+                    $principle = $member->sureties->filter(function ($value, $key) { return !is_null($value->code) && is_null($value->completed_at); })->sum(function ($value) { return $value->payments->sum('principle'); });         
+                    $available = ($outstanding > 0) ? $limit - ($gaurantee * (($outstanding - $principle) / $outstanding)) : $limit;
+            
+                    if ($netSalary < $rule->other_netsalary) {
+                        $result = new stdClass();
+                        $result->id = 0;
+                        $result->message = "ไม่สามารถค้ำประกันได้ เนื่องจากเงินเดือนสุทธิผู้ค้ำ น้อยกว่า " . number_format($rule->other_netsalary, 0, '.', ',') . " บาท";
 
+                    }
+                    else if ($available < $amount) {
+                        $result = new stdClass();
+                        $result->id = 0;
+                        $result->message = "ไม่สามารถค้ำประกันได้ เงินเดือนไม่พอที่ใช้ค้ำประกัน (สามารถค้ำได้ " . number_format($available, 2, '.', ',') . " บาท)";
+                    }
+                    else {
+                        $loan->sureties()->attach($member->id, ['salary' => $salary, 'amount' => $amount, 'yourself' => false]);
+
+                        $result = new stdClass();
+                        $result->id = $member->id;
+                        $result->loan_id = $loan->id;
+                        $result->name = $member->profile->fullName;
+                        $result->amount = number_format($amount, 2, '.', ',');
+                        $result->available = number_format($available, 2, '.', ',');
+                        $result->yourself = false;
+                    }
                 }
-                else if ($available < $amount) {
-                    $result = new stdClass();
-                    $result->id = 0;
-                    $result->message = "ไม่สามารถค้ำประกันได้ เงินเดือนไม่พอที่ใช้ค้ำประกัน (สามารถค้ำได้ " . number_format($available, 2, '.', ',') . " บาท)";
-                }
-                else {
-                    $loan->sureties()->attach($member->id, ['salary' => $salary, 'amount' => $amount, 'yourself' => false]);
+                else { // บุคคลภายนอก
+                    $rule = Bailsman::find(2);
+                    $available = ($member->shareholdings->sum('amount') * $rule->other_rate < $rule->other_maxguaruntee) ? $member->shareholdings->sum('amount') * $rule->other_rate : $rule->other_maxguaruntee;
 
-                    $result = new stdClass();
-                    $result->id = $member->id;
-                    $result->loan_id = $loan->id;
-                    $result->name = $member->profile->fullName;
-                    $result->amount = number_format($amount, 2, '.', ',');
-                    $result->available = number_format($available, 2, '.', ',');
-                    $result->yourself = false;
+                    if ($available >= $amount) {
+                        $loan->sureties()->attach($member->id, ['salary' => 0, 'amount' => $amount, 'yourself' => true]);
+
+                        $result = new stdClass();
+                        $result->id = $member->id;
+                        $result->loan_id = $loan->id;
+                        $result->name = $member->profile->fullName;
+                        $result->amount = number_format($amount, 2, '.', ',');
+                        $result->available = number_format($available, 2, '.', ',');
+                        $result->yourself = false;
+                    }
+                    else {
+                        $result = new stdClass();
+                        $result->id = 0;
+                        $result->message = "ไม่สามารถค้ำประกันได้ เนื่องจากจำนวนหุ้นไม่พอใช้ค้ำประกัน (" . number_format($rule->other_rate * 100, 0, '.', ',') . "% ของหุ้น แต่ไม่เกิน " . number_format($rule->other_maxguaruntee, 2, '.', ',') . " บาท)";
+                    }
                 }
             }
         }
@@ -939,13 +970,14 @@ class AjaxController extends Controller
             ->leftJoin('loan_member', 'members.id', '=', 'loan_member.member_id')
             ->leftJoin('loans', 'loan_member.loan_id', '=', 'loans.id')
             ->whereNull('members.leave_date')
-            ->groupBy(['members.id', 'profiles.name', 'profiles.lastname', 'employee_types.name'])
+            ->groupBy(['members.id', 'profiles.name', 'profiles.lastname', 'employee_types.id', 'employee_types.name'])
             ->select([
                 DB::raw("LPAD(members.id, 5, '0') as code"),
                 DB::raw("CONCAT('<span class=\"text-primary\"><i class=\"fa fa-user fa-fw\"></i> ', IF(profiles.name = '<ข้อมูลถูกลบ>', profiles.name, CONCAT(profiles.name, ' ', profiles.lastname)), '</span>') as fullname"),
                 DB::raw("CONCAT('<span class=\"label label-primary\">', employee_types.name, '</span>') as typename"),
                 DB::raw("IF(COALESCE(SUM(IF(loan_member.yourself = 1 AND loans.code IS NOT NULL AND loans.completed_at IS NULL, loan_member.amount, 0))) > 0, CONCAT(FORMAT(COALESCE(SUM(IF(loan_member.yourself = 1 AND loans.code IS NOT NULL AND loans.completed_at IS NULL, loan_member.amount, 0))), 2), ' บาท'), '-') as yourself"),
-                DB::raw("IF(COALESCE(SUM(IF(loan_member.yourself = 0 AND loans.code IS NOT NULL AND loans.completed_at IS NULL, loan_member.amount, 0))) > 0, CONCAT(FORMAT(COALESCE(SUM(IF(loan_member.yourself = 0 AND loans.code IS NOT NULL AND loans.completed_at IS NULL, loan_member.amount, 0))), 2), ' บาท'), '-') as other")
+                DB::raw("IF(COALESCE(SUM(IF(loan_member.yourself = 0 AND loans.code IS NOT NULL AND loans.completed_at IS NULL, loan_member.amount, 0))) > 0, CONCAT(FORMAT(COALESCE(SUM(IF(loan_member.yourself = 0 AND loans.code IS NOT NULL AND loans.completed_at IS NULL, loan_member.amount, 0))), 2), ' บาท'), '-') as other"),
+				DB::raw("IF(SUM(IF(loan_member.yourself = 0 AND loans.code IS NOT NULL AND loans.completed_at IS NULL, 1, 0)) < 2, CONCAT('<span class=\"label label-success\">ค้ำได้อีก ', 2 - SUM(IF(loan_member.yourself = 0 AND loans.code IS NOT NULL AND loans.completed_at IS NULL, 1, 0)), ' สัญญา</span>', IF(employee_types.id > 1, ' <i class=\"fa fa-exclamation-triangle\"></i>', '')), '<span class=\"label label-danger\">ค้ำเต็มจำนวนแล้ว</span>') as status")
             ]);
 
         return Datatables::queryBuilder($members)->make(true);

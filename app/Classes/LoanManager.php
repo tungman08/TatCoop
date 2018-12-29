@@ -3,6 +3,7 @@
 namespace App\Classes;
 
 use stdClass;
+use App\Bailsman;
 use App\Loan;
 use App\Payment;
 use App\Member;
@@ -98,7 +99,7 @@ class LoanManager {
         $pay = ($payment_type == 1)
             ? LoanCalculator::pmt($loan->loanType->rate, $outstanding, $period) 
             : LoanCalculator::flat($loan->loanType->rate, $outstanding, $period);
-        if ($netsalary - $pay < 3000) {
+        if ($netsalary - $pay < $loan->loanType->min_netsalary) {
             $validator->errors()->add('netsalary', "ไม่สามารถกู้ได้ เนื่องจากเงินเดือนสุทธิไม่พอสำหรับขอกู้ (ค่างวดต่อเดือน " . number_format($pay, 2, '.', ',') . " บาท)");
         }
     }
@@ -114,34 +115,42 @@ class LoanManager {
         $total_payments = $loans->sum(function($value) { return $value->payments->sum('principle'); });
 
         $balance = $total_outstanding - $total_payments;
+        $limit = $loan->loanType->max_loansummary;
 
-        if ($outstanding + $balance > 1200000) {
-            $validator->errors()->add('overflow', "ไม่สามารถกู้ได้ เนื่องจากผลรวมยอดเงินกู้สามัญ + กู้เฉพาะกิจอื่นๆ รวมกันแล้วเกิน 1,200,000 บาท (สามารถกู้สูงสุดได้ " . number_format(1200000 - $balance, 2, '.', ',') . " บาท)");
+        if ($outstanding + $balance > $limit) {
+            $validator->errors()->add('overflow', "ไม่สามารถกู้ได้ เนื่องจากผลรวมยอดเงินกู้สามัญ + กู้เฉพาะกิจอื่นๆ รวมกันแล้วเกิน 1,200,000 บาท (สามารถกู้สูงสุดได้ " . number_format($limit - $balance, 2, '.', ',') . " บาท)");
         }
     }
 
-    // ตรวจสอบความสามารถในการค้ำประกันตนเองของพนักงาน / ลูกจ้าง
+    // ตรวจสอบความสามารถในการค้ำประกันตนเองของพนักงาน/ลูกจ้าง
     public function check_employee_selfsurety($validator, Loan $loan, $outstanding) {
         $member = Member::find($loan->member_id);
-        $available = ($member->shareholdings->sum('amount') * 0.9 < 1200000) ? $member->shareholdings->sum('amount') * 0.9 : 1200000;
+        $rule = Bailsman::find(1);
+        $shareholding = ($member->shareholdings->sum('amount') * $rule->self_rate < $rule->self_maxguaruntee) ? $member->shareholdings->sum('amount') * $rule->self_rate : $rule->self_maxguaruntee;
+        $selfsurety = DB::table('loan_member')
+            ->where('member_id', $loan->member_id)
+            ->where('yourself', true)
+            ->sum('amount');
+        $available = $shareholding - $selfsurety;
 
         if ($available < $outstanding) {
-            $validator->errors()->add('unavailable', "ไม่สามารถกู้ได้ เนื่องจาก 90% ของหุ้นผู้กู้มีเพียง " . number_format($available, 2, '.', ',') . " บาท");
+            $validator->errors()->add('unavailable', "ไม่สามารถกู้ได้ เนื่องจาก " . number_format($rule->self_rate * 100, 0, '.', ',') . "% ของหุ้นผู้กู้มีหุ้นคงเหลือเพียง " . number_format($available, 2, '.', ',') . " บาท");
         }
     }
 
     // ตรวจสอบความสามารถในการค้ำประกันตนเองของบุคคลภายนอก
     public function check_outsider_selfsurety($validator, Loan $loan, $outstanding) {
         $member = Member::find($loan->member_id);
-        $shareholding = ($member->shareholdings->sum('amount') * 0.8 < 1200000) ? $member->shareholdings->sum('amount') * 0.8 : 1200000;
-        $loans = Loan::where('member_id', $loan->member_id)
-            ->whereNotNull('code')
-            ->whereNull('completed_at');
-        $balance = $loans->sum('outstanding') - $loans->get()->sum(function($value) { return $value->payments->sum('principle'); });
-        $available = $shareholding - $balance;
+        $rule = Bailsman::find(2);
+        $shareholding = ($member->shareholdings->sum('amount') * $rule->self_rate < $rule->self_maxguaruntee) ? $member->shareholdings->sum('amount') * $rule->self_rate : $rule->self_maxguaruntee;
+        $selfsurety = DB::table('loan_member')
+            ->where('member_id', $loan->member_id)
+            ->where('yourself', true)
+            ->sum('amount');
+        $available = $shareholding - $selfsurety;
 
         if ($available < $outstanding) {
-            $validator->errors()->add('unavailable', "ไม่สามารถกู้ได้ เนื่องจาก 80% ของหุ้นผู้กู้มีเพียง " . number_format($available, 2, '.', ',') . " บาท");
+            $validator->errors()->add('unavailable', "ไม่สามารถกู้ได้ เนื่องจาก " . number_format($rule->self_rate * 100, 0, '.', ',') . "% ของหุ้นผู้กู้มีหุ้นคงเหลือเพียง " . number_format($available, 2, '.', ',') . " บาท");
         }
     }
 

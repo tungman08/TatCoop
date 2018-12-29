@@ -42,4 +42,11 @@ class Shareholding extends Model
     public function shareholding_type() {
         return $this->belongsTo(ShareholdingType::class);
     }
+
+    /**
+     * Get the attach files that uses by the shareholding.
+     */
+    public function attachments() {
+        return $this->hasMany(ShareholdingAttachment::class);
+    }
 }

@@ -14,13 +14,19 @@
         </tr>
         <tr>
             <th>วันที่สิ้นสุดการใช้:</th>
-            <td>{{ (Diamond::maxValue()->diffInDays(Diamond::parse($loantype->expire_date)) > 0) ? Diamond::parse($loantype->expire_date)->thai_format('j M Y') : 'N/A' }}</td>
+            <td>{{ (Diamond::maxValue()->diffInDays(Diamond::parse($loantype->expire_date)) > 0) ? Diamond::parse($loantype->expire_date)->thai_format('j M Y') : 'N/A' }} {!! (Diamond::today()->greaterThan(Diamond::parse($loantype->expire_date))) ? '<span class="text-red">(สิ้นสุดการใช้งานแล้ว)</span>' : '' !!}</td>
         </tr>
         <tr>
             <th>เงื่อนไข:</th>
             <td>
                 <ul class="list-info">
-                    <li>กู้สูงสุดได้ไม่เกิน <strong>{{ $loantype->salarytimes }}</strong> เท่าของเงินเดือน หรือไม่เกิน <strong>{{ number_format($loantype->limits->max('cash_end'), 2, '.', ',') }}</strong> บาท</li>
+                    <li><span class="text-blue">[เฉพาะพนักงาน/ลูกจ้าง ททท.]</span> กู้สูงสุดได้ไม่เกิน <strong>{{ $loantype->employee_ratesalary }}</strong> เท่าของเงินเดือน และไม่เกิน <strong>{{ number_format($loantype->limits->max('cash_end'), 2, '.', ',') }}</strong> บาท</li>
+                    <li><span class="text-blue">[เฉพาะพนักงาน/ลูกจ้าง ททท.]</span> เงินเดือนสุทธิเมื่อหักค่างวดรายเดือนต้องไม่น้อยกว่า <strong>{{ number_format($loantype->employee_netsalary, 2, '.', ',') }}</strong> บาท</li>
+                    <li><span class="text-blue">[เฉพาะบุคคลภายนอก]</span> กู้สูงสุดได้ไม่เกิน <strong>{{ number_format($loantype->outsider_rateshareholding * 100, 0, '.', ',') }}%</strong> ของทุนเรือนหุ้นสะสมทั้งหมด และไม่เกิน <strong>{{ number_format($loantype->limits->max('cash_end'), 2, '.', ',') }}</strong> บาท</li>
+
+                    @if ($loantype->id != 2)
+                        <li>จำนวนยอดกู้สามัญ รวมกับยอดกู้เฉพาะกิจอื่นๆ (ไม่รวมกู้ฉุกเฉิน) ต้องไม่เกิน <strong>{{ number_format($loantype->max_loansummary, 2, '.', ',') }}</strong> บาท</li>
+                    @endif
 
                     @foreach($loantype->limits as $limit)
                         <li>

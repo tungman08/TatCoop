@@ -11,7 +11,8 @@
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
             ['item' => 'จัดการทุนเรือนหุ้น', 'link' => '/service/shareholding/member'],
             ['item' => 'ทุนเรือนหุ้น', 'link' => '/service/' . $member->id . '/shareholding'],
-            ['item' => 'รายละเอียด', 'link' => '/service/shareholding/' . $member->id . '/' . $date->format('Y-n-j') . '/show'],
+			['item' => Diamond::parse($shareholding->pay_date)->thai_format('M Y'), 'link' => action('Admin\ShareholdingController@getShow', ['member_id'=>$member->id, 'paydate'=>Diamond::parse($shareholding->pay_date)->format('Y-n-1')]) ],
+            ['item' => 'รายละเอียด', 'link' => action('Admin\ShareholdingController@getDetail', ['member_id'=>$member->id, 'paydate'=>Diamond::parse($shareholding->pay_date)->format('Y-n-1'), 'id'=>$shareholding->id])],
             ['item' => 'ใบเสร็จรับเงิน', 'link' => ''],
         ]])
 
@@ -22,7 +23,7 @@
         <!-- Info boxes -->
         <div class="well">
             <h4>ใบรับเงินค่าหุ้น</h4>
-            <p>ใบรับเงินค่าหุ้นเดือน {{ $date->thai_format('F Y') }} ของ {{ $member->profile->fullName }}</p>
+            <p>ใบรับเงินค่าหุ้นเดือน {{ Diamond::parse($shareholding->pay_date)->thai_format('F Y') }} ของ {{ $member->profile->fullName }}</p>
         </div>
 
         <!-- Main content -->
@@ -72,7 +73,7 @@
                             </tr>
                             <tr>
                                 <th>หน่วยงาน:</th>
-                                <td>สหกรณ์การท่องเที่ยว</td>
+                                <td>สอ.สรทท.</td>
                             </tr>
                         </table>
                     </div>
@@ -82,8 +83,8 @@
                     <div class="table-responsive" style="border: 1px solid #ddd;">
                         <table class="table table-bordered" style="margin-bottom: 0px;">
                             <tr>
-                                <th style="width:20%">วันที่:</th>
-                                <td>{{ $date->thai_format('d/m/Y') }}</td>
+                                <th style="width:20%">วันที่ชำระ:</th>
+                                <td>{{ Diamond::parse($shareholding->pay_date)->thai_format('d/m/Y') }}</td>
                             </tr>
                             <tr>
                                 <th>เลขทะเบียน:</th>
@@ -91,7 +92,7 @@
                             </tr>
                             <tr>
                                 <th>ทุนเรือนหุ้นสะสม:</th>
-                                <td>{{ number_format($total_shareholding, 2,'.', ',') }}</td>
+                                <td>{{ number_format($total_shareholding + $shareholding->amount, 2,'.', ',') }}</td>
                             </tr>
                         </table>
                     </div>
@@ -114,22 +115,18 @@
                         </thead>
                         <tfoot>
                             <tr>
-                                <td colspan="2">{{ Number::toBaht($shareholdings->sum('amount')) }}</td>
-                                <td class="text-right">{{ number_format($shareholdings->sum('amount'), 2,'.', ',') }}</td>
+                                <td colspan="2">{{ Number::toBaht($shareholding->amount) }}</td>
+                                <td class="text-right">{{ number_format($shareholding->amount, 2,'.', ',') }}</td>
                                 <td>&nbsp;</td>
                             </tr>
                         </tfoot>
                         <tbody>
-                            @php($result = $total_shareholding - $shareholdings->sum('amount'))
-                            @foreach($shareholdings as $share)
-                                @php($result += $share->amount)
-                                <tr>
-                                    <td>รับ{{ $share->shareholding_type->name }}</td>
-                                    <td class="text-center">{{ $date->thai_format('m/y') }}</td>
-                                    <td class="text-right">{{ number_format($share->amount, 2,'.', ',') }}</td>
-                                    <td class="text-right">{{ number_format($result, 2,'.', ',') }}</td>
-                                </tr>
-                            @endforeach
+                            <tr>
+                                <td>รับ{{ $shareholding->shareholding_type->name }}</td>
+                                <td class="text-center">{{ Diamond::parse($shareholding->pay_date)->thai_format('m/y') }}</td>
+                                <td class="text-right">{{ number_format($shareholding->amount, 2,'.', ',') }}</td>
+                                <td class="text-right">{{ number_format($total_shareholding + $shareholding->amount, 2,'.', ',') }}</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -173,11 +170,11 @@
             <!-- this row will not appear when printing -->
             <div class="row no-print" style="margin-top: 30px;">
                 <div class="col-xs-12">
-                    <a href="{{ url('/service/shareholding/' . $member->id . '/' . $date->format('Y-n-j') . '/print') }}" target="_blank" class="btn btn-default btn-flat"><i class="fa fa-print"></i> พิมพ์</a>
+                    <a href="{{ action('Admin\ShareholdingController@getPrintBilling', ['member_id'=>$member->id, 'paydate'=>Diamond::parse($shareholding->pay_date)->format('Y-n-j'), 'id'=>$shareholding->id]) }}" target="_blank" class="btn btn-default btn-flat"><i class="fa fa-print"></i> พิมพ์</a>
                     <button type="button"
                         class="btn btn-primary btn-flat pull-right"
                         style="margin-right: 5px;"
-                        onclick="javascript:document.location = '{{ url('/service/shareholding/' . $member->id . '/' . $date->format('Y-n-j') . '/pdf') }}';">
+                        onclick="javascript:document.location = '{{ action('Admin\ShareholdingController@getPdfBilling', ['member_id'=>$member->id, 'paydate'=>Diamond::parse($shareholding->pay_date)->format('Y-n-j'), 'id'=>$shareholding->id]) }}';">
                         <i class="fa fa-download"></i> บันทึกเป็น PDF
                     </button>
                 </div>

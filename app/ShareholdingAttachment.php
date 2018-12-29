@@ -4,22 +4,22 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class EmployeeType extends Model
+class ShareholdingAttachment extends Model
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-	protected $table = 'employee_types';
-
+    protected $table = 'shareholding_attachments';
+    
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'name',
+        'shareholding_id', 'file', 'display',
     ];
 
     /**
@@ -30,16 +30,9 @@ class EmployeeType extends Model
     protected $dates = ['created_at', 'updated_at'];
 
     /**
-     * Get the employees for the type.
+     * Get the shareholding that uses by the attach file.
      */
-    public function employees() {
-        return $this->hasMany(Employee::class);
-    } 
-    
-    /**
-     * Get the bailsman associated with the type.
-     */
-    public function bailsman() {
-        return $this->hasOne(Bailsman::class);
-    } 
+    public function shareholding() {
+        return $this->belongsTo(Shareholding::class);
+    }
 }

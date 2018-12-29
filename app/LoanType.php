@@ -24,7 +24,7 @@ class LoanType extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'rate', 'salarytimes', 'start_date', 'expire_date',
+        'name', 'rate', 'employee_ratesalary', 'employee_netsalary', 'outsider_rateshareholding', 'max_loansummary', 'start_date', 'expire_date',
     ];
 
     /**
@@ -40,7 +40,10 @@ class LoanType extends Model
     public function limits() {
         return $this->hasMany(LoanTypeLimit::class);
     }
-    
+
+    /**
+     * Get the loans that uses by the type.
+     */
     public function loans() {
         return $this->hasMany(Loan::class);
     }

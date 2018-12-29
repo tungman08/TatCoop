@@ -4,68 +4,34 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
         <h1>
-            จัดการการกู้ยืมของสมาชิกสหกรณ์ฯ
-            <small>เพิ่ม ลบ แก้ไข การกู้ยืมของสมาชิก สอ.สรทท.</small>
+            จัดการทุนเรือนหุ้นของสมาชิกสหกรณ์ฯ
+            <small>เพิ่ม ลบ แก้ไข ทุนเรือนหุ้นของสมาชิก สอ.สรทท.</small>
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการการกู้ยืม', 'link' => '/service/loan/member'],
-            ['item' => 'การกู้ยืม', 'link' => '/service/' . $member->id . '/loan'],
-            ['item' => 'สัญญากู้ยืม', 'link' => '/service/' . $member->id . '/loan/' . $loan->id],
-            ['item' => 'รายการผ่อนชำระ', 'link' => ''],
+            ['item' => 'จัดการทุนเรือนหุ้น', 'link' => '/service/shareholding/member'],
+            ['item' => 'ทุนเรือนหุ้น', 'link' => '/service/' . $member->id . '/shareholding'],
+            ['item' => Diamond::parse($shareholding->pay_date)->thai_format('M Y'), 'link' => action('Admin\ShareholdingController@getShow', ['member_id'=>$member->id, 'paydate'=>Diamond::parse($shareholding->pay_date)->format('Y-n-1')])],
+            ['item' => 'รายละเอียด', 'link' => ''],
         ]])
+
     </section>
 
     <!-- Main content -->
     <section class="content">
         <!-- Info boxes -->
         <div class="well">
-            <h4>รายละเอียดสัญญากู้ยืมเลขที่ {{ $loan->code }}</h4>
-
-            <div class="table-responsive">
-                <table class="table table-info">
-                    <tr>
-                        <th style="width:20%;">ชื่อผู้สมาชิก:</th>
-                        <td>{{ $member->profile->fullName }}</td>
-                    </tr>
-                    <tr>
-                        <th>ประเภทเงินกู้:</th>
-                        <td>{{ $loan->loanType->name }}</td>
-                    </tr>  
-                    <tr>
-                        <th>วงเงินที่กู้:</th>
-                        <td>{{ number_format($loan->outstanding, 2, '.', ',') }} บาท</td>
-                    </tr>  
-                    <tr>
-                        <th>จำนวนงวดผ่อนชำระ:</th>
-                        <td>{{ number_format($loan->period, 0, '.', ',') }} งวด (ชำระงวดละ {{ number_format(LoanCalculator::pmt($loan->rate, $loan->outstanding, $loan->period), 2, '.', ',') }} บาท)</td>
-                    </tr> 
-                    <tr>
-                        <th>เงินต้นคงเหลือ:</th>
-                        <td>{{ number_format($loan->outstanding - $loan->payments->sum('principle'), 2, '.', ',') }} บาท</td>
-                    </tr>
-                    <tr>
-                        <th>ดอกเบี้ยสะสม:</th>
-                        <td>{{ number_format($loan->payments->sum('interest'), 2, '.', ',') }} บาท</td>
-                    </tr>
-                    
-                    @if ($loan->loan_type_id == 1)
-                        <tr>
-                            <th>ผู้ค้ำประกัน:</th>
-                            <td>
-                                <ul class="list-info">
-                                    @foreach($loan->sureties as $item)
-                                        <li>{{ $item->profile->fullName }} (ค้ำประกันจำนวน {{ number_format($item->pivot->amount, 2, '.', ',')  }}  บาท)</li>
-                                    @endforeach
-                                </ul>
-                            </td>
-                        </tr>
-                    @endif
-                </table>
-                <!-- /.table -->
-            </div>  
-            <!-- /.table-responsive --> 
+            <h4>ข้อมูลทุนเรือนหุ้น</h4>
+            <p>รายละเอียดข้อมูลชำระค่าหุ้นต่างๆ ของ {{ $member->profile->fullName }} วันที่ {{ Diamond::parse($shareholding->pay_date)->thai_format('j F Y') }}</p>
         </div>
+
+        @if ($errors->count() > 0)
+            <div class="alert alert-danger alert-dismissible">
+                <button type="button" class="close" aria-hidden="true" data-dismiss="alert" data-toggle="tooltip" title="Close">×</button>
+                <h4><i class="icon fa fa-ban"></i>ข้อผิดพลาด!</h4>
+                {{ Html::ul($errors->all()) }}
+            </div>
+        @endif
 
         @if(Session::has('flash_message'))
             <div class="callout {{ Session::get('callout_class') }}">
@@ -84,16 +50,16 @@
             <div class="col-md-6">
                 <div class="box box-primary">
                     <div class="box-header with-border">
-                        <h3 class="box-title"><i class="fa fa-credit-card"></i> รายละเอียดผ่อนชำระ</h3>
+                        <h3 class="box-title"><i class="fa fa-money"></i> รายละเอียดการชำระค่าหุ้น วันที่ {{ Diamond::parse($shareholding->pay_date)->thai_format('j F Y') }}</h3>
                     </div>
                     <!-- /.box-header -->
 
                     <div class="box-body">
-                        <button class="btn btn-primary btn-flat margin-b-sm" onclick="javascript:window.location.href='{{ url('/service/' . $member->id . '/loan/' . $loan->id . '/payment/billing/' . $payment->id . '/' . Diamond::parse($payment->pay_date)->format('Y-n-j')) }}';">
-                            <i class="fa fa-file-text-o"></i> ใบเสร็จรับเงินการชำระเงินกู้
+                        <button class="btn btn-primary btn-flat margin-b-sm" onclick="javascript:window.location.href='{{ action('Admin\ShareholdingController@getBilling', ['member_id'=>$member->id, 'paydate'=>Diamond::parse($shareholding->pay_date)->format('Y-n-1'), 'id'=>$shareholding->id]) }}';">
+                            <i class="fa fa-file-text-o"></i> ใบเสร็จรับเงินค่าหุ้น
                         </button>
 
-                        <button class="btn btn-primary btn-flat margin-b-sm pull-right" onclick="javascript:document.location = '{{ url('/service/' . $member->id . '/loan/' . $loan->id . '/payment/' . $payment->id . '/edit') }}';">
+                        <button class="btn btn-primary btn-flat margin-b-sm pull-right" onclick="javascript:document.location = '{{ action('Admin\ShareholdingController@edit', ['member_id'=>$member->id, 'id'=>$shareholding->id]) }}';">
                             <i class="fa fa-pencil"></i> แก้ไข
                         </button>
 
@@ -101,20 +67,24 @@
                             <table class="table" width="100%">
                                 <tbody>
                                     <tr>
-                                        <th style="width:20%; border-top: none;">วันที่ชำระ</th>
-                                        <td style="border-top: none;">{{ Diamond::parse($payment->pay_date)->thai_format('j M Y') }}</td>
+                                        <th style="width:30%; border-top: none;">วันที่ชำระ</th>
+                                        <td style="border-top: none;">{{ Diamond::parse($shareholding->pay_date)->thai_format('j M Y') }}</td>
                                     </tr>
                                     <tr>
-                                        <th>เงินต้น</th>
-                                        <td>{{ number_format($payment->principle, 2, '.', ',') }} บาท</td>
+                                        <th>ประเภท</th>
+                                        <td><span class="label label-primary">{{ $shareholding->shareholding_type->name }}</span></td>
                                     </tr>
                                     <tr>
-                                        <th>ดอกเบี้ย</th>
-                                        <td>{{ number_format($payment->interest, 2, '.', ',') }} บาท</td>
+                                        <th>จำนวน</th>
+                                        <td>{{ number_format($shareholding->amount, 2, '.', ',') }} บาท</td>
                                     </tr>
                                     <tr>
-                                        <th>รวม</th>
-                                        <td>{{ number_format($payment->principle + $payment->interest, 2, '.', ',') }} บาท</td>
+                                        <th>ทุนเรือนหุ้นสะสม ณ ขณะนั้น</th>
+                                        <td>{{ number_format($total_shareholding + $shareholding->amount, 2, '.', ',') }} บาท</td>
+                                    </tr>
+                                    <tr>
+                                        <th>หมายเหตุ</th>
+                                        <td>{{ !empty($share->remark) ? $shareholding->remark : '-' }}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -136,7 +106,7 @@
                     <!-- /.box-header -->
 
                     <div class="box-body">
-                        <input type="hidden" id="payment_id" value="{{ $payment->id }}" />
+                        <input type="hidden" id="shareholding_id" value="{{ $shareholding->id }}" />
                         <input type="file" id="attachment" class="file-upload" onchange="javascript:attachment(this);" />
                         <button class="btn btn-primary btn-flat margin-b-sm" onclick="javascript:$('#attachment').click();">
                             <i class="fa fa-plus-circle"></i> เพิ่มเอกสารแนบ
@@ -149,7 +119,7 @@
                                         <th style="width:80%; border-top: none;">เอกสารแนบ</td>
                                         <th style="width:20%; border-top: none;"><i class="fa fa-gear"></i></td>
                                     </tr>
-                                    @forelse ($payment->attachments as $attachment)
+                                    @forelse ($shareholding->attachments as $attachment)
                                         <tr id="item-{{ $attachment->id }}">
                                             <td><a href="{{ FileManager::get('attachments', $attachment->file) }}" target="_blank"><i class="fa fa-paperclip"></i> {{ $attachment->display }}</a></td>
                                             <td>
@@ -190,25 +160,34 @@
 @endsection
 
 @section('styles')
+    <!-- Bootstrap DataTable CSS -->
+    {!! Html::style(elixir('css/dataTables.bootstrap.css')) !!}
+
     @parent
 @endsection
 
 @section('scripts')
     @parent
 
+    <!-- Bootstrap DataTable JavaScript -->
+    {!! Html::script(elixir('js/moment.js')) !!}
+    {!! Html::script(elixir('js/jquery.dataTables.js')) !!}
+    {!! Html::script(elixir('js/dataTables.responsive.js')) !!}
+    {!! Html::script(elixir('js/dataTables.bootstrap.js')) !!}
+    
     <script>
     $(document).ready(function () {
         $.ajaxSetup({
             headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
         });
 
-        $('[data-tooltip="true"]').tooltip(); 
-    });   
+        $('[data-tooltip="true"]').tooltip();
+    });
     
 	function attachment(file) {
 		if (file.files && file.files[0]) {
 			let formData = new FormData();
-                formData.append('payment_id', $('#payment_id').val());
+                formData.append('shareholding_id', $('#shareholding_id').val());
                 formData.append('file', file.files[0]);
 
 			uploadfile(formData);
@@ -221,7 +200,7 @@
 	function uploadfile(formData) {
         $.ajax({
             dataType: 'json',
-            url: '/service/loan/payment/uploadfile',
+            url: '/service/shareholding/uploadfile',
             type: 'post',
             cache: false,
             data: formData,
@@ -261,7 +240,7 @@
 	function deletefile(id) {
         $.ajax({
             dataType: 'json',
-            url: '/service/loan/payment/deletefile',
+            url: '/service/shareholding/deletefile',
             type: "post",
             data: {
                 'id': id
@@ -283,5 +262,5 @@
             }
         });
 	}
-    </script>  
+    </script>
 @endsection

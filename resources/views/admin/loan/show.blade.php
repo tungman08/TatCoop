@@ -130,13 +130,14 @@
                         <thead>
                             <tr>
                                 <th style="width: 10%;">#</th>
-                                <th style="width: 30%;">วันที่ชำระ</th>
+                                <th style="width: 25%;">วันที่ชำระ</th>
                                 <th style="width: 20%;">เงินต้น</th>
                                 <th style="width: 20%;">ดอกเบี้ย</th>
                                 <th style="width: 20%;">รวม</th>
+								<th style="width: 5%;">&nbsp;</th>
                             </tr>
                         </thead>
-                        <tboby>
+                        <tbody>
                             @php($count = 0)
                             @foreach($loan->payments->sortByDesc('pay_date') as $payment)
                                 <tr onclick="javascript: document.location = '{{ url('/service/' . $member->id . '/loan/' . $loan->id . '/payment/' . $payment->id) }}';" style="cursor: pointer;">
@@ -145,6 +146,7 @@
                                     <td>{{ number_format($payment->principle, 2, '.', ',') }} บาท</td>
                                     <td>{{ number_format($payment->interest, 2, '.', ',') }} บาท</td>
                                     <td>{{ number_format($payment->principle + $payment->interest, 2, '.', ',') }} บาท</td>
+									<td>{!! ($payment->attachments->count() > 0) ? '<i class="fa fa-paperclip"></i>' : '&nbsp;' !!}</td>
                                 </tr>
                             @endforeach
                         </tbody>

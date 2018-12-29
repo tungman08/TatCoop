@@ -35,6 +35,7 @@
             {{ Form::text('start_date', null, [
                 'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
                 'autocomplete'=>'off',
+                'readonly'=>($edit) ? ($loantype->id == 1 || $loantype->id == 2) ? true : false : false,
                 'class'=>'form-control'])
             }}       
             <span class="input-group-addon">
@@ -52,6 +53,7 @@
             {{ Form::text('expire_date', null, [
                 'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
                 'autocomplete'=>'off',
+                'readonly'=>($edit) ? ($loantype->id == 1 || $loantype->id == 2) ? true : false : false,
                 'class'=>'form-control'])
             }}       
             <span class="input-group-addon">
@@ -60,26 +62,105 @@
             </span> 
         </div>
     </div>
+
     <div class="form-group">
-        {{ Form::label('salarytimes', 'กู้ได้ไม่เกิน', [
+        <div class="col-sm-2">&nbsp;</div>
+        <div class="col-sm-10">
+            <strong>เงื่อนไขเฉพาะพนักงาน/ลูกจ้าง ททท.</strong>
+        </div>
+    </div>
+
+    <div class="form-group">
+        {{ Form::label('employee_ratesalary', 'จำนวนเท่าเงินเดือนที่สามารถกู้ได้ (เท่า)', [
             'class'=>'col-sm-2 control-label']) 
         }}
 
-        <div class="col-sm-10 input-group" id="expire_date" style="padding: 0 5px;">
-            <div class="row">
-                <div class="col-sm-1">
-                    {{ Form::text('salarytimes', null, [
-                        'placeholder' => 'ตัวอย่าง: 10',
-                        'autocomplete'=>'off',
-                        'class'=>'form-control'])
-                    }}   
-                </div>
-                <div class="col-sm-11" style="padding-top: 7px;">เท่าของเงินเดือน</div>
-            </div>
+        <div class="col-sm-10">
+            {{ Form::text('employee_ratesalary', null, [
+                'placeholder' => 'ตัวอย่าง: 40',
+                'autocomplete'=>'off',
+                'class'=>'form-control'])
+            }}
         </div>
     </div>
     <div class="form-group">
-        {{ Form::label('limits', 'เงื่อนไขอื่นๆ', [
+        {{ Form::label('employee_netsalary', 'เงินเดือนสุทธิต่ำสุดเมื่อหักค่างวดแล้ว', [
+            'class'=>'col-sm-2 control-label']) 
+        }}
+
+        <div class="col-sm-10">
+            {{ Form::text('employee_netsalary', null, [
+                'placeholder' => 'ตัวอย่าง: 3000',
+                'autocomplete'=>'off',
+                'class'=>'form-control'])
+            }}
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-sm-2">&nbsp;</div>
+        <div class="col-sm-10">
+            <strong>เงื่อนไขเฉพาะบุคคลภายนอก</strong>
+        </div>
+    </div>
+
+    <div class="form-group">
+        {{ Form::label('outsider_rateshareholding', 'จำนวนหุ้นที่ต้องใช้ (%)', [
+            'class'=>'col-sm-2 control-label']) 
+        }}
+
+        <div class="col-sm-10">
+            {{ Form::text('outsider_rateshareholding', ($edit) ? $loantype->outsider_rateshareholding * 100 : null, [
+                'placeholder' => 'ตัวอย่าง: 80',
+                'autocomplete'=>'off',
+                'class'=>'form-control'])
+            }}
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-sm-2">&nbsp;</div>
+        <div class="col-sm-10">
+            <strong>เงื่อนไขอื่นๆ</strong>
+        </div>
+    </div>
+
+    @if (!$edit)
+        <div class="form-group">
+            {{ Form::label('max_loansummary', 'ผลรวมยอดเงินกู้ทุกประเภทสูงสุด', [
+                'class'=>'col-sm-2 control-label']) 
+            }}
+
+            <div class="col-sm-10">
+                {{ Form::text('max_loansummary', null, [
+                    'placeholder' => 'ตัวอย่าง: 1000000',
+                    'autocomplete'=>'off',
+                    'class'=>'form-control'])
+                }}
+            </div>
+        </div>
+    @else
+        @if ($loantype->id != 2)
+            <div class="form-group">
+                {{ Form::label('max_loansummary', 'ผลรวมยอดเงินกู้ทุกประเภทสูงสุด', [
+                    'class'=>'col-sm-2 control-label']) 
+                }}
+
+                <div class="col-sm-10">
+                    {{ Form::text('max_loansummary', null, [
+                        'placeholder' => 'ตัวอย่าง: 1000000',
+                        'autocomplete'=>'off',
+                        'class'=>'form-control'])
+                    }}
+                </div>
+            </div>
+        @else
+            {{ Form::hidden('max_loansummary', 0) }}
+        @endif
+    @endif
+
+    <div class="form-group">
+        {{ Form::label('limits', 'เงื่อนไขขอบเขต', [
             'class'=>'col-sm-2 control-label']) 
         }}
 

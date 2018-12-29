@@ -47,9 +47,10 @@
                             <tr>
                                 <th style="width: 10%;">รหัสสมาชิก</th>
                                 <th style="width: 20%;">ชื่อสมาชิก</th>
-                                <th style="width: 20%;">ประเภทสมาชิก</th>
-                                <th style="width: 25%;">จำนวนหุ้นที่ค้ำประกันตนเอง</th>
-                                <th style="width: 25%;">จำนวนหุ้นที่ค้ำประกันผู้อื่น</th>
+                                <th style="width: 15%;">ประเภทสมาชิก</th>
+                                <th style="width: 20%;">จำนวนหุ้นที่ค้ำประกันตนเอง</th>
+                                <th style="width: 20%;">จำนวนหุ้นที่ค้ำประกันผู้อื่น</th>
+								<th style="width: 15%;">สถานะการค้ำประกันผู้อื่น</th>
                             </tr>
                         </thead>
                     </table>
@@ -115,7 +116,8 @@
                 { "data": "fullname" },
                 { "data": "typename" },
                 { "data": "yourself" },
-                { "data": "other" }
+                { "data": "other" },
+				{ "data": "status" }
             ]
         });   
 

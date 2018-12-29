@@ -53,7 +53,8 @@
 
        <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title"><i class="fa fa-credit-card"></i> สัญญาเงินกู้ที่ใช้ประเภทเงินกู้นี้</h3>
+                @php($count = $loantype->loans->filter(function ($value, $key) { return !empty($value->code) && empty($value->completed_at); })->count())
+                <h3 class="box-title"><i class="fa fa-credit-card"></i> สัญญาเงินกู้ที่ใช้ประเภทเงินกู้นี้ @if ($count > 0) (กำลังผ่อนชำระจำนวน {{ number_format($count, 0, '.', ',') }} สัญญา) @endif</h3>
                 <div class="btn-group pull-right">
                     <button type="button" class="btn btn-default btn-flat btn-xs"
                         onclick="javascript:window.location.href='{{ url('/admin/loantype/' . $loantype->id . '/finished') }}';">

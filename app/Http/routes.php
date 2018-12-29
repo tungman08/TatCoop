@@ -37,7 +37,7 @@ Route::group(['domain' => 'www.' . env('APP_DOMAIN'),
     });
 
     // Member Shareholding Billing Route...
-    Route::group(['prefix' => '/member/{id}/shareholding/billing/{date}'], function() {
+    Route::group(['prefix' => '/member/{id}/shareholding/{shareholding_id}/billing/{date}'], function() {
         Route::get('/print', ['as' => 'website.member.shareholding.billing.print', 'uses' => 'MemberController@getPrintShareholdingBilling']);
         Route::get('/pdf', ['as' => 'website.member.shareholding.billing.pdf', 'uses' => 'MemberController@getPdfShareholdingBilling']);
         Route::get('/', ['as' => 'website.member.shareholding.billing', 'uses' => 'MemberController@getShareholdingBilling']);
@@ -45,6 +45,7 @@ Route::group(['domain' => 'www.' . env('APP_DOMAIN'),
 
     // Member Shareholding Route...
     Route::group(['prefix' => '/member/{id}/shareholding'], function() {
+		Route::get('/{month}', ['as' => 'website.member.shareholding.show', 'uses' => 'MemberController@getShowShareholding']);
         Route::get('/', ['as' => 'website.member.shareholding', 'uses' => 'MemberController@getShareholding']);
     });
 
@@ -157,12 +158,16 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
         // Share Holding Route...
         Route::get('shareholding/member', ['as' => 'service.shareholding.member', 'uses' => 'ShareholdingController@getMember']);
         Route::get('shareholding/{member_id}/{paydate}/show', ['as' => 'service.shareholding.show', 'uses' => 'ShareholdingController@getShow']);
-        Route::get('shareholding/{member_id}/{paydate}/billing', ['as' => 'service.shareholding.billing', 'uses' => 'ShareholdingController@getBilling']);
-        Route::get('shareholding/{member_id}/{paydate}/print', ['as' => 'service.shareholding.print', 'uses' => 'ShareholdingController@getPrintBilling']);
-        Route::get('shareholding/{member_id}/{paydate}/pdf', ['as' => 'service.shareholding.pdf', 'uses' => 'ShareholdingController@getPdfBilling']);
+        Route::get('shareholding/{member_id}/{paydate}/detail/{id}', ['as' => 'service.shareholding.detail', 'uses' => 'ShareholdingController@getDetail']);
+        Route::get('shareholding/{member_id}/{paydate}/billing/{id}', ['as' => 'service.shareholding.billing', 'uses' => 'ShareholdingController@getBilling']);
+        Route::get('shareholding/{member_id}/{paydate}/print/{id}', ['as' => 'service.shareholding.print', 'uses' => 'ShareholdingController@getPrintBilling']);
+        Route::get('shareholding/{member_id}/{paydate}/pdf/{id}', ['as' => 'service.shareholding.pdf', 'uses' => 'ShareholdingController@getPdfBilling']);
         Route::get('shareholding/autoshareholding', ['as' => 'service.shareholding.auto', 'uses' => 'ShareholdingController@getAutoShareholding']);
         Route::post('shareholding/autoshareholding', 'ShareholdingController@postAutoShareholding');
-        Route::resource('{member_id}/shareholding', 'ShareholdingController');
+		Route::post('shareholding/showfiles', 'ShareholdingController@postShowFiles');
+        Route::post('shareholding/uploadfile', 'ShareholdingController@postUploadFile');
+		Route::post('shareholding/deletefile', 'ShareholdingController@postDeleteFile');
+        Route::resource('{member_id}/shareholding', 'ShareholdingController', ['except' => [ 'show' ]]);
 
         // Loan Route...
         Route::get('loan/member', ['as' => 'service.loan.member', 'uses' => 'LoanController@getMember']);
@@ -190,6 +195,8 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
         // Payment Route...
         Route::get('loan/autopayment', ['as' => 'service.payment.auto', 'uses' => 'PaymentController@getAutoPayment']);
         Route::post('loan/autopayment', 'PaymentController@postAutoPayment');
+        Route::post('loan/payment/uploadfile', 'PaymentController@postUploadFile');
+		Route::post('loan/payment/deletefile', 'PaymentController@postDeleteFile');
         Route::group(['prefix' => '{member_id}/loan/{loan_id}'], function () {
             Route::get('payment/calculate', ['as' => 'service.payment.calculate', 'uses' => 'PaymentController@getCalculate']);
             Route::get('payment/close', ['as' => 'service.payment.close', 'uses' => 'PaymentController@getClose']);
@@ -229,6 +236,9 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
         Route::post('loantype/{id}/forcedelete', 'LoanTypeController@postForceDelete');
         Route::post('loantype/{id}/restore', 'LoanTypeController@postRestore');       
         Route::resource('loantype', 'LoanTypeController');
+
+        // Bailsman Route...
+        Route::resource('bailsman', 'BailsmanController', ['only' => [ 'index', 'edit', 'update' ]]);
 
         // Active Loan Route...
         Route::resource('activeloan', 'ActiveloanController', ['only' => [ 'index' ]]);

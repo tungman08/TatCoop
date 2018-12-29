@@ -54,7 +54,7 @@
                         </tr>
                         <tr>
                             <th>วันที่กู้:</th>
-                            <td>{{ Diamond::parse($loan->loaned_at)->thai_format('Y-m-d') }}</td>
+                            <td>{{ Diamond::parse($loan->loaned_at)->thai_format('j F Y') }}</td>
                         </tr>
                         <tr>
                             <th>จำนวนเงินที่กู้:</th>
@@ -63,6 +63,10 @@
                         <tr>
                             <th>จำนวนเงินต้นที่ชำระแล้ว:</th>
                             <td>{{ number_format($loan->payments->sum('principle'), 2, '.', ',') }} บาท</td>
+                        </tr>
+                        <tr>
+                            <th>คงเหลือ</th>
+                            <td>{{ number_format($loan->outstanding - $loan->payments->sum('principle'), 2, '.', ',') }} บาท</td>
                         </tr>
                     </table>
                 </div>

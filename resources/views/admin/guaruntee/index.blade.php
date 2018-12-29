@@ -83,8 +83,9 @@
                         <thead>
                             <tr>
                                 <th style="width: 10%;">#</th>
-                                <th style="width: 15%;">เลขที่สัญญา</th>
-                                <th style="width: 25%;">ชื่อผู้กู้</th>
+                                <th style="width: 10%;">เลขที่สัญญา</th>
+                                <th style="width: 20%;">ชื่อผู้กู้</th>
+								<th style="width: 10%;">ค้ำประกันตนเอง</th>
                                 <th style="width: 10%;">วันที่กู้</th>
                                 <th style="width: 15%;">วงเงินที่กู้</th>
                                 <th style="width: 15%;">จำนวนหุ้นที่ค้ำประกันคงเหลือ</th>
@@ -98,6 +99,7 @@
                                     <td>{{ ++$count }}</td>
                                     <td class="text-primary"><i class="fa fa-file-text-o fa-fw"></i> {{ $loan->code }}</td>
                                     <td>{{ $loan->member->profile->fullName }}</td>
+									<td>{!! ($member->id == $loan->member->id) ? '<i class="fa fa-check-circle"></i>' : '&nbsp;' !!}</td>
                                     <td>{{ Diamond::parse($loan->loaned_at)->thai_format('Y-m-d') }}</td>
                                     <td>{{ number_format($loan->outstanding, 2, '.', ',') }}</td>
                                     <td>{{ number_format(LoanCalculator::surety_balance($loan), 2, '.', ',') . '/' .number_format($loan->pivot->amount, 2, '.', ',') }} บาท</td>

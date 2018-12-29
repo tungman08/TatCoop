@@ -22,7 +22,7 @@
 
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title">รายละเอียดข้อมูลทุนเรือนหุ้น</h3>
+                <h3 class="box-title">รายละเอียดข้อมูลทุนเรือนหุ้น (ทุนเรือนหุ้นสะสม {{ number_format($shareholdings->sum('amount') + $shareholdings->sum('amount_cash'), 2, '.', ',') }} บาท)</h3>
             </div>
             <!-- /.box-header -->
 
@@ -36,24 +36,20 @@
                                 <th style="width: 18%;">ค่าหุ้นปกติ</th>
                                 <th style="width: 18%;">ค่าหุ้นเงินสด</th>
                                 <th style="width: 18%;">รวมเป็นเงิน</th>
-                                <th style="width: 18%;">ใบรับเงินค่าหุ้น</th>
+                                <th style="width: 18%;">ทุนเรือนทุ้นสะสม</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @eval($count = 0)
+                            @php($count = 0)
                             @foreach($shareholdings->sortByDesc('name') as $share)
                                 @php($date = Diamond::parse($share->name))
-                                <tr>
-                                    <td>{{ ++$count }}</td>
+                                <tr onclick="javascript: document.location = '{{ action('Website\MemberController@getShowShareholding', ['id'=>$member->id, 'month'=>$date->format('Y-n-1')]) }}';" style="cursor: pointer;">
+                                    <td>{{ ++$count }}.</td>
                                     <td class="text-primary"><i class="fa fa-money fa-fw"></i> {{ $date->thai_format('F Y') }}</td>
                                     <td>{{ number_format($share->amount, 2, '.', ',') }} บาท</td>
                                     <td>{{ number_format($share->amount_cash, 2, '.', ',') }} บาท</td>
                                     <td>{{ number_format($share->amount + $share->amount_cash, 2, '.', ',') }} บาท</td>
-                                    <td>
-                                        @if (Diamond::parse($share->name)->gte(Diamond::create(2016, 1, 1, 0, 0, 0)))
-                                            <a href="/member/{{ $member->id }}/shareholding/billing/{{ $date->endOfMonth()->format('Y-m-d') }}"><i class="fa fa-file-o"></i> ใบรับเงินค่าหุ้น</a>
-                                        @endif
-                                    </td>
+									<td>{{ number_format($share->total_shareholding + $share->amount + $share->amount_cash, 2, '.', ',') }} บาท</td>
                                 </tr>
                             @endforeach
                         </tbody>

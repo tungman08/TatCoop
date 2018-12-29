@@ -60,7 +60,7 @@
                             </tr>
                             <tr>
                                 <th class="block">หน่วยงาน:</th>
-                                <td class="block">สหกรณ์การท่องเที่ยว</td>
+                                <td class="block">สอ.สรทท.</td>
                             </tr>
                         </table>
                     </div>
@@ -70,8 +70,8 @@
                     <div class="table-responsive" style="border: 1px solid #ddd;">
                         <table class="table table-bordered" style="margin-bottom: 0px;">
                             <tr>
-                                <th class="block">วันที่:</th>
-                                <td class="block">{{ $date->thai_format('d/m/Y') }}</td>
+                                <th class="block">วันที่ชำระ:</th>
+                                <td class="block">{{ Diamond::parse($shareholding->pay_date)->thai_format('d/m/Y') }}</td>
                             </tr>
                             <tr>
                                 <th class="block">เลขทะเบียน:</th>
@@ -79,7 +79,7 @@
                             </tr>
                             <tr>
                                 <th class="block">ทุนเรือนหุ้นสะสม:</th>
-                                <td class="block">{{ number_format($total_shareholding, 2,'.', ',') }}</td>
+                                <td class="block">{{ number_format($total_shareholding + $shareholding->amount, 2,'.', ',') }}</td>
                             </tr>
                         </table>
                     </div>
@@ -102,22 +102,18 @@
                         </thead>
                         <tfoot>
                             <tr>
-                                <td colspan="2">{{ Number::toBaht($shareholdings->sum('amount')) }}</td>
-                                <td class="text-right">{{ number_format($shareholdings->sum('amount'), 2,'.', ',') }}</td>
+                                <td colspan="2">{{ Number::toBaht($shareholding->amount) }}</td>
+                                <td class="text-right">{{ number_format($shareholding->amount, 2,'.', ',') }}</td>
                                 <td>&nbsp;</td>
                             </tr>
                         </tfoot>
                         <tbody>
-                            @eval($result = $total_shareholding - $shareholdings->sum('amount'))
-                            @foreach($shareholdings as $share)
-                                @eval($result += $share->amount)
-                                <tr>
-                                    <td>รับ{{ $share->shareholding_type->name }}</td>
-                                    <td class="text-center">{{ $date->thai_format('m/y') }}</td>
-                                    <td class="text-right">{{ number_format($share->amount, 2,'.', ',') }}</td>
-                                    <td class="text-right">{{ number_format($result, 2,'.', ',') }}</td>
-                                </tr>
-                            @endforeach
+                            <tr>
+                                <td>รับ{{ $shareholding->shareholding_type->name }}</td>
+                                <td class="text-center">{{ Diamond::parse($shareholding->pay_date)->thai_format('m/y') }}</td>
+                                <td class="text-right">{{ number_format($shareholding->amount, 2,'.', ',') }}</td>
+                                <td class="text-right">{{ number_format($total_shareholding + $shareholding->amount, 2,'.', ',') }}</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

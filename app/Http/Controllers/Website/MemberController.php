@@ -62,34 +62,34 @@ class MemberController extends Controller
    /**
     * Responds to requests to GET /member
     */
-    public function show($id) {
+   public function show($id) {
         $member = Member::find($id);
 
         return view('website.member.show', [
             'member' => $member,
             'histories' => Member::where('profile_id', $member->profile_id)->get(),
         ]);
-    }
+   }
 
-    /**
-     * Responds to requests to GET /member/edit
-     */
-     public function edit($id) {
-        $member = Member::find(Auth::user()->member_id);
-        $provinces = Province::orderBy('name')->get();
-        $districts = District::where('province_id', $member->profile->province_id)->orderBy('name')->get();
-        $subdistricts = Subdistrict::where('district_id', $member->profile->district_id)->orderBy('name')->get();
+   /**
+    * Responds to requests to GET /member/edit
+    */
+   public function edit($id) {
+		$member = Member::find(Auth::user()->member_id);
+		$provinces = Province::orderBy('name')->get();
+		$districts = District::where('province_id', $member->profile->province_id)->orderBy('name')->get();
+		$subdistricts = Subdistrict::where('district_id', $member->profile->district_id)->orderBy('name')->get();
 
-         return view('website.member.edit', [
-            'member' => $member,
-            'prefixs' => Prefix::all(),
-            'provinces' => $provinces,
-            'districts' => $districts,
-            'subdistricts' => $subdistricts,
-         ]);
-     }
+		return view('website.member.edit', [
+			'member' => $member,
+			'prefixs' => Prefix::all(),
+			'provinces' => $provinces,
+			'districts' => $districts,
+			'subdistricts' => $subdistricts,
+		]);
+   }
 
-     public function update($id, Request $request) {
+   public function update($id, Request $request) {
         $rules = [
             'profile.birth_date' => 'required|date_format:Y-m-d', 
             'profile.address' => 'required', 
@@ -127,15 +127,17 @@ class MemberController extends Controller
                 ->with('flash_message', 'แก้ไขข้อมูลเรียบร้อยแล้ว')
                 ->with('callout_class', 'callout-success');
         }
-     }
+   }
 
-     public function getShareholding($id) {
+   public function getShareholding($id) {
         $member = Member::find($id);
         $shareholdings = Shareholding::where('member_id', $member->id)
             ->select(
+                DB::raw('concat(year(pay_date), \'-\', month(pay_date), \'-1\') as paydate'),
                 DB::raw('str_to_date(concat(\'1/\', month(pay_date), \'/\', year(pay_date)), \'%d/%m/%Y\') as name'),
                 DB::raw('(sum(if(member_id = ' . $member->id . ' and shareholding_type_id = 1, amount, 0))) as amount'),
-                DB::raw('(sum(if(member_id = ' . $member->id . ' and shareholding_type_id = 2, amount, 0))) as amount_cash'))
+                DB::raw('(sum(if(member_id = ' . $member->id . ' and shareholding_type_id = 2, amount, 0))) as amount_cash'),
+                DB::raw('(select sum(s.amount) from shareholdings s where s.member_id = ' . $member->id . ' and s.pay_date < paydate) as total_shareholding'))
             ->groupBy(DB::raw('year(pay_date)'), DB::raw('month(pay_date)'))
             ->get();
 
@@ -143,9 +145,36 @@ class MemberController extends Controller
             'member' => $member,
             'shareholdings' => $shareholdings
         ]);
-     }
+   }
 
-     public function getLoan($id) {
+      public function getShowShareholding($id, $month) {
+        $pay_date = Diamond::parse($month);
+		$shareholdings = Shareholding::join('shareholding_types', 'shareholdings.shareholding_type_id', '=', 'shareholding_types.id')
+			->leftJoin('shareholding_attachments', 'shareholdings.id', '=', 'shareholding_attachments.shareholding_id')
+			->where('shareholdings.member_id', $id)
+			->whereYear('shareholdings.pay_date', '=', $pay_date->year)
+			->whereMonth('shareholdings.pay_date', '=', $pay_date->month)
+			->select(
+				'shareholdings.id as id',
+				DB::raw('shareholdings.pay_date as paydate'),
+				DB::raw('shareholding_types.name as shareholding_type_name'),
+				DB::raw('shareholdings.amount as amount'),
+				DB::raw('(select sum(s.amount) from shareholdings s where s.member_id = ' . $id . ' and s.pay_date < shareholdings.pay_date and s.id < shareholdings.id) as total_shareholding'),
+				DB::raw('case when shareholding_attachments.id is not null > 0 then \'<i class="fa fa-paperclip"></i>\' else \'&nbsp;\' end as attachment'))
+			->get();
+		$total_shareholding = Shareholding::where('member_id', $id)
+			->whereDate('pay_date', '<', $pay_date)
+			->sum('amount');
+
+        return view('website.member.showshareholding', [
+            'member' => Member::find($id),
+            'shareholding_date' => $pay_date,
+            'shareholdings' => $shareholdings,
+			'total_shareholding' => $total_shareholding
+        ]);
+   }
+
+   public function getLoan($id) {
         $member = Member::find($id);
 
         return view('website.member.loan', [
@@ -153,9 +182,9 @@ class MemberController extends Controller
             'loans' => Loan::where('member_id', $member->id)->whereNotNull('code')->orderBy('id', 'desc')->get(),
             'loantypes' => LoanType::active()->get()
         ]);
-     }
+   }
 
-     public function getShowLoan($id, $loan_id) {
+   public function getShowLoan($id, $loan_id) {
         $member = Member::find($id);
         $loan = Loan::find($loan_id);
 
@@ -163,9 +192,9 @@ class MemberController extends Controller
             'member' => $member,
             'loan' => $loan,  
         ]);
-     }
+   }
 
-     public function getDividend($id) {
+   public function getDividend($id) {
         $member = Member::find($id);
         $dividend_years = Dividend::all();
 
@@ -176,85 +205,75 @@ class MemberController extends Controller
                 ->where('member_id', $member->id)
                 ->get()
         ]);
-     }
+   }
 
-     public function getGuaruntee($id) {
+   public function getGuaruntee($id) {
         $member = Member::find($id);
 
         return view('website.member.guaruntee', [
             'member' => $member
         ]);
-     }
+   }
 
-     public function getShareholdingBilling($id, $date) {
-        $billdate = Diamond::parse($date);
-        $member = Member::find($id);
-        $shareholdings = Shareholding::where('member_id', $member->id)
-            ->whereYear('pay_date', '=', $billdate->year)
-            ->whereMonth('pay_date', '=', $billdate->month)
-            ->get();
-        $total_shareholding = $shareholdings->sum('amount');
+   public function getShareholdingBilling($id, $shareholding_id, $date) {
+        $pay_date = Diamond::parse($date);
+		$shareholding = Shareholding::find($shareholding_id);
+		$total_shareholding = Shareholding::where('member_id', $id)
+			->where('id', '<', $shareholding_id)
+			->whereDate('pay_date', '<', $shareholding->pay_date)
+			->sum('amount');
 
         return view('website.member.shareholding.billing', [
-            'member' => $member,
-            'billing' => Billing::latest()->first(),
-            'shareholdings' => $shareholdings,
+            'member' => Member::find($id),
+            'shareholding' => $shareholding,
             'total_shareholding' => $total_shareholding,
-            'billno' => $billdate->thai_format('Y') . str_pad($shareholdings->max('id'), 8, '0', STR_PAD_LEFT),
-            'date' => $billdate
+            'billno' => Diamond::parse($shareholding->pay_date)->thai_format('Y') . str_pad($shareholding->id, 8, '0', STR_PAD_LEFT),
+			'billing' => Billing::latest()->first()
         ]);
-     }
+   }
 
-     public function getPrintShareholdingBilling($id, $date) {
-        $billdate = Diamond::parse($date);
-        $member = Member::find($id);
-        $shareholdings = Shareholding::where('member_id', $member->id)
-            ->whereYear('pay_date', '=', $billdate->year)
-            ->whereMonth('pay_date', '=', $billdate->month)
-            ->get();
-        $total_shareholding = Shareholding::where('member_id', $member->id)
-            ->where('pay_date', '<=', $billdate)
-            ->sum('amount');
+   public function getPrintShareholdingBilling($id, $shareholding_id, $date) {
+        $pay_date = Diamond::parse($date);
+		$shareholding = Shareholding::find($shareholding_id);
+		$total_shareholding = Shareholding::where('member_id', $id)
+			->where('id', '<', $shareholding_id)
+			->whereDate('pay_date', '<', $shareholding->pay_date)
+			->sum('amount');
 
         History::addUserHistory(Auth::guard()->id(), 'นำข้อมูลออก', 'นำข้อมูลใบเสร็จออกจากระบบ');
 
         return view('website.member.shareholding.print', [
-            'member' => $member,
-            'billing' => Billing::latest()->first(),
-            'shareholdings' => $shareholdings,
+            'member' => Member::find($id),
+            'shareholding' => $shareholding,
             'total_shareholding' => $total_shareholding,
-            'billno' => $billdate->thai_format('Y') . str_pad($shareholdings->max('id'), 8, '0', STR_PAD_LEFT),
-            'date' => $billdate
+            'billno' => Diamond::parse($shareholding->pay_date)->thai_format('Y') . str_pad($shareholding->id, 8, '0', STR_PAD_LEFT),
+			'billing' => Billing::latest()->first()
         ]);
-     }
+   }
 
-     public function getPdfShareholdingBilling($id, $date) {
-        $billdate = Diamond::parse($date);
-        $member = Member::find($id);
-        $shareholdings = Shareholding::where('member_id', $member->id)
-            ->whereYear('pay_date', '=', $billdate->year)
-            ->whereMonth('pay_date', '=', $billdate->month)
-            ->get();
-        $total_shareholding = Shareholding::where('member_id', $member->id)
-            ->where('pay_date', '<=', $billdate)
-            ->sum('amount');
+   public function getPdfShareholdingBilling($id, $shareholding_id, $date) {
+        $pay_date = Diamond::parse($date);
+		$shareholding = Shareholding::find($shareholding_id);
+		$total_shareholding = Shareholding::where('member_id', $id)
+			->where('id', '<', $shareholding_id)
+			->whereDate('pay_date', '<', $shareholding->pay_date)
+			->sum('amount');
 
         $data = [
-            'member' => $member,
-            'billing' => Billing::latest()->first(),
-            'shareholdings' => $shareholdings,
+            'member' => Member::find($id),
+            'shareholding' => $shareholding,
             'total_shareholding' => $total_shareholding,
-            'billno' => $billdate->thai_format('Y') . str_pad($shareholdings->max('id'), 8, '0', STR_PAD_LEFT),
-            'date' => $billdate
+            'billno' => Diamond::parse($shareholding->pay_date)->thai_format('Y') . str_pad($shareholding->id, 8, '0', STR_PAD_LEFT),
+			'billing' => Billing::latest()->first()
         ];
 
         History::addUserHistory(Auth::guard()->id(), 'นำข้อมูลออก', 'นำข้อมูลใบเสร็จออกจากระบบ');
 
         return PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])
-            ->loadView('website.member.shareholding.pdf', $data)->download('ใบเสร็จรับเงินค่าหุ้นเดือน-' . $billdate->thai_format('M-Y') . '.pdf');
-     }
+            ->loadView('website.member.shareholding.pdf', $data)->download('ใบเสร็จรับเงินค่าหุ้นเดือน-' . Diamond::parse($shareholding->pay_date)->thai_format('M-Y') . '.pdf');
+   }
 
-     public function getLoanBilling($id, $loan_id, $payment_id, $date) {
+   public function getLoanBilling($id, $loan_id, $payment_id, $date) {
         $billdate = Diamond::parse($date);
         $member = Member::find($id);
         $loan = Loan::find($loan_id);
@@ -268,9 +287,9 @@ class MemberController extends Controller
             'billno' => $billdate->thai_format('Y') . str_pad($payment->loan->id, 8, '0', STR_PAD_LEFT),
             'date' => $billdate
         ]);
-     }
+   }
 
-     public function getPrintLoanBilling($id, $loan_id, $payment_id, $date) {
+   public function getPrintLoanBilling($id, $loan_id, $payment_id, $date) {
         $billdate = Diamond::parse($date);
         $member = Member::find($id);
         $loan = Loan::find($loan_id);
@@ -286,9 +305,9 @@ class MemberController extends Controller
             'billno' => $billdate->thai_format('Y') . str_pad($payment->loan->id, 8, '0', STR_PAD_LEFT),
             'date' => $billdate
         ]);
-     }
+   }
 
-     public function getPdfLoanBilling($id, $loan_id, $payment_id, $date) {
+   public function getPdfLoanBilling($id, $loan_id, $payment_id, $date) {
         $billdate = Diamond::parse($date);
         $member = Member::find($id);
         $loan = Loan::find($loan_id);
@@ -307,5 +326,5 @@ class MemberController extends Controller
 
         return PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])
             ->loadView('website.member.loan.pdf', $data)->download('ใบเสร็จรับเงินค่างวด สัญญาเลขที่ ' . $loan->code . ' เดือน-' . $billdate->thai_format('M-Y') . '.pdf');
-     }
+   }
 }

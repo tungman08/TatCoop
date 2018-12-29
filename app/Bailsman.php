@@ -4,14 +4,14 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class EmployeeType extends Model
+class Bailsman extends Model
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-	protected $table = 'employee_types';
+    protected $table = 'bailsmans';
 
     /**
      * The attributes that are mass assignable.
@@ -19,7 +19,7 @@ class EmployeeType extends Model
      * @var array
      */
     protected $fillable = [
-        'name',
+        'employee_type_id', 'self_type', 'self_rate', 'self_maxguaruntee', 'self_netsalary', 'other_type', 'other_rate', 'other_maxguaruntee', 'other_netsalary'
     ];
 
     /**
@@ -30,16 +30,10 @@ class EmployeeType extends Model
     protected $dates = ['created_at', 'updated_at'];
 
     /**
-     * Get the employees for the type.
+     * Get the employee type that owns the bailsman.
      */
-    public function employees() {
-        return $this->hasMany(Employee::class);
-    } 
-    
-    /**
-     * Get the bailsman associated with the type.
-     */
-    public function bailsman() {
-        return $this->hasOne(Bailsman::class);
-    } 
+    public function employeeType()
+    {
+        return $this->belongsTo(EmployeeType::class);
+    }
 }

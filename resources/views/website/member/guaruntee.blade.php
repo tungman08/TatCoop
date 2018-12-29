@@ -42,8 +42,9 @@
                             </tr>
                         </thead>
                         <tbody>
+							@php($loans = $member->sureties->filter(function ($value, $key) { return !is_null($value->code) && is_null($value->completed_at); }))
                             @php($count = 0)
-                            @foreach($member->sureties->filter(function ($value, $key) { return !is_null($value->code) && is_null($value->completed_at); }) as $loan)
+                            @foreach($loans as $loan)
                                 @if ($loan->member->id <> $member->id)
                                     <tr>
                                         <td>{{ ++$count }}</td>

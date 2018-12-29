@@ -11,7 +11,8 @@
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
             ['item' => 'จัดการทุนเรือนหุ้น', 'link' => '/service/shareholding/member'],
             ['item' => 'ทุนเรือนหุ้น', 'link' => '/service/' . $member->id . '/shareholding'],
-            ['item' => 'รายละเอียด', 'link' => '/service/shareholding/' . $member->id . '/' . $shareholding->pay_date->year . '-' . $shareholding->pay_date->month . '-1' . '/editlist'],
+            ['item' => Diamond::parse($shareholding->pay_date)->thai_format('M Y'), 'link' => action('Admin\ShareholdingController@getShow', ['member_id'=>$member->id, 'paydate'=>Diamond::parse($shareholding->pay_date)->format('Y-n-1')])],
+            ['item' => 'รายละเอียด', 'link' => action('Admin\ShareholdingController@getDetail', ['member_id'=>$member->id, 'paydate'=>Diamond::parse($shareholding->pay_date)->format('Y-n-1'), 'id'=>$shareholding->id])],
             ['item' => 'แก้ไข', 'link' => ''],
         ]])
 

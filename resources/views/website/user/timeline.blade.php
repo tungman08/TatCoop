@@ -3,7 +3,7 @@
     @foreach($histories as $history)
         <!-- timeline time label -->
         <li class="time-label">
-            <span class="bg-red">{{ Diamond::parse($history->date)->thai_format('Y-m-d') }}</span>
+            <span class="bg-red">{{ Diamond::parse($history->date)->thai_format('j M Y') }}</span>
         </li>
         <!-- /.timeline-label -->
 
@@ -13,13 +13,13 @@
                 <i class="fa {{ $item->history_type->icon }} {{ $item->history_type->color }}"></i>
                 @if (is_null($item->description))
                     <div class="timeline-item">
-                        <span class="time"><i class="fa fa-clock-o"></i> {{ (Diamond::today()->diff(Diamond::parse($item->created_at))->days > 1) ? Diamond::parse($item->created_at)->thai_format('Y-m-d') : Diamond::parse($item->created_at)->thai_diffForHumans() }}</span>
+                        <span class="time"><i class="fa fa-clock-o"></i> {{ (Diamond::today()->diff(Diamond::parse($item->created_at))->days > 1) ? Diamond::parse($item->created_at)->thai_format('j M Y') : Diamond::parse($item->created_at)->thai_diffForHumans() }}</span>
 
                         <h3 class="timeline-header no-border">{{ $item->history_type->name }}</h3>
                     </div>
                 @else
                     <div class="timeline-item">
-                        <span class="time"><i class="fa fa-clock-o"></i> {{ (Diamond::today()->diff(Diamond::parse($item->created_at))->days > 1) ? Diamond::parse($item->created_at)->thai_format('Y-m-d') : Diamond::parse($item->created_at)->thai_diffForHumans() }}</span>
+                        <span class="time"><i class="fa fa-clock-o"></i> {{ (Diamond::today()->diff(Diamond::parse($item->created_at))->days > 1) ? Diamond::parse($item->created_at)->thai_format('j M Y') : Diamond::parse($item->created_at)->thai_diffForHumans() }}</span>
 
                         <h3 class="timeline-header">{{ $item->history_type->name }}</h3>
 

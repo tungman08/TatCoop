@@ -93,7 +93,7 @@
             <!-- /.box-header -->
 
             <!-- form start -->
-            {{ Form::open(['url' => '/service/' . $member->id . '/loan/' . $loan->id . '/payment', 'method' => 'post', 'class' => 'form-horizontal']) }}
+            {{ Form::open(['url' => '/service/' . $member->id . '/loan/' . $loan->id . '/payment', 'method' => 'post', 'class' => 'form-horizontal', 'enctype'=>'multipart/form-data']) }}
                 <div class="box-body">
                     <div class="form-group">
                         {{ Form::label('pay_date', 'วันที่ชำระ', [
@@ -164,6 +164,16 @@
                                 'onkeypress' => 'javascript:return isNumberKey(event);'])
                             }}        
                         </div>
+                    </div>
+                    <hr />
+                    <div class="form-group">
+                        {{ Form::label('attachment', 'เอกสารแนบ', [
+                            'class'=>'col-sm-2 control-label']) 
+                        }}
+                        {{ Form::file ('attachment', [
+                                'class'=>'form-control-file',
+                                'style'=>'padding-top: 7px'])
+                        }} 
                     </div>
                 </div>
                 <!-- /.box-body -->

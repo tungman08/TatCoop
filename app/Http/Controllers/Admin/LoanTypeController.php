@@ -48,7 +48,10 @@ class LoanTypeController extends Controller
         $rules = [
             'name' => 'required',
             'rate' => 'required|numeric|between:0,100',
-            'salarytimes' => 'required|numeric|between:1,100',
+            'employee_ratesalary' => 'required|numeric|between:1,100',
+            'employee_netsalary' => 'required|numeric',
+            'outsider_rateshareholding' => 'required|numeric|between:1,100',
+            'max_loansummary' => 'required|numeric',
             'start_date' => 'required|date_format:Y-m-d', 
             'expire_date' => 'required|date_format:Y-m-d',
             'limits.*.cash_begin' => 'required|numeric|min:1',
@@ -61,7 +64,10 @@ class LoanTypeController extends Controller
         $attributeNames = [
             'name' => 'ชื่อประเภทเงินกู้พิเศษ',
             'rate' => 'อัตราดอกเบี้ย',
-            'salarytimes' => 'จำนวนเท่าของเงินเดือน',
+            'employee_ratesalary' => 'จำนวนเท่าเงินเดือนที่สามารถกู้ได้',
+            'employee_netsalary' => 'เงินเดือนสุทธิต่ำสุดเมื่อหักค่างวด',
+            'outsider_rateshareholding' => 'จำนวนหุ้นที่ต้องใช้',
+            'max_loansummary' => 'ผลรวมยอดเงินกู้ทุกประเภทสูงสุด',
             'start_date' => 'วันที่เริ่มใช้', 
             'expire_date' => 'วันที่หมดอายุ',
             'limits.*.cash_begin' => 'วงเงินกู้เริ่มต้น',
@@ -94,7 +100,10 @@ class LoanTypeController extends Controller
                 $loanType = new LoanType();
                 $loanType->name = $request->input('name');
                 $loanType->rate = $request->input('rate');
-                $loanType->salarytimes = $request->input('salarytimes');
+                $loanType->employee_ratesalary = $request->input('employee_ratesalary');
+                $loanType->employee_netsalary = $request->input('employee_netsalary');
+                $loanType->outsider_rateshareholding = $request->input('outsider_rateshareholding') / 100;
+                $loanType->max_loansummary = $request->input('max_loansummary');
                 $loanType->start_date = Diamond::parse($request->input('start_date'));
                 $loanType->expire_date = Diamond::parse($request->input('expire_date'));
                 $loanType->save();
@@ -133,7 +142,10 @@ class LoanTypeController extends Controller
     public function update(Request $request, $id) {
         $rules = [
             'rate' => 'required|numeric|between:0,100',
-            'salarytimes' => 'required|numeric|between:1,100',
+            'employee_ratesalary' => 'required|numeric|between:1,100',
+            'employee_netsalary' => 'required|numeric',
+            'outsider_rateshareholding' => 'required|numeric|between:1,100',
+            'max_loansummary' => 'required|numeric',
             'start_date' => 'required|date_format:Y-m-d', 
             'expire_date' => 'required|date_format:Y-m-d',
             'limits.*.cash_begin' => 'required|numeric|min:1',
@@ -145,7 +157,10 @@ class LoanTypeController extends Controller
 
         $attributeNames = [
             'rate' => 'อัตราดอกเบี้ย',
-            'salarytimes' => 'จำนวนเท่าของเงินเดือน',
+            'employee_ratesalary' => 'จำนวนเท่าเงินเดือนที่สามารถกู้ได้',
+            'employee_netsalary' => 'เงินเดือนสุทธิต่ำสุดเมื่อหักค่างวด',
+            'outsider_rateshareholding' => 'จำนวนหุ้นที่ต้องใช้',
+            'max_loansummary' => 'ผลรวมยอดเงินกู้ทุกประเภทสูงสุด',
             'start_date' => 'วันที่เริ่มใช้', 
             'expire_date' => 'วันที่หมดอายุ',    
             'limits.*.cash_begin' => 'วงเงินกู้เริ่มต้น',
@@ -167,7 +182,10 @@ class LoanTypeController extends Controller
             DB::transaction(function() use ($request, $id) {
                 $loanType = LoanType::find($id);
                 $loanType->rate = $request->input('rate');
-                $loanType->salarytimes = $request->input('salarytimes');
+                $loanType->employee_ratesalary = $request->input('employee_ratesalary');
+                $loanType->employee_netsalary = $request->input('employee_netsalary');
+                $loanType->outsider_rateshareholding = $request->input('outsider_rateshareholding') / 100;
+                $loanType->max_loansummary = $request->input('max_loansummary');
                 $loanType->start_date = Diamond::parse($request->input('start_date'));
                 $loanType->expire_date = Diamond::parse($request->input('expire_date'));
                 $loanType->limits()->delete();
@@ -190,7 +208,6 @@ class LoanTypeController extends Controller
                 return redirect()->action('Admin\LoanTypeController@show', [ 'loantype' => LoanType::find($id) ])
                     ->with('flash_message', 'แก้ไขประเภทเงินกู้ชื่อ ' . $request->input('name') . ' เรียบร้อยแล้ว')
                     ->with('callout_class', 'callout-success');
-
             }
             else {
                 return redirect()->action('Admin\LoanTypeController@getExpiredDetail', [ 'loantype' => LoanType::find($id) ])

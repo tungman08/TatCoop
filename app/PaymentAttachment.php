@@ -4,22 +4,22 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class EmployeeType extends Model
+class PaymentAttachment extends Model
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-	protected $table = 'employee_types';
-
+    protected $table = 'payment_attachments';
+    
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'name',
+        'payment_id', 'file', 'display',
     ];
 
     /**
@@ -30,16 +30,9 @@ class EmployeeType extends Model
     protected $dates = ['created_at', 'updated_at'];
 
     /**
-     * Get the employees for the type.
+     * Get the payment that uses by the attach file.
      */
-    public function employees() {
-        return $this->hasMany(Employee::class);
-    } 
-    
-    /**
-     * Get the bailsman associated with the type.
-     */
-    public function bailsman() {
-        return $this->hasOne(Bailsman::class);
-    } 
+    public function payment() {
+        return $this->belongsTo(payment::class);
+    }
 }
