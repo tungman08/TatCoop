@@ -24,10 +24,11 @@ class CreateDividendMembersTable extends Migration
                 ->on('members')->onDelete('cascade');
 
             $table->string('dividend_name');
-            $table->float('shareholding');
-            $table->float('shareholding_dividend');
-            $table->float('interest');
-            $table->float('interest_dividend');
+            $table->date('dividend_date');
+            $table->double('shareholding');
+            $table->double('shareholding_dividend');
+            $table->double('interest');
+            $table->double('interest_dividend');
 
             $table->timestamps();
         });

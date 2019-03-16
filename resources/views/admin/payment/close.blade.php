@@ -26,7 +26,7 @@
                 <table class="table table-info">
                     <tr>
                         <th style="width:20%;">ชื่อผู้สมาชิก:</th>
-                        <td>{{ $member->profile->fullName }}</td>
+                        <td>{{ $member->profile->fullname }}</td>
                     </tr>
                     <tr>
                         <th>ประเภทเงินกู้:</th>
@@ -53,7 +53,7 @@
                         <td>
                             <ul class="list-info">
                                 @foreach($loan->sureties as $item)
-                                    <li>{{ $item->profile->fullName }} (ค้ำประกันจำนวน {{ number_format($item->pivot->amount, 2, '.', ',')  }}  บาท)</li>
+                                    <li>{{ $item->profile->fullname }} (ค้ำประกันจำนวน {{ number_format($item->pivot->amount, 2, '.', ',')  }}  บาท)</li>
                                 @endforeach
                             </ul>
                         </td>
@@ -118,15 +118,13 @@
                             'class'=>'col-sm-2 control-label']) 
                         }}
 
-                        <div class="col-sm-10 input-group" id="datepicker" style="padding: 0 5px;">
+                        <div class="col-sm-10" style="padding: 0 5px;">
                             {{ Form::text('pay_date', Diamond::today()->format('Y-m-d'), [
+                                'id'=>'pay_date',
                                 'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
+                                'autocomplete'=>'off',
                                 'class'=>'form-control'])
                             }}       
-                            <span class="input-group-addon">
-                                <span class="fa fa-calendar">
-                                </span>
-                            </span> 
                         </div>
                     </div>
                     <div class="form-group">
@@ -245,7 +243,7 @@
 
             $("#save").attr("disabled", true);
 
-            $('#datepicker').datetimepicker({
+            $('#pay_date').datetimepicker({
                 locale: 'th',
                 viewMode: 'days',
                 format: 'YYYY-MM-DD',

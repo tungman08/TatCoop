@@ -21,7 +21,8 @@ elixir(function(mix) {
         .sass('miscellaneous.scss')
         .sass('font-awesome.scss')
         .sass('homepage.scss')
-        .sass('announce.scss');
+        .sass('announce.scss')
+        .sass('toggle-switch.scss');
 
     mix.less('bootstrap-datetimepicker.less')
         .less('admin-lte.less')
@@ -41,6 +42,7 @@ elixir(function(mix) {
         .scripts('./bower_components/datatables/media/js/jquery.dataTables.js')
         .scripts('./bower_components/datatables/media/js/dataTables.bootstrap.js')
         .scripts('./bower_components/datatables-responsive/js/dataTables.responsive.js')
+        .scripts('./bower_components/datatables-plugins/sorting/formatted-numbers.js')
         .scripts('./bower_components/flot/jquery.flot.js')
         .scripts('./bower_components/flot/jquery.flot.resize.js')
         .scripts('./bower_components/flot.tooltip/js/jquery.flot.tooltip.js')
@@ -48,6 +50,8 @@ elixir(function(mix) {
         .scripts('./bower_components/magnific-popup/dist/jquery.magnific-popup.js')
         .scripts('./bower_components/jquery-number/jquery.number.js')
         .scripts(['jquery.inputmask.js', 'jquery.inputmask.date.extensions.js', 'jquery.inputmask.extensions.js'], 'public/js/jquery.inputmask.js', './bower_components/AdminLTE/plugins/input-mask')
+        .scripts('./bower_components/jquery-confirm2/js/jquery-confirm.js')
+        .scripts(['./bower_components/jQuery-SlotMachine/dist/slotmachine.js', './bower_components/jQuery-SlotMachine/dist/jquery.slotmachine.js'], 'public/js/jquery.slotmachine.js')
         .scripts('jquery.easing.js')
         .scripts('admin-statistics.js')
         .scripts('admin-form.js')
@@ -62,6 +66,8 @@ elixir(function(mix) {
         .styles('./bower_components/datatables/media/css/dataTables.bootstrap.css')
         .styles('./bower_components/AdminLTE/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.css')
         .styles('./bower_components/magnific-popup/dist/magnific-popup.css')
+        .styles('./bower_components/jquery-confirm2/css/jquery-confirm.css')
+        .styles(['./bower_components/jQuery-SlotMachine/dist/jquery.slotmachine.css', 'slotmachine.css'], 'public/css/jquery.slotmachine.css')
         .styles('auth.css')
         .styles('stepwizard.css')
         .styles('jquery-circle-progress.css')
@@ -94,11 +100,14 @@ elixir(function(mix) {
         'js/moment.js',
         'js/bootstrap-datetimepicker.js',
         'js/jquery.dataTables.js',
+        'js/formatted-numbers.js',
         'js/dataTables.bootstrap.js',
         'js/dataTables.responsive.js',
         'js/jquery.flot.js',
         'js/jquery.flot.resize.js',
         'js/jquery.flot.tooltip.js',
+        'js/jquery-confirm.js',
+        'js/jquery.slotmachine.js',
         'js/admin-statistics.js',
         'js/auth.js',
         'js/homepage.js',
@@ -119,5 +128,8 @@ elixir(function(mix) {
         'css/stepwizard.css',
         'css/admin-carousel.css',
         'css/black-ribbon.css',
+        'css/toggle-switch.css',
+        'css/jquery-confirm.css',
+        'css/jquery.slotmachine.css',
     ]);
 });

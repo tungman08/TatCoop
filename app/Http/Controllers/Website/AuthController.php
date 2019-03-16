@@ -97,6 +97,14 @@ class AuthController extends Controller
 
             if (!is_null($user)) {
                 if (!$user->confirmed) {
+                    if (DB::table('user_confirmations')->where('email', $user->email)->count() == 0) {
+                        $token = hash_hmac('sha256', str_random(40), config('app.key'));
+                        DB::table('user_confirmations')->insert([
+                            'email' => strtolower($user->email), 
+                            'token' => $token
+                        ]);
+                    }
+
                     $token = DB::table('user_confirmations')->where('email', $user->email)->first()->token;
 
                     Mail::send('website.emails.verify', ['token' => $token], function($message) use ($user) {
@@ -104,7 +112,8 @@ class AuthController extends Controller
                             ->subject('ยืนยันการสมัครเข้าใช้งานระบบเว็บไซต์ www.tatcoop.com');
                     });                        
 
-                    $validator->errors()->add('verify', 'ยังไม่ได้ทำการยืนยันข้อมูลสมาชิกนี้ โปรดตรวจสอบอีเมลที่ได้รับจากระบบ');
+                    $validator->errors()
+                        ->add('verify', 'ยังไม่ได้ทำการยืนยันข้อมูลสมาชิกนี้ โปรดตรวจสอบอีเมลที่ได้รับจากระบบ');
                 }
             }
         });
@@ -173,7 +182,8 @@ class AuthController extends Controller
 
             if (!is_null($member)) {
                 if (str_replace('-', '', $member->profile->citizen_code) != $request->input('citizen_code')) {
-                    $validator->errors()->add('citizen_code_notmatch', 'ข้อมูล เลขประจำตัวประชาชน ไม่ตรงกับข้อมูลสมาชิก');
+                    $validator->errors()
+                        ->add('citizen_code_notmatch', 'ข้อมูล เลขประจำตัวประชาชน ไม่ตรงกับข้อมูลสมาชิก');
                 }
             }
         });
@@ -218,15 +228,17 @@ class AuthController extends Controller
      */
     public function getVerify($token) {
         if(!$token) {
-            return redirect()->action('Website\HomeController@getIndex');
+            return redirect()->action('Website\HomeController@index');
         }
 
         $confirm = DB::table('user_confirmations')
             ->where('token', $token)
             ->first();
 
-        if (!$confirm) {
-            return redirect()->action('Website\HomeController@getIndex');
+        if (is_null($confirm)) {
+            return redirect()->action('Website\AuthController@getLogin')
+                ->with('verified', 'คุณเคยทำการยืนยันอีเมลไปแล้ว ไม่ต้องยืนยันซ้ำอีก สามารถเข้าใช้งานระบบได้เลย')
+                ->withInput(['email' => $confirm->email]);
         }
 
         DB::transaction(function() use ($confirm) {

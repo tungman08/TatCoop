@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Administrator;
-use App\Member;
+use App\Role;
 use App\Shareholding;
 use Auth;
 use DB;
@@ -48,7 +48,7 @@ class AdminController extends Controller
      */
     public function index() {
         return view('admin.administrator.index', [
-            'admins' => Administrator::normal()->get()
+            'admins' => Administrator::admin()->get()
         ]);
     }
 
@@ -69,14 +69,16 @@ class AdminController extends Controller
     public function store(Request $request) {
         $rules = [
             'name' => 'required', 
+            'lastname' => 'required', 
             'email' => 'required|unique:administrators,email',
             'new_password' => 'required|min:6|confirmed', 
             'new_password_confirmation' => 'required|min:6',
         ];
 
         $attributeNames = [
-            'name' => 'อีเมลผู้ดูแลระบบ',
-            'email' => 'ชื่อสำหรับแสดงผล',
+            'name' => 'ชื่อ',
+            'lastname' => 'นามสกุล',
+            'email' => 'อีเมลเจ้าหน้าที่สหกรณ์',
             'new_password' => 'รหัสผ่าน',
             'new_password_confirmation' => 'ยืนยันรหัสผ่าน',
         ];
@@ -91,18 +93,21 @@ class AdminController extends Controller
         }
         else {
             DB::transaction(function() use ($request) {
+                $role = Role::find(2);
+
                 $admin = new Administrator();
                 $admin->name = $request->input('name');
+                $admin->lastname = $request->input('lastname');
                 $admin->email = strtolower($request->input('email'));
                 $admin->password = $request->input('new_password');
-                $admin->save();
+                $role->admins()->save();
 
-                History::addAdminHistory($admin->id, 'สร้างบัญชีผู้ดูแลระบบ');
-                History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'เพิ่มบัญชี ' . $admin->name . ' (' . $admin->email . ') เป็นผู้ดูแลระบบ');
+                History::addAdminHistory($admin->id, 'สร้างบัญชีเจ้าหน้าที่สหกรณ์');
+                History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'เพิ่มบัญชี ' . $admin->fullname . ' (' . $admin->email . ') เป็นเจ้าหน้าที่สหกรณ์');
 
                 Mail::send('admin.emails.newadmin', ['email' => $request->input('email'), 'password' => $request->input('new_password')], function($message) use ($admin) {
-                    $message->to($admin->email, $admin->name)
-                        ->subject('คุณได้รับการแต่งตั้งเป็นผู้ดูแลระบบเว็บไซต์ www.tatcoop.com');
+                    $message->to($admin->email, $admin->fullname)
+                        ->subject('คุณได้รับการแต่งตั้งเป็นเจ้าหน้าที่สหกรณ์เว็บไซต์ www.tatcoop.com');
                 });
             });
 
@@ -119,12 +124,14 @@ class AdminController extends Controller
      * @return Response
      */
     public function edit($id) {
-        if ($id <= 1 || $id > Administrator::max('id')) {
+        $user = Administrator::find($id);
+
+        if ($user->role_id != 2) {
             return redirect()->to('admin/administrator');
         }
 
         return view('admin.administrator.edit', [
-            'admins' => Administrator::find($id)
+            'user' => $user
         ]);
     }
 
@@ -137,11 +144,13 @@ class AdminController extends Controller
     public function update(Request $request, $id) {
         $rules = [
             'name' => 'required', 
+            'lastname' => 'required', 
         ];
 
         $attributeNames = [
-            'name' => 'อีเมลผู้ดูแลระบบ',
-            'email' => 'ชื่อสำหรับแสดงผล',
+            'name' => 'ชื่อ',
+            'lastname' => 'นามสกุล',
+            'email' => 'อีเมลเจ้าหน้าที่สหกรณ์',
             'new_password' => 'รหัสผ่าน',
             'new_password_confirmation' => 'ยืนยันรหัสผ่าน',
         ];
@@ -166,6 +175,7 @@ class AdminController extends Controller
             DB::transaction(function() use ($request, $id) {
                 $admin = Administrator::find($id);
                 $admin->name = $request->input('name');
+                $admin->lastname = $request->input('lastname');
 
                 if (!empty($request->input('new_password'))) {
                     $admin->password = $request->input('new_password');
@@ -174,12 +184,12 @@ class AdminController extends Controller
 
                 $admin->save();
 
-                History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'แก้ไขบัญชีผู้ดูแลระบบชื่อ ' . $admin->name . ' (' . $admin->email . ')');
+                History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'แก้ไขบัญชีเจ้าหน้าที่สหกรณ์ชื่อ ' . $admin->fullname . ' (' . $admin->email . ')');
 
                 if (!empty($request->input('new_password'))) {
                     Mail::send('admin.emails.updateadmin', ['email' => $request->input('email'), 'password' => $request->input('new_password')], function($message) use ($admin) {
-                        $message->to($admin->email, $admin->name)
-                            ->subject('บัญชีผู้ดูแลระบบ www.tatcoop.com ของคุณได้มีการแก้ไขเรียบร้อย');
+                        $message->to($admin->email, $admin->fullname)
+                            ->subject('บัญชีเจ้าหน้าที่สหกรณ์ www.tatcoop.com ของคุณได้มีการแก้ไขเรียบร้อย');
                     });
                 }
             });
@@ -222,7 +232,7 @@ class AdminController extends Controller
         else {
             $admin = Administrator::findOrFail($id);
 
-            History::addAdminHistory(Auth::guard($this->guard)->id(), 'ลบข้อมูล', 'ลบบัญชีผู้ดูแลระบบชื่อ ' . $admin->name . ' (' . $admin->email . ')');
+            History::addAdminHistory(Auth::guard($this->guard)->id(), 'ลบข้อมูล', 'ลบบัญชีเจ้าหน้าที่สหกรณ์ชื่อ ' . $admin->fullname . ' (' . $admin->email . ')');
 
             $admin->delete();
 
@@ -240,12 +250,14 @@ class AdminController extends Controller
      * @return Response
      */
     public function getDelete($id) {
-        if ($id <= 1 || $id > Administrator::max('id')) {
-            return redirect()->to('/admin/administrator');
+        $user = Administrator::find($id);
+
+        if ($user->role_id != 2) {
+            return redirect()->to('admin/administrator');
         }
 
         return view('admin.administrator.delete', [
-            'admins' => Administrator::find($id)
+            'user' => $user
         ]);
     }
 
@@ -255,10 +267,12 @@ class AdminController extends Controller
      * @return Response
      */
     public function getInactive() {
-        $admin = Administrator::onlyTrashed()->get();
+        $admins = Administrator::onlyTrashed()
+            ->where('role_id', 2)
+            ->get();
 
         return view('admin.administrator.inactive', [
-            'admins' => $admin
+            'admins' => $admins
         ]);
     }
 
@@ -271,7 +285,7 @@ class AdminController extends Controller
         $admin = Administrator::withTrashed()->findOrFail($id);
         $admin->restore();
 
-        History::addAdminHistory(Auth::guard($this->guard)->id(), 'คืนสภาพข้อมูล', 'คืนสภาพบัญชีผู้ดูแลระบบชื่อ ' . $admin->name . ' (' . $admin->email . ')');
+        History::addAdminHistory(Auth::guard($this->guard)->id(), 'คืนสภาพข้อมูล', 'คืนสภาพบัญชีเจ้าหน้าที่สหกรณ์ชื่อ ' . $admin->fullname . ' (' . $admin->email . ')');
 
         return redirect()->action('Admin\AdminController@index')
             ->with('flash_message', 'คืนค่าบัญชีผู้ใช้เรียบร้อยแล้ว')
@@ -286,7 +300,7 @@ class AdminController extends Controller
     public function postForceDelete($id) {
         $admin = Administrator::withTrashed()->findOrFail($id);
 
-        History::addAdminHistory(Auth::guard($this->guard)->id(), 'ลบข้อมูลอย่างถาวร', 'ลบบัญชีผู้ดูแลระบบชื่อ ' . $admin->name . ' (' . $admin->email . ') ออกจากระบบอย่างถาวร');
+        History::addAdminHistory(Auth::guard($this->guard)->id(), 'ลบข้อมูลอย่างถาวร', 'ลบบัญชีเจ้าหน้าที่สหกรณ์ชื่อ ' . $admin->fullname . ' (' . $admin->email . ') ออกจากระบบอย่างถาวร');
 
         $admin->forceDelete();
 

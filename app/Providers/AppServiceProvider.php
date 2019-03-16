@@ -29,13 +29,13 @@ class AppServiceProvider extends ServiceProvider
         /* bind data to admin views */
         view()->composer('admin.*', function ($view) {
             if (Auth::guard('admins')->check()) {
-                $view->with('admin', Auth::guard('admins')->user());
-            }
-        });
+                $admin = Auth::guard('admins')->user();
 
-        /* @eval($var++) */
-        Blade::directive('eval', function($expression) {
-            return "<?php $expression; ?>";
+                $view->with('admin', $admin)
+                    ->with('is_super', $admin->role_id == 1)
+                    ->with('is_admin', $admin->role_id == 2)
+                    ->with('is_viewer', $admin->role_id == 3);
+            }
         });
     }
 
@@ -97,6 +97,10 @@ class AppServiceProvider extends ServiceProvider
         App::bind('dividendcalculator', function() {
             return new \App\Classes\DividendCalculator;
         });    
+
+        App::bind('shareholdingcalculator', function() {
+            return new \App\Classes\ShareholdingCalculator;
+        });  
 
         App::bind('dashboard', function() {
             return new \App\Classes\Dashboard;

@@ -9,7 +9,7 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'ข้อมูลประเภทเงินกู้', 'link' => '/admin/loantype'],
+            ['item' => 'ข้อมูลประเภทเงินกู้', 'link' => '/database/loantype'],
             ['item' => 'เพิ่ม', 'link' => ''],
         ]])
 
@@ -39,7 +39,7 @@
             <!-- /.box-header -->
 
             <!-- form start -->
-            {{ Form::open(['url' => '/admin/loantype', 'method' => 'post', 'class' => 'form-horizontal']) }}
+            {{ Form::open(['url' => '/database/loantype', 'method' => 'post', 'class' => 'form-horizontal']) }}
                 @include('admin.loantype.form', ['edit' => false])
             {{ Form::close() }}
         </div>
@@ -163,7 +163,7 @@
 
         function isNumberKey(evt){
             var charCode = (evt.which) ? evt.which : event.keyCode
-            if (charCode > 31 && (charCode < 48 || charCode > 57))
+            if (charCode != 8 && charCode != 127&& charCode != 45 && charCode != 46 && (charCode < 48 || charCode > 57))
                 return false;
             return true;
         }

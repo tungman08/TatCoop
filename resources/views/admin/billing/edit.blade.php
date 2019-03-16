@@ -9,7 +9,7 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการใบรับเงิน', 'link' => 'admin/billing'],
+            ['item' => 'จัดการใบรับเงิน', 'link' => 'database/billing'],
             ['item' => 'แก้ไข', 'link' => '']
         ]])
     </section>
@@ -38,7 +38,7 @@
             <!-- /.box-header -->
 
             <!-- form start -->
-            {{ Form::model($billing, ['route' => ['admin.billing.update', $billing->id], 'method' => 'put', 'class' => 'form-horizontal']) }}
+            {{ Form::model($billing, ['route' => ['database.billing.update', $billing->id], 'method' => 'put', 'class' => 'form-horizontal']) }}
                 <div class="box-body">
                     <div class="form-group padding-l-md padding-r-md">
                         {{ Form::label('manager', 'ผู้จัดการ', [

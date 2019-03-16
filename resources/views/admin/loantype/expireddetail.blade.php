@@ -9,8 +9,8 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการประเภทเงินกู้', 'link' => '/admin/loantype'],
-            ['item' => 'หมดอายุ', 'link' => '/admin/loantype/expired'],
+            ['item' => 'จัดการประเภทเงินกู้', 'link' => '/database/loantype'],
+            ['item' => 'หมดอายุ', 'link' => '/database/loantype/expired'],
             ['item' => 'ประเภทเงินกู้', 'link' => ''],
         ]])
     </section>
@@ -25,7 +25,7 @@
 
             @include('admin.loantype.info', ['loantype' => $loantype])
 
-            <button class="btn btn-primary btn-flat" onclick="javascript:window.location = '/admin/loantype/{{ $loantype->id }}/edit';">
+            <button class="btn btn-primary btn-flat" onclick="javascript:document.location.href = '/database/loantype/{{ $loantype->id }}/edit';">
                 <i class="fa fa-edit"></i> แก้ไขประเภทสัญญา
             </button>
         </div>
@@ -57,7 +57,7 @@
                 <h3 class="box-title"><i class="fa fa-credit-card"></i> สัญญาเงินกู้ที่ใช้ประเภทเงินกู้นี้ @if ($count > 0) (กำลังผ่อนชำระจำนวน {{ number_format($count, 0, '.', ',') }} สัญญา) @endif</h3>
                 <div class="btn-group pull-right">
                     <button type="button" class="btn btn-default btn-flat btn-xs"
-                        onclick="javascript:window.location.href='{{ url('/admin/loantype/' . $loantype->id . '/finished') }}';">
+                        onclick="javascript:document.location.href='{{ url('/database/loantype/' . $loantype->id . '/finished') }}';">
                         <i class="fa fa-check-circle-o"></i> สัญญาเงินกู้ที่ชำระหมดแล้ว
                     </button>
                 </div>            
@@ -80,12 +80,11 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @php($count = 0)
-                            @foreach($loantype->loans->filter(function ($value, $key) { return !empty($value->code) && is_null($value->completed_at); })->sortByDesc('loaned_at') as $loan)
-                                <tr onclick="javascript: document.location = '{{ url('/service/' . $loan->member->id . '/loan/' . $loan->id) }}';">
-                                    <td>{{ ++$count }}</td>
+                            @foreach($loantype->loans->filter(function ($value, $key) { return !empty($value->code) && is_null($value->completed_at); })->sortByDesc('loaned_at') as $index => $loan)
+                                <tr onclick="javascript: document.location.href  = '{{ url('/service/' . $loan->member->id . '/loan/' . $loan->id) }}';">
+                                    <td>{{ $index + 1 }}.</td>
                                     <td class="text-primary"><i class="fa fa-credit-card fa-fw"></i> {{ $loan->code }}</td>
-                                    <td>{{ $loan->member->profile->fullName }}</td>
+                                    <td>{{ $loan->member->profile->fullname }}</td>
                                     <td>{{ Diamond::parse($loan->loaned_at)->thai_format('Y-m-d') }}</td>
                                     <td>{{ number_format($loan->outstanding, 2, '.', ',') }}</td>
                                     <td>{{ number_format($loan->period, 0, '.', ',') }}</td>

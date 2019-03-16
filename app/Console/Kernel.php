@@ -17,7 +17,11 @@ class Kernel extends ConsoleKernel
         Commands\BingCommand::class,
         Commands\MailCommand::class,
         Commands\ViewMakeCommand::class,
-        Commands\DividendCommand::class
+        Commands\DividendCommand::class,
+        Commands\PaymentCalculateCommand::class,
+        Commands\PaymentStoreCommand::class,
+        Commands\ShareholdingCalculateCommand::class,
+        Commands\ShareholdingStoreCommand::class,
     ];
 
     /**

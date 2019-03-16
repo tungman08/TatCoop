@@ -15,7 +15,7 @@ class History
 
         $groups = UserHistory::where('user_id', $id)
             ->groupBy(DB::raw('date(created_at)'))
-            ->select(DB::raw('date(created_at) as created_at'))
+            ->select('user_id', DB::raw('date(created_at) as created_at'))
             ->orderBy('created_at', 'desc')
             ->skip($index)
             ->take(1)
@@ -23,7 +23,11 @@ class History
 
         foreach ($groups as $g) {
             $history_date = $g->created_at;
-            $history_items = UserHistory::with('history_type')->whereDate('created_at', '=', $g->created_at)->orderBy('created_at')->get();
+            $history_items = UserHistory::with('history_type')
+                ->where('user_id', $g->user_id)
+                ->whereDate('created_at', '=', $g->created_at)
+                ->orderBy('created_at')
+                ->get();
             
             $item = new stdClass();
             $item->date = $history_date;
@@ -40,7 +44,7 @@ class History
 
         $groups = AdministratorHistory::where('admin_id', $id)
             ->groupBy(DB::raw('date(created_at)'))
-            ->select(DB::raw('date(created_at) as created_at'))
+            ->select('admin_id', DB::raw('date(created_at) as created_at'))
             ->orderBy('created_at', 'desc')
             ->skip($index)
             ->take(1)
@@ -48,7 +52,11 @@ class History
 
         foreach ($groups as $g) {
             $history_date = $g->created_at;
-            $history_items = AdministratorHistory::with('history_type')->whereDate('created_at', '=', $g->created_at)->orderBy('created_at')->get();
+            $history_items = AdministratorHistory::with('history_type')
+                ->where('admin_id', $g->admin_id)
+                ->whereDate('created_at', '=', $g->created_at)
+                ->orderBy('created_at')
+                ->get();
 
             $item = new stdClass();
             $item->date = $history_date;

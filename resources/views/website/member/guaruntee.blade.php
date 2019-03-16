@@ -17,12 +17,36 @@
         <!-- Info boxes -->
         <div class="well">
             <h4>ข้อมูลการค้ำประกัน</h4>
-            <p>แสดงการค้ำประกันการกู้ยืม ของ {{ $member->profile->fullName }}</p>
+
+            <div class="table-responsive">
+                <table class="table table-info">
+                    <tr>
+                        @php($sureties = $member->sureties->filter(function ($value, $key) use ($member) { return is_null($value->completed_at) && $value->member_id == $member->id; }))
+                        <th style="width:20%;">สัญญาเงินกู้ที่ค้ำประกันตนเอง:</th>
+                        <td>{{ ($sureties->count()) > 0 ? number_format($sureties->count(), 0, '.', ',') . ' สัญญา' : '-' }}</td>
+                    </tr>
+                    <tr>
+                        <th style="width:20%;">จำนวนหุ้นที่ใช้ค้ำประกันตนเอง:</th>
+                        <td>{{ ($sureties->count()) > 0 ? number_format(LoanCalculator::sureties_balance($sureties), 2, '.', ',') . '/' . number_format($sureties->sum('pivot.amount'), 2, '.', ',') . ' บาท' : '-' }}</td>
+                    </tr>
+                    <tr>
+                        @php($sureties = $member->sureties->filter(function ($value, $key) use ($member) { return !is_null($value->code) && is_null($value->completed_at) && $value->member_id != $member->id; }))
+                        <th style="width:20%;">สัญญาเงินกู้ที่ค้ำประกันให้ผู้อื่น:</th>
+                        <td>{{ ($sureties->count()) > 0 ? number_format($sureties->count(), 0, '.', ',') . ' สัญญา' : '-' }}</td>
+                    </tr>
+                    <tr>
+                        <th>จำนวนเงินที่ใช้คำประกันผู้อื่น:</th>
+                        <td>{{ ($sureties->count() > 0) ? number_format(LoanCalculator::sureties_balance($sureties), 2, '.', ',') . '/' . number_format($sureties->sum('pivot.amount'), 2, '.', ',') . ' บาท' : '-' }}</td>
+                    </tr>     
+                </table>
+                <!-- /.table -->
+            </div>  
+            <!-- /.table-responsive --> 
         </div>
 
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title">รายละเอียดข้อมูลการค้ำประกัน</h3>
+                <h3 class="box-title">รายละเอียดข้อมูลการค้ำประกันผู้อื่น</h3>
             </div>
             <!-- /.box-header -->
 
@@ -43,18 +67,17 @@
                         </thead>
                         <tbody>
 							@php($loans = $member->sureties->filter(function ($value, $key) { return !is_null($value->code) && is_null($value->completed_at); }))
-                            @php($count = 0)
-                            @foreach($loans as $loan)
+                            @foreach($loans as $index => $loan)
                                 @if ($loan->member->id <> $member->id)
                                     <tr>
-                                        <td>{{ ++$count }}</td>
+                                        <td>{{ $index + 1 }}.</td>
                                         <td class="text-primary"><i class="fa fa-file-text-o fa-fw"></i> {{ $loan->code }}</td>
-                                        <td>{{ $loan->member->profile->fullName }}</td>
+                                        <td>{{ $loan->member->profile->fullname }}</td>
                                         <td>{{ Diamond::parse($loan->loaned_at)->thai_format('Y-m-d') }}</td>
                                         <td>{{ number_format($loan->outstanding, 2, '.', ',') }}</td>
                                         <td>{{ number_format($loan->pivot->amount, 2, '.', ',') }}</td>
                                         <td>{{ number_format(LoanCalculator::surety_balance($loan), 2, '.', ',') }}</td>
-                                        <td class="{{ is_null($loan->completed_at) ? 'text-danger' : 'text-success' }}">{{ is_null($loan->completed_at) ? 'กำลังผ่อนชำระ' : 'ผ่อนชำระหมดแล้ว' }}</td>
+                                        <td>{!! is_null($loan->completed_at) ? '<span class="label label-danger">กำลังผ่อนชำระ</span>' : '<span class="label label-primary">ผ่อนชำระหมดแล้ว</span>' !!}</td>
                                     </tr>
                                 @endif
                             @endforeach

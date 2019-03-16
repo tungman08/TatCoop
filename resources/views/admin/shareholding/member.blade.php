@@ -18,7 +18,25 @@
         <!-- Info boxes -->
         <div class="well">
             <h4>การจัดการทุนเรือนหุ้นของสมาชิกสหกรณ์</h4>
-            <p>ให้ผู้ดูแลระบบสามารถ เพิ่ม ลบ แก้ไข ข้อมูลทุนเรือนหุ้นของสมาชิกสหกรณ์</p>
+
+            <div class="table-responsive">
+                <table class="table table-info">
+                    <tr>
+                        <th style="width:20%;">ทุนเรือนหุ้นสะสมรวม:</th>
+                        <td>{{ number_format($total_shareholding, 2, '.', ',') }} บาท</td>
+                    </tr>
+                    <tr>
+                        <th>สมาชิกที่มีหุ้นรายเดือนสูดสุด:</th>
+                        <td>{{ $rich_member->memberCode }} - {{ $rich_member->profile->fullname }}</td>
+                    </tr> 
+                    <tr>
+                        <th>จำนวนหุ้น:</th>
+                        <td>{{ number_format($rich_member->shareholding, 2, '.', ',') }} หุ้น</td>
+                    </tr>  
+                </table>
+                <!-- /.table -->
+            </div>  
+            <!-- /.table-responsive --> 
         </div>
 
         @if(Session::has('flash_message'))
@@ -41,11 +59,6 @@
             <!-- /.box-header -->
 
             <div class="box-body">
-                <button class="btn btn-primary btn-flat margin-b-md" type="button" data-tooltip="true" title="ชำระค่าหุ้นอัตโนมัติ"
-                    onclick="javascript:window.location.href='{{ url('/service/shareholding/autoshareholding') }}';">
-                    <i class="fa fa-bolt"></i> ชำระค่าหุ้นรายเดือนแบบอัตโนมัติ
-                </button>
-
                 <div class="table-responsive" style=" margin-top: 10px;">
                     <table id="dataTables-users" class="table table-hover dataTable" width="100%">
                         <thead>
@@ -87,6 +100,7 @@
     {!! Html::script(elixir('js/jquery.dataTables.js')) !!}
     {!! Html::script(elixir('js/dataTables.responsive.js')) !!}
     {!! Html::script(elixir('js/dataTables.bootstrap.js')) !!}
+    {!! Html::script(elixir('js/formatted-numbers.js')) !!}
 
     <script>
     $(document).ready(function () {
@@ -115,6 +129,10 @@
             "createdRow": function(row, data, index) {
                 $(this).css('cursor', 'pointer');
             },
+            "columnDefs": [
+                { type: 'formatted-num', targets: 3 },
+                { type: 'formatted-num', targets: 4 }
+            ],
             "columns": [
                 { "data": "code" },
                 { "data": "fullname" },
@@ -125,8 +143,23 @@
         });   
 
         $('#dataTables-users tbody').on('click', 'tr', function() {
-            document.location = '/service/' + parseInt($(this).children("td").first().html()).toString() + '/shareholding';            
+            document.location.href  = '/service/' + parseInt($(this).children("td").first().html()).toString() + '/shareholding';            
         });         
-    });   
+    }); 
+   
+    jQuery.extend(jQuery.fn.dataTableExt.oSort, {
+        "formatted-num-pre": function ( a ) {
+            a = (a === "-" || a === "") ? 0 : a.replace(/[^\d\-\.]/g, "");
+            return parseFloat( a );
+        },
+
+        "formatted-num-asc": function ( a, b ) {
+            return a - b;
+        },
+
+        "formatted-num-desc": function ( a, b ) {
+            return b - a;
+        }
+    });
     </script>
 @endsection

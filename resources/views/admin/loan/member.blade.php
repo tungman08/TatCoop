@@ -18,7 +18,25 @@
         <!-- Info boxes -->
         <div class="well">
             <h4>การจัดการการกู้ยืมของสมาชิกสหกรณ์</h4>
-            <p>ให้ผู้ดูแลระบบสามารถ เพิ่ม ลบ แก้ไข ข้อมูลการกู้ยืมของสมาชิกสหกรณ์</p>
+
+            <div class="table-responsive">
+                <table class="table table-info">
+                    <tr>
+                        <th style="width:20%;">จำนวนสัญญาที่กำลังผ่อนชำระ:</th>
+                        <td>{{ number_format($loans, 0, '.', ',') }} สัญญา</td>
+                    </tr>
+                    <tr>
+                        <th>สมาชิกที่มีเงินกู้สูดสุด:</th>
+                        <td>{{ $highest_loan->fullname }}</td>
+                    </tr> 
+                    <tr>
+                        <th>เงินต้นคงเหลือ:</th>
+                        <td>{{ number_format($highest_loan->balance, 2, '.', ',') }} บาท</td>
+                    </tr>  
+                </table>
+                <!-- /.table -->
+            </div>  
+            <!-- /.table-responsive --> 
         </div>
 
         @if(Session::has('flash_message'))
@@ -41,11 +59,6 @@
             <!-- /.box-header -->
 
             <div class="box-body">
-                <button class="btn btn-primary btn-flat margin-b-md" type="button" data-tooltip="true" title="ชำระค่าหุ้นอัตโนมัติ"
-                    onclick="javascript:window.location.href='{{ url('/service/loan/autopayment') }}';">
-                    <i class="fa fa-bolt"></i> ชำระเงินกู้รายเดือนแบบอัตโนมัติ
-                </button>
-
                 <div class="table-responsive" style=" margin-top: 10px;">
                     <table id="dataTables-users" class="table table-hover dataTable" width="100%">
                         <thead>
@@ -87,6 +100,7 @@
     {!! Html::script(elixir('js/jquery.dataTables.js')) !!}
     {!! Html::script(elixir('js/dataTables.responsive.js')) !!}
     {!! Html::script(elixir('js/dataTables.bootstrap.js')) !!}
+    {!! Html::script(elixir('js/formatted-numbers.js')) !!}
 
     <script>
     $(document).ready(function () {
@@ -115,6 +129,10 @@
             "createdRow": function(row, data, index) {
                 $(this).css('cursor', 'pointer');
             },
+            "columnDefs": [
+                { type: 'formatted-num', targets: 3 },
+                { type: 'formatted-num', targets: 4 }
+            ],
             "columns": [
                 { "data": "code" },
                 { "data": "fullname" },
@@ -125,8 +143,23 @@
         });   
 
         $('#dataTables-users tbody').on('click', 'tr', function() {
-            document.location = '/service/' + parseInt($(this).children("td").first().html()).toString() + '/loan';            
+            document.location.href  = '/service/' + parseInt($(this).children("td").first().html()).toString() + '/loan';            
         });     
     });   
+    
+    jQuery.extend(jQuery.fn.dataTableExt.oSort, {
+        "formatted-num-pre": function ( a ) {
+            a = (a === "-" || a === "") ? 0 : a.replace(/[^\d\-\.]/g, "");
+            return parseFloat( a );
+        },
+
+        "formatted-num-asc": function ( a, b ) {
+            return a - b;
+        },
+
+        "formatted-num-desc": function ( a, b ) {
+            return b - a;
+        }
+    });
     </script>
 @endsection

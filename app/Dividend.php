@@ -19,7 +19,7 @@ class Dividend extends Model
      * @var array
      */
     protected $fillable = [
-        'rate_year', 'sharholding_rate', 'loan_rate'
+        'rate_year', 'sharholding_rate', 'loan_rate', 'release_date', 'calculated'
     ];
 
     /**

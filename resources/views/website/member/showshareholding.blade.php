@@ -18,7 +18,25 @@
         <!-- Info boxes -->
         <div class="well">
             <h4>ข้อมูลทุนเรือนหุ้น</h4>
-            <p>แสดงการชำระค่าหุ้นต่างๆ ของ {{ $member->profile->fullName }}</p>
+
+            <div class="table-responsive">
+                <table class="table table-info">
+                    <tr>
+                        <th style="width:20%;">จำนวนหุ้นรายเดือน:</th>
+                        <td>{{ ($member->shareholding > 0) ? number_format($member->shareholding, 0, '.', ',') . ' หุ้น': '-' }}</td>
+                    </tr>
+                    <tr>
+                        <th>ค่าหุ้นรายเดือน:</th>
+                        <td>{{ ($member->shareholding > 0) ? number_format($member->shareholding * 10, 2, '.', ',') . ' บาท': '-' }}</td>
+                    </tr>
+                    <tr>
+                        <th>ทุนเรือนหุ้นสะสม:</th>
+                        <td>{{ number_format($member->shareHoldings->sum('amount'), 2, '.', ',') }} บาท</td>
+                    </tr>        
+                </table>
+                <!-- /.table -->
+            </div>  
+            <!-- /.table-responsive --> 
         </div>
 
         <div class="box box-primary">
@@ -31,12 +49,8 @@
                 <div class="table-responsive">
                     <table class="table">
 						<tr>
-							<th style="width:20%; border-top: none;">ชื่อผู้สมาชิก:</th>
-							<td style="border-top: none;">{{ ($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' : $member->profile->fullName }}</td>
-						</tr>
-						<tr>
-							<th>ค่าหุ้นเดือน:</th>
-							<td>{{ Diamond::parse($shareholding_date)->thai_format('F Y') }}</td>
+							<th style="width:20%; border-top: none;">ค่าหุ้นเดือน:</th>
+							<td style="border-top: none;">{{ Diamond::parse($shareholding_date)->thai_format('F Y') }}</td>
 						</tr>
 						<tr>
 							<th>ชำระจำนวน:</th>
@@ -77,10 +91,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @php($count = 0)
-                            @foreach($shareholdings->sortByDesc('id')->sortByDesc('paydate') as $share)
+                            @foreach($shareholdings as $index => $share)
                                 <tr>
-                                    <td>{{ ++$count }}.</td>
+                                    <td>{{ $index + 1 }}.</td>
                                     <td class="text-primary"><i class="fa fa-money fa-fw"></i> {{ Diamond::parse($share->paydate)->thai_format('Y-n-d') }}</td>
                                     <td><span class="label label-primary">{{ $share->shareholding_type_name }}</td>
                                     <td>{{ number_format($share->amount, 2, '.', ',') }} บาท</td>
@@ -132,8 +145,27 @@
         });
 
          $('#dataTables-shareholding').dataTable({
-            "iDisplayLength": 10
+            "iDisplayLength": 10,
+            "columnDefs": [
+                { type: 'formatted-num', targets: 3 },
+                { type: 'formatted-num', targets: 4 }
+            ]
         });
     });   
+
+    jQuery.extend(jQuery.fn.dataTableExt.oSort, {
+        "formatted-num-pre": function ( a ) {
+            a = (a === "-" || a === "") ? 0 : a.replace(/[^\d\-\.]/g, "");
+            return parseFloat( a );
+        },
+
+        "formatted-num-asc": function ( a, b ) {
+            return a - b;
+        },
+
+        "formatted-num-desc": function ( a, b ) {
+            return b - a;
+        }
+    });
     </script>
 @endsection

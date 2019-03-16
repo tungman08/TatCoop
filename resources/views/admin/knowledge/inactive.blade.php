@@ -61,7 +61,7 @@
                                             'class'=>'btn btn-default btn-xs btn-flat',
 											'data-tooltip'=>true,
 											'title'=>'รายละเอียด',
-                                            'onclick'=>"javascript:window.location.href='/website/knowledge/inactive/" . $inactive->id . "';"])
+                                            'onclick'=>"javascript:document.location.href='/website/knowledge/inactive/" . $inactive->id . "';"])
                                         }}
                                         {{ Form::button('<i class="fa fa-rotate-left"></i>', [
                                             'type' => 'submit',

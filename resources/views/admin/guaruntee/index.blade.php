@@ -24,7 +24,7 @@
                 <table class="table table-info">
                     <tr>
                         <th style="width:20%;">ชื่อผู้ค้ำประกัน:</th>
-                        <td>{{ ($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' : $member->profile->fullName }}</td>
+                        <td>{{ ($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' : $member->profile->fullname }}</td>
                     </tr>
                     <tr>
                         <th>จำนวนหุ้นที่ใช้ค้ำประกันตนเอง:</th>
@@ -44,17 +44,17 @@
 
         <div class="row margin-b-md">
             <div class="col-md-5ths">
-                <button type="button" class="btn btn-block btn-primary btn-lg" onclick="javascript:window.location.href='{{ url('/service/member/' . $member->id) }}';">
+                <button type="button" class="btn btn-block btn-primary btn-lg" onclick="javascript:document.location.href='{{ url('/service/member/' . $member->id) }}';">
                     <i class="fa fa-user fa-fw"></i> ข้อมูลสมาชิก
                 </button>
             </div>
             <div class="col-md-5ths">
-                <button type="button" class="btn btn-block btn-success btn-lg" onclick="javascript:window.location.href='{{ url('/service/' . $member->id . '/shareholding') }}';">
+                <button type="button" class="btn btn-block btn-success btn-lg" onclick="javascript:document.location.href='{{ url('/service/' . $member->id . '/shareholding') }}';">
                     <i class="fa fa-money fa-fw"></i> ทุนเรือนหุ้น
                 </button>
             </div>            
             <div class="col-md-5ths">
-                <button type="button" class="btn btn-block btn-danger btn-lg" onclick="javascript:window.location.href='{{ url('/service/' . $member->id . '/loan') }}';">
+                <button type="button" class="btn btn-block btn-danger btn-lg" onclick="javascript:document.location.href='{{ url('/service/' . $member->id . '/loan') }}';">
                     <i class="fa fa-credit-card fa-fw"></i> การกู้ยืม
                 </button>
             </div>
@@ -64,7 +64,7 @@
                 </button>
             </div>
             <div class="col-md-5ths">
-                <button type="button" class="btn btn-block btn-purple btn-lg" onclick="javascript:window.location.href='{{ url('/service/' . $member->id . '/dividend') }}';">
+                <button type="button" class="btn btn-block btn-purple btn-lg" onclick="javascript:document.location.href='{{ url('/service/' . $member->id . '/dividend') }}';">
                     <i class="fa fa-dollar fa-fw"></i> เงินปันผล
                 </button>
             </div>
@@ -93,12 +93,11 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @php($count = 0)
-                            @foreach($member->sureties->filter(function ($value, $key) { return !is_null($value->code) && is_null($value->completed_at); }) as $loan)
-                                <tr onclick="javascript: document.location = '{{ url('service/' . $loan->member->id . '/loan/' . $loan->id) }}';" style="cursor: pointer;">
-                                    <td>{{ ++$count }}</td>
+                            @foreach($member->sureties->filter(function ($value, $key) { return !is_null($value->code) && is_null($value->completed_at); }) as $index => $loan)
+                                <tr onclick="javascript: document.location.href  = '{{ url('service/' . $loan->member->id . '/loan/' . $loan->id) }}';" style="cursor: pointer;">
+                                    <td>{{ $index + 1 }}.</td>
                                     <td class="text-primary"><i class="fa fa-file-text-o fa-fw"></i> {{ $loan->code }}</td>
-                                    <td>{{ $loan->member->profile->fullName }}</td>
+                                    <td>{{ $loan->member->profile->fullname }}</td>
 									<td>{!! ($member->id == $loan->member->id) ? '<i class="fa fa-check-circle"></i>' : '&nbsp;' !!}</td>
                                     <td>{{ Diamond::parse($loan->loaned_at)->thai_format('Y-m-d') }}</td>
                                     <td>{{ number_format($loan->outstanding, 2, '.', ',') }}</td>

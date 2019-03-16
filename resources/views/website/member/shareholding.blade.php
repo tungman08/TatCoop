@@ -17,12 +17,30 @@
         <!-- Info boxes -->
         <div class="well">
             <h4>ข้อมูลทุนเรือนหุ้น</h4>
-            <p>แสดงการชำระค่าหุ้นต่างๆ ของ {{ $member->profile->fullName }}</p>
+
+            <div class="table-responsive">
+                <table class="table table-info">
+                    <tr>
+                        <th style="width:20%;">จำนวนหุ้นรายเดือน:</th>
+                        <td>{{ ($member->shareholding > 0) ? number_format($member->shareholding, 0, '.', ',') . ' หุ้น': '-' }}</td>
+                    </tr>
+                    <tr>
+                        <th>ค่าหุ้นรายเดือน:</th>
+                        <td>{{ ($member->shareholding > 0) ? number_format($member->shareholding * 10, 2, '.', ',') . ' บาท': '-' }}</td>
+                    </tr>
+                    <tr>
+                        <th>ทุนเรือนหุ้นสะสม:</th>
+                        <td>{{ number_format($member->shareHoldings->sum('amount'), 2, '.', ',') }} บาท</td>
+                    </tr>        
+                </table>
+                <!-- /.table -->
+            </div>  
+            <!-- /.table-responsive --> 
         </div>
 
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title">รายละเอียดข้อมูลทุนเรือนหุ้น (ทุนเรือนหุ้นสะสม {{ number_format($shareholdings->sum('amount') + $shareholdings->sum('amount_cash'), 2, '.', ',') }} บาท)</h3>
+                <h3 class="box-title">รายละเอียดข้อมูลทุนเรือนหุ้น</h3>
             </div>
             <!-- /.box-header -->
 
@@ -40,11 +58,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @php($count = 0)
-                            @foreach($shareholdings->sortByDesc('name') as $share)
+                            @foreach($shareholdings as $index => $share)
                                 @php($date = Diamond::parse($share->name))
-                                <tr onclick="javascript: document.location = '{{ action('Website\MemberController@getShowShareholding', ['id'=>$member->id, 'month'=>$date->format('Y-n-1')]) }}';" style="cursor: pointer;">
-                                    <td>{{ ++$count }}.</td>
+                                <tr onclick="javascript: document.location.href  = '{{ action('Website\MemberController@getShowShareholding', ['id'=>$member->id, 'month'=>$date->format('Y-n-1')]) }}';" style="cursor: pointer;">
+                                    <td>{{ $index + 1 }}.</td>
                                     <td class="text-primary"><i class="fa fa-money fa-fw"></i> {{ $date->thai_format('F Y') }}</td>
                                     <td>{{ number_format($share->amount, 2, '.', ',') }} บาท</td>
                                     <td>{{ number_format($share->amount_cash, 2, '.', ',') }} บาท</td>
@@ -88,10 +105,32 @@
     <script>
     $(document).ready(function () {
         $('[data-tooltip="true"]').tooltip();
+
+        $('#dataTables-shareholding').dataTable({
+            "iDisplayLength": 10,
+            "columnDefs": [
+                { type: 'formatted-num', targets: 0 },
+                { type: 'formatted-num', targets: 2 },
+                { type: 'formatted-num', targets: 3 },
+                { type: 'formatted-num', targets: 4 },
+                { type: 'formatted-num', targets: 5 }
+            ]
+        });
     });
 
-    $('#dataTables-shareholding').dataTable({
-        "iDisplayLength": 10
+    jQuery.extend(jQuery.fn.dataTableExt.oSort, {
+        "formatted-num-pre": function ( a ) {
+            a = (a === "-" || a === "") ? 0 : a.replace(/[^\d\-\.]/g, "");
+            return parseFloat( a );
+        },
+
+        "formatted-num-asc": function ( a, b ) {
+            return a - b;
+        },
+
+        "formatted-num-desc": function ( a, b ) {
+            return b - a;
+        }
     });
     </script>
 @endsection

@@ -13,7 +13,7 @@ class DividendCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'dividend:calculate {--year= : The year that uses for calculate dividend.}';
+    protected $signature = 'dividend:calculate {year? : The year that uses for calculate dividend} {--force : Force the operation to run}';
 
     /**
      * The console command description.
@@ -39,13 +39,8 @@ class DividendCommand extends Command
      */
     public function handle()
     {  
-        $options = $this->option();
+        $result = DividendCalculator::calculate($this->argument('year'), $this->option('force'));
 
-        $result = DividendCalculator::calculate($options['year']);
-        $message = ($result !== false) ?
-            "Success" : 
-            "Failure";
-
-        $this->info($message);
+        $this->info($result);
     }
 }

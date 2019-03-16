@@ -26,7 +26,7 @@
                 <table class="table table-info">
                     <tr>
                         <th style="width:20%;">ชื่อผู้สมาชิก:</th>
-                        <td>{{ $member->profile->fullName }}</td>
+                        <td>{{ $member->profile->fullname }}</td>
                     </tr>
                     <tr>
                         <th>ประเภทเงินกู้:</th>
@@ -53,7 +53,7 @@
                         <td>
                             <ul class="list-info">
                                 @foreach($loan->sureties as $item)
-                                    <li>{{ $item->profile->fullName }} (ค้ำประกันจำนวน {{ number_format($item->pivot->amount, 2, '.', ',')  }}  บาท)</li>
+                                    <li>{{ $item->profile->fullname }} (ค้ำประกันจำนวน {{ number_format($item->pivot->amount, 2, '.', ',')  }}  บาท)</li>
                                 @endforeach
                             </ul>
                         </td>
@@ -77,14 +77,10 @@
 
                     <div class="form-group">
                         <label for="pay_date" class="col-sm-2 control-label">วันที่ชำระ</label>
-                        <div class="col-sm-10 input-group" id="datepicker" style="padding: 0 5px;">
+                        <div class="col-sm-10 input-group" style="padding: 0 5px;">
                             <input type="text" name="pay_date" id="pay_date"
                                 placeholder="กรุณาเลือกจากปฏิทิน..."
                                 autocomplete="off" class="form-control" />  
-                            <span class="input-group-addon">
-                                <span class="fa fa-calendar">
-                                </span>
-                            </span> 
                         </div>
                     </div>
                     <div class="form-group">
@@ -163,7 +159,7 @@
         $('[data-tooltip="true"]').tooltip();
         $(".ajax-loading").css("display", "none"); 
 
-        $('#datepicker').datetimepicker({
+        $('#pay_date').datetimepicker({
             viewMode: 'days',
             format: 'YYYY-MM-D',
             //minDate: moment(),

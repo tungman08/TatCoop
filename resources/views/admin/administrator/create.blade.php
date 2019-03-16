@@ -4,12 +4,12 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
         <h1>
-            จัดการผู้ดูแลระบบฯ
-            <small>เพิ่ม ลบ แก้ไข บัญชีของผู้ดูแลระบบ สอ.สรทท.</small>
+            จัดการเจ้าหน้าที่สหกรณ์
+            <small>เพิ่ม ลบ แก้ไข บัญชีของเจ้าหน้าที่สหกรณ์ สอ.สรทท.</small>
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการผู้ดูแลระบบ', 'link' => '/admin/administrator'],
+            ['item' => 'จัดการเจ้าหน้าที่สหกรณ์', 'link' => '/admin/administrator'],
             ['item' => 'เพิ่ม', 'link' => ''],
         ]])
     </section>
@@ -18,8 +18,8 @@
     <section class="content">
         <!-- Info boxes -->
         <div class="well">
-            <h4>เพิ่มบัญชีผู้ดูแลระบบ</h4>
-            <p>เมื่อกดปุ่มบันทึกข้อมูลแล้ว ระบบจะส่งรหัสผ่านไปถึง e-mail ที่ป้อนเพื่อแจ้งผู้ดูแลระบบคนใหม่ให้ทราบ</p>
+            <h4>เพิ่มบัญชีเจ้าหน้าที่สหกรณ์</h4>
+            <p>เมื่อกดปุ่มบันทึกข้อมูลแล้ว ระบบจะส่งรหัสผ่านไปถึง e-mail ที่ป้อนเพื่อแจ้งเจ้าหน้าที่สหกรณ์คนใหม่ให้ทราบ</p>
         </div>
 
         @if ($errors->count() > 0)
@@ -33,7 +33,7 @@
         <!-- Horizontal Form -->
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title">เพิ่มบัญชีผู้ดูแลระบบ</h3>
+                <h3 class="box-title">เพิ่มบัญชีเจ้าหน้าที่สหกรณ์</h3>
             </div>
             <!-- /.box-header -->
 

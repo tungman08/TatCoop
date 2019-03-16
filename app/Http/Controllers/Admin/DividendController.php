@@ -36,28 +36,47 @@ class DividendController extends Controller
     }
 
     public function getMember() {
-        $dividend = Dividend::whereRaw('rate_year = (select max(rate_year) as rate_year from dividends)')->first();
-        $year = ($dividend != null) ? $dividend->rate_year : intval(Diamond::today()->format('Y'));
+        $dividend_years = Dividend::all();
+        $year = DB::select(DB::raw('select max(a.rate_year) as rate_year ' .
+            'from (' .
+            'select d.rate_year ' .
+            'from dividends d ' .
+            'inner join dividend_member dm on d.id = dm.dividend_id ' .
+            'group by d.rate_year ' .
+            'having count(dm.id) > 0 ' .
+            ') a;'));
 
         return view('admin.dividend.member', [
-            'year' => $year
+            'dividend_years' => collect($dividend_years),
+            'year' => $year[0]->rate_year
         ]);
     }
 
-    public function getMemberDividend($member_id) {
+    public function getMemberDividend($member_id, Request $request) {
         $dividend_years = Dividend::all();
-
+        $year = is_null($request->input('year')) ? 
+            DB::select(DB::raw('select max(a.rate_year) as rate_year ' .
+                'from (' .
+                'select d.rate_year ' .
+                'from dividends d ' .
+                'inner join dividend_member dm on d.id = dm.dividend_id ' .
+                'group by d.rate_year ' .
+                'having count(dm.id) > 0 ' .
+                ') a;'))[0]->rate_year : 
+            $request->input('year');
+        $dividend = Dividend::where('rate_year', $year)->first();
         $member = Member::find($member_id);
-        $dividend = $dividend_years->last();
 
         $dividends = Dividendmember::where('dividend_id', $dividend->id)
             ->where('member_id', $member->id)
+            ->orderBy('dividend_date')
             ->get();
 
         return view('admin.dividend.show', [
-            'member' => $member,
             'dividend_years' => collect($dividend_years),
-            'dividends' => $dividends,
+            'member' => $member,
+            'dividend' => $dividend,
+            'dividends' => $dividends
         ]);
     }
 
@@ -113,18 +132,22 @@ class DividendController extends Controller
     }
 
     public function edit($id) {
-        return view('admin.dividend.edit', ['dividend'=>Dividend::find($id)]);
+        return view('admin.dividend.edit', [
+            'dividend'=>Dividend::find($id)]
+        );
     }
 
     public function update(Request $request, $id) {
         $rules = [
             'shareholding_rate' => 'required|numeric|between:0,100',
-            'loan_rate' => 'required|numeric|between:0,100'
+            'loan_rate' => 'required|numeric|between:0,100',
+            'release_date' => 'required|date_format:Y-m-d'
         ];
 
         $attributeNames = [
             'shareholding_rate' => 'อัตราเงินปันผล',
-            'loan_rate' => 'อัตราเงินเฉลี่ยคืน'
+            'loan_rate' => 'อัตราเงินเฉลี่ยคืน',
+            'release_date' => 'วันที่เผยแพร่'
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -140,6 +163,7 @@ class DividendController extends Controller
                 $dividend = Dividend::find($id);
                 $dividend->shareholding_rate = $request->input('shareholding_rate');
                 $dividend->loan_rate = $request->input('loan_rate');
+                $dividend->release_date = Diamond::parse($request->input('release_date'));
                 $dividend->save();
     
                 History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'แก้ไขอัตราเงินปันผล ประจำปี ' . $dividend->rate_year + 543);
@@ -163,5 +187,64 @@ class DividendController extends Controller
         return redirect()->action('Admin\DividendController@index')
             ->with('flash_message', 'ลบข้อมูลอัตราเงินปันผลเรียบร้อยแล้ว')
             ->with('callout_class', 'callout-success');
+    }
+
+    public function getMemberEdit($member_id, $dividend_id) {
+        $member = Member::find($member_id);
+        $dividend = Dividendmember::find($dividend_id);
+        $year = Dividend::find($dividend->dividend_id)->rate_year;
+
+        return view('admin.dividend.memberedit', [
+            'year' => $year,
+            'member' => $member,
+            'dividend' => $dividend
+        ]);
+    }
+
+    public function postMemberUpdate($member_id, $dividend_id, Request $request) {
+        $rules = [
+            'shareholding' => 'required|numeric',
+            'shareholding_dividend' => 'required|numeric',
+            'interest' => 'required|numeric',
+            'interest_dividend' => 'required|numeric'
+        ];
+
+        $attributeNames = [
+            'shareholding' => 'เงินค่าหุ้น',
+            'shareholding_dividend' => 'เงินปันผล',
+            'interest' => 'ดอกเบี้ยเงินกู้',
+            'interest_dividend' => 'เงินเฉลี่ยคืน'
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+        $validator->setAttributeNames($attributeNames);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+        else {
+            DB::transaction(function() use ($member_id, $dividend_id, $request) {
+                $member = Member::find($member_id);
+                $dividend = Dividendmember::find($dividend_id);
+                $year = Dividend::find($dividend->dividend_id)->rate_year;     
+
+                $dividend->shareholding = $request->input('shareholding');
+                $dividend->shareholding_dividend = $request->input('shareholding_dividend');
+                $dividend->interest = $request->input('interest');
+                $dividend->interest_dividend = $request->input('interest_dividend');
+                $dividend->save();
+    
+                History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'แก้ไขข้อมูลเงินปันผล ประจำปี ' . $year . ' ของ ' . $member->profile->fullname);
+            });
+
+            $dividend = Dividendmember::find($dividend_id);
+            $year = Dividend::find($dividend->dividend_id)->rate_year;     
+
+            return redirect('/service/' . $member_id . '/dividend?year=' . $year)
+                ->with('flash_message', 'แก้ไขข้อมูลเงินปันผลเรียบร้อยแล้ว')
+                ->with('callout_class', 'callout-success');
+        }
     }
 }

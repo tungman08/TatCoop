@@ -72,7 +72,7 @@ class Profile extends Model
         return $query->whereNull('leave_date');
     }
 
-    public function getFullNameAttribute() {
+    public function getFullnameAttribute() {
         return $this->prefix->name . ' ' . $this->attributes['name'] .' '. $this->attributes['lastname'];
     }
 

@@ -103,7 +103,7 @@
         });
 
         $('#employee_code').blur(function() {
-            if ($('#employee_code').val().length == 5) {
+            if (parseInt($('#employee_code').val(), 10) != 0) {
                 $.ajax({
                     url: '/ajax/status',
                     type: "post",

@@ -17,6 +17,8 @@ class CreateDividendsTable extends Migration
             $table->integer('rate_year');
             $table->float('shareholding_rate');
             $table->float('loan_rate');
+            $table->date('release_date');
+            $table->boolean('calculated')->default(false);
             $table->timestamps();
         });
     }

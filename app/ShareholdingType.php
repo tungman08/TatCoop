@@ -35,4 +35,11 @@ class ShareholdingType extends Model
     public function shareHoldings() {
         return $this->hasMany(ShareHolding::class);
     }
+
+    /**
+     * Get the tempolary shares that uses by the type.
+     */
+    public function tempShareholdings() {
+        return $this->hasMany(RoutineShareholdingDetail::class);
+    }
 }

@@ -9,7 +9,7 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการประเภทเงินกู้', 'link' => '/admin/loantype'],
+            ['item' => 'จัดการประเภทเงินกู้', 'link' => '/database/loantype'],
             ['item' => 'หมดอายุ', 'link' => ''],
         ]])
     </section>
@@ -40,19 +40,20 @@
                         <thead>
                             <tr>
                                 <th style="width: 10%;">#</th>
-                                <th style="width: 45%;">ชื่อประเภทเงินกู้</th>
+                                <th style="width: 25%;">ชื่อประเภทเงินกู้</th>
+                                <th style="width: 20%;">อัตราดอกเบี้ย</th>
                                 <th style="width: 15%;">วันที่เริ่มใช้</th>
                                 <th style="width: 15%;">วันที่สิ้นสุดการใช้</th>
                                 <th style="width: 15%;">จำนวนสัญญาเงินกู้</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @eval($count = 0)
-                            @foreach($loantypes as $type)
-                            <tr onclick="javascript: document.location = '{{ url('/admin/loantype/expired/' . $type->id) }}';"
+                            @foreach($loantypes as $index => $type)
+                            <tr onclick="javascript: document.location.href  = '{{ url('/database/loantype/expired/' . $type->id) }}';"
                                 style="cursor: pointer;">
-                                <td>{{ ++$count }}</td>
+                                <td>{{ $index + 1 }}.</td>
                                 <td class="text-primary"><i class="fa fa-credit-card fa-fw"></i> {{ $type->name }}</td>
+                                <td>{{ number_format($type->rate, 2, '.', ',') }}%</td>
                                 <td>{{ Diamond::parse($type->start_date)->thai_format('Y-m-d') }}</td>
                                 <td>{{ Diamond::parse($type->expire_date)->thai_format('Y-m-d') }}</td>
                                 <td>{{ number_format($type->loans->filter(function ($value, $key) { return !empty($value->code); })->count()) }}</td>

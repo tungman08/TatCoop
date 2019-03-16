@@ -4,15 +4,13 @@
             'class'=>'col-sm-2 control-label']) 
         }}
 
-        <div class="col-sm-10 input-group" id="datepicker" style="padding: 0 5px;">
+        <div class="col-sm-10" style="padding: 0 5px;">
             {{ Form::text('pay_date', null, [
+                'id'=>'pay_date',
                 'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
+                'autocomplete'=>'off',
                 'class'=>'form-control'])
             }}       
-            <span class="input-group-addon">
-                <span class="fa fa-calendar">
-                </span>
-            </span> 
         </div>
     </div>
     <div class="form-group">

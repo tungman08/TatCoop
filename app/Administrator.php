@@ -22,7 +22,7 @@ class Administrator extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'password_changed',
+        'role_id', 'name', 'email', 'password', 'password_changed',
     ];
 
     /**
@@ -42,6 +42,20 @@ class Administrator extends Authenticatable
     ];
 
     /**
+     * Get the role that uses by the administrators.
+     */
+    public function role() {
+        return $this->belongsTo(Role::class);
+    }
+
+    /**
+     * Get the rewards for the administrators.
+     */
+    public function rewards() {
+        return $this->hasMany(Reward::class, 'admin_id');
+    }
+
+    /**
      * Get the statistics for the administrators login.
      */
     public function administrator_statistics() {
@@ -59,12 +73,36 @@ class Administrator extends Authenticatable
     }
 
     /**
-     * Scope a query to only include normal province.
+     * Scope a query to only include super admin.
      *
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeNormal($query)
+    public function scopeSuper($query)
     {
-        return $query->where('id', '>', 1);
+        return $query->where('role_id', 1);
+    }
+
+    /**
+     * Scope a query to only include admin.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeAdmin($query)
+    {
+        return $query->where('role_id', 2);
+    }
+
+    /**
+     * Scope a query to only include viewer.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeViewer($query)
+    {
+        return $query->where('role_id', 3);
+    }
+
+    public function getFullnameAttribute() {
+        return $this->attributes['name'] .' '. $this->attributes['lastname'];
     }
 }

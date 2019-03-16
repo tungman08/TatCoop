@@ -21,7 +21,7 @@
         <!-- Info boxes -->
         <div class="well">
             <h4>ข้อมูลทุนเรือนหุ้น</h4>
-            <p>เพิ่มการชำระค่าหุ้นต่างๆ ของ {{ $member->profile->fullName }}</p>
+            <p>เพิ่มการชำระค่าหุ้นต่างๆ ของ {{ $member->profile->fullname }}</p>
         </div>
 
         @if ($errors->count() > 0)
@@ -46,15 +46,13 @@
                         'class'=>'col-sm-2 control-label']) 
                     }}
 
-                    <div class="col-sm-10 input-group" id="datepicker" style="padding: 0 5px;">
+                    <div class="col-sm-10" style="padding: 0 5px;">
                         {{ Form::text('pay_date', null, [
+                            'id'=>'pay_date',
                             'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
+                            'autocomplete'=>'off',
                             'class'=>'form-control'])
                         }}       
-                        <span class="input-group-addon">
-                            <span class="fa fa-calendar">
-                            </span>
-                        </span> 
                     </div>
                 </div>
                 <div class="form-group">
@@ -100,8 +98,8 @@
                         'class'=>'col-sm-2 control-label']) 
                     }}
                     {{ Form::file ('attachment', [
-                            'class'=>'form-control-file',
-                            'style'=>'padding-top: 7px'])
+                        'class'=>'form-control-file',
+                        'style'=>'padding-top: 7px'])
                     }} 
                 </div>
             </div>
@@ -148,7 +146,7 @@
     {!! Html::script(elixir('js/bootstrap-datetimepicker.js')) !!}
 
     <script>
-    $('#datepicker').datetimepicker({
+    $('#pay_date').datetimepicker({
         locale: 'th',
         viewMode: 'days',
         format: 'YYYY-MM-DD',

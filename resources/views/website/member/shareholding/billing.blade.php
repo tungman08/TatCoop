@@ -19,7 +19,20 @@
         <!-- Info boxes -->
         <div class="well">
             <h4>ใบรับเงินค่าหุ้น</h4>
-            <p>ใบรับเงินค่าหุ้นเดือน {{ Diamond::parse($shareholding->pay_date)->thai_format('F Y') }} ของ {{ $member->profile->fullName }}</p>
+            <p>ใบรับเงินค่าหุ้นเดือน {{ Diamond::parse($shareholding->pay_date)->thai_format('F Y') }} ของ {{ $member->profile->fullname }}</p>
+     
+            <!-- this row will not appear when printing -->
+            <div class="row no-print" style="margin-top: 30px;">
+                <div class="col-xs-12">
+                    <a href="{{ url('/member/' . $member->id . '/shareholding/' . $shareholding->id . '/billing/' . Diamond::parse($shareholding->pay_date)->format('Y-n-d') . '/print') }}" target="_blank" class="btn btn-default btn-flat"><i class="fa fa-print"></i> พิมพ์</a>
+                    <button type="button"
+                        class="btn btn-primary btn-flat pull-right"
+                        style="margin-right: 5px;"
+                        onclick="javascript:document.location.href  = '{{ url('/member/' . $member->id . '/shareholding/' . $shareholding->id . '/billing/' . Diamond::parse($shareholding->pay_date)->format('Y-n-d') . '/pdf') }}';">
+                        <i class="fa fa-download"></i> บันทึกเป็น PDF
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- Main content -->
@@ -65,7 +78,7 @@
                             </tr>
                             <tr>
                                 <th>ได้รับเงินจาก:</th>
-                                <td>{{ $member->profile->fullName }}</td>
+                                <td>{{ $member->profile->fullname }}</td>
                             </tr>
                             <tr>
                                 <th>หน่วยงาน:</th>
@@ -161,19 +174,6 @@
                     <span>ใบรับเงินประจำเดือนจะสมบูรณ์ต่อเมื่อสหกรณ์ได้รับเงินที่เรียกเก็บครบถ้วนแล้ว</span>
                 </div>
                 <!-- /.col -->
-            </div>
-
-            <!-- this row will not appear when printing -->
-            <div class="row no-print" style="margin-top: 30px;">
-                <div class="col-xs-12">
-                    <a href="{{ url('/member/' . $member->id . '/shareholding/' . $shareholding->id . '/billing/' . Diamond::parse($shareholding->pay_date)->format('Y-n-d') . '/print') }}" target="_blank" class="btn btn-default btn-flat"><i class="fa fa-print"></i> พิมพ์</a>
-                    <button type="button"
-                        class="btn btn-primary btn-flat pull-right"
-                        style="margin-right: 5px;"
-                        onclick="javascript:document.location = '{{ url('/member/' . $member->id . '/shareholding/' . $shareholding->id . '/billing/' . Diamond::parse($shareholding->pay_date)->format('Y-n-d') . '/pdf') }}';">
-                        <i class="fa fa-download"></i> บันทึกเป็น PDF
-                    </button>
-                </div>
             </div>
         </section>
         <!-- /.content -->

@@ -26,7 +26,7 @@
                 <table class="table table-info">
                     <tr>
                         <th style="width:20%;">ชื่อผู้สมาชิก:</th>
-                        <td>{{ $member->profile->fullName }}</td>
+                        <td>{{ $member->profile->fullname }}</td>
                     </tr>
                     <tr>
                         <th>ประเภทเงินกู้:</th>
@@ -55,7 +55,7 @@
                             <td>
                                 <ul class="list-info">
                                     @foreach($loan->sureties as $item)
-                                        <li>{{ $item->profile->fullName }} (ค้ำประกันจำนวน {{ number_format($item->pivot->amount, 2, '.', ',')  }}  บาท)</li>
+                                        <li>{{ $item->profile->fullname }} (ค้ำประกันจำนวน {{ number_format($item->pivot->amount, 2, '.', ',')  }}  บาท)</li>
                                     @endforeach
                                 </ul>
                             </td>
@@ -89,11 +89,13 @@
                     <!-- /.box-header -->
 
                     <div class="box-body">
-                        <button class="btn btn-primary btn-flat margin-b-sm" onclick="javascript:window.location.href='{{ url('/service/' . $member->id . '/loan/' . $loan->id . '/payment/billing/' . $payment->id . '/' . Diamond::parse($payment->pay_date)->format('Y-n-j')) }}';">
+                        <button class="btn btn-primary btn-flat margin-b-sm" onclick="javascript:document.location.href='{{ url('/service/' . $member->id . '/loan/' . $loan->id . '/payment/billing/' . $payment->id . '/' . Diamond::parse($payment->pay_date)->format('Y-n-j')) }}';">
                             <i class="fa fa-file-text-o"></i> ใบเสร็จรับเงินการชำระเงินกู้
                         </button>
 
-                        <button class="btn btn-primary btn-flat margin-b-sm pull-right" onclick="javascript:document.location = '{{ url('/service/' . $member->id . '/loan/' . $loan->id . '/payment/' . $payment->id . '/edit') }}';">
+                        <button class="btn btn-primary btn-flat margin-b-sm pull-right"
+                            {{ (($is_super || $is_admin) ? '' : 'disabled') }}
+                            onclick="javascript:document.location.href  = '{{ url('/service/' . $member->id . '/loan/' . $loan->id . '/payment/' . $payment->id . '/edit') }}';">
                             <i class="fa fa-pencil"></i> แก้ไข
                         </button>
 
@@ -101,8 +103,12 @@
                             <table class="table" width="100%">
                                 <tbody>
                                     <tr>
-                                        <th style="width:20%; border-top: none;">วันที่ชำระ</th>
-                                        <td style="border-top: none;">{{ Diamond::parse($payment->pay_date)->thai_format('j M Y') }}</td>
+                                        <th style="width:20%; border-top: none;">งวดที่</th>
+                                        <td style="border-top: none;">{{ $payment->period }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>วันที่ชำระ</th>
+                                        <td>{{ Diamond::parse($payment->pay_date)->thai_format('j M Y') }}</td>
                                     </tr>
                                     <tr>
                                         <th>เงินต้น</th>
@@ -138,7 +144,8 @@
                     <div class="box-body">
                         <input type="hidden" id="payment_id" value="{{ $payment->id }}" />
                         <input type="file" id="attachment" class="file-upload" onchange="javascript:attachment(this);" />
-                        <button class="btn btn-primary btn-flat margin-b-sm" onclick="javascript:$('#attachment').click();">
+                        <button class="btn btn-primary btn-flat margin-b-sm" onclick="javascript:$('#attachment').click();"
+                            {{ (($is_super || $is_admin) ? '' : 'disabled') }}>
                             <i class="fa fa-plus-circle"></i> เพิ่มเอกสารแนบ
                         </button>
 

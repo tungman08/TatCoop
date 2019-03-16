@@ -37,7 +37,7 @@
 
         * {
             font-family: "THSarabunNew";
-            font-size: 18px;
+            font-size: 16px;
         }
 
         h3 {
@@ -61,10 +61,23 @@
 
         .table tr th, .table tr td {
             padding: 3px 8px;
-            vertical-align: top;
-            text-align: left;
         }
 
+        .table tr th {
+            vertical-align: middle;
+        }
+
+        .table tr td {
+            vertical-align: top;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .text-right {
+            text-align: right;
+        }
     </style>
 </head>
 <body>
@@ -92,7 +105,7 @@
                         </tr>
                         <tr>
                             <th>ได้รับเงินจาก:</th>
-                            <td>{{ $member->profile->fullName }}</td>
+                            <td>{{ $member->profile->fullname }}</td>
                         </tr>
                         <tr>
                             <th>หน่วยงาน:</th>

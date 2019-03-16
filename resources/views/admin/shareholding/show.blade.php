@@ -26,7 +26,7 @@
                 <table class="table table-info">
                     <tr>
                         <th style="width:20%;">ชื่อผู้สมาชิก:</th>
-                        <td>{{ ($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' : $member->profile->fullName }}</td>
+                        <td>{{ ($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' : $member->profile->fullname }}</td>
                     </tr>
                     <tr>
                         <th>ค่าหุ้นเดือน:</th>
@@ -87,10 +87,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @php($count = 0)
-                            @foreach($shareholdings->sortByDesc('id')->sortByDesc('paydate') as $share)
-                                <tr onclick="javascript: document.location = '{{ action('Admin\ShareholdingController@getDetail', ['member_id'=>$member->id, 'paydate'=>Diamond::parse($share->paydate)->format('Y-n-1'), 'id'=>$share->id]) }}';" style="cursor: pointer;">
-                                    <td>{{ ++$count }}.</td>
+                            @foreach($shareholdings as $index => $share)
+                                <tr onclick="javascript: document.location.href  = '{{ action('Admin\ShareholdingController@getDetail', ['member_id'=>$member->id, 'paydate'=>Diamond::parse($share->paydate)->format('Y-n-1'), 'id'=>$share->id]) }}';" style="cursor: pointer;">
+                                    <td>{{ $index + 1 }}.</td>
                                     <td class="text-primary"><i class="fa fa-money fa-fw"></i> {{ Diamond::parse($share->paydate)->thai_format('Y-n-d') }}</td>
                                     <td><span class="label label-primary">{{ $share->shareholding_type_name }}</td>
                                     <td>{{ number_format($share->amount, 2, '.', ',') }} บาท</td>
@@ -141,7 +140,11 @@
         $('[data-tooltip="true"]').tooltip();
 
         $('#dataTables-shareholding').dataTable({
-            "iDisplayLength": 10
+            "iDisplayLength": 10,
+            "columnDefs": [
+                { type: 'formatted-num', targets: 3 },
+                { type: 'formatted-num', targets: 4 }
+            ]
         });
     });
     </script>

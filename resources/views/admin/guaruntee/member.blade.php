@@ -18,7 +18,25 @@
         <!-- Info boxes -->
         <div class="well">
             <h4>รายละเอียดข้อมูลการค้ำประกันของสมาชิกสหกรณ์</h4>
-            <p>ให้ผู้ดูแลระบบสามารถดูรายละเอียดข้อมูลการค้ำประกันของสมาชิกสหกรณ์</p>
+
+            <div class="table-responsive">
+                <table class="table table-info">
+                    <tr>
+                        <th style="width:20%;">สมาชิกที่ค้ำเต็มแล้ว:</th>
+                        <td>{{ number_format($full, 0, '.', ',') }} คน</td>
+                    </tr>
+                    <tr>
+                        <th>สมาชิกที่ยังสามารถค้ำได้ 1 สัญญา:</th>
+                        <td>{{ number_format($available1, 0, '.', ',') }} คน</td>
+                    </tr> 
+                    <tr>
+                        <th>สมาชิกที่ยังสามารถค้ำได้ 2 สัญญา:</th>
+                        <td>{{ number_format($available2, 0, '.', ',') }} คน</td>
+                    </tr> 
+                </table>
+                <!-- /.table -->
+            </div>  
+            <!-- /.table-responsive --> 
         </div>
 
         @if(Session::has('flash_message'))
@@ -48,9 +66,9 @@
                                 <th style="width: 10%;">รหัสสมาชิก</th>
                                 <th style="width: 20%;">ชื่อสมาชิก</th>
                                 <th style="width: 15%;">ประเภทสมาชิก</th>
-                                <th style="width: 20%;">จำนวนหุ้นที่ค้ำประกันตนเอง</th>
-                                <th style="width: 20%;">จำนวนหุ้นที่ค้ำประกันผู้อื่น</th>
-								<th style="width: 15%;">สถานะการค้ำประกันผู้อื่น</th>
+                                <th style="width: 20%;">ค้ำประกันตนเอง</th>
+                                <th style="width: 20%;">ค้ำประกันผู้อื่น</th>
+								<th style="width: 15%;">ความสามารถในการค้ำฯ ผู้อื่น</th>
                             </tr>
                         </thead>
                     </table>
@@ -83,6 +101,7 @@
     {!! Html::script(elixir('js/jquery.dataTables.js')) !!}
     {!! Html::script(elixir('js/dataTables.responsive.js')) !!}
     {!! Html::script(elixir('js/dataTables.bootstrap.js')) !!}
+    {!! Html::script(elixir('js/formatted-numbers.js')) !!}
 
     <script>
     $(document).ready(function () {
@@ -111,6 +130,10 @@
             "createdRow": function(row, data, index) {
                 $(this).css('cursor', 'pointer');
             },
+            "columnDefs": [
+                { type: 'formatted-num', targets: 3 },
+                { type: 'formatted-num', targets: 4 }
+            ],
             "columns": [
                 { "data": "code" },
                 { "data": "fullname" },
@@ -122,8 +145,23 @@
         });   
 
         $('#dataTables-users tbody').on('click', 'tr', function() {
-            document.location = '/service/' + parseInt($(this).children("td").first().html()).toString() + '/guaruntee';            
+            document.location.href  = '/service/' + parseInt($(this).children("td").first().html()).toString() + '/guaruntee';            
         });         
     });   
+    
+    jQuery.extend(jQuery.fn.dataTableExt.oSort, {
+        "formatted-num-pre": function ( a ) {
+            a = (a === "-" || a === "") ? 0 : a.replace(/[^\d\-\.]/g, "");
+            return parseFloat( a );
+        },
+
+        "formatted-num-asc": function ( a, b ) {
+            return a - b;
+        },
+
+        "formatted-num-desc": function ( a, b ) {
+            return b - a;
+        }
+    });
     </script>
 @endsection

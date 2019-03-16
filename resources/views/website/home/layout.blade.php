@@ -76,7 +76,7 @@
 
     <!-- Services Section -->
     <section id="services" class="services-section">
-        @include('website.home.services')
+        @include('website.home.news')
     </section>
 
     <!-- About Section -->

@@ -69,7 +69,7 @@
                             </tr>
                             <tr>
                                 <th>ได้รับเงินจาก:</th>
-                                <td>{{ $member->profile->fullName }}</td>
+                                <td>{{ $member->profile->fullname }}</td>
                             </tr>
                             <tr>
                                 <th>หน่วยงาน:</th>

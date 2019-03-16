@@ -19,7 +19,7 @@ class Dividendmember extends Model
      * @var array
      */
     protected $fillable = [
-        'dividend_name', 'shareholding', 'shareholding_dividend', 'interest', 'interest_dividend'
+        'dividend_name', 'dividend_date', 'shareholding', 'shareholding_dividend', 'interest', 'interest_dividend'
     ];
 
     /**
@@ -27,5 +27,5 @@ class Dividendmember extends Model
      *
      * @var array
      */
-    protected $dates = ['created_at', 'updated_at'];
+    protected $dates = ['dividend_date', 'created_at', 'updated_at'];
 }

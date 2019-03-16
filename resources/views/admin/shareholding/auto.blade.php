@@ -55,15 +55,13 @@
                                 <tbody>
                                     <tr>
                                         <td>
-                                            <div class="input-group" id="datepicker" style="width: 250px;">
+                                            <div class="input-group" style="width: 250px;">
                                                 {{ Form::text('month', Diamond::today()->format('Y-m'), [
                                                     'id'=>'month', 
+                                                    'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
+                                                    'autocomplete'=>'off',
                                                     'class'=>'form-control'])
                                                 }}     
-                                                <span class="input-group-addon">
-                                                    <span class="fa fa-calendar">
-                                                    </span>
-                                                </span>
                                             </div>
                                         </td>
                                         <td>
@@ -143,7 +141,7 @@
         $('[data-tooltip="true"]').tooltip();
         $(".ajax-loading").css("display", "none"); 
 
-        $('#datepicker').datetimepicker({
+        $('#month').datetimepicker({
             viewMode: 'months',
             format: 'YYYY-MM',
             minDate: moment('2015-12-31'),
@@ -154,7 +152,7 @@
             bindDataTable(e.date.format('YYYY-M-D'))
         }).on('dp.hide', function(e){
             setTimeout(function() {
-                $('#datepicker').data('DateTimePicker').viewMode('months');
+                $('#month').data('DateTimePicker').viewMode('months');
             }, 1);
         });
 

@@ -4,12 +4,12 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
         <h1>
-            จัดการเงินปันผล
-            <small>เพิ่ม ลบ แก้ไข อัตราเงินปันผลประจำปี สอ.สรทท.</small>
+            จัดการเงินปันผล/เฉลี่ยคืน
+            <small>เพิ่ม ลบ แก้ไข อัตราเงินปันผล/เฉลี่ยคืนประจำปี สอ.สรทท.</small>
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการเงินปันผล', 'link' => '/admin/dividend'],
+            ['item' => 'จัดการเงินปันผล/เฉลี่ยคืน', 'link' => '/database/dividend'],
             ['item' => 'เพิ่ม', 'link' => ''],
         ]])
     </section>
@@ -18,8 +18,8 @@
     <section class="content">
         <!-- Info boxes -->
         <div class="well">
-            <h4>การจัดการอัตราเงินปันผลประจำปีของสหกรณ์</h4>
-            <p>เพิ่มอัตราเงินปันผลประจำปีของสหกรณ์</p>
+            <h4>การจัดการอัตราเงินปันผล/เฉลี่ยคืนประจำปีของสหกรณ์</h4>
+            <p>เพิ่มอัตราเงินปันผล/เฉลี่ยคืนประจำปีของสหกรณ์</p>
         </div>
 
         @if ($errors->count() > 0)
@@ -32,12 +32,12 @@
 
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title">เพิ่มอัตราเงินปันผลประจำปี</h3>
+                <h3 class="box-title">เพิ่มอัตราเงินปันผล/เฉลี่ยคืนประจำปี</h3>
             </div>
             <!-- /.box-header -->
 
             <!-- form start -->
-            {{ Form::open(['url' => '/admin/dividend', 'method' => 'post', 'class' => 'form-horizontal']) }}
+            {{ Form::open(['url' => '/database/dividend', 'method' => 'post', 'class' => 'form-horizontal']) }}
                 @include('admin.dividend.form', ['edit' => false])
             {{ Form::close() }}
         </div>

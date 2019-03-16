@@ -121,7 +121,7 @@ class ReportController extends Controller
                     foreach ($members as $member) {
                         $data = [];
                         $data[] = $member->memberCode;
-                        $data[] = $member->profile->fullName;
+                        $data[] = $member->profile->fullname;
 
                         $m_dividends = Dividendmember::where('dividend_id', $dividend->id)
                             ->where('member_id', $member->id)
@@ -131,7 +131,7 @@ class ReportController extends Controller
                         $index = 0;
                         $column = 3;
                         foreach ($m_dividends as $m_dividend) {
-                            $pointer = ($index > 0) ? Diamond::parse($m_dividend->dividend_name)->month : 0;
+                            $pointer = ($index > 0) ? $this->name_to_date($m_dividend->dividend_name)->month : 0;
 
                             if ($index == 0) {
                                 $data[] = $m_dividend->shareholding;
@@ -371,7 +371,7 @@ class ReportController extends Controller
             $item->loantype = $loan->loanType->name;
             $item->loancode = $loan->code;
             $item->membercode = $loan->member->memberCode;
-            $item->membername = $loan->member->profile->fullName;
+            $item->membername = $loan->member->profile->fullname;
             $item->loandate = Diamond::parse($loan->loaned_at)->format('Y-m-d');
             $item->outstanding = $loan->outstanding;
             $item->period = $loan->payments->count() . '/' . $loan->period;
@@ -426,5 +426,14 @@ class ReportController extends Controller
         else {
             return chr(64 + $second);
         }
+    }
+
+    private function name_to_date($name) {
+        $months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+        $date = explode(" ", $name);
+        $month = array_search($date[0], $months) + 1;
+        $year = $date[1] - 543;
+
+        return Diamond::parse("{$year}-{$month}-1");
     }
 }

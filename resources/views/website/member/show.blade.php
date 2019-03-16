@@ -17,7 +17,7 @@
         <!-- Info boxes -->
         <div class="well">
             <h4>ข้อมูลสมาชิกสหกรณ์</h4>
-            <p>ข้อมูลของ {{ $member->profile->fullName }} รหัสสมาชิก: {{ $member->memberCode }}</p>
+            <p>ข้อมูลของ {{ $member->profile->fullname }} รหัสสมาชิก: {{ $member->memberCode }}</p>
         </div>
 
         @if(Session::has('flash_message'))
@@ -43,7 +43,7 @@
                 <button class="btn btn-primary btn-flat"
                     style="margin-bottom: 5px;"
                     title="แก้ไขข้อมูล"
-                    onclick="javascript:window.location = '/member/{{ $user->member_id }}/edit';">
+                    onclick="javascript:document.location.href = '/member/{{ $user->member_id }}/edit';">
                     <i class="fa fa-edit"></i> แก้ไขข้อมูล
                 </button>
 
@@ -56,7 +56,7 @@
                         <tr>
                             <th>ชื่อ:</th>
                             <td>
-                                {{ ($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' :$member->profile->fullName }} 
+                                {{ ($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' :$member->profile->fullname }} 
                                 {!! !is_null($member->leave_date) ? ' <span class="text-danger">(ออกจากสมาชิกแล้ว)<span>' : '' !!}
                             </td>
                         </tr>

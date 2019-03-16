@@ -89,4 +89,8 @@ class BailsmanController extends Controller
             ->with('flash_message', 'แก้ไขข้อมูลเงื่อนไขการค้ำประกันเรียบร้อยแล้ว' )
             ->with('callout_class', 'callout-success');
     }
+
+    public function getAvailable() {
+        return view('admin.bailsman.available');
+    }
 }

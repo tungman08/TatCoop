@@ -4,12 +4,12 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
         <h1>
-            จัดการผู้ดูแลระบบฯ
-            <small>เพิ่ม ลบ แก้ไข บัญชีของผู้ดูแลระบบ สอ.สรทท.</small>
+            จัดการเจ้าหน้าที่สหกรณ์
+            <small>เพิ่ม ลบ แก้ไข บัญชีของเจ้าหน้าที่สหกรณ์ สอ.สรทท.</small>
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการผู้ดูแลระบบ', 'link' => ''],
+            ['item' => 'จัดการเจ้าหน้าที่สหกรณ์', 'link' => ''],
         ]])
     </section>
 
@@ -17,8 +17,8 @@
     <section class="content">
         <!-- Info boxes -->
         <div class="well">
-            <h4>การจัดการข้อมูลผู้ดูแลระบบ</h4>
-            <p>ให้ผู้ดูแลระบบสามารถ เพิ่ม ลบ แก้ไข ตั้งรหัสผ่านใหม่ และกำหนดสิทธิ์การเข้าถึงข้อมูล ของผู้ดูแลระบบทั้งหมด</p>
+            <h4>การจัดการข้อมูลเจ้าหน้าที่สหกรณ์</h4>
+            <p>ให้ผู้ดูแลระบบสามารถ เพิ่ม ลบ แก้ไข ตั้งรหัสผ่านใหม่ และกำหนดสิทธิ์การเข้าถึงข้อมูล ของเจ้าหน้าที่สหกรณ์ทั้งหมด</p>
         </div>
 
         @if(Session::has('flash_message'))
@@ -36,18 +36,18 @@
 
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title"><i class="fa fa-user-circle-o"></i> บัญชีผู้ใช้งานระบบ</h3>
+                <h3 class="box-title"><i class="fa fa-user-circle-o"></i> บัญชีเจ้าหน้าที่สหกรณ์</h3>
             </div>
             <!-- /.box-header -->
 
             <div class="box-body">
                 <button class="btn btn-primary btn-flat" style="margin-top: 15px; margin-bottom: 15px;"
-                    onclick="javascript:window.location.href='{{ url('/admin/administrator/create') }}';">
-                    <i class="fa fa-user-plus"></i> เพื่อบัญชีผู้ดูแลระบบ
+                    onclick="javascript:document.location.href='{{ url('/admin/administrator/create') }}';">
+                    <i class="fa fa-user-plus"></i> เพื่อบัญชีเจ้าหน้าที่สหกรณ์
                 </button>
                 <button class="btn btn-default btn-flat pull-right" style="margin-top: 15px; margin-bottom: 15px;"
-                    onclick="javascript:window.location.href='{{ url('/admin/administrator/inactive') }}';">
-                    <i class="fa fa-trash"></i> ผู้ดูแลระบบที่ถูกลบ
+                    onclick="javascript:document.location.href='{{ url('/admin/administrator/inactive') }}';">
+                    <i class="fa fa-trash"></i> เจ้าหน้าที่สหกรณ์ที่ถูกลบ
                 </button>
 
                 <div class="table-responsive">
@@ -61,13 +61,13 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($admins as $index => $adminx)
-                            <tr onclick="javascript: document.location = '{{ url('/admin/administrator/' . $adminx->id . '/edit') }}';"
+                            @foreach($admins as $index => $user)
+                            <tr onclick="javascript: document.location.href  = '{{ url('/admin/administrator/' . $user->id . '/edit') }}';"
                                 style="cursor: pointer;">
                                 <td>{{ $index + 1 }}.</td>
-                                <td class="text-primary"><i class="fa fa-user-secret fa-fw"></i> {{ $adminx->email }}</td>
-                                <td>{{ $adminx->name }}</td>
-                                <td>{{ Diamond::parse($adminx->created_at)->thai_format('Y-m-d') }}</td>
+                                <td class="text-primary"><i class="fa fa-user-secret fa-fw"></i> {{ $user->email }}</td>
+                                <td>{{ $user->fullname }}</td>
+                                <td>{{ Diamond::parse($user->created_at)->thai_format('Y-m-d') }}</td>
                             </tr>
                             @endforeach
                         </tbody>

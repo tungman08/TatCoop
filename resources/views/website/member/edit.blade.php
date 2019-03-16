@@ -18,7 +18,7 @@
         <!-- Info boxes -->
         <div class="well">
             <h4>ข้อมูลสมาชิกสหกรณ์</h4>
-            <p>ข้อมูลของ{{ $member->profile->fullName }} รหัสสมาชิก: {{ $member->memberCode }}</p>
+            <p>ข้อมูลของ{{ $member->profile->fullname }} รหัสสมาชิก: {{ $member->memberCode }}</p>
         </div>
 
         <div class="box box-primary">

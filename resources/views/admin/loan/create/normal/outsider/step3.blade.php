@@ -23,6 +23,7 @@
     {{ Form::text('loaned_at', null, [
         'id' => 'loaned_at',
         'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
+        'autocomplete'=>'off',
         'class'=>'form-control'])
     }}             
 </div>
@@ -31,7 +32,7 @@
     <table class="table table-info">
         <tr>
             <th style="width:20%; border-top: 1px solid #fff;">ชื่อผู้กู้:</th>
-            <td style="border-top: 1px solid #fff;">{{ $loan->member->profile->fullName }}</td>
+            <td style="border-top: 1px solid #fff;">{{ $loan->member->profile->fullname }}</td>
         </tr>
         <tr>
             <th>ประเภทการกู้:</th>
@@ -56,9 +57,9 @@
                     @foreach($loan->sureties as $surty)
                         <li>
                             @if($surty->id == $loan->member_id)
-                                {{ $surty->profile->fullName }} (ค้ำประกันด้วยหุ้นตนเอง) จำนวน {{ number_format($surty->pivot->amount, 2, '.', ',') }} บาท
+                                {{ $surty->profile->fullname }} (ค้ำประกันด้วยหุ้นตนเอง) จำนวน {{ number_format($surty->pivot->amount, 2, '.', ',') }} บาท
                             @else
-                                {{ $surty->profile->fullName }} จำนวน {{ number_format($surty->pivot->amount, 2, '.', ',') }} บาท
+                                {{ $surty->profile->fullname }} จำนวน {{ number_format($surty->pivot->amount, 2, '.', ',') }} บาท
                             @endif
                         </li>
                     @endforeach

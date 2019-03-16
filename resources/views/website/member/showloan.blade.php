@@ -18,7 +18,7 @@
         <!-- Info boxes -->
         <div class="well">
             <h4>ข้อมูลการกู้ยืม</h4>
-            <p>แสดงการกู้ยืม ของ {{ $member->profile->fullName }}</p>
+            <p>แสดงการกู้ยืม ของ {{ $member->profile->fullname }}</p>
         </div>
 
         <div class="box box-primary">
@@ -37,7 +37,7 @@
                         <tr>
                             <th>ผู้กู้:</th>
                             <td>
-                                {{ ($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' :$member->profile->fullName }} 
+                                {{ ($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' :$member->profile->fullname }} 
                             </td>
                         </tr>
                         <tr>
@@ -87,25 +87,25 @@
                         <thead>
                             <tr>
                                 <th style="width: 10%;">#</th>
-                                <th style="width: 18%;">วันที่ชำระ</th>
-                                <th style="width: 18%;">เงินต้น</th>
-                                <th style="width: 18%;">ดอกเบี้ย</th>
-                                <th style="width: 18%;">รวมเป็นเงิน</th>
-                                <th style="width: 18%;">ใบรับเงินค่างวด</th>
+                                <th style="width: 15%;">งวดที่</th>
+                                <th style="width: 15%;">วันที่ชำระ</th>
+                                <th style="width: 15%;">เงินต้น</th>
+                                <th style="width: 15%;">ดอกเบี้ย</th>
+                                <th style="width: 15%;">รวมเป็นเงิน</th>
+                                <th style="width: 15%;">ใบรับเงินค่างวด</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @php($count = 0)
-                            @foreach($loan->payments as $payment) 
-                                @php($date = Diamond::parse($payment->pay_date))
+                            @foreach($payments as $index => $payment) 
                                 <tr>
-                                    <td>{{ ++$count }}</td>
-                                    <td class="text-primary"><i class="fa fa-file-text-o fa-fw"></i> {{ $date->thai_format('Y-m-d') }}</td>
+                                    <td>{{ $index + 1 }}.</td>
+                                    <td class="text-primary"><i class="fa fa-file-text-o fa-fw"></i> งวดที่ {{ $payment->period }}</td>
+                                    <td>{{ Diamond::parse($payment->pay_date)->thai_format('Y-m-d') }}</td>
                                     <td>{{ number_format($payment->principle, 2, '.', ',') }}</td>
                                     <td>{{ number_format($payment->interest, 2, '.', ',') }}</td>
                                     <td>{{ number_format($payment->principle + $payment->interest, 2, '.', ',') }}</td>
                                     <td>
-                                        <a href="/member/{{ $member->id }}/loan/{{ $loan->id }}/{{ $payment->id }}/billing/{{ $date->endOfMonth()->format('Y-m-d') }}"><i class="fa fa-file-o"></i> ใบรับเงินค่างวด</a>
+                                        <a href="/member/{{ $member->id }}/loan/{{ $loan->id }}/{{ $payment->id }}/billing/{{ Diamond::parse($payment->pay_date)->copy()->endOfMonth()->format('Y-m-d') }}"><i class="fa fa-file-o"></i> ใบรับเงินค่างวด</a>
                                     </td>
                                 </tr>
                             @endforeach
@@ -142,7 +142,6 @@
     {!! Html::script(elixir('js/dataTables.responsive.js')) !!}
     {!! Html::script(elixir('js/dataTables.bootstrap.js')) !!}
 
-
     <script>
     $(document).ready(function () {
         $.ajaxSetup({
@@ -150,8 +149,29 @@
         });
 
          $('#dataTables-loans').dataTable({
-            "iDisplayLength": 10
+            "iDisplayLength": 10,
+            "columnDefs": [
+                { type: 'formatted-num', targets: 0 },
+                { type: 'formatted-num', targets: 3 },
+                { type: 'formatted-num', targets: 4 },
+                { type: 'formatted-num', targets: 5 }
+            ]
         });
     });   
+
+    jQuery.extend(jQuery.fn.dataTableExt.oSort, {
+        "formatted-num-pre": function ( a ) {
+            a = (a === "-" || a === "") ? 0 : a.replace(/[^\d\-\.]/g, "");
+            return parseFloat( a );
+        },
+
+        "formatted-num-asc": function ( a, b ) {
+            return a - b;
+        },
+
+        "formatted-num-desc": function ( a, b ) {
+            return b - a;
+        }
+    });
     </script>
 @endsection

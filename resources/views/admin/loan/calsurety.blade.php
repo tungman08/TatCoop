@@ -40,7 +40,7 @@
         
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title"><i class="fa fa-calculator"></i> การคำนวณความสามารถในการค้ำประกันของ {{ $member->profile->fullName }}</h3>
+                <h3 class="box-title"><i class="fa fa-calculator"></i> การคำนวณความสามารถในการค้ำประกันของ {{ $member->profile->fullname }}</h3>
             </div>
             <!-- /.box-header -->
 
@@ -137,7 +137,7 @@
 
     function isNumberKey(evt){
         var charCode = (evt.which) ? evt.which : event.keyCode
-        if (charCode != 8 && charCode != 127 && charCode != 46 && (charCode < 48 || charCode > 57))
+        if (charCode != 8 && charCode != 127 && charCode != 45 && charCode != 46 && (charCode < 48 || charCode > 57))
             return false;
         return true;
     }    

@@ -24,17 +24,17 @@
                                 <h4>
                                     <a href="{{ url('/news/' . $item->id) }}">{{ $item->title }}</a>
                                 </h4>
-                                <p>{!! html_entity_decode($item->content) !!}</p>
+                                {{--<p>{!! html_entity_decode($item->content) !!}</p>--}}
                             </div>
                             <div class="ratings">
                                 <p class="pull-right">อ่าน: {{ number_format($item->viewer, 0, '.', ',') }}</p>
-                                <p><i class="fa fa-clock-o"></i> {{ (Diamond::now()->diff(Diamond::parse($item->created_at))->days > 1) ? Diamond::parse($item->created_at)->thai_format('Y-m-d') : Diamond::parse($item->created_at)->thai_diffForHumans() }}</p>
+                                <p><i class="fa fa-clock-o"></i> {{ (Diamond::now()->diff(Diamond::parse($item->created_at))->days > 1) ? Diamond::parse($item->created_at)->thai_format('j M Y') : Diamond::parse($item->created_at)->thai_diffForHumans() }}</p>
                             </div>
                         </div>
                     </div>
                 @empty
                     <div class="col-sm-12 col-lg-12 col-md-12" style="padding: 150px 0px;">
-                        <h4><i class="fa fa-newspaper-o fa-fw"></i> ไม่มีข่าวสารสำหรับสมาชิก</h>
+                        <h4><i class="fa fa-newspaper-o fa-fw"></i> ไม่มีข่าวสารสำหรับสมาชิก</h4>
                     </div>
                 @endforelse
             </div>

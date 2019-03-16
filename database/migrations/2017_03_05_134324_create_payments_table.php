@@ -20,6 +20,7 @@ class CreatePaymentsTable extends Migration
                 ->on('loans')->onDelete('cascade');
 
             $table->date('pay_date');
+            $table->integer('period');
             $table->double('principle');
             $table->double('interest');
             $table->timestamps();

@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Administrator;
+use App\Role;
 use History;
 
 class AdminCommand extends Command
@@ -48,10 +49,11 @@ class AdminCommand extends Command
 
                 if ($password == $confirmed) {
                     if (strlen($password) >= 6) {
-                        $admin = ['name' => 'Administrator', 'email' => 'admin@tatcoop.com', 'password' => $password, 'password_changed' => true];
-
+                        $admin = ['name' => 'Secret', 'lastname' => 'Administrator', 'email' => 'admin@tatcoop.com', 'password' => $password, 'password_changed' => true];
                         $obj = new Administrator($admin);
-                        $obj->save();
+
+                        $role = Role::find(1);
+                        $role->admins()->save($obj);
 
                         History::addAdminHistory($obj->id, 'สร้างบัญชีผู้ดูแลระบบ');
                         $this->info('Super administrator was created.');

@@ -42,15 +42,15 @@
 
             <div class="box-body">
                 <button class="btn btn-primary btn-flat margin-b-md" type="button" data-tooltip="true" title="เพิ่มประเภทเงินกู้"
-                    onclick="javascript:window.location.href='{{ url('/admin/loantype/create') }}';">
+                    onclick="javascript:document.location.href='{{ url('/database/loantype/create') }}';">
                     <i class="fa fa-plus"></i> เพิ่มประเภทเงินกู้
                 </button>
                 <button class="btn btn-default btn-flat margin-b-md pull-right" type="button" data-tooltip="true" title="สมาชิกประเภทเงินกู้ที่ถูกลบ"
-                    onclick="javascript:window.location.href='{{ url('/admin/loantype/inactive') }}';">
+                    onclick="javascript:document.location.href='{{ url('/database/loantype/inactive') }}';">
                     <i class="fa fa-trash"></i> แสดงประเภทเงินกู้ที่ถูกลบ
                 </button>
                 <button class="btn btn-default btn-flat margin-b-md margin-r-sm pull-right" type="button" data-tooltip="true" title="สมาชิกประเภทเงินกู้ที่หมดอายุ"
-                    onclick="javascript:window.location.href='{{ url('/admin/loantype/expired') }}';">
+                    onclick="javascript:document.location.href='{{ url('/database/loantype/expired') }}';">
                     <i class="fa fa-ban"></i> แสดงประเภทเงินกู้ที่สิ้นสุดการใช้
                 </button>
 
@@ -59,19 +59,20 @@
                         <thead>
                             <tr>
                                 <th style="width: 10%;">#</th>
-                                <th style="width: 45%;">ชื่อประเภทเงินกู้</th>
+                                <th style="width: 25%;">ชื่อประเภทเงินกู้</th>
+                                <th style="width: 20%;">อัตราดอกเบี้ย</th>
                                 <th style="width: 15%;">วันที่เริ่มใช้</th>
                                 <th style="width: 15%;">วันที่สิ้นสุดการใช้</th>
                                 <th style="width: 15%;">จำนวนสัญญาเงินกู้</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @php($count = 0)
-                            @foreach($loantypes as $type)
-                            <tr onclick="javascript: document.location = '{{ url('/admin/loantype/' . $type->id) }}';"
+                            @foreach($loantypes as $index => $type)
+                            <tr onclick="javascript: document.location.href  = '{{ url('/database/loantype/' . $type->id) }}';"
                                 style="cursor: pointer;">
-                                <td>{{ ++$count }}.</td>
+                                <td>{{ $index + 1 }}.</td>
                                 <td class="text-primary"><i class="fa fa-credit-card fa-fw"></i> {{ $type->name }}</td>
+                                <td>{{ number_format($type->rate, 2, '.', ',') }}%</td>
                                 <td>{{ (Diamond::minValue()->diffInDays(Diamond::parse($type->start_date)) > 0) ? Diamond::parse($type->start_date)->thai_format('Y-m-d') : 'N/A' }}</td>
                                 <td>{{ (Diamond::maxValue()->diffInDays(Diamond::parse($type->expire_date)) > 0) ? Diamond::parse($type->expire_date)->thai_format('Y-m-d') : 'N/A' }}</td>
                                 <td>{{ number_format($type->loans->filter(function ($value, $key) { return !empty($value->code); })->count()) }}</td>

@@ -26,7 +26,7 @@
                 <table class="table table-info">
                     <tr>
                         <th style="width:20%;">ชื่อผู้สมาชิก:</th>
-                        <td>{{ $member->profile->fullName }}</td>
+                        <td>{{ $member->profile->fullname }}</td>
                     </tr>
                     <tr>
                         <th>ประเภทเงินกู้:</th>
@@ -53,7 +53,7 @@
                         <td>
                             <ul class="list-info">
                                 @foreach($loan->sureties as $item)
-                                    <li>{{ $item->profile->fullName }} (ค้ำประกันจำนวน {{ number_format($item->pivot->amount, 2, '.', ',')  }}  บาท)</li>
+                                    <li>{{ $item->profile->fullname }} (ค้ำประกันจำนวน {{ number_format($item->pivot->amount, 2, '.', ',')  }}  บาท)</li>
                                 @endforeach
                             </ul>
                         </td>
@@ -96,19 +96,31 @@
             {{ Form::open(['url' => '/service/' . $member->id . '/loan/' . $loan->id . '/payment', 'method' => 'post', 'class' => 'form-horizontal', 'enctype'=>'multipart/form-data']) }}
                 <div class="box-body">
                     <div class="form-group">
+                        {{ Form::label('period', 'งวดที่', [
+                            'class'=>'col-sm-2 control-label']) 
+                        }}
+
+                        <div class="col-sm-10">
+                            {{ Form::text('period', null, [
+                                'class'=>'form-control', 
+                                'placeholder'=>'ตัวอย่าง: 0', 
+                                'autocomplete'=>'off',
+                                'onkeypress' => 'javascript:return isNumberKey(event);'])
+                            }}  
+                        </div>
+                    </div>
+                    <div class="form-group">
                         {{ Form::label('pay_date', 'วันที่ชำระ', [
                             'class'=>'col-sm-2 control-label']) 
                         }}
 
-                        <div class="col-sm-10 input-group" id="datepicker" style="padding: 0 5px;">
+                        <div class="col-sm-10 input-group" style="padding: 0 5px;">
                             {{ Form::text('pay_date', Diamond::today()->format('Y-m-d'), [
+                                'id'=>'pay_date',
                                 'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
+                                'autocomplete'=>'off',
                                 'class'=>'form-control'])
                             }}       
-                            <span class="input-group-addon">
-                                <span class="fa fa-calendar">
-                                </span>
-                            </span> 
                         </div>
                     </div>
                     <div class="form-group">
@@ -226,7 +238,7 @@
 
             $("#save").attr("disabled", true);
 
-            $('#datepicker').datetimepicker({
+            $('#pay_date').datetimepicker({
                 locale: 'th',
                 viewMode: 'days',
                 format: 'YYYY-MM-DD',
@@ -266,9 +278,9 @@
                         $('#interest').val($.number(result.interest, 2));
                         $('#total').val($.number(result.total, 2));
 
-                        if (result.interest >= 0) {
+                        //if (result.interest >= 0) {
                             $('#save').removeAttr("disabled");
-                        }              
+                        //}              
                     }
                 });
             }
@@ -284,7 +296,7 @@
         
         function isNumberKey(evt){
             var charCode = (evt.which) ? evt.which : event.keyCode
-            if (charCode != 8 && charCode != 127 && charCode != 46 && (charCode < 48 || charCode > 57))
+            if (charCode != 8 && charCode != 127 && charCode != 45 && charCode != 46 && (charCode < 48 || charCode > 57))
                 return false;
             return true;
         }   

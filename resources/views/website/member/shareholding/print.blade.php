@@ -56,7 +56,7 @@
                             </tr>
                             <tr>
                                 <th class="block">ได้รับเงินจาก:</th>
-                                <td class="block">{{ $member->profile->fullName }}</td>
+                                <td class="block">{{ $member->profile->fullname }}</td>
                             </tr>
                             <tr>
                                 <th class="block">หน่วยงาน:</th>

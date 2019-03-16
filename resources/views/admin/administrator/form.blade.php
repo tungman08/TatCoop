@@ -1,6 +1,6 @@
 <div class="box-body">
     <div class="form-group">
-        {{ Form::label('name', 'ชื่อผู้ดูแลระบบ', [
+        {{ Form::label('name', 'ชื่อ', [
             'class'=>'col-sm-2 control-label']) 
         }}
 
@@ -8,13 +8,27 @@
             {{ Form::text('name', null, [
                 'required',
                 'class'=>'form-control', 
-                'placeholder'=>'ตัวอย่าง: ร.ต.ท.วศิน มีปรีชา', 
+                'placeholder'=>'ตัวอย่าง: วศิน', 
                 'autocomplete'=>'off'])
             }}
         </div>
     </div>
     <div class="form-group">
-        {{ Form::label('email', 'อีเมล/บัญชีผู้ดูแลระบบ', [
+        {{ Form::label('lastname', 'นามสกุล', [
+            'class'=>'col-sm-2 control-label']) 
+        }}
+
+        <div class="col-sm-10">
+            {{ Form::text('lastname', null, [
+                'required',
+                'class'=>'form-control', 
+                'placeholder'=>'ตัวอย่าง: มีปรีชา', 
+                'autocomplete'=>'off'])
+            }}
+        </div>
+    </div>
+    <div class="form-group">
+        {{ Form::label('email', 'อีเมล/บัญชีเจ้าหน้าที่สหกรณ์', [
             'class'=>'col-sm-2 control-label']) 
         }}
 
@@ -79,7 +93,7 @@
     @if ($edit)
         {{ Form::button('<i class="fa fa-trash"></i> ลบ', [
             'class'=>'btn btn-danger btn-flat pull-right', 
-            'onclick'=>'javascript:window.location = "/admin/administrator/' . $id . '/delete";'])
+            'onclick'=>'javascript:document.location.href = "/admin/administrator/' . $id . '/delete";'])
         }}
     @endif
 </div>

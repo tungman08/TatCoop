@@ -23,7 +23,7 @@
         <!-- Info boxes -->
         <div class="well">
             <h4>ข้อมูลทุนเรือนหุ้น</h4>
-            <p>แก้ไขข้อมูลชำระค่าหุ้นต่างๆ ของ {{ $member->profile->fullName }}</p>
+            <p>แก้ไขข้อมูลชำระค่าหุ้นต่างๆ ของ {{ $member->profile->fullname }}</p>
         </div>
 
         @if ($errors->count() > 0)
@@ -86,7 +86,7 @@
     $(document).ready(function () {
         $('[data-tooltip="true"]').tooltip();
         
-        $('#datepicker').datetimepicker({
+        $('#pay_date').datetimepicker({
             locale: 'th',
             viewMode: 'days',
             format: 'YYYY-MM-DD',

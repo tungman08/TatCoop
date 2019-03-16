@@ -17,7 +17,7 @@
                 <a class="page-scroll" href="#page-top"></a>
             </li>
             <li>
-                <a class="page-scroll" href="#services">บริการอิเล็กทรอนิกส์</a>
+                <a class="page-scroll" href="#services">ข่าวสารสำหรับสมาชิก</a>
             </li>
             <li>
                 <a class="page-scroll" href="#about">สาระน่ารู้เกี่ยวกับสหกรณ์</a>

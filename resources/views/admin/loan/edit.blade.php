@@ -20,7 +20,7 @@
     <section class="content">
         <!-- Info boxes -->
         <div class="well">
-            <h4>การทำสัญญาการกู้ยืมของ {{ ($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' :$member->profile->fullName }}</h4>
+            <h4>การทำสัญญาการกู้ยืมของ {{ ($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' :$member->profile->fullname }}</h4>
             <p>ให้ผู้ดูแลระบบ แก้ไขสัญญาเงินกู้ได้</p>
         </div>
 
@@ -65,6 +65,7 @@
                             {{ Form::text('loaned_at', $loan->loaned_at, [
                                 'id' => 'loaned_at',
                                 'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
+                                'autocomplete'=>'off',
                                 'class'=>'form-control'])
                             }}             
                         </div>

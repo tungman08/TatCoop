@@ -26,7 +26,7 @@
                 <table class="table table-info">
                     <tr>
                         <th style="width:20%;">ชื่อผู้สมาชิก:</th>
-                        <td>{{ $member->profile->fullName }}</td>
+                        <td>{{ $member->profile->fullname }}</td>
                     </tr>
                     <tr>
                         <th>ประเภทเงินกู้:</th>
@@ -102,7 +102,7 @@
                             <div class="box-body">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        {{ $surety->profile->fullName }}
+                                        {{ $surety->profile->fullname }}
 
                                         @if ($surety->pivot->yourself)
                                             @php($available = LoanCalculator::shareholding_available($surety))
@@ -397,7 +397,7 @@
 
     function isNumberKey(evt){
         var charCode = (evt.which) ? evt.which : event.keyCode
-        if (charCode != 8 && charCode != 127 && charCode != 46 && (charCode < 48 || charCode > 57))
+        if (charCode != 8 && charCode != 127&& charCode != 45 && charCode != 46 && (charCode < 48 || charCode > 57))
             return false;
         return true;
     }    

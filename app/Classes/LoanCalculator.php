@@ -3,6 +3,7 @@
 namespace App\Classes;
 
 use stdClass;
+use App\Bailsman;
 use App\Loan;
 use App\Payment;
 use App\Member;
@@ -75,6 +76,7 @@ class LoanCalculator {
         }
     }
 
+    //กู้สามัญด้วยเงินเดือน
     public function shareholding_available($member) {
         // (หุ้น x 0.8 บุคคลภายนอก) - เงินที่กู้ไปแล้ว ณ ปัจจุบัน
         // (หุ้น x 0.9 พนักงาน) - เงินที่กู้ไปแล้ว ณ ปัจจุบัน
@@ -82,18 +84,8 @@ class LoanCalculator {
         $shareholding = $member->shareholdings->sum('amount') * $weitgh < 1200000 ? $member->shareholdings->sum('amount') * $weitgh : 1200000;
         $gaurantee = $member->loans->filter(function ($value, $key) { return !is_null($value->code) && is_null($value->completed_at); })->sum(function ($value) { return $value->sureties->filter(function ($value, $key) { return $value->yourself; })->sum('amount'); });
         $principle = $member->loans->filter(function ($value, $key) { return !is_null($value->code) && is_null($value->completed_at); })->sum(function ($value) { return $value->payments->sum('principle'); });
-
+        
         return $shareholding - ($gaurantee - $principle);
-    }
-
-    public function salary_available($member, $salary) {
-        // (เงินเดือน x 40) - เงินที่ค้ำไปแล้ว ณ ปัจจุบัน
-        $limit = ($salary * 40 < 1200000) ? $salary * 40 : 1200000;
-        $gaurantee = $member->sureties->filter(function ($value, $key) { return !is_null($value->code) && is_null($value->completed_at); })->sum(function ($value) { return $value->sureties->filter(function ($value, $key) { return $value->yourself; })->sum('amount'); });
-        $outstanding = $member->sureties->filter(function ($value, $key) { return !is_null($value->code) && is_null($value->completed_at); })->sum('outstanding');
-        $principle = $member->sureties->filter(function ($value, $key) { return !is_null($value->code) && is_null($value->completed_at); })->sum(function ($value) { return $value->payments->sum('principle'); });
-
-        return ($outstanding > 0) ? $limit - ($gaurantee * (($outstanding - $principle) / $outstanding)) : $limit;
     }
 
     public function sureties_balance($sureties) {

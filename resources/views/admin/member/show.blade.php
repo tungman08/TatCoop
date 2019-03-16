@@ -31,7 +31,7 @@
                 <table class="table table-info">
                     <tr>
                         <th style="width:20%;">ชื่อผู้สมาชิก:</th>
-                        <td>{{ ($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' : $member->profile->fullName }}</td>
+                        <td>{{ ($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' : $member->profile->fullname }}</td>
                     </tr>
                     <tr>
                         <th>รหัสสมาชิก:</th>
@@ -73,22 +73,22 @@
                 </button>
             </div>
             <div class="col-md-5ths">
-                <button type="button" class="btn btn-block btn-success btn-lg" onclick="javascript:window.location.href='{{ url('/service/' . $member->id . '/shareholding') }}';">
+                <button type="button" class="btn btn-block btn-success btn-lg" onclick="javascript:document.location.href='{{ url('/service/' . $member->id . '/shareholding') }}';">
                     <i class="fa fa-money fa-fw"></i> ทุนเรือนหุ้น
                 </button>
             </div>            
             <div class="col-md-5ths">
-                <button type="button" class="btn btn-block btn-danger btn-lg" onclick="javascript:window.location.href='{{ url('/service/' . $member->id . '/loan') }}';">
+                <button type="button" class="btn btn-block btn-danger btn-lg" onclick="javascript:document.location.href='{{ url('/service/' . $member->id . '/loan') }}';">
                     <i class="fa fa-credit-card fa-fw"></i> การกู้ยืม
                 </button>
             </div>
             <div class="col-md-5ths">
-                <button type="button" class="btn btn-block btn-warning btn-lg" onclick="javascript:window.location.href='{{ url('/service/' . $member->id . '/guaruntee') }}';">
+                <button type="button" class="btn btn-block btn-warning btn-lg" onclick="javascript:document.location.href='{{ url('/service/' . $member->id . '/guaruntee') }}';">
                     <i class="fa fa-share-alt fa-fw"></i> การค้ำประกัน
                 </button>
             </div>
             <div class="col-md-5ths">
-                <button type="button" class="btn btn-block btn-purple btn-lg" onclick="javascript:window.location.href='{{ url('/service/' . $member->id . '/dividend') }}';">
+                <button type="button" class="btn btn-block btn-purple btn-lg" onclick="javascript:document.location.href='{{ url('/service/' . $member->id . '/dividend') }}';">
                     <i class="fa fa-dollar fa-fw"></i> เงินปันผล
                 </button>
             </div>
@@ -97,7 +97,7 @@
 
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title"><i class="fa fa-user"></i> ข้อมูลของ {{ ($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' : $member->profile->fullName }}</h3>
+                <h3 class="box-title"><i class="fa fa-user"></i> ข้อมูลของ {{ ($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' : $member->profile->fullname }}</h3>
             </div>
             <!-- /.box-header -->
 
@@ -114,11 +114,42 @@
     <div class="ajax-loading">
         <i class="fa fa-spinner fa-3x fa-spin"></i>
     </div>
+
+    <!-- Leave Modal -->
+    <div id="leaveModal" class="modal fade" role="dialog">
+        <input type="hidden" id="member_id" value="{{ $member->id }}" />
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header panel-heading">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">ลาออกจากสมาชิก</h4>
+                </div>
+                <div class="modal-body">
+                    <label for="leave_date">วันที่ลาออก</label>
+                    <input type="text" id="leave_date" 
+                        placeholder="กรุณาเลือกจากปฏิทิน..." 
+                        autocomplete="off"
+                        class="form-control margin-b-lg" />
+
+                    <div class="text-center">
+                        <button id="leave_btn" class="btn btn-danger btn-flat margin-b-lg">
+                            <i class="fa fa-user-times"></i> ลาออก
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> 
 @endsection
 
 @section('styles')
     <!-- Bootstrap DataTable CSS -->
     {!! Html::style(elixir('css/dataTables.bootstrap.css')) !!}
+
+    <!-- Bootstrap DateTime Picker CSS -->
+    {!! Html::style(elixir('css/bootstrap-datetimepicker.css')) !!}
 
     @parent
 @endsection
@@ -132,6 +163,9 @@
     {!! Html::script(elixir('js/dataTables.responsive.js')) !!}
     {!! Html::script(elixir('js/dataTables.bootstrap.js')) !!}
 
+    <!-- Bootstrap DateTime Picker JavaScript -->
+    {!! Html::script(elixir('js/bootstrap-datetimepicker.js')) !!}
+
     <script>
     $(document).ready(function () {
         $.ajaxSetup({
@@ -139,6 +173,22 @@
         });
 
         $('[data-tooltip="true"]').tooltip();
+
+        $('#leave_date').datetimepicker({
+            locale: 'th',
+            viewMode: 'days',
+            format: 'YYYY-MM-DD',
+            locale: moment().lang('th'),
+            useCurrent: false
+        });
+
+        $('#leave_btn').click(function() {
+            if($('#leave_date').val() != '') {
+                let leave_date = $('#leave_date').val();
+
+                document.location.href = "/service/member/" + $('#member_id').val() + "/leave/" + leave_date;
+            }
+        });
     });
     </script>
 @endsection

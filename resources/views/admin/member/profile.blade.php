@@ -1,13 +1,15 @@
 @if (is_null($member->leave_date))
     <button class="btn btn-primary btn-flat"
+        {{ (($is_super || $is_admin) ? '' : 'disabled') }}
         title="แก้ไขข้อมูล"
-        onclick="javascript:window.location = '/service/member/{{ $member->id }}/edit';">
+        onclick="javascript:document.location = '/service/member/{{ $member->id }}/edit';">
         <i class="fa fa-edit"></i> แก้ไขข้อมูล
     </button>
 
     <button class="btn btn-danger btn-flat pull-right"
+        {{ (($is_super || $is_admin) ? '' : 'disabled') }}
         title="ลาออกจากสมาชิก"
-        onclick="javascript:window.location = '/service/member/{{ $member->id }}/leave';">
+        onclick="javascript: $('#leaveModal').modal('show');">
         <i class="fa fa-user-times"></i> ลาออกจากสมาชิก
     </button>
 @endif
@@ -21,7 +23,7 @@
         <tr>
             <th>ชื่อ:</th>
             <td>
-                {{ ($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' :$member->profile->fullName }} 
+                {{ ($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' :$member->profile->fullname }} 
                 {!! !is_null($member->leave_date) ? ' <span class="text-danger">(ออกจากสมาชิกแล้ว)<span>' : '' !!}
             </td>
         </tr>

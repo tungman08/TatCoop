@@ -24,7 +24,7 @@
                 <table class="table table-info">
                     <tr>
                         <th style="width:20%;">ชื่อผู้สมาชิก:</th>
-                        <td>{{ ($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' : $member->profile->fullName }}</td>
+                        <td>{{ ($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' : $member->profile->fullname }}</td>
                     </tr>
                     <tr>
                         <th>จำนวนค่าหุ้นรายเดือน:</th>
@@ -55,7 +55,7 @@
 
         <div class="row margin-b-md">
             <div class="col-md-5ths">
-                <button type="button" class="btn btn-block btn-primary btn-lg" onclick="javascript:window.location.href='{{ url('/service/member/' . $member->id) }}';">
+                <button type="button" class="btn btn-block btn-primary btn-lg" onclick="javascript:document.location.href='{{ url('/service/member/' . $member->id) }}';">
                     <i class="fa fa-user fa-fw"></i> ข้อมูลสมาชิก
                 </button>
             </div>
@@ -65,17 +65,17 @@
                 </button>
             </div>            
             <div class="col-md-5ths">
-                <button type="button" class="btn btn-block btn-danger btn-lg" onclick="javascript:window.location.href='{{ url('/service/' . $member->id . '/loan') }}';">
+                <button type="button" class="btn btn-block btn-danger btn-lg" onclick="javascript:document.location.href='{{ url('/service/' . $member->id . '/loan') }}';">
                     <i class="fa fa-credit-card fa-fw"></i> การกู้ยืม
                 </button>
             </div>
             <div class="col-md-5ths">
-                <button type="button" class="btn btn-block btn-warning btn-lg" onclick="javascript:window.location.href='{{ url('/service/' . $member->id . '/guaruntee') }}';">
+                <button type="button" class="btn btn-block btn-warning btn-lg" onclick="javascript:document.location.href='{{ url('/service/' . $member->id . '/guaruntee') }}';">
                     <i class="fa fa-share-alt fa-fw"></i> การค้ำประกัน
                 </button>
             </div>
             <div class="col-md-5ths">
-                <button type="button" class="btn btn-block btn-purple btn-lg" onclick="javascript:window.location.href='{{ url('/service/' . $member->id . '/dividend') }}';">
+                <button type="button" class="btn btn-block btn-purple btn-lg" onclick="javascript:document.location.href='{{ url('/service/' . $member->id . '/dividend') }}';">
                     <i class="fa fa-dollar fa-fw"></i> เงินปันผล
                 </button>
             </div>
@@ -90,7 +90,8 @@
 
             <div class="box-body">
                 <button class="btn btn-primary btn-flat" style="margin-bottom: 15px;"
-                    onclick="javascript:window.location = '/service/{{ $member->id }}/shareholding/create';">
+                    {{ (($is_super || $is_admin) ? '' : 'disabled') }}
+                    onclick="javascript:document.location = '/service/{{ $member->id }}/shareholding/create';">
                     <i class="fa fa-plus-circle"></i> ชำระเงินค่าหุ้น
                 </button>
 
@@ -107,12 +108,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @php($count = 0)
-                            @foreach($shareholdings->sortByDesc('name') as $share)
-                                @php($date = Diamond::parse($share->name))
-                                <tr onclick="javascript: document.location = '{{ url('service/shareholding/' . $member->id . '/' . $share->paydate . '/show') }}';" style="cursor: pointer;">
-                                    <td>{{ ++$count }}.</td>
-                                    <td class="text-primary"><i class="fa fa-money fa-fw"></i> {{ $date->thai_format('F Y') }}</td>
+                            @foreach($shareholdings as $index => $share)
+                                <tr onclick="javascript: document.location.href  = '{{ url('service/shareholding/' . $member->id . '/' . $share->paydate . '/show') }}';" style="cursor: pointer;">
+                                    <td>{{ $index + 1 }}.</td>
+                                    <td class="text-primary"><i class="fa fa-money fa-fw"></i> {{ Diamond::parse($share->paydate)->thai_format('F Y') }}</td>
                                     <td>{{ number_format($share->amount, 2, '.', ',') }} บาท</td>
                                     <td>{{ number_format($share->amount_cash, 2, '.', ',') }} บาท</td>
                                     <td>{{ number_format($share->amount + $share->amount_cash, 2, '.', ',') }} บาท</td>
@@ -157,7 +156,13 @@
         $('[data-tooltip="true"]').tooltip();
 
         $('#dataTables-shareholding').dataTable({
-            "iDisplayLength": 10
+            "iDisplayLength": 10,
+            "columnDefs": [
+                { type: 'formatted-num', targets: 2 },
+                { type: 'formatted-num', targets: 3 },
+                { type: 'formatted-num', targets: 4 },
+                { type: 'formatted-num', targets: 5 }
+            ]
         });
     });
     </script>

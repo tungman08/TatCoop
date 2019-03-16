@@ -1,6 +1,6 @@
 <div class="box">
     <div class="box-header with-border">
-        <h3 class="box-title">สมาชิก ปี {{ Diamond::today()->thai_format('Y') }}</h3>
+        <h3 class="box-title">สมาชิก ปี <span class="filter-year"></span></h3>
     </div>
     <!-- /.box-header -->
 
@@ -19,7 +19,7 @@
 
             <div class="col-md-4">
                 <p class="text-center">
-                    <strong>สมาชิกล่าสุด</strong>
+                    <strong>สมาชิกล่าสุด ณ ปัจจุบัน</strong>
                 </p>
 
                 <ul id="newmembers" class="products-list product-list-in-box">

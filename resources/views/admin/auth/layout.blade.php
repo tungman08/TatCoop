@@ -51,7 +51,7 @@
     </header>
     <!-- /header -->
 
-    <div class="login-box">
+    <div class="login-box" style="padding-bottom: 40px;">
         <div class="login-logo">
             <a href="{{ url(env('APP_URL', 'http://www.tatcoop.com')) }}"><b>TAT Coopperative</b></a>
         </div>

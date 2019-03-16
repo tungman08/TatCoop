@@ -116,7 +116,7 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
     Route::controller('/ajax', 'AjaxController');
 
     // Background Route...
-    Route::get('/background/{photo}', ['as' => 'website.background', 'uses' => 'BackgroundController@getBackground']);
+    Route::get('/background/{photo}', ['as' => 'admin.background', 'uses' => 'BackgroundController@getBackground']);
 
     // Carousel Route...
     Route::get('/carousel/{image}', ['as' => 'admin.carousel', 'uses' => 'CarouselController@getCarousel']);
@@ -151,7 +151,7 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
     Route::group(['prefix' => '/service'], function() {
         // Member Route...
         Route::get('member/inactive', 'MemberController@getInactive');
-        Route::get('member/{id}/leave', ['as' => 'admin.member.leave', 'uses' => 'MemberController@getLeave']);
+        Route::get('member/{id}/leave/{date}', ['as' => 'service.member.leave', 'uses' => 'MemberController@getLeave']);
         Route::post('member/{id}/leave', 'MemberController@postLeave');
         Route::resource('member', 'MemberController');
 
@@ -162,8 +162,6 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
         Route::get('shareholding/{member_id}/{paydate}/billing/{id}', ['as' => 'service.shareholding.billing', 'uses' => 'ShareholdingController@getBilling']);
         Route::get('shareholding/{member_id}/{paydate}/print/{id}', ['as' => 'service.shareholding.print', 'uses' => 'ShareholdingController@getPrintBilling']);
         Route::get('shareholding/{member_id}/{paydate}/pdf/{id}', ['as' => 'service.shareholding.pdf', 'uses' => 'ShareholdingController@getPdfBilling']);
-        Route::get('shareholding/autoshareholding', ['as' => 'service.shareholding.auto', 'uses' => 'ShareholdingController@getAutoShareholding']);
-        Route::post('shareholding/autoshareholding', 'ShareholdingController@postAutoShareholding');
 		Route::post('shareholding/showfiles', 'ShareholdingController@postShowFiles');
         Route::post('shareholding/uploadfile', 'ShareholdingController@postUploadFile');
 		Route::post('shareholding/deletefile', 'ShareholdingController@postDeleteFile');
@@ -182,6 +180,9 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
         Route::get('{member_id}/loan/create/refinance/employee', ['as' => 'service.loan.create.refinance.employee', 'uses' => 'RefinanceController@getCreateEmployeeRefinance']);
         Route::get('{member_id}/loan/create/refinance/outsider', ['as' => 'service.loan.create.refinance.outsider', 'uses' => 'RefinanceController@getCreateOutsiderRefinance']);
         Route::get('{member_id}/loan/{loan_id}/sureties/edit', ['as' => 'service.loan.sureties.edit', 'uses' => 'LoanController@getEditSureties']);
+        Route::get('{member_id}/loan/debt', ['as' => 'service.loan.debt', 'uses' => 'LoanController@getDebt']);
+        Route::get('{member_id}/loan/debt/print', ['as' => 'service.loan.debtprint', 'uses' => 'LoanController@getDebtPrint']);
+        Route::get('{member_id}/loan/debt/pdf', ['as' => 'service.loan.debtpdf', 'uses' => 'LoanController@getDebtPdf']);
         Route::post('{member_id}/loan/create/normal/employee', 'NormalLoanController@postCreateEmployeeLoan');
         Route::post('{member_id}/loan/create/normal/outsider', 'NormalLoanController@postCreateOutsiderLoan');
         Route::post('{member_id}/loan/create/emerging/employee', 'EmergingLoanController@postCreateEmployeeLoan');
@@ -193,8 +194,6 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
         Route::resource('{member_id}/loan', 'LoanController');
         
         // Payment Route...
-        Route::get('loan/autopayment', ['as' => 'service.payment.auto', 'uses' => 'PaymentController@getAutoPayment']);
-        Route::post('loan/autopayment', 'PaymentController@postAutoPayment');
         Route::post('loan/payment/uploadfile', 'PaymentController@postUploadFile');
 		Route::post('loan/payment/deletefile', 'PaymentController@postDeleteFile');
         Route::group(['prefix' => '{member_id}/loan/{loan_id}'], function () {
@@ -210,10 +209,61 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
         // Dividend Route...
         Route::get('dividend/member', ['as' => 'service.dividend.member', 'uses' => 'DividendController@getMember']);
         Route::get('{member_id}/dividend', ['as' => 'service.dividend.member.show', 'uses' => 'DividendController@getMemberDividend']);
+        Route::get('{member_id}/dividend/{dividend_id}/edit', ['as' => 'service.dividendmember.edit', 'uses' => 'DividendController@getMemberEdit']);
+        Route::post('{member_id}/dividend/{dividend_id}/edit', 'DividendController@postMemberUpdate');  
 
         // Quaruntee Route...
         Route::get('guaruntee/member', ['as' => 'service.guaruntee.member', 'uses' => 'GuarunteeController@getMember']);
         Route::resource('{member_id}/guaruntee', 'GuarunteeController');
+    });
+
+    // Co-op Route...
+    Route::group(['prefix' => '/coop'], function() {
+        // Loan List Route...
+        Route::get('loanlist', ['as' => 'coop.loan.loanlist', 'uses' => 'LoanController@getLoanList']);
+
+        // Routine Shareholding Payment Route...
+        Route::post('routine/shareholding/detail', 'RoutineShareholdingController@saveDetail');
+        Route::get('routine/shareholding/detail/{id}/edit', ['as' => 'coop.routine.shareholding.detail.edit', 'uses' => 'RoutineShareholdingController@editDetail']);
+        Route::put('routine/shareholding/detail/{id}', 'RoutineShareholdingController@updateDetail');
+        Route::delete('routine/shareholding/detail/{id}', 'RoutineShareholdingController@deleteDetail');
+        Route::post('routine/shareholding/{id}/save', 'RoutineShareholdingController@save');
+        Route::resource('routine/shareholding', 'RoutineShareholdingController', ['only' => [ 'index', 'show' ]]);
+
+        // Routine Loan Payment Route...
+        Route::post('routine/payment/detail', 'RoutinePaymentController@saveDetail');
+        Route::get('routine/payment/detail/{id}/edit', ['as' => 'coop.routine.payment.detail.edit', 'uses' => 'RoutinePaymentController@editDetail']);
+        Route::put('routine/payment/detail/{id}', 'RoutinePaymentController@updateDetail');
+        Route::delete('routine/payment/detail/{id}', 'RoutinePaymentController@deleteDetail');
+        Route::post('routine/payment/{id}/save', 'RoutinePaymentController@save');
+        Route::resource('routine/payment', 'RoutinePaymentController', ['only' => [ 'index', 'show' ]]);
+
+        // Routine Available Loan Route...
+        Route::get('available/loan', ['as' => 'coop.available.loan', 'uses' => 'LoanController@getAvailable']);
+
+        // Routine Available Bailsman Route...
+        Route::get('available/bailsman', ['as' => 'coop.available.bailsman', 'uses' => 'BailsmanController@getAvailable']);
+    });
+
+    // Database Route...
+    Route::group(['prefix' => '/database'], function() {
+        // Loan Type Route...
+        Route::get('loantype/{id}/finished', ['as' => 'database.loantype.finished', 'uses' => 'LoanTypeController@getFinished']);
+        Route::get('loantype/expired', ['as' => 'database.loantype.expired', 'uses' => 'LoanTypeController@getExpired']);
+        Route::get('loantype/expired/{id}', ['as' => 'database.loantype.expired.detail', 'uses' => 'LoanTypeController@getExpiredDetail']);
+        Route::get('loantype/inactive', ['as' => 'database.loantype.inactive', 'uses' => 'LoanTypeController@getInactive']);
+        Route::post('loantype/{id}/forcedelete', 'LoanTypeController@postForceDelete');
+        Route::post('loantype/{id}/restore', 'LoanTypeController@postRestore');       
+        Route::resource('loantype', 'LoanTypeController');
+
+        // Bailsman Route...
+        Route::resource('bailsman', 'BailsmanController', ['only' => [ 'index', 'edit', 'update' ]]);
+
+        // Dividend Route...
+        Route::resource('dividend', 'DividendController', ['except' => [ 'show' ]]);
+
+        // Billing Route...
+        Route::resource('billing', 'BillingController', ['only' => [ 'index', 'create', 'store', 'edit', 'update' ]]);        
     });
 
     // Admin Route...
@@ -225,40 +275,25 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
         Route::post('administrator/{id}/restore', 'AdminController@postRestore');
         Route::resource('administrator', 'AdminController', ['except' => [ 'show' ]]);
 
+        //Board Account Route...
+        Route::get('board/{id}/delete', ['as' => 'admin.board.delete', 'uses' => 'BoardController@getDelete']);
+        Route::get('board/inactive', ['as' => 'admin.board.inactive', 'uses' => 'BoardController@getInactive']);
+        Route::post('board/{id}/forcedelete', 'BoardController@postForceDelete');
+        Route::post('board/{id}/restore', 'BoardController@postRestore');
+        Route::resource('board', 'BoardController', ['except' => [ 'show' ]]);
+
         // User Account Route...
         Route::resource('account', 'AccountController', ['only' => [ 'index', 'show', 'edit', 'update' ]]);
 
-        // Loan Type Route...
-        Route::get('loantype/{id}/finished', ['as' => 'admin.loantype.finished', 'uses' => 'LoanTypeController@getFinished']);
-        Route::get('loantype/expired', ['as' => 'admin.loantype.expired', 'uses' => 'LoanTypeController@getExpired']);
-        Route::get('loantype/expired/{id}', ['as' => 'admin.loantype.expired.detail', 'uses' => 'LoanTypeController@getExpiredDetail']);
-        Route::get('loantype/inactive', ['as' => 'admin.loantype.inactive', 'uses' => 'LoanTypeController@getInactive']);
-        Route::post('loantype/{id}/forcedelete', 'LoanTypeController@postForceDelete');
-        Route::post('loantype/{id}/restore', 'LoanTypeController@postRestore');       
-        Route::resource('loantype', 'LoanTypeController');
-
-        // Bailsman Route...
-        Route::resource('bailsman', 'BailsmanController', ['only' => [ 'index', 'edit', 'update' ]]);
-
-        // Active Loan Route...
-        Route::resource('activeloan', 'ActiveloanController', ['only' => [ 'index' ]]);
-        Route::get('inactiveloan', ['as' => 'admin.activeloan.inactiveloan', 'uses' => 'ActiveloanController@getInactiveloan']);
-
-        // Dividend Route...
-        Route::resource('dividend', 'DividendController', ['except' => [ 'show' ]]);
-
-        // Billing Route...
-        Route::resource('billing', 'BillingController', ['only' => [ 'index', 'create', 'store', 'edit', 'update' ]]);
-
-        // Dividend Member Route...
-        Route::get('dividendmember/year', ['as' => 'admin.dividendmember.year', 'uses' => 'DividendmemberController@getYear']);
-        Route::get('dividendmember/{dividend_id}', ['as' => 'admin.dividendmember.index', 'uses' => 'DividendmemberController@getIndex']);
-        Route::get('dividendmember/{dividend_id}/{member_id}', ['as' => 'admin.dividendmember.show', 'uses' => 'DividendmemberController@getShow']);
-        Route::get('dividendmember/{dividend_id}/{member_id}/{m_dividend_id}/edit', ['as' => 'admin.dividendmember.edit', 'uses' => 'DividendmemberController@getEdit']);
-        Route::post('dividendmember/{dividend_id}/{member_id}/{m_dividend_id}', ['as' => 'admin.dividendmember.update', 'uses' => 'DividendmemberController@postUpdate']);  
+        // Slotmachine Route...
+        Route::get('reward/slotmachine', ['as' => 'admin.reward.play', 'uses' => 'RewardController@getSlotmachine']);
+        Route::post('reward/winners', 'RewardController@postWinners');
+        Route::post('reward/shuffle', 'RewardController@postShuffle');
+        Route::post('reward/savewinner', 'RewardController@postSavewinner');
+        Route::resource('reward', 'RewardController', ['only' => [ 'index', 'show', 'destroy' ]]);
 
         // Reports Route...
-        Route::post('report/export', ['as' => 'admin.report.export', 'uses' => 'ReportController@postExport']); 
+        Route::post('report/export', 'ReportController@postExport'); 
         Route::get('report', ['as' => 'admin.report.index', 'uses' => 'ReportController@getIndex']);
 
         // Statistic Route...

@@ -44,11 +44,11 @@
 
             <div class="box-body">
                 <button class="btn btn-primary btn-flat margin-b-md" type="button" data-tooltip="true" title="เพิ่มสาระน่ารู้"
-                    onclick="javascript:window.location.href='{{ url('/website/knowledge/create') }}';">
+                    onclick="javascript:document.location.href='{{ url('/website/knowledge/create') }}';">
                     <i class="fa fa-plus-circle"></i> เพิ่มสาระน่ารู้
                 </button>
                 <button class="btn btn-default btn-flat margin-b-md pull-right" type="button" data-tooltip="true" title="สาระน่ารู้ที่ถูกลบ"
-                    onclick="javascript:window.location.href='{{ url('/website/knowledge/inactive') }}';">
+                    onclick="javascript:document.location.href='{{ url('/website/knowledge/inactive') }}';">
                     <i class="fa fa-trash"></i> แสดงสาระน่ารู้ที่ถูกลบ
                 </button> 
 
@@ -63,7 +63,7 @@
                         </thead>
                         <tbody>
                             @foreach($knowledges as $index => $knowledge)
-                            <tr onclick="javascript: document.location = '{{ url('/website/knowledge/' . $knowledge->id) }}';"
+                            <tr onclick="javascript: document.location.href  = '{{ url('/website/knowledge/' . $knowledge->id) }}';"
                                 style="cursor: pointer;">
                                 <td>{{ $index + 1 }}.</td>
                                 <td class="text-primary"><i class="fa fa-commenting fa-fw"></i> {{ $knowledge->title }}</td>

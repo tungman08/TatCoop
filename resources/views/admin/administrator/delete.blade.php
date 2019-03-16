@@ -4,13 +4,13 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
         <h1>
-            จัดการผู้ดูแลระบบฯ
-            <small>เพิ่ม ลบ แก้ไข บัญชีของผู้ดูแลระบบ สอ.สรทท.</small>
+            จัดการเจ้าหน้าที่สหกรณ์
+            <small>เพิ่ม ลบ แก้ไข บัญชีของเจ้าหน้าที่สหกรณ์ สอ.สรทท.</small>
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการผู้ดูแลระบบ', 'link' => '/admin/administrator'],
-            ['item' => 'แก้ไขผู้ดูแลระบบ', 'link' => ''],
+            ['item' => 'จัดการเจ้าหน้าที่สหกรณ์', 'link' => '/admin/administrator'],
+            ['item' => 'แก้ไขเจ้าหน้าที่สหกรณ์', 'link' => ''],
         ]])
     </section>
 
@@ -23,16 +23,16 @@
 
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title"><i class="fa fa-trash fa-fw"></i> ลบบัญชีผู้ใช้งานระบบ</h3>
+                <h3 class="box-title"><i class="fa fa-trash fa-fw"></i> ลบบัญชีเจ้าหน้าที่สหกรณ์</h3>
             </div>
             <!-- /.box-header -->
             <div class="box-body">
-                {{ Form::open(['route' => ['admin.administrator.destroy', $admins->id], 'method' => 'delete', 'role' => 'form']) }}
+                {{ Form::open(['route' => ['admin.administrator.destroy', $user->id], 'method' => 'delete', 'role' => 'form']) }}
                     <div class="box-body">
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="form-group">
-                                    {{ Form::label('email', 'บัญชีผู้ใช้งาน [' . $admins->email . ']') }}
+                                    {{ Form::label('email', 'บัญชีผู้ใช้งาน [' . $user->email . ']') }}
                                     {{ Form::text('email', null, [
                                         'required',
                                         'class'=>'form-control', 
@@ -58,10 +58,10 @@
 
                         {{ Form::button('<i class="fa fa-trash"></i> ลบ', [
                             'type' => 'submit', 
-                            'class'=>'btn btn-danger',
+                            'class'=>'btn btn-danger btn-flat',
                             'onclick'=>'javascript:return confirm("คุณต้องการลบบัญชีผู้ใช้นี้ ?");' ]) }}
                         {{ Form::button('<i class="fa fa-ban"></i> ยกเลิก', [
-                            'class'=>'btn btn-default', 
+                            'class'=>'btn btn-default btn-flat', 
                             'onclick'=>'javascript:history.go(-1);']) }}
                     </div>
                     <!-- /.box-footer -->

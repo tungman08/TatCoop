@@ -81,7 +81,7 @@
                         <!-- /.box-body -->
 
                         <div class="box-footer">
-                            <a class="btn btn-primary" href="{{ action('Admin\BailsmanController@edit', ['id' => $bailsman->id]) }}">
+                            <a class="btn btn-primary btn-flat" href="{{ action('Admin\BailsmanController@edit', ['id' => $bailsman->id]) }}">
                                 <i class="fa fa-pencil"></i> แก้ไข
                             </a>
                         </div>

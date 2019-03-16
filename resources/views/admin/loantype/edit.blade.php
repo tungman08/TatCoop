@@ -9,8 +9,8 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'ข้อมูลประเภทเงินกู้', 'link' => '/admin/loantype'],
-            ['item' => 'ประเภทเงินกู้', 'link' => '/admin/loantype/' . $loantype->id],
+            ['item' => 'ข้อมูลประเภทเงินกู้', 'link' => '/database/loantype'],
+            ['item' => 'ประเภทเงินกู้', 'link' => '/database/loantype/' . $loantype->id],
             ['item' => 'แก้ไขประเภทสัญญา', 'link' => ''],
         ]])
 
@@ -40,7 +40,7 @@
             <!-- /.box-header -->
 
             <!-- form start -->
-            {{ Form::model($loantype, ['route' => ['admin.loantype.update', $loantype->id], 'method' => 'put', 'class' => 'form-horizontal']) }}
+            {{ Form::model($loantype, ['route' => ['database.loantype.update', $loantype->id], 'method' => 'put', 'class' => 'form-horizontal']) }}
                 @include('admin.loantype.form', ['edit' => true])
             {{ Form::close() }}
         </div>
@@ -164,7 +164,7 @@
 
         function isNumberKey(evt){
             var charCode = (evt.which) ? evt.which : event.keyCode
-            if (charCode > 31 && (charCode < 48 || charCode > 57))
+            if (charCode != 8 && charCode != 127&& charCode != 45 && charCode != 46 && (charCode < 48 || charCode > 57))
                 return false;
             return true;
         }

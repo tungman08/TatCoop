@@ -42,7 +42,10 @@ class ShareholdingController extends Controller
     }
 
     public function getMember() {
-        return view('admin.shareholding.member');
+        return view('admin.shareholding.member', [
+            'total_shareholding' => Shareholding::sum('amount'),
+            'rich_member' => Member::where('shareholding', Member::max('shareholding'))->first()
+        ]);
     }
 
     public function index($id) {
@@ -53,8 +56,9 @@ class ShareholdingController extends Controller
                 DB::raw('str_to_date(concat(\'1/\', month(pay_date), \'/\', year(pay_date)), \'%d/%m/%Y\') as name'),
                 DB::raw('(sum(if(member_id = ' . $member->id . ' and shareholding_type_id = 1, amount, 0))) as amount'),
                 DB::raw('(sum(if(member_id = ' . $member->id . ' and shareholding_type_id = 2, amount, 0))) as amount_cash'),
-                DB::raw('(select sum(s.amount) from shareholdings s where s.member_id = ' . $member->id . ' and s.pay_date < paydate) as total_shareholding'))
+                DB::raw('(select sum(s.amount) from shareholdings s where s.member_id = ' . $member->id . ' and s.pay_date < date(paydate)) as total_shareholding'))
             ->groupBy(DB::raw('year(pay_date)'), DB::raw('month(pay_date)'))
+            ->orderBy('total_shareholding', 'desc')
             ->get();
 
         return view('admin.shareholding.index', [
@@ -141,7 +145,8 @@ class ShareholdingController extends Controller
 				DB::raw('shareholding_types.name as shareholding_type_name'),
 				DB::raw('shareholdings.amount as amount'),
 				DB::raw('(select sum(s.amount) from shareholdings s where s.member_id = ' . $member_id . ' and s.pay_date < shareholdings.pay_date and s.id < shareholdings.id) as total_shareholding'),
-				DB::raw('case when shareholding_attachments.id is not null > 0 then \'<i class="fa fa-paperclip"></i>\' else \'&nbsp;\' end as attachment'))
+                DB::raw('case when shareholding_attachments.id is not null > 0 then \'<i class="fa fa-paperclip"></i>\' else \'&nbsp;\' end as attachment'))
+            ->orderBy('paydate', 'desc')
 			->get();
 		$total_shareholding = Shareholding::where('member_id', $member_id)
 			->whereDate('pay_date', '<', $pay_date)
@@ -251,44 +256,44 @@ class ShareholdingController extends Controller
             ->with('callout_class', 'callout-success');
     }
 
-    public function getAutoShareholding() {
-        return view('admin.shareholding.auto');
-    }
+    // public function getAutoShareholding() {
+    //    return view('admin.shareholding.auto');
+    // }
 
-    public function postAutoShareholding(Request $request) {
-        $date = Diamond::parse($request->input('month') . '-1')->endOfMonth();
+    // public function postAutoShareholding(Request $request) {
+    //     $date = Diamond::parse($request->input('month') . '-1')->endOfMonth();
 
-        $members = Member::active()
-            ->join('employees', 'members.profile_id', '=', 'employees.profile_id')
-            ->where('members.shareholding', '>', 0)
-            ->where('employees.employee_type_id', 1)
-            ->whereDate('members.start_date', '<', $date)
-            ->whereNotIn('members.id', function($query) use ($date) {
-                $query->from('shareholdings')
-                    ->whereMonth('pay_date', '=', $date->month)
-                    ->whereYear('pay_date', '=', $date->year)
-                    ->where('shareholding_type_id', 1)
-                    ->select('member_id');
-            })
-            ->select('members.*')->get();
+    //     $members = Member::active()
+    //         ->join('employees', 'members.profile_id', '=', 'employees.profile_id')
+    //         ->where('members.shareholding', '>', 0)
+    //         ->where('employees.employee_type_id', 1)
+    //         ->whereDate('members.start_date', '<', $date)
+    //         ->whereNotIn('members.id', function($query) use ($date) {
+    //             $query->from('shareholdings')
+    //                 ->whereMonth('pay_date', '=', $date->month)
+    //                 ->whereYear('pay_date', '=', $date->year)
+    //                 ->where('shareholding_type_id', 1)
+    //                 ->select('member_id');
+    //         })
+    //         ->select('members.*')->get();
 
-        DB::transaction(function() use ($members, $date) {
-            foreach($members as $member) {
-                $share = new Shareholding();
-                $share->pay_date = $date;
-                $share->shareholding_type_id = 1;
-                $share->amount = $member->shareholding * 10 ;
-                $share->remark = 'ป้อนข้อมูลอัตโนมัติ';
-                $member->shareholdings()->save($share);
-            }
+    //     DB::transaction(function() use ($members, $date) {
+    //         foreach($members as $member) {
+    //             $share = new Shareholding();
+    //             $share->pay_date = $date;
+    //             $share->shareholding_type_id = 1;
+    //             $share->amount = $member->shareholding * 10 ;
+    //             $share->remark = 'ป้อนข้อมูลอัตโนมัติ';
+    //             $member->shareholdings()->save($share);
+    //         }
 
-            History::addAdminHistory(Auth::guard($this->guard)->id(), 'ป้อนการชำระค่าหุ้นแบบอัตโนมัติ', 'ทำรายการชำระค่าหุ้นอัตโนมัติประจำเดือน' . $date->thai_format('F Y'));
-        });
+    //         History::addAdminHistory(Auth::guard($this->guard)->id(), 'ป้อนการชำระค่าหุ้นแบบอัตโนมัติ', 'ทำรายการชำระค่าหุ้นอัตโนมัติประจำเดือน' . $date->thai_format('F Y'));
+    //     });
 
-        return redirect()->action('Admin\ShareholdingController@getMember')
-            ->with('flash_message', 'ทำรายการชำระค่าหุ้นอัตโนมัติประจำเดือน' . $date->thai_format('F Y') . ' จำนวน ' . $members->count() . ' คน เรียบร้อยแล้ว')
-            ->with('callout_class', 'callout-success');
-    }
+    //     return redirect()->action('Admin\ShareholdingController@getMember')
+    //         ->with('flash_message', 'ทำรายการชำระค่าหุ้นอัตโนมัติประจำเดือน' . $date->thai_format('F Y') . ' จำนวน ' . $members->count() . ' คน เรียบร้อยแล้ว')
+    //         ->with('callout_class', 'callout-success');
+    // }
 
     function getBilling($member_id, $paydate, $id) {
         $pay_date = Diamond::parse($paydate);

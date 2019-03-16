@@ -54,6 +54,20 @@ class Member extends Model
     }
 
     /**
+     * Get the tempolary shares that uses by the member.
+     */
+    public function tempShareholdings() {
+        return $this->hasMany(RoutineShareholdingDetail::class);
+    }
+
+    /**
+     * Get the winners that uses by the member.
+     */
+    public function winners() {
+        return $this->hasMany(Winner::class);
+    }
+
+    /**
      * Get the user for the member.
      */
     public function user() {

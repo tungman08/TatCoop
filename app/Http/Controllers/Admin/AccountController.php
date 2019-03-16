@@ -53,13 +53,13 @@ class AccountController extends Controller
         $rules = [
             'new_email' => 'required|email|max:255|unique:users,email|confirmed',
             'new_email_confirmation' => 'required|email|max:255',
-            'reamrk' => 'required'
+            'remark' => 'required'
         ];
 
         $attributeNames = [
             'new_email' => 'อีเมลบัญชีผู้ใช้ใหม่',
             'new_email_confirmation' => 'ยืนยันอีเมลบัญชีผู้ใช้ใหม่',
-            'reamrk' => 'หมายเหตุ'
+            'remark' => 'หมายเหตุ'
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -73,22 +73,31 @@ class AccountController extends Controller
         else {
             DB::transaction(function() use ($request, $id) {
                 $user = User::find($id);
-                $old_email = $user->email;
+                $email = $user->email;
+                $new_email = strtolower($request->input('new_email'));
 
-                $user->email = $request->input('new_email');
+                if (DB::table('user_confirmations')->where('email', $email)->count() > 0) {
+                    $token = DB::table('user_confirmations')->where('email', $user->email)->first()->token;
+
+                    DB::table('user_confirmations')
+                        ->where('token', $token)
+                        ->update(['email' => $new_email]);
+                }
+
+                $user->email = $new_email;
                 $user->newaccount = true;
                 $user->save();
 
                 $oldemail = new OldEmail();
-                $oldemail->email = $old_email;
+                $oldemail->email = $email;
                 $oldemail->canceled_at = Diamond::today();
                 $oldemail->remark = $request->input('remark');
                 $user->old_emails()->save($oldemail);
 
                 History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'แก้ไขข้อมูลอีเมลบัญชีผู้ใช้ระบบ');
 
-                Mail::send('admin.account.email', ['old_email' => $old_email, 'email' => $user->email], function($message) use ($user) {
-                    $message->to($user->email, $user->member->profile->fullName)
+                Mail::send('admin.account.email', ['old_email' => $email, 'email' => $new_email], function($message) use ($user) {
+                    $message->to($user->email, $user->member->profile->fullname)
                         ->subject('ยืนยันเปลี่ยนแปลงชื่อบัญชีผู้ใช้ www.tatcoop.com');
                 });
             });

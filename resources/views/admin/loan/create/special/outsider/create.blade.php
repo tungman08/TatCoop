@@ -19,7 +19,7 @@
     <section class="content">
         <!-- Info boxes -->
         <div class="well">
-            <h4>การทำสัญญาการกู้ยืมของ {{ ($loan->member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' :$loan->member->profile->fullName }}</h4>
+            <h4>การทำสัญญาการกู้ยืมของ {{ ($loan->member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' :$loan->member->profile->fullname }}</h4>
 
             @include('admin.loan.info', ['member' => $loan->member])
         </div>

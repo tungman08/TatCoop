@@ -1,0 +1,52 @@
+.toggle-btn{
+    width: 65px;
+    height: 32px;
+    margin: 10px 10px 10px 0px;
+    border-radius: 20px;
+    display: inline-block;
+    position: relative;
+    background : url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAyklEQVQ4T42TaxHCQAyENw5wAhLACVUAUkABOCkSwEkdhNmbpHNckzv689L98toIAKjqGcAFwElEFr5ln6ruAMwA7iLyFBM/TPDuQSrxwf6fCKBoX2UMIYGYkg8BLOnVg2RiAEexGaQQq4w9e9klcxGLLAUwgDAcihlYAR1IvZA1sz/+AAaQjXhTQQVoe2Yo3E7UQiT2ijeQdojRtClOfVKvMVyVpU594kZK9zzySWTlcNqZY9tjCsUds00+A57z1e35xzlzJjee8xf0HYp+cOZQUQAAAABJRU5ErkJggg==') no-repeat 39px center #dd4b39;
+    cursor: pointer;
+    -webkit-transition: background-color .40s ease-in-out;
+    -moz-transition: background-color .40s ease-in-out;
+    -o-transition: background-color .40s ease-in-out;
+    transition: background-color .40s ease-in-out;
+    cursor:pointer;
+    &.active{
+        background : url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAmUlEQVQ4T6WT0RWDMAhFeZs4ipu0mawZpaO4yevBc6hUIWLNd+4NeQDk5sE/PMkZwFvZywKSTxF5iUgH0C4JHGyF97IggFVSqyCFga0CvQSg70Mdwd8QSSr4sGBMcgavAgdvwQCtApvA2uKr1x7Pu++06ItrF5LXPB/CP4M0kKTwYRIDyRAOR9lJTuF0F0hOAJbKopVHOZN9ACS0UgowIx8ZAAAAAElFTkSuQmCC') no-repeat 10px center #3c8dbc;
+        .round-btn{
+            left: 35px;
+        }
+    }
+    .round-btn{
+        width: 26px;
+        height: 26px;
+        background-color: #fff;
+        border-radius: 50%;
+        display: inline-block;
+        position: absolute;
+        left: 4px;
+        top: 50%;
+        margin-top: -13px;
+        -webkit-transition: all .30s ease-in-out;
+        -moz-transition: all .30s ease-in-out;
+        -o-transition: all .30s ease-in-out;
+        transition: all .30s ease-in-out;
+    }
+    .cb-value{
+        position: absolute;
+        left:0;
+        right:0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        z-index: 9;
+        cursor:pointer;
+        /* -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)"; */
+    }
+    .toggle-label {
+        margin: 5px 5px 5px 80px;
+        white-space: nowrap;
+    }
+  }
+  

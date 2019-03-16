@@ -44,11 +44,11 @@
 
             <div class="box-body">
                 <button class="btn btn-primary btn-flat margin-b-md" type="button" data-tooltip="true" title="เพิ่มข่าวสารสำหรับสมาชิก"
-                    onclick="javascript:window.location.href='{{ url('/website/news/create') }}';">
+                    onclick="javascript:document.location.href='{{ url('/website/news/create') }}';">
                     <i class="fa fa-plus-circle"></i> เพิ่มข่าวสารสำหรับสมาชิก
                 </button>
                 <button class="btn btn-default btn-flat margin-b-md pull-right" type="button" data-tooltip="true" title="ข่าวสารสำหรับสมาชิกที่ถูกลบ"
-                    onclick="javascript:window.location.href='{{ url('/website/news/inactive') }}';">
+                    onclick="javascript:document.location.href='{{ url('/website/news/inactive') }}';">
                     <i class="fa fa-trash"></i> แสดงข่าวสารสำหรับสมาชิกที่ถูกลบ
                 </button>  
 
@@ -63,7 +63,7 @@
                         </thead>
                         <tbody>
                             @foreach($newses as $index => $news)
-                            <tr onclick="javascript: document.location = '{{ url('/website/news/' . $news->id) }}';"
+                            <tr onclick="javascript: document.location.href  = '{{ url('/website/news/' . $news->id) }}';"
                                 style="cursor: pointer;">
                                 <td>{{ $index + 1 }}.</td>
                                 <td class="text-primary"><i class="fa fa-newspaper-o fa-fw"></i> {{ $news->title }}</td>

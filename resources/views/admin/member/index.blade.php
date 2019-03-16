@@ -18,7 +18,25 @@
         <!-- Info boxes -->
         <div class="well">
             <h4>การจัดการข้อมูลสมาชิกสหกรณ์</h4>
-            <p>ให้ผู้ดูแลระบบสามารถ เพิ่ม ลบ แก้ไข ข้อมูลของผู้สมาชิกสหกรณ์</p>
+
+            <div class="table-responsive">
+                <table class="table table-info">
+                    <tr>
+                        <th style="width:20%;">จำนวนสมาชิก ณ ปัจจุบัน:</th>
+                        <td>{{ number_format($members, 0, '.', ',') }} คน</td>
+                    </tr>
+                    <tr>
+                        <th>สมาชิกล่าสุด:</th>
+                        <td>{{ $last_member->memberCode }} - {{ $last_member->profile->fullname }}</td>
+                    </tr> 
+                    <tr>
+                        <th>เป็นสมาชิกเมื่อ:</th>
+                        <td>{{ Diamond::parse($last_member->start_date)->thai_format('j M Y') }}</td>
+                    </tr>  
+                </table>
+                <!-- /.table -->
+            </div>  
+            <!-- /.table-responsive --> 
         </div>
 
         @if(Session::has('flash_message'))
@@ -41,12 +59,15 @@
             <!-- /.box-header -->
 
             <div class="box-body">
-                <button class="btn btn-primary btn-flat margin-b-md" type="button" data-tooltip="true" title="เพิ่มสมาชิกสหกรณ์"
-                    onclick="javascript:window.location.href='{{ url('/service/member/create') }}';">
+                <button class="btn btn-primary btn-flat margin-b-md" type="button"
+                    {{ (($is_super || $is_admin) ? '' : 'disabled') }}
+                    data-tooltip="true" title="เพิ่มสมาชิกสหกรณ์"
+                    onclick="javascript:document.location.href='{{ url('/service/member/create') }}';">
                     <i class="fa fa-user-plus"></i> เพิ่มสมาชิกสหกรณ์
                 </button>
+
                 <button class="btn btn-default btn-flat margin-b-md pull-right" type="button" data-tooltip="true" title="สมาชิกสหกรณ์ที่ลาออก"
-                    onclick="javascript:window.location.href='{{ url('/service/member/inactive') }}';">
+                    onclick="javascript:document.location.href='{{ url('/service/member/inactive') }}';">
                     <i class="fa fa-trash"></i> แสดงสมาชิกที่ลาออก
                 </button>
 
@@ -132,7 +153,7 @@
         });   
 
         $('#dataTables-users tbody').on('click', 'tr', function() {
-            document.location = '/service/member/' + parseInt($(this).children("td").first().html());            
+            document.location.href  = '/service/member/' + parseInt($(this).children("td").first().html());            
         });         
     });   
     </script>

@@ -2,7 +2,7 @@
 <li class="dropdown user user-menu">
     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
         <img src="{{ asset('images/user.png') }}" class="user-image" alt="User Image">
-        <span class="hidden-xs">{{ $admin->name }}</span>
+        <span class="hidden-xs">{{ $admin->fullname }}</span>
     </a>
 
     <ul class="dropdown-menu">
@@ -11,8 +11,8 @@
             <img src="{{  asset('images/user.png') }}" class="img-circle" alt="User Image">
             <p>
                 {{ $admin->email }}<br />
-                {{ $admin->name }}
-                <small>ลงทะเบียนเมื่อ: {{ Diamond::parse($admin->create_at)->thai_format('Y-m-d') }}</small>
+                {{ $admin->fullname }}
+                <small>ลงทะเบียนเมื่อ: {{ Diamond::parse($admin->created_at)->thai_format('j M Y') }}</small>
             </p>
         </li>
 
@@ -37,12 +37,12 @@
             <div class="pull-left">
                 {{ Form::button('<i class="fa fa-user"></i> ข้อมูลผู้ใช้งาน', [
                     'class' => 'btn btn-default btn-flat',
-                    'onclick' => 'javascript:window.location = "' . url('/user/profile') . '"']) }}
+                    'onclick' => 'javascript:document.location.href = "' . url('/user/profile') . '"']) }}
             </div>
             <div class="pull-right">
                 {{ Form::button('<i class="fa fa-sign-out"></i> ออกจากระบบ', [
                     'class' => 'btn btn-default btn-flat',
-                    'onclick' => 'javascript:var result = confirm(\'คุณต้องการออกจากระบบใช่ไหม ?\'); if (result) { window.location.href = "' . url('/auth/logout') . '" }']) }}
+                    'onclick' => 'javascript:var result = confirm(\'คุณต้องการออกจากระบบใช่ไหม ?\'); if (result) { document.location.href = "' . url('/auth/logout') . '" }']) }}
             </div>
         </li>
     </ul>

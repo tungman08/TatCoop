@@ -10,7 +10,7 @@
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
             ['item' => 'บัญชีผู้ใช้งานระบบ', 'link' => '/admin/account'],
-            ['item' => $user->member->profile->fullName, 'link' => '/admin/account/' . $user->member->id ],
+            ['item' => $user->member->profile->fullname, 'link' => '/admin/account/' . $user->member->id ],
             ['item' => 'แก้ไขบัญชีผู้ใช้', 'link' => ''],
         ]])
     </section>

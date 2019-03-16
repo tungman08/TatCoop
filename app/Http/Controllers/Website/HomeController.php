@@ -11,6 +11,7 @@ use File;
 use App\Carousel;
 use App\News;
 use App\Knowledge;
+use App\LoanType;
 
 class HomeController extends Controller
 {
@@ -29,9 +30,10 @@ class HomeController extends Controller
     public function index() {
         return view('website.home.index', [
             'carousels' => Carousel::all(),
-            'news' => News::orderBy('id', 'desc')->take(6)->get(),
+            'news' => News::orderBy('id', 'desc')->take(8)->get(),
             'knowledges' => Knowledge::orderBy('id', 'desc')->take(8)->get(),
-            'statistics' => Statistic::visitor_statistic()
+            'statistics' => Statistic::visitor_statistic(),
+            'loan_types' => LoanType::active()->get()
         ]);
     }
 

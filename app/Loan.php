@@ -52,6 +52,13 @@ class Loan extends Model
     public function payments() {
         return $this->hasMany(Payment::class);
     }
+
+    /**
+     * Get the tempolary payments that uses by the loan.
+     */
+    public function tempPayments() {
+        return $this->hasMany(RoutinePaymentDetail::class);
+    }
     
     /**
      * Get the member that uses by the loan.
@@ -67,7 +74,8 @@ class Loan extends Model
      */
     public function scopeActive($query)
     {
-        return $query->whereNull('completed_at');
+        return $query->whereNotNull('code')
+            ->whereNull('completed_at');
     }
 
     /**
@@ -77,6 +85,7 @@ class Loan extends Model
      */
     public function scopeFinished($query)
     {
-        return $query->whereNotNull('completed_at');
+        return $query->whereNotNull('code')
+            ->whereNotNull('completed_at');
     }
 }

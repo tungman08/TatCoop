@@ -22,7 +22,7 @@
         <!-- Info boxes -->
         <div class="well">
             <h4>ข้อมูลทุนเรือนหุ้น</h4>
-            <p>รายละเอียดข้อมูลชำระค่าหุ้นต่างๆ ของ {{ $member->profile->fullName }} วันที่ {{ Diamond::parse($shareholding->pay_date)->thai_format('j F Y') }}</p>
+            <p>รายละเอียดข้อมูลชำระค่าหุ้นต่างๆ ของ {{ $member->profile->fullname }} วันที่ {{ Diamond::parse($shareholding->pay_date)->thai_format('j F Y') }}</p>
         </div>
 
         @if ($errors->count() > 0)
@@ -55,11 +55,14 @@
                     <!-- /.box-header -->
 
                     <div class="box-body">
-                        <button class="btn btn-primary btn-flat margin-b-sm" onclick="javascript:window.location.href='{{ action('Admin\ShareholdingController@getBilling', ['member_id'=>$member->id, 'paydate'=>Diamond::parse($shareholding->pay_date)->format('Y-n-1'), 'id'=>$shareholding->id]) }}';">
+                        <button class="btn btn-primary btn-flat margin-b-sm" 
+                            onclick="javascript:document.location.href='{{ action('Admin\ShareholdingController@getBilling', ['member_id'=>$member->id, 'paydate'=>Diamond::parse($shareholding->pay_date)->format('Y-n-1'), 'id'=>$shareholding->id]) }}';">
                             <i class="fa fa-file-text-o"></i> ใบเสร็จรับเงินค่าหุ้น
                         </button>
 
-                        <button class="btn btn-primary btn-flat margin-b-sm pull-right" onclick="javascript:document.location = '{{ action('Admin\ShareholdingController@edit', ['member_id'=>$member->id, 'id'=>$shareholding->id]) }}';">
+                        <button class="btn btn-primary btn-flat margin-b-sm pull-right"
+                            {{ (($is_super || $is_admin) ? '' : 'disabled') }}
+                            onclick="javascript:document.location.href  = '{{ action('Admin\ShareholdingController@edit', ['member_id'=>$member->id, 'id'=>$shareholding->id]) }}';">
                             <i class="fa fa-pencil"></i> แก้ไข
                         </button>
 
@@ -84,7 +87,7 @@
                                     </tr>
                                     <tr>
                                         <th>หมายเหตุ</th>
-                                        <td>{{ !empty($share->remark) ? $shareholding->remark : '-' }}</td>
+                                        <td>{{ !empty($shareholding->remark) ? $shareholding->remark : '-' }}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -108,7 +111,9 @@
                     <div class="box-body">
                         <input type="hidden" id="shareholding_id" value="{{ $shareholding->id }}" />
                         <input type="file" id="attachment" class="file-upload" onchange="javascript:attachment(this);" />
-                        <button class="btn btn-primary btn-flat margin-b-sm" onclick="javascript:$('#attachment').click();">
+                        <button class="btn btn-primary btn-flat margin-b-sm" 
+                            {{ (($is_super || $is_admin) ? '' : 'disabled') }}
+                            onclick="javascript:$('#attachment').click();">
                             <i class="fa fa-plus-circle"></i> เพิ่มเอกสารแนบ
                         </button>
 

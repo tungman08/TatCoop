@@ -3,10 +3,11 @@
 namespace App\Classes;
 
 use DB;
+use App\Loan;
 use App\Dividend;
 use App\Member;
 use App\Shareholding;
-use App\Loan;
+use App\Payment;
 use stdClass;
 use LoanCalculator;
 
@@ -22,49 +23,92 @@ class MemberProperty
 {
     const DAYS_IN_YEAR = 365;
 
-    public function getDividend(Member $member, $year) {
-        $dividends = collect([]);
-        $rate = Dividend::where('rate_year', $year)->first();
+    // public function getDividend($member_id, $dividend_id) {
+    //     $dividends = collect([]);
+    //     $rate = Dividend::find($dividend_id);
 
-        if (!is_null($rate)) {
-            $forward_shareholding = $member->shareHoldings
-                ->filter(function ($value, $key) use ($year) { 
-                    return Diamond::parse($value->pay_date)->year < $year; 
-                })->sum('amount');
+    //     $forward_shareholding = Shareholding::where('member_id', $member_id)
+    //         ->whereYear('pay_date', '<', $rate->rate_year)
+    //         ->sum('amount');
 
-            $item = new stdClass();
-            $item->name = 'ยอดยกมา';
-            $item->shareholding = $forward_shareholding;
-            $item->shareholding_dividend = $forward_shareholding * ($rate->shareholding_rate / 100);
-            $item->interest = 0;
-            $item->interest_dividend = 0;
-            $item->total = $item->shareholding_dividend + $item->interest_dividend;
-            $dividends->push($item);
+    //     $item = new stdClass();
+    //     $item->name = 'ยอดยกมา';
+    //     $item->date = Diamond::parse("{$rate->rate_year}-1-1");
+    //     $item->shareholding = $forward_shareholding;
+    //     $item->shareholding_dividend = $forward_shareholding * ($rate->shareholding_rate / 100);
+    //     $item->interest = 0;
+    //     $item->interest_dividend = 0;
+    //     $item->total = $item->shareholding_dividend + $item->interest_dividend;
+    //     $dividends->push($item);
 
-            $shareholdings = $member->shareHoldings->filter(function ($value, $key) use ($year) { return Diamond::parse($value->pay_date)->year == $year; });
-            $payments = $member->loans->filter(function ($value, $key) use ($year) { return $value->payments->filter(function ($value, $key) use ($year) { return Diamond::parse($value->pay_date)->year == $year; } ); } );
-            for ($month = 1; $month <= 12; $month++) {
-                $shareholding = $shareholdings->filter(function ($value, $key) use ($month) { return Diamond::parse($value->pay_date)->month == $month; })->sum('amount');
-                $interest = $payments->filter(function ($value, $key) use ($month) { return Diamond::parse($value->pay_date)->month == $month; })->sum('interest');
-                foreach ($member->loans as $loan) {
-                    $interest += $loan->payments->filter(function ($value, $key) use ($year, $month) { 
-                        return Diamond::parse($value->pay_date)->year == $year && Diamond::parse($value->pay_date)->month == $month; 
-                    })->sum('interest');
-                }
+    //     $shareholdings = Shareholding::where('member_id', $member_id)
+    //         ->whereYear('pay_date', '=', $rate->rate_year)
+    //         ->get();
 
-                $item = new stdClass();
-                $item->name = Diamond::parse("$year-$month-1")->thai_format('Y-m-d');
-                $item->shareholding = $shareholding;
-                $item->shareholding_dividend = $shareholding * ($rate->shareholding_rate / 100) * ((12 - $month) / 12);
-                $item->interest = $interest;
-                $item->interest_dividend = $interest * ($rate->loan_rate / 100);
-                $item->total = $item->shareholding_dividend + $item->interest_dividend;
-                $dividends->push($item);  
-            }
-        }
+    //     $payments = Payment::join('loans', 'payments.loan_id', '=', 'loans.id')
+    //         ->where('loans.member_id', $member_id)
+    //         ->whereYear('payments.pay_date', '=', $rate->rate_year)
+    //         ->get();
 
-        return $dividends;
-    }
+    //     for ($month = 1; $month <= 12; $month++) {
+    //         $shareholding = $shareholdings->filter(function ($value, $key) use ($month) { return Diamond::parse($value->pay_date)->month == $month; })->sum('amount');
+    //         $interest = $payments->filter(function ($value, $key) use ($month) { return Diamond::parse($value->pay_date)->month == $month; })->sum('interest');
+
+    //         $item = new stdClass();
+    //         $item->name = Diamond::parse("{$rate->rate_year}-$month-1")->thai_format('M Y');
+    //         $item->date = Diamond::parse("{$rate->rate_year}-$month-31");
+    //         $item->shareholding = $shareholding;
+    //         $item->shareholding_dividend = $shareholding * ($rate->shareholding_rate / 100) * ((12 - $month) / 12);
+    //         $item->interest = $interest;
+    //         $item->interest_dividend = $interest * ($rate->loan_rate / 100);
+    //         $item->total = $item->shareholding_dividend + $item->interest_dividend;
+    //         $dividends->push($item);      
+    //     }
+
+    //     return $dividends;
+
+    //     $dividends = collect([]);
+    //     $rate = Dividend::where('rate_year', $year)->first();
+
+    //     if (!is_null($rate)) {
+    //         $forward_shareholding = $member->shareHoldings
+    //             ->filter(function ($value, $key) use ($year) { 
+    //                 return Diamond::parse($value->pay_date)->year < $year; 
+    //             })->sum('amount');
+
+    //         $item = new stdClass();
+    //         $item->name = 'ยอดยกมา';
+    //         $item->shareholding = $forward_shareholding;
+    //         $item->shareholding_dividend = $forward_shareholding * ($rate->shareholding_rate / 100);
+    //         $item->interest = 0;
+    //         $item->interest_dividend = 0;
+    //         $item->total = $item->shareholding_dividend + $item->interest_dividend;
+    //         $dividends->push($item);
+
+    //         $shareholdings = $member->shareHoldings->filter(function ($value, $key) use ($year) { return Diamond::parse($value->pay_date)->year == $year; });
+    //         $payments = $member->loans->filter(function ($value, $key) use ($year) { return $value->payments->filter(function ($value, $key) use ($year) { return Diamond::parse($value->pay_date)->year == $year; } ); } );
+    //         for ($month = 1; $month <= 12; $month++) {
+    //             $shareholding = $shareholdings->filter(function ($value, $key) use ($month) { return Diamond::parse($value->pay_date)->month == $month; })->sum('amount');
+    //             $interest = $payments->filter(function ($value, $key) use ($month) { return Diamond::parse($value->pay_date)->month == $month; })->sum('interest');
+    //             foreach ($member->loans as $loan) {
+    //                 $interest += $loan->payments->filter(function ($value, $key) use ($year, $month) { 
+    //                     return Diamond::parse($value->pay_date)->year == $year && Diamond::parse($value->pay_date)->month == $month; 
+    //                 })->sum('interest');
+    //             }
+
+    //             $item = new stdClass();
+    //             $item->name = Diamond::parse("$year-$month-1")->thai_format('F Y');
+    //             $item->shareholding = $shareholding;
+    //             $item->shareholding_dividend = $shareholding * ($rate->shareholding_rate / 100) * ((12 - $month) / 12);
+    //             $item->interest = $interest;
+    //             $item->interest_dividend = $interest * ($rate->loan_rate / 100);
+    //             $item->total = $item->shareholding_dividend + $item->interest_dividend;
+    //             $dividends->push($item);  
+    //         }
+    //     }
+
+    //     return $dividends;
+    // }
 
     // public function getDividendQuick(Member $member, $year) {
     //     $rate = Dividend::where('rate_year', $year)->first();
@@ -98,11 +142,11 @@ class MemberProperty
     //     return $dividends;
     // }
 
-    public function getTotalPayment(Member $member) {
+    public function getTotalPayment(Member $member, Diamond $date) {
         $payment = new stdClass();
         $payment->outstanding = $member->loans->filter(function ($value, $key) { return is_null($value->completed_at); })->sum('outstanding');
         $payment->principle = $member->loans->filter(function ($value, $key) { return is_null($value->completed_at); })->sum(function ($value) { return $value->payments->sum('principle'); } );
-        $payment->interest = LoanCalculator::total_interest($member, Diamond::today());
+        $payment->interest = LoanCalculator::total_interest($member, $date);
 
         return $payment;
     }

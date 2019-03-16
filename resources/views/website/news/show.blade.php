@@ -71,7 +71,7 @@
             <div class="panel-body">
                 <ul class="list-unstyled">
                     @foreach ($news->attachments()->where('attach_type', 'document')->get() as $item)
-                        <li class="padding-xs"><i class="fa fa-file-pdf-o fa-fw"></i> <a href="{{ url('/attachment/' . $item->file) }}">{{ $item->display }}</a></li>
+                        <li class="padding-xs"><i class="fa fa-file-pdf-o fa-fw"></i> <a href="{{ url('/storage/file/attachments/' . $item->file) }}">{{ $item->display }}</a></li>
                     @endforeach
                 </ul>
             </div>

@@ -20,7 +20,7 @@
     <section class="content">
         <!-- Info boxes -->
         <div class="well">
-            <h4>การทำสัญญาการกู้ยืมของ {{ ($loan->member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' :$loan->member->profile->fullName }}</h4>
+            <h4>การทำสัญญาการกู้ยืมของ {{ ($loan->member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' :$loan->member->profile->fullname }}</h4>
 
             @include('admin.loan.info', ['member' => $loan->member])
         </div>
@@ -450,7 +450,7 @@
 
     function isNumberKey(evt){
         var charCode = (evt.which) ? evt.which : event.keyCode
-        if (charCode != 8 && charCode != 127 && charCode != 46 && (charCode < 48 || charCode > 57))
+        if (charCode != 8 && charCode != 127 && charCode != 45 && charCode != 46 && (charCode < 48 || charCode > 57))
             return false;
         return true;
     }    

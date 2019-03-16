@@ -1,5 +1,5 @@
 <img class="logo" src="{{ asset('images/logo-coop.png') }}" alt="tatcoop logo" />
-<p class="lead">ข้อมูลข่าวสารสำหรับสมาชิก</p>
+<p class="lead">สอ.สรทท.</p>
 
 <div class="list-group">
     <ul class="nav" id="side-menu">

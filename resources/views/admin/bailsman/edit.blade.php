@@ -37,7 +37,7 @@
             <!-- /.box-header -->
 
             <!-- form start -->
-            {{ Form::model($bailsman, ['route' => ['admin.bailsman.update', $bailsman->id], 'method' => 'put', 'class' => 'form-horizontal']) }}
+            {{ Form::model($bailsman, ['route' => ['database.bailsman.update', $bailsman->id], 'method' => 'put', 'class' => 'form-horizontal']) }}
                 <div class="box-body">
                     <strong>กรณีค้ำประกันตนเอง ({{ ($bailsman->self_type == 'shareholding') ? 'ใช้ทุนเรือนหุ้น' : 'ใช้เงินเดือน' }})</strong>
                     {{ Form::hidden('self_type', $bailsman->self_type) }}  

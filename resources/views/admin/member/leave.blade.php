@@ -25,8 +25,12 @@
                 <table class="table table-info">
                     <tr>
                         <th style="width:20%;">ชื่อผู้สมาชิก:</th>
-                        <td>{{ $member->profile->fullName }}</td>
+                        <td>{{ $member->profile->fullname }}</td>
                     </tr>
+                    <tr>
+                        <th>วันที่ลาออก:</th>
+                        <td>{{ Diamond::parse($leave_date)->thai_format('j F Y') }}</td>
+                    </tr>  
                     <tr>
                         <th>จำนวนทุนเรือนหุ้นสะสม:</th>
                         <td>{{ number_format($shareholdings, 2, '.', ',') }} บาท</td>
@@ -54,11 +58,10 @@
                                         <tr>
                                     </thead>
                                     <tbody>
-                                    @php($count = 0)
-                                    @foreach($loans as $loan)
+                                    @foreach($loans as $index => $loan)
                                         @php($payment = MemberProperty::getClosePayment($loan))
                                         <tr>
-                                            <td>{{ ++$count }}.</td>
+                                            <td>{{ $index + 1 }}.</td>
                                             <td>{{ $loan->code }}</td>
                                             <td>{{ $loan->loanType->name }}</td>
                                             <td>{{ number_format($loan->outstanding, 2, '.', ',') }}</td>
@@ -95,7 +98,7 @@
 
         <div class="box box-danger">
             <div class="box-header with-border">
-                <h3 class="box-title"><i class="fa fa-user-times"></i> ยืนยันการลาออกของ {{ ($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' : $member->profile->fullName }} (รหัสสมาชิก {{ $member->memberCode }})</h3>
+                <h3 class="box-title"><i class="fa fa-user-times"></i> ยืนยันการลาออกของ {{ ($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' : $member->profile->fullname }} (รหัสสมาชิก {{ $member->memberCode }})</h3>
             </div>
             <!-- /.box-header -->
 
@@ -123,6 +126,7 @@
                         {{ Form::text('leave_date', null, [
                             'id' => 'leave_date',
                             'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
+                            'autocomplete'=>'off',
                             'class'=>'form-control'])
                         }} 
                     </div>

@@ -20,6 +20,20 @@
         <div class="well">
             <h4>จัดการใบรับเงินค่าหุ้น/ค่างวด</h4>
             <p>ให้ผู้ดูแลระบบสามารถ แก้ไข ชื่อผู้จัดการและเหรัญญิกได้</p>
+
+            <div style="padding-top: 20px;">
+                @if (empty($billing))
+                    <button class="btn btn-primary btn-flat" type="button" data-tooltip="true" title="เพิ่มชื่อผู้จัดการ/เหรัญญิก"
+                        onclick="javascript:document.location.href='{{ url('/database/billing/create') }}';">
+                        <i class="fa fa-plus-circle"></i> เพิ่มชื่อผู้จัดการ/เหรัญญิก
+                    </button>
+                @else
+                    <button class="btn btn-primary btn-flat" type="button" data-tooltip="true" title="แก้ไขชื่อผู้จัดการ/เหรัญญิก"
+                        onclick="javascript:document.location.href='{{ url('/database/billing/' . $billing->id . '/edit') }}';">
+                        <i class="fa fa-edit"></i> แก้ไขชื่อผู้จัดการ/เหรัญญิก
+                    </button>
+                @endif
+            </div>
         </div>
 
         @if(Session::has('flash_message'))
@@ -55,24 +69,6 @@
 
 			</div>
 			<!-- /.tab-content -->
-
-			<!-- Box row -->
-			<div class="row">
-				<div class="col-lg-12 text-center" style="padding: 20px 0px;">
-					@if (empty($billing))
-						<button class="btn btn-primary btn-flat" type="button" data-tooltip="true" title="เพิ่มชื่อผู้จัดการ/เหรัญญิก"
-							onclick="javascript:window.location.href='{{ url('/admin/billing/create') }}';">
-							<i class="fa fa-plus-circle"></i> เพิ่มชื่อผู้จัดการ/เหรัญญิก
-						</button>
-					@else
-						<button class="btn btn-primary btn-flat" type="button" data-tooltip="true" title="แก้ไขชื่อผู้จัดการ/เหรัญญิก"
-							onclick="javascript:window.location.href='{{ url('/admin/billing/' . $billing->id . '/edit') }}';">
-							<i class="fa fa-edit"></i> แก้ไขชื่อผู้จัดการ/เหรัญญิก
-						</button>
-					@endif
-				</div>
-				<!-- /.col -->
-			</div>
 		</div>
 		<!-- /.nav-tabs-custom -->
 

@@ -42,7 +42,7 @@
                 <h3 class="box-title"><i class="fa fa-newspaper-o fa-fw"></i> ข่าวสารสำหรับสมาชิก</h3>    
                 <div class="btn-group pull-right">
                     <button type="button" class="btn btn-default btn-flat btn-xs"
-                        onclick="javascript:window.location.href='{{ url('/website/news/' . $news->id . '/edit') }}';">
+                        onclick="javascript:document.location.href='{{ url('/website/news/' . $news->id . '/edit') }}';">
                         แก้ไข
                     </button>
                     <button type="button" class="btn btn-default btn-flat dropdown-toggle btn-xs" data-toggle="dropdown">
@@ -50,7 +50,7 @@
                         <span class="sr-only">Toggle Dropdown</span>
                     </button>
                     <ul class="dropdown-menu" role="menu">
-                        <li><a style="cursor: pointer;" onclick="javascript:window.location.href='{{ url('/website/news/' . $news->id . '/edit') }}';"><i class="fa fa-edit"></i> แก้ไข</a></li>
+                        <li><a style="cursor: pointer;" onclick="javascript:document.location.href='{{ url('/website/news/' . $news->id . '/edit') }}';"><i class="fa fa-edit"></i> แก้ไข</a></li>
                         <li><a style="cursor: pointer;" onclick="javascript:result = confirm('คุณต้องการลบรายการนี้ใช่ไหม ?'); if (result) { $('#delete_item').click(); }"><i class="fa fa-trash"></i> ลบ</a></li>
                     </ul>
                 </div>

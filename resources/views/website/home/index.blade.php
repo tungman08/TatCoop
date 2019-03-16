@@ -16,6 +16,6 @@
     </div>
 
     <div class="row">
-        @include('website.home.news')
+        @include('website.home.services')
     </div>
 @endsection

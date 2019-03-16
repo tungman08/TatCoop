@@ -43,7 +43,7 @@
             <div class="box-body">
                 <div class="row">
                     <div class="col-md-6">
-                        {{ $surety->profile->fullName }}
+                        {{ $surety->profile->fullname }}
 
                         @if ($surety->pivot->yourself)
                             @php($available = LoanCalculator::shareholding_available($surety))

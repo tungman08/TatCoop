@@ -9,7 +9,7 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการประเภทเงินกู้', 'link' => '/admin/loantype'],
+            ['item' => 'จัดการประเภทเงินกู้', 'link' => '/database/loantype'],
             ['item' => 'ถูกลบ', 'link' => ''],
         ]])
 
@@ -41,25 +41,26 @@
                         <thead>
                             <tr>
                                 <th style="width: 10%;">#</th>
-                                <th style="width: 45%;">ชื่อประเภทเงินกู้</th>
+                                <th style="width: 25%;">ชื่อประเภทเงินกู้</th>
+                                <th style="width: 20%;">อัตราดอกเบี้ย</th>
                                 <th style="width: 15%;">วันที่เริ่มใช้</th>
                                 <th style="width: 15%;">วันที่ลบ</th>
                                 <th style="width: 15%;"><i class="fa fa-gear"></i></th>
                             </tr>
                         </thead>
                         <tbody>
-                            @eval($count = 0)
-                            @foreach($loantypes as $type)
+                            @foreach($loantypes as $index => $type)
                             <tr>
-                                <td>{{ ++$count }}</td>
+                                <td>{{ $index + 1 }}.</td>
                                 <td class="text-primary"><i class="fa fa-credit-card fa-fw"></i> {{ $type->name }}</td>
+                                <td>{{ number_format($type->rate, 2, '.', ',') }}%</td>
                                 <td>{{ Diamond::parse($type->start_date)->thai_format('Y-m-d') }}</td>
                                 <td>{{ Diamond::parse($type->deleted_at)->thai_format('Y-m-d') }}</td>
                                 <td>
                                     <table>
                                         <tr>
                                             <td>
-                                                {{ Form::open(['url' => '/admin/loantype/' . $type->id . '/restore', 'method' => 'post']) }}
+                                                {{ Form::open(['url' => '/database/loantype/' . $type->id . '/restore', 'method' => 'post']) }}
                                                     {{ Form::button('<i class="fa fa-rotate-left"></i>', [
                                                         'type' => 'submit',
                                                         'class'=>'btn btn-default btn-xs btn-flat',
@@ -68,7 +69,7 @@
                                                 {{ Form::close() }}
                                             </td>
                                             <td>
-                                                {{ Form::open(['url' => '/admin/loantype/' . $type->id . '/forcedelete', 'method' => 'post']) }}
+                                                {{ Form::open(['url' => '/database/loantype/' . $type->id . '/forcedelete', 'method' => 'post']) }}
                                                     {{ Form::button('<i class="fa fa-trash"></i>', [
                                                         'type' => 'submit',
                                                         'class'=>'btn btn-default btn-xs btn-flat', 

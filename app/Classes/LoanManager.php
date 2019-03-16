@@ -2,6 +2,7 @@
 
 namespace App\Classes;
 
+use DB;
 use stdClass;
 use App\Bailsman;
 use App\Loan;
@@ -77,7 +78,7 @@ class LoanManager {
     // ตรวจสอบเงินเดือนผู้กู้ กรณีกู้สามัญ
     public function check_salarynormal($validator, Loan $loan, $salary, $outstanding) {
         $maxcash = $loan->loanType->limits->max('cash_end');
-        $max_outstanding = ($salary * $loan->loanType->salarytimes >= $maxcash) ? $maxcash : $salary * $loan->loanType->salarytimes;
+        $max_outstanding = ($salary * $loan->loanType->employee_ratesalary >= $maxcash) ? $maxcash : $salary * $loan->loanType->employee_ratesalary;
 
         if ($outstanding > $max_outstanding) {
             $validator->errors()->add('salary', "ไม่สามารถกู้ได้ เนื่องจากเงินเดือนน้อยกว่าวงเงินที่ขอกู้ (วงเงินที่กู้ได้สูงสุด " . number_format($max_outstanding, 2, '.', ',') . " บาท)");
@@ -87,7 +88,7 @@ class LoanManager {
     // ตรวจสอบเงินเดือนผู้กู้ กรณีไม่ใช่กู้สามัญ
     public function check_salaryabnormal($validator, Loan $loan, $salary, $outstanding) {
         $maxcash = $loan->loanType->limits->max('cash_end');
-        $max_outstanding = ($salary * $loan->loanType->salarytimes >= $maxcash) ? $maxcash : $salary * $loan->loanType->salarytimes;
+        $max_outstanding = ($salary * $loan->loanType->employee_ratesalary >= $maxcash) ? $maxcash : $salary * $loan->loanType->employee_ratesalary;
 
         if ($outstanding > $max_outstanding) {
             $validator->errors()->add('salary', "ไม่สามารถกู้ได้ เนื่องจากเงินเดือนน้อยกว่าวงเงินที่ขอกู้ (วงเงินที่กู้ได้สูงสุด " . number_format($max_outstanding, 2, '.', ',') . " บาท)");

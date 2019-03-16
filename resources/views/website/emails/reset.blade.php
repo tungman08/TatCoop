@@ -21,7 +21,7 @@
             คุณเป็นสมาชิกในเว็บไซต์ของเราและได้ใช้อีเมลนี้ในการลงทะเบียนสมาชิก เราต้องการให้คุณยืนยันว่าอีเมลนี้มีผู้ใช้งานอยู่จริงไม่ใช่ สแปม<br />
             <br />
             เพื่อทำการตั้งค่ารหัสผ่าน คลิกลิงค์ด้านล่างนี้<br />
-            <a href="{{ $link = url('password/reset', $token).'?email='.urlencode($user->getEmailForPasswordReset()) }}" target="_blank">{{ $link }}</a><br />
+            <a href="{{ $link = url("password/reset/$token").'?email='.urlencode($user->getEmailForPasswordReset()) }}" target="_blank">{{ $link }}</a><br />
             (หากลิงค์นี้ไม่ทำงาน โปรดคัดลอกลิงค์แล้วนำไปวางในแถบที่อยู่ของเบราว์เซอร์ด้วยตนเอง)<br />
             <br />
             ขอบคุณสำหรับการใช้งานเว็บไซต์ของเรา<br />

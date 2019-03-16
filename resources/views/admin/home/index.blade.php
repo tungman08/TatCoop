@@ -14,37 +14,19 @@
     <!-- Main content -->
     <section class="content">
         <!-- Info boxes -->
-        <div class="row">
-            @include('admin.home.info')
-        </div>
-        <!-- /.row -->
+        @include('admin.home.info')
+
+        <!-- Filter boxes -->
+        @include('admin.home.filter')
 
         <!-- Main row -->
-        <div class="row">
-            <div class="col-md-12">
-                @include('admin.home.member')
-            </div>    
-            <!-- /.col -->
-        </div>
-        <!-- /.row -->
+        @include('admin.home.member')
 
         <!-- Main row -->
-        <div class="row">
-            <div class="col-md-12">
-                @include('admin.home.shareholding')
-            </div>    
-            <!-- /.col -->
-        </div>
-        <!-- /.row -->
+        @include('admin.home.shareholding')
 
         <!-- Main row -->
-        <div class="row">
-            <div class="col-md-12">
-                @include('admin.home.loan')
-            </div>    
-            <!-- /.col -->
-        </div>
-        <!-- /.row -->
+        @include('admin.home.loan')
     </section>
     <!-- /.content -->
 
@@ -80,13 +62,22 @@
                 headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
             });
             
-            dashboard();
+            dashboard($('#filter_year').val());
+
+            $('#filter_year').change(function() {
+                dashboard($(this).val());
+            });
         });   
 
-        function dashboard() {
+        function dashboard(year) {
+            $('.filter-year').html(parseInt(year, 10) + 543);
+
             $.ajax({
                 dataType: 'json',
                 url: '/dashboard',
+                data: {
+                    'year': year
+                },
                 type: 'post',
                 cache: false,
                 beforeSend: function () {
@@ -114,25 +105,54 @@
                     $("<div class='axisLabel yaxisLabel'></div>").text("จำนวนเงินค่าหุ้น (บาท)").appendTo($("#shareholding-flot-line-chart"))
                         .css("margin-top", $("<div class='axisLabel yaxisLabel'></div>").width() / 2 - 20);
 
+                    var dataset_totalshareholdings = [
+                        { label: "&nbsp;เงินค่าหุ้นสะสม", data: data.chart.totalshareholdings[1], color: "#337ab7" },
+                    ];
+                    $.plot($("#totalshareholding-flot-line-chart"), dataset_totalshareholdings, options_line_chart(data.chart.totalshareholdings[0], data_length));
+                    $("<div class='axisLabel yaxisLabel'></div>").text("จำนวนเงินค่าหุ้น (บาท)").appendTo($("#totalshareholding-flot-line-chart"))
+                        .css("margin-top", $("<div class='axisLabel yaxisLabel'></div>").width() / 2 - 20);
+
                     var dataset_loans = [
-                        { label: "&nbsp;เงินที่ให้กู้", data: data.chart.loans[1], color: "#337ab7" },
-                        { label: "&nbsp;ดอกเบี้ยที่เก็บได้", data: data.chart.loans[2], color: "#3c763d" },
-                        { label: "&nbsp;ดอกเบี้ยที่เก็บได้ของปีก่อน", data: data.chart.loans[3], color: "#a1a1a1" },
+                        { label: "&nbsp;ยอดชำระเงินกู้ที่เก็บได้", data: data.chart.loans[1], color: "#3c763d" },
+                        { label: "&nbsp;ยอดชำระเงินกู้ที่เก็บได้ของปีก่อน", data: data.chart.loans[2], color: "#a1a1a1" },
                     ];
                     $.plot($("#loan-flot-line-chart"), dataset_loans, options_line_chart(data.chart.loans[0], data_length));
                     $("<div class='axisLabel yaxisLabel'></div>").text("จำนวนเงิน (บาท)").appendTo($("#loan-flot-line-chart"))
                         .css("margin-top", $("<div class='axisLabel yaxisLabel'></div>").width() / 2 - 20);
 
+                    var dataset_loantypes = [
+                        { label: "&nbsp;เงินที่ให้กู้ทั้งหมด", data: data.chart.loantypes[1], color: "#337ab7" },
+                        { label: "&nbsp;เงินกู้สามัญที่ให้กู้", data: data.chart.loantypes[2], color: "#3c763d" },
+                        { label: "&nbsp;เงินกู้ฉุกเฉินที่ให้กู้", data: data.chart.loantypes[3], color: "#dd4b39" },
+                        { label: "&nbsp;เงินกู้เฉพาะกิจที่ให้กู้", data: data.chart.loantypes[4], color: "#ac58fa" }
+                    ];
+                    $.plot($("#loantype-flot-line-chart"), dataset_loantypes, options_line_chart(data.chart.loantypes[0], data_length));
+                    $("<div class='axisLabel yaxisLabel'></div>").text("จำนวนเงิน (บาท)").appendTo($("#loantype-flot-line-chart"))
+                        .css("margin-top", $("<div class='axisLabel yaxisLabel'></div>").width() / 2 - 20);
+
+                    $('#newmembers').empty();
                     $.each(data.summary.members, function(index, value) {
                         append_item("#newmembers", index + 1, value);
                     });
 
+                    $('#topmonthshareholdings').empty();
+                    $.each(data.summary.monthshareholding, function(index, value) {
+                        append_item("#topmonthshareholdings", index + 1, value);
+                    });
+
+                    $('#topshareholdings').empty();
                     $.each(data.summary.shareholdings, function(index, value) {
                         append_item("#topshareholdings", index + 1, value);
                     });
 
+                    $('#toploans').empty();
                     $.each(data.summary.loans, function(index, value) {
                         append_item("#toploans", index + 1, value);
+                    });
+
+                    $('#toploantypes').empty();
+                    $.each(data.summary.loantypes, function(index, value) {
+                        append_item("#toploantypes", index + 1, value);
                     });
                 }
             });
@@ -141,7 +161,7 @@
         function append_item(parent, index, value) {
             let str = '<li class="item"><div class="product-info"></div><a href="' + value.link + '" class="product-title">' + 
                 index + '. ' + value.fullname + 
-                '<span class="label ' + ((value.employee_type == 'พนักงาน/ลูกจ้าง ททท.') ? 'label-success' : 'label-warning') + ' pull-right">' + value.employee_type + 
+                '<span class="label ' + ((value.employee_type != 'พนักงาน/ลูกจ้าง ททท.') ? (value.employee_type != 'บุคคลภายนอก') ? 'label-info' : 'label-warning' : 'label-success') + ' pull-right">' + value.employee_type +
                 '</span></a><span class="product-description">' + value.message + '</span></li>';
 
             $(parent).append(str);
@@ -178,7 +198,6 @@
                     ticks: ticks
                 },
                 yaxis: {
-                    min: 0,
                     labelWidth: 50,
                     tickDecimals: 0,
                     minTickSize: 1,

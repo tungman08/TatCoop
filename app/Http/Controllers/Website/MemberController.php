@@ -139,6 +139,7 @@ class MemberController extends Controller
                 DB::raw('(sum(if(member_id = ' . $member->id . ' and shareholding_type_id = 2, amount, 0))) as amount_cash'),
                 DB::raw('(select sum(s.amount) from shareholdings s where s.member_id = ' . $member->id . ' and s.pay_date < paydate) as total_shareholding'))
             ->groupBy(DB::raw('year(pay_date)'), DB::raw('month(pay_date)'))
+            ->orderBy('total_shareholding', 'desc')
             ->get();
 
         return view('website.member.shareholding', [
@@ -160,7 +161,8 @@ class MemberController extends Controller
 				DB::raw('shareholding_types.name as shareholding_type_name'),
 				DB::raw('shareholdings.amount as amount'),
 				DB::raw('(select sum(s.amount) from shareholdings s where s.member_id = ' . $id . ' and s.pay_date < shareholdings.pay_date and s.id < shareholdings.id) as total_shareholding'),
-				DB::raw('case when shareholding_attachments.id is not null > 0 then \'<i class="fa fa-paperclip"></i>\' else \'&nbsp;\' end as attachment'))
+                DB::raw('case when shareholding_attachments.id is not null > 0 then \'<i class="fa fa-paperclip"></i>\' else \'&nbsp;\' end as attachment'))
+            ->orderBy('paydate', 'desc')
 			->get();
 		$total_shareholding = Shareholding::where('member_id', $id)
 			->whereDate('pay_date', '<', $pay_date)
@@ -179,7 +181,7 @@ class MemberController extends Controller
 
         return view('website.member.loan', [
             'member' => $member,
-            'loans' => Loan::where('member_id', $member->id)->whereNotNull('code')->orderBy('id', 'desc')->get(),
+            'loans' => Loan::where('member_id', $member->id)->whereNotNull('code')->orderBy('completed_at', 'asc')->orderBy('loaned_at', 'desc')->get(),
             'loantypes' => LoanType::active()->get()
         ]);
    }
@@ -187,22 +189,27 @@ class MemberController extends Controller
    public function getShowLoan($id, $loan_id) {
         $member = Member::find($id);
         $loan = Loan::find($loan_id);
+        $payments = Payment::where('loan_id', $loan_id)
+            ->orderBy('period', 'desc')
+            ->get();
 
         return view('website.member.showloan', [
             'member' => $member,
-            'loan' => $loan,  
+            'loan' => $loan,
+            'payments' => $payments
         ]);
    }
 
    public function getDividend($id) {
         $member = Member::find($id);
-        $dividend_years = Dividend::all();
+        $dividend_years = Dividend::whereDate('release_date', '<=', Diamond::today())->get();
 
         return view('website.member.dividend', [
             'member' => $member,
             'dividend_years' => collect($dividend_years),
             'dividends' => Dividendmember::where('dividend_id', $dividend_years->last()->id)
                 ->where('member_id', $member->id)
+                ->orderBy('dividend_date')
                 ->get()
         ]);
    }

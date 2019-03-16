@@ -31,17 +31,14 @@
             'class'=>'col-sm-2 control-label']) 
         }}
 
-        <div class="col-sm-10 input-group" id="start_date" style="padding: 0 5px;">
+        <div class="col-sm-10" style="padding: 0 5px;">
             {{ Form::text('start_date', null, [
+                'id'=>'start_date',
                 'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
                 'autocomplete'=>'off',
                 'readonly'=>($edit) ? ($loantype->id == 1 || $loantype->id == 2) ? true : false : false,
                 'class'=>'form-control'])
             }}       
-            <span class="input-group-addon">
-                <span class="fa fa-calendar">
-                </span>
-            </span> 
         </div>
     </div>
     <div class="form-group">
@@ -49,17 +46,14 @@
             'class'=>'col-sm-2 control-label']) 
         }}
 
-        <div class="col-sm-10 input-group" id="expire_date" style="padding: 0 5px;">
+        <div class="col-sm-10" style="padding: 0 5px;">
             {{ Form::text('expire_date', null, [
+                'id'=>'expire_date',
                 'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
                 'autocomplete'=>'off',
                 'readonly'=>($edit) ? ($loantype->id == 1 || $loantype->id == 2) ? true : false : false,
                 'class'=>'form-control'])
             }}       
-            <span class="input-group-addon">
-                <span class="fa fa-calendar">
-                </span>
-            </span> 
         </div>
     </div>
 

@@ -38,9 +38,10 @@ class HomeController extends Controller
         ]);
     }
 
-    public function postDashboard() {
-        $summary = Dashboard::summary();
-        $chart = Dashboard::chart();
+    public function postDashboard(Request $request) {
+        $year = $request->input('year');
+        $summary = Dashboard::summary($year);
+        $chart = Dashboard::chart($year);
 
         return compact('summary', 'chart');
     }

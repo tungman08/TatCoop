@@ -48,7 +48,10 @@ class MemberController extends Controller
     }
 
     public function index() {
-        return view('admin.member.index');
+        return view('admin.member.index', [
+            'members' => Member::active()->count(),
+            'last_member' => Member::find(Member::active()->max('id'))
+        ]);
     }
 
     public function create() {
@@ -105,11 +108,15 @@ class MemberController extends Controller
         $validator = Validator::make($request->all(), $rules);
         $validator->setAttributeNames($attributeNames);
 
-        $validator->after(function($validator) use ($member) {
+        $validator->after(function($validator) use ($request, $member) {
             if ($member != null) {
                 if ($member->leave_date == null) {
                     $validator->errors()->add('membered', 'ไม่สามารถสมัครสมาชิกได้ เนื่องจากยังเป็นสมาชิกอยู่');
                 }
+            }
+
+            if (Diamond::parse($request->input('start_date'))->greaterThan(Diamond::today())) {
+                $validator->errors()->add('calendar', 'กรุณาเลือกวันที่สมัครจากปฏิทิน ในรูปแบบ ค.ศ.');
             }
         });
 
@@ -264,8 +271,9 @@ class MemberController extends Controller
         return view('admin.member.inactive');
     }
 
-    public function getLeave($id) {
+    public function getLeave($id, $date) {
         $member = Member::find($id);
+        $leave_date = Diamond::parse($date);
 
         if (is_null($member->leave_date)) {
             if ($member->sureties->filter(function ($value, $key) use ($member) { return is_null($value->completed_at) && $value->member_id != $member->id; })->count() > 0) {
@@ -274,10 +282,11 @@ class MemberController extends Controller
                     ->with('callout_class', 'callout-danger');
             }
             else {
-                $payments = MemberProperty::getTotalPayment($member);
+                $payments = MemberProperty::getTotalPayment($member, $leave_date);
 
                 return view('admin.member.leave', [
                     'member' => $member,
+                    'leave_date' => $leave_date,
                     'shareholdings' => $member->shareHoldings->sum('amount'),
                     'loans' => $member->loans->filter(function ($value, $key) { return is_null($value->completed_at); }),
                     'payments' => ($payments->outstanding - $payments->principle) + $payments->interest
@@ -347,7 +356,7 @@ class MemberController extends Controller
                     $payment = new Payment();
                     $payment->pay_date = $leave_date;
                     $payment->principle = $loan->outstanding - $loan->payments->sum('principle');
-                    $payment->interest = LoanCalculator::loan_interest($loan, Diamond::today());
+                    $payment->interest = LoanCalculator::loan_interest($loan, $leave_date);
         
                     $loan->payments()->save($payment);
                     $loan->completed_at = $leave_date;
@@ -364,7 +373,7 @@ class MemberController extends Controller
 
                 $user = User::where('member_id', $member->id)->first();
 
-                History::addAdminHistory(Auth::guard($this->guard)->id(), 'บันทึกการลาออกของสมาชิก', 'คุณ' . $member->profile->fullName . ' ได้ลาออกจากการเป็นเป็นสมาชิกสหกรณ์');
+                History::addAdminHistory(Auth::guard($this->guard)->id(), 'บันทึกการลาออกของสมาชิก', 'คุณ' . $member->profile->fullname . ' ได้ลาออกจากการเป็นเป็นสมาชิกสหกรณ์');
 
                 if (!is_null($user)) {
                     History::addAdminHistory($user->id, 'ลาออก');
@@ -372,7 +381,7 @@ class MemberController extends Controller
             });
 
             return redirect()->action('Admin\MemberController@index')
-                ->with('flash_message', 'คุณ ' . $member->profile->fullName . ' รหัสสมาชิก ' . str_pad($member->id, 5, "0", STR_PAD_LEFT) . ' ได้ลาออกจากการเป็นเป็นสมาชิกสหกรณ์แล้ว')
+                ->with('flash_message', 'คุณ ' . $member->profile->fullname . ' รหัสสมาชิก ' . str_pad($member->id, 5, "0", STR_PAD_LEFT) . ' ได้ลาออกจากการเป็นเป็นสมาชิกสหกรณ์แล้ว')
                 ->with('callout_class', 'callout-success');      
         }
     }

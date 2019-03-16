@@ -10,7 +10,7 @@
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
             ['item' => 'บัญชีผู้ใช้งานระบบ', 'link' => '/admin/account'],
-            ['item' => $user->member->profile->fullName, 'link' => ''],
+            ['item' => $user->member->profile->fullname, 'link' => ''],
         ]])
     </section>
 
@@ -46,7 +46,7 @@
                     <table class="table table-info">
                         <tr>
                             <th style="width:20%; border-top: 1px solid #ffffff;">ชื่อผู้สมาชิก:</th>
-                            <td style="border-top: 1px solid #ffffff;">{{ $user->member->profile->fullName }}</td>
+                            <td style="border-top: 1px solid #ffffff;">{{ $user->member->profile->fullname }}</td>
                         </tr>
                         <tr>
                             <th>อีเมล:</th>
@@ -66,7 +66,7 @@
                 <!-- /.table-responsive --> 
 
                 <button class="btn btn-primary btn-flat margin-b-md" type="button"
-                    onclick="javascript:window.location.href='{{ url('/admin/account/' . $user->member->id . '/edit') }}';">
+                    onclick="javascript:document.location.href='{{ url('/admin/account/' . $user->member->id . '/edit') }}';">
                     <i class="fa fa-edit"></i> แก้ไขอีเมลบัญชีผู้ใช้
                 </button>
 
@@ -99,10 +99,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @php($count = 0)
-                            @foreach($user->old_emails->sortByDesc('canceled_at') as $email)
+                            @foreach($user->old_emails->sortByDesc('canceled_at') as $index => $email)
                             <tr>
-                                <td>{{ ++$count }}.</td>
+                                <td>{{ $index + 1 }}.</td>
                                 <td class="text-primary"><i class="fa fa-envelope fa-fw"></i> {{ $email->email }}</td>
                                 <td>{{ Diamond::parse($email->canceled_at)->thai_format('j M Y') }}</td>
                                 <td>{{ $email->remark }}</td>
@@ -135,10 +134,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @php($count = 0)
-                            @foreach($user->user_histories->sortByDesc('created_at') as $history)
+                            @foreach($user->user_histories->sortByDesc('created_at') as $index => $history)
                             <tr>
-                                <td>{{ ++$count }}.</td>
+                                <td>{{ $index + 1 }}.</td>
                                 <td class="text-primary">
                                     <i class="fa fa-clock-o fa-fw"></i> {{ Diamond::parse($history->created_at)->thai_format('j M Y') }} เวลา {{ Diamond::parse($history->created_at)->thai_format('H:i') }} น.
                                 </td>
