@@ -119,17 +119,21 @@
         });
 
         $('#annual').datetimepicker({
+            locale: moment.locale('th'),
             viewMode: 'years',
             format: 'YYYY',
-            locale: moment().lang('th'),
-            useCurrent: false
+            useCurrent: false,
+            focusOnShow: false,
+            buddhism: true
         });
 
         $('#monthly').datetimepicker({
+            locale: moment.locale('th'),
             viewMode: 'months',
             format: 'YYYY-MM',
-            locale: moment().lang('th'),
-            useCurrent: false
+            useCurrent: false,
+            focusOnShow: false,
+            buddhism: true
         });
     });
 

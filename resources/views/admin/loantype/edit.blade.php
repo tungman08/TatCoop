@@ -71,19 +71,21 @@
             $('#delete_limit').prop("disabled", $('#limits tbody tr').length == 1);
 
             $('#start_date').datetimepicker({
-                locale: 'th',
+                locale: moment.locale('th'),
                 viewMode: 'days',
                 format: 'YYYY-MM-DD',
-                locale: moment().lang('th'),
-                useCurrent: false
+                useCurrent: false,
+                focusOnShow: false,
+                buddhism: true
             });
 
             $('#expire_date').datetimepicker({
-                locale: 'th',
+                locale: moment.locale('th'),
                 viewMode: 'days',
-                format: 'YYYY-MM-DD',
-                locale: moment().lang('th'),
-                useCurrent: false
+                format: 'YYYY-MM-DD',   
+                useCurrent: false,
+                focusOnShow: false,
+                buddhism: true
             });
 
             $('#add_limit').click(function () {

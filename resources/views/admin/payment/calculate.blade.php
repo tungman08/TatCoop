@@ -160,11 +160,12 @@
         $(".ajax-loading").css("display", "none"); 
 
         $('#pay_date').datetimepicker({
+            locale: moment.locale('th'),
             viewMode: 'days',
             format: 'YYYY-MM-D',
-            //minDate: moment(),
-            locale: moment().lang('th'),
-            useCurrent: false
+            useCurrent: false,
+            focusOnShow: false,
+            buddhism: true
         }).on('dp.hide', function(e){
             setTimeout(function() {
                 $('#pay_date').data('DateTimePicker').viewMode('days');

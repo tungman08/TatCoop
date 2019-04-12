@@ -87,11 +87,12 @@
         $('[data-tooltip="true"]').tooltip();
         
         $('#pay_date').datetimepicker({
-            locale: 'th',
+            locale: moment.locale('th'),
             viewMode: 'days',
             format: 'YYYY-MM-DD',
-            locale: moment().lang('th'),
-            useCurrent: false
+            useCurrent: false,
+            focusOnShow: false,
+            buddhism: true
         });
     });
     </script>

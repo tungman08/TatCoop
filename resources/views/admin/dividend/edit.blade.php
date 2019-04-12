@@ -73,24 +73,28 @@
     {!! Html::script(elixir('js/member-form.js')) !!}
 
     <script>
-        $('#rate_year').datetimepicker({
-            locale: 'th',
-            format: 'YYYY',
-            viewMode: 'years',
-            locale: moment().lang('th'),
-            useCurrent: false
-        }).on('dp.hide', function(e){
-            setTimeout(function() {
-                $('#rate_year').data('DateTimePicker').viewMode('years');
-            }, 1);
-        });
+        $(document).ready(function() {
+            $('#rate_year').datetimepicker({
+                locale: moment.locale('th'),
+                format: 'YYYY',
+                viewMode: 'years',
+                useCurrent: false,
+                focusOnShow: false,
+                buddhism: true
+            }).on('dp.hide', function(e){
+                setTimeout(function() {
+                    $('#rate_year').data('DateTimePicker').viewMode('years');
+                }, 1);
+            });
 
-        $('#release_date').datetimepicker({
-                locale: 'th',
+            $('#release_date').datetimepicker({
+                locale: moment.locale('th'),
                 viewMode: 'days',
                 format: 'YYYY-MM-DD',
-                locale: moment().lang('th'),
-                useCurrent: false
+                useCurrent: false,
+                focusOnShow: false,
+                buddhism: true
+            });
         });
     </script>
 @endsection

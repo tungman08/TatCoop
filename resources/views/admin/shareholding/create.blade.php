@@ -146,12 +146,15 @@
     {!! Html::script(elixir('js/bootstrap-datetimepicker.js')) !!}
 
     <script>
-    $('#pay_date').datetimepicker({
-        locale: 'th',
-        viewMode: 'days',
-        format: 'YYYY-MM-DD',
-        locale: moment().lang('th'),
-        useCurrent: false
+    $(document).ready(function () {
+        $('#pay_date').datetimepicker({
+            locale: moment.locale('th'),
+            viewMode: 'days',
+            format: 'YYYY-MM-DD',
+            useCurrent: false,
+            focusOnShow: false,
+            buddhism: true
+        });
     });
     </script>
 @endsection

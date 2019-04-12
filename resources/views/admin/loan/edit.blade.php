@@ -113,11 +113,12 @@
     <script>
     $(document).ready(function () {
         $('#loaned_at').datetimepicker({
-            locale: 'th',
+            locale: moment.locale('th'),
             viewMode: 'days',
             format: 'YYYY-MM-DD',
-            locale: moment().lang('th'),
-            useCurrent: false
+            useCurrent: false,
+            focusOnShow: false,
+            buddhism: true
         });
     });
     </script>

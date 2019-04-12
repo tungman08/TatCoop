@@ -1,14 +1,14 @@
 {
   "private": true,
   "devDependencies": {
-    "cryptiles": ">=4.1.2",
-    "gulp": "^4.0.0",
-    "laravel-elixir": "^6.0.0-18",
-    "marked": "^0.6.1",
     "atob": ">=2.1.0",
-    "sshpk": ">=1.13.2",
+    "cryptiles": ">=4.1.2",
+    "gulp": "^3.9.1",
+    "hoek": "^6.1.3",
+    "laravel-elixir": "^6.0.0-18",
     "lodash": ">=4.17.11",
-    "hoek": ">=4.2.1"
+    "marked": "^0.6.2",
+    "sshpk": ">=1.13.2"
   },
   "dependencies": {
     "bootstrap-sass": "^3.4.1"

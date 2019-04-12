@@ -66,13 +66,14 @@
     <script>
         $(document).ready(function() {
             $('#rate_year').datetimepicker({
-                locale: 'th',
+                locale: moment.locale('th'),
                 format: 'YYYY',
                 viewMode: 'years',
                 minDate: moment('2015-12-31'),
                 maxDate: moment(),
-                locale: moment().lang('th'),
-                useCurrent: false
+                useCurrent: false,
+                focusOnShow: false,
+                buddhism: true
             }).on('dp.hide', function(e){
                 setTimeout(function() {
                     $('#rate_year').data('DateTimePicker').viewMode('years');
@@ -80,11 +81,12 @@
             });
 
             $('#release_date').datetimepicker({
-                locale: 'th',
+                locale: moment.locale('th'),
                 viewMode: 'days',
                 format: 'YYYY-MM-DD',
-                locale: moment().lang('th'),
-                useCurrent: false
+                useCurrent: false,
+                focusOnShow: false,
+                buddhism: true
             });
         });
     </script>

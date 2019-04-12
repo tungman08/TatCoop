@@ -4,9 +4,12 @@
     });
 
     $('#datepicker').datetimepicker({
+        locale: moment.locale("th"),
         viewMode: 'months',
         format: 'YYYY-MM',
-        locale: moment().lang("th")
+        useCurrent: false,
+        focusOnShow: false,
+        buddhism: true
     }).on("dp.change", function (e) {
         $('.display-month').html(thai_date(e.date));
         detail_statistic(e.date);
