@@ -5,25 +5,27 @@ namespace App\Classes;
 use DB;
 use Diamond;
 use stdClass;
+use LoanCalculator;
 use App\Member;
 use App\RoutineSetting;
-use App\RoutineShareholding;
-use App\RoutineShareholdingDetail;
-use App\Shareholding;
+use App\RoutinePayment;
+use App\RoutinePaymentDetail;
+use App\Loan;
+use App\Payment;
 
-class ShareholdingCalculator {
+class PaymentCalculator {
     public function calculate($date) {
-        $setting = RoutineSetting::find(1);
+        $setting = RoutineSetting::find(2);
         
         if ($setting->calculate_status == true) {
-            return $this->shareholding($date);
+            return $this->payment($date);
         }
 
         return 'Nothing';
     }
-
+ 
     public function store() {
-        $setting = RoutineSetting::find(1);
+        $setting = RoutineSetting::find(2);
 
         if ($setting->save_status == true) {
             return $this->save();
@@ -32,7 +34,7 @@ class ShareholdingCalculator {
         return 'Nothing';
     }
 
-    protected function shareholding($date) {
+    protected function payment($date) {
         $result = 'Nothing';
 
         if (!empty($date)) {
@@ -55,45 +57,53 @@ class ShareholdingCalculator {
     public function addnew($date) {
         $result = 'Nothing';
         $mydate = Diamond::parse($date->startOfMonth()->format('Y-m-d'));
-        $count = RoutineShareholding::whereDate('calculated_date', '=', $mydate)->count();
+        $count = RoutinePayment::whereDate('calculated_date', '=', $mydate)->count();
 
         if ($count == 0) {
             $members = Member::join('employees', 'employees.profile_id', '=', 'members.profile_id')
+                ->join('loans', 'members.id', '=', 'loans.member_id')
                 ->where('employees.employee_type_id', 1)
                 ->whereYear('members.start_date', '<=', $mydate->year)
                 ->where(function ($query) use ($mydate) {
                     $query->whereYear('members.leave_date', '>', $mydate->year)
                         ->orWhereNull('members.leave_date'); })
+                ->whereNotNUull('loans.code')
+                ->whereNull('loans.completed_at')
                 ->select([
-                    'members.id',
-                    'members.shareholding'])
+                    'members.id as id',
+                    'loans.id as loan_id'])
                 ->get();
 
             DB::transaction(function() use ($mydate, $members) {
-                $routine = new RoutineShareholding();
+                $routine = new RoutinePayment();
                 $routine->calculated_date = $mydate;
                 $routine->save();
     
                 foreach ($members as $member) {
-                    $detail = new RoutineShareholdingDetail();
-                    $detail->routine_shareholding_id = $routine->id;
-                    $detail->member_id = $member->id;
+                    $loan = Loan::find($member->loan_id);
+                    $payment = LoanCalculator::monthly_payment($loan, $mydate);
+
+                    $detail = new RoutinePaymentDetail();
+                    $detail->routine_payment_id = $routine->id;
+                    $detail->loan_id = $member->loan_id;
                     $detail->pay_date = Diamond::parse($mydate->endOfMonth()->format('Y-m-d'));
-                    $detail->amount = $member->shareholding * 10;
+                    $detail->period = ($loan->payments->count() > 0) ? $loan->payments->max('period') + 1 : 1;
+                    $detail->principle = $payment->principle;
+                    $detail->interest = $payment->interest;
                     $detail->save();
                 }
             });
 
-            $result = "Created {$members->count()} shareholding(s).";
+            $result = "Created {$members->count()} payment(s).";
         }
 
         return $result;
     }
 
-    protected function save() {
+    protected function save() {        
         $this->updateStatus();
         
-        $routines = RoutineShareholding::whereNotNull('approved_date')
+        $routines = RoutinePayment::whereNotNull('approved_date')
             ->whereNull('saved_date')
             ->where('status', false)
             ->get();
@@ -103,13 +113,14 @@ class ShareholdingCalculator {
                 DB::transaction(function() use ($routine) {
                     foreach ($routine->details as $detail) {
                         if ($detail->status == false) {
-                            $shareholding = new Shareholding();
-                            $shareholding->member_id = $detail->member_id;
-                            $shareholding->shareholding_type_id = 1;
-                            $shareholding->pay_date = Diamond::parse($detail->pay_date);
-                            $shareholding->amount = $detail->amount;
-                            $shareholding->remark = 'ป้อนข้อมูลอัตโนมัติ';
-                            $shareholding->save();
+                            $payment = new Payment();
+                            $payment->loan_id = $detail->member_id;
+                            $payment->pay_date = Diamond::parse($detail->pay_date);
+                            $payment->period = $detail->period;
+                            $payment->principle = $detail->principle;
+                            $payment->interest = $detail->interest;
+                            $payment->remark = 'ป้อนข้อมูลอัตโนมัติ';
+                            $payment->save();
                 
                             $detail->status = true;
                             $detail->save();
@@ -122,24 +133,22 @@ class ShareholdingCalculator {
                 });
             }
 
-            return 'Save all shareholding to database successfully.';
+            return 'Save all payment to database successfully.';
         }
 
         return 'Nothing';
     }
-        
+
     protected function updateStatus() {
         // also would work, temporary turn off auto timestamps
-        with($model = new RoutineShareholdingDetail)->timestamps = false;
+        with($model = new RoutinePaymentDetail)->timestamps = false;
 
-        $model->join('shareholdings', function ($query) {
-            $query->on('routine_shareholding_details.member_id', '=', 'shareholdings.member_id')
-                 ->on('routine_shareholding_details.pay_date', '=', 'shareholdings.pay_date')
-                 ->on('routine_shareholding_details.amount', '=', 'shareholdings.amount'); })
-        ->where('routine_shareholding_details.status', false)
-        ->where('shareholdings.shareholding_type_id', 1)
+        $model->join('payments', function ($query) {
+            $query->on('routine_payment_details.loan_id', '=', 'payments.loan_id')
+                ->on('routine_payment_details.pay_date', '=', 'payments.pay_date'); })
+        ->where('routine_payment_details.status', false)
         ->update([
-            'routine_shareholding_details.status' => true
+            'routine_payment_details.status' => true
         ]);
     }
 }

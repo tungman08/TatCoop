@@ -20,7 +20,7 @@ class CreateLoansTable extends Migration
             $table->float('rate')->nullable();
             $table->integer('period')->nullable();
             $table->boolean('shareholding');
-            $table->dateTime('completed_at')->nullable();
+            $table->date('completed_at')->nullable();
             $table->integer('step');
             $table->timestamps();
         });

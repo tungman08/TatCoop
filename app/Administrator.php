@@ -73,6 +73,13 @@ class Administrator extends Authenticatable
     }
 
     /**
+     * Get the histories for the admin action.
+     */
+    public function admin_histories() {
+        return $this->hasMany(AdministratorHistory::class, 'admin_id', 'id');
+    }
+
+    /**
      * Scope a query to only include super admin.
      *
      * @return \Illuminate\Database\Eloquent\Builder

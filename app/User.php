@@ -62,7 +62,7 @@ class User extends Authenticatable
         return $this->hasMany(UserStatistic::class);
     }
 
-        /**
+    /**
      * Get the histories for the user action.
      */
     public function user_histories() {

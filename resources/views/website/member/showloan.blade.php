@@ -105,7 +105,7 @@
                                     <td>{{ number_format($payment->interest, 2, '.', ',') }}</td>
                                     <td>{{ number_format($payment->principle + $payment->interest, 2, '.', ',') }}</td>
                                     <td>
-                                        <a href="/member/{{ $member->id }}/loan/{{ $loan->id }}/{{ $payment->id }}/billing/{{ Diamond::parse($payment->pay_date)->copy()->endOfMonth()->format('Y-m-d') }}"><i class="fa fa-file-o"></i> ใบรับเงินค่างวด</a>
+                                        <a href="/member/{{ $member->id }}/loan/{{ $loan->id }}/{{ $payment->id }}/billing/{{ Diamond::parse($payment->pay_date)->endOfMonth()->format('Y-m-d') }}"><i class="fa fa-file-o"></i> ใบรับเงินค่างวด</a>
                                     </td>
                                 </tr>
                             @endforeach

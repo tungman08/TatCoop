@@ -25,6 +25,7 @@
             </p>  
             
             <div class="form-group" style="margin-bottom: 0px;">
+                <input type="hidden" id="routine_status" value="{{ $routine->status }}" />
                 <input type="hidden" id="month_id" value="{{ $routine->id }}" />
                 <div id="approve-toggle" class="toggle-btn">
                     <label class="toggle-label">ตรวจสอบความถูกต้อง</label>
@@ -62,23 +63,41 @@
             <!-- /.box-header -->
 
             <div class="box-body">
-                {{ Form::open(['action' => ['Admin\RoutinePaymentController@save', $routine->id], 'method' => 'post', 'class' => 'form', 'onsubmit' => "return confirm('คุณต้องการบันทึกข้อมูลทั้งหมดใช่ไหม?');"]) }}
-                    {{ Form::button('<i class="fa fa-floppy-o"></i> บันทึกทั้งหมด', [
-                        'id'=>'save_all',
-                        'type' => 'submit', 
-                        'class'=>'btn btn-primary btn-flat margin-b-md',
-                        'disabled'=>true])
-                    }}  
-                {{ Form::close() }}
+            <div class="row">
+                <div class="col-md-6">
+                    {{ Form::open(['action' => ['Admin\RoutinePaymentController@save', $routine->id], 'method' => 'post', 'class' => 'form', 'onsubmit' => "return confirm('คุณต้องการบันทึกข้อมูลทั้งหมดใช่ไหม?');"]) }}
+                        {{ Form::button('<i class="fa fa-floppy-o"></i> บันทึกทั้งหมด', [
+                            'id'=>'save_all',
+                            'type' => 'submit', 
+                            'class'=>'btn btn-primary btn-flat margin-b-md',
+                            'disabled'=>true])
+                        }}  
+                    {{ Form::close() }}
+                    </div>
+                    <!--/.col-->
+
+                    <div class="col-md-6">
+                        {{ Form::open(['action' => ['Admin\RoutinePaymentController@report', $routine->id], 'method' => 'post', 'class' => 'form']) }}
+                            {{ Form::button('<i class="fa fa-file-excel-o"></i> บันทึกเป็น Excel', [
+                                'id'=>'report',
+                                'type' => 'submit', 
+                                'class'=>'btn btn-default btn-flat margin-b-md pull-right'])
+                            }}  
+                        {{ Form::close() }}
+                    </div>
+                    <!--/.col-->
+                </div>
+                <!--/.row-->
 
                 <div class="table-responsive" style=" margin-top: 10px;">
                     <table id="dataTables" class="table table-hover dataTable" width="100%">
                         <thead>
                             <tr>
-                                <th style="width: 12%;">ประเภทเงินกู้</th>
-                                <th style="width: 10%;">เลขที่สัญญา</th>
-                                <th style="width: 12%;">รหัสสมาชิก</th>
-                                <th style="width: 20%;">ชื่อสมาชิก</th>
+                                <th style="width: 8%;">รหัสสมาชิก</th>
+                                <th style="width: 16%;">ชื่อสมาชิก</th>
+                                <th style="width: 8%;">เลขที่สัญญา</th>
+                                <th style="width: 16%;">ประเภทเงินกู้</th>
+                                <th style="width: 8%;">งวดที่</th>
                                 <th style="width: 12%;">จำนวนเงินต้น</th>
                                 <th style="width: 12%;">จำนวนดอกเบี้ย</th>
                                 <th style="width: 12%;">รวมเป็นเงิน</th>
@@ -86,22 +105,23 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($routine->details->sortBy(function ($value, $key) { return $value->loan->member_id; }) as $detail) 
+                            @foreach($details as $detail) 
                                 <tr>
-                                    <td><span class="label label-primary">{{ $detail->loan->loanType->name }}</span></td>
-                                    <td>{{ $detail->loan->code }}</td>
-                                    <td>{{ $detail->loan->member->memberCode }}</td>
-                                    <td class="text-primary">{{ $detail->loan->member->profile->name . ' ' . $detail->loan->member->profile->lastname }}</td>
-                                    <td>{{ number_format($detail->principle, 2, '.', ',') }}</td>
-                                    <td>{{ number_format($detail->interest, 2, '.', ',') }}</td>
-                                    <td>{{ number_format($detail->principle + $detail->interest, 2, '.', ',') }}</td>
+                                    <td>{{ $detail->membercode }}</td>
+                                    <td class="text-primary">{{ $detail->fullname }}</td>
+                                    <td><span class="label label-primary">{{ $detail->loancode }}</span></td>
+                                    <td>{{ $detail->loantypename }}</td>
+                                    <td>{{ $detail->period }}</td>
+                                    <td>{{ $detail->principle }}</td>
+                                    <td>{{ $detail->interest }}</td>
+                                    <td>{{ $detail->total }}</td>
                                     <td>
                                         @if (!$detail->status || (is_null($routine->approved_at) && !$routine->status && Diamond::today()->greaterThan(Diamond::parse($routine->saved_at))))
                                             <div class="btn-group">
-                                                <button type="button" class="btn btn-default btn-flat btn-xs"
+                                                {{--<button type="button" class="btn btn-default btn-flat btn-xs"
                                                     onclick="javascript: save_detail({{ $detail->id }});">
                                                     <i class="fa fa-floppy-o"></i>
-                                                </button>
+                                                </button>--}}
                                                 <button type="button" class="btn btn-default btn-flat btn-xs"
                                                     onclick="javascript: document.location.href='{{ action('Admin\RoutinePaymentController@editDetail', ['id' => $detail->id]) }}';">
                                                     <i class="fa fa-pencil"></i>
@@ -111,6 +131,8 @@
                                                     <i class="fa fa-trash"></i>
                                                 </button>
                                             </div>
+                                        @else 
+                                            <span class="label label-primary">บันทึกข้อมูลแล้ว</span>
                                         @endif
                                     </td>
                                 </tr>
@@ -164,10 +186,13 @@
             });
 
             $('#approve-toggle').click(() => {
+                let routine = $('#routine_status').val();
                 let id = $('#month_id').val();
                 let status = $('#approve').is(':checked');
 
-                toggle(id, status);
+                if (routine !== "1") {
+                    toggle(id, status);
+                }   
             });
 
             init($('#month_id').val());
@@ -236,8 +261,13 @@
         }
         
         function set_toggle_switch(status) {
+            let routine = $('#routine_status').val();
+
             $('#approve').prop("checked", status);
-            $('#save_all').prop("disabled", !status);
+
+            if (routine !== "1") {
+                $('#save_all').prop("disabled", !status);
+            }    
 
             if (status) {
                 $('#approve-toggle').addClass('active');

@@ -100,6 +100,10 @@ class AppServiceProvider extends ServiceProvider
 
         App::bind('shareholdingcalculator', function() {
             return new \App\Classes\ShareholdingCalculator;
+        }); 
+        
+        App::bind('paymentcalculator', function() {
+            return new \App\Classes\PaymentCalculator;
         });  
 
         App::bind('dashboard', function() {

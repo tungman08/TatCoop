@@ -11,7 +11,7 @@ class RoutineShareholdingDetail extends Model
      *
      * @var string
      */
-	protected $table = 'routine_shareholding_details';
+    protected $table = 'routine_shareholding_details';
 
     /**
      * The attributes that are mass assignable.

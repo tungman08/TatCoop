@@ -35,4 +35,11 @@ class AdministratorHistory extends Model
     public function history_type() {
         return $this->belongsTo(HistoryType::class);
     }
+
+    /**
+     * Get the admin that uses by the session.
+     */
+    public function admin() {
+        return $this->belongsTo(Administrator::class, 'admin_id');
+    }
 }

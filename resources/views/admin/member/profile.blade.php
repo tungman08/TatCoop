@@ -2,7 +2,7 @@
     <button class="btn btn-primary btn-flat"
         {{ (($is_super || $is_admin) ? '' : 'disabled') }}
         title="แก้ไขข้อมูล"
-        onclick="javascript:document.location = '/service/member/{{ $member->id }}/edit';">
+        onclick="javascript:document.location.href = '/service/member/{{ $member->id }}/edit';">
         <i class="fa fa-edit"></i> แก้ไขข้อมูล
     </button>
 

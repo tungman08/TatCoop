@@ -4,12 +4,12 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
         <h1>
-            บัญชีผู้ใช้งานระบบฯ
+            บัญชีสมาชิกสหกรณ์
             <small>รายชื่อบัญชีของสมาชิกที่ใช้งานระบบบริการอิเล็กทรอนิกส์</small>
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'บัญชีผู้ใช้งานระบบ', 'link' => ''],
+            ['item' => 'บัญชีสมาชิกสหกรณ์', 'link' => ''],
         ]])
     </section>
 
@@ -17,12 +17,12 @@
     <section class="content">
         <!-- Info boxes -->
         <div class="well">
-            <h4>บัญชีผู้ใช้งานระบบบริการอิเล็กทรอนิกส์</h4>
+            <h4>บัญชีสมาชิกสหกรณ์ที่ใช้งานระบบบริการอิเล็กทรอนิกส์</h4>
             <p>แสดงรายชื่อบัญชีของสมาชิกที่ได้ลงทะเบียนเข้าใช้งานระบบบริการอิเล็กทรอนิกส์</p>
         </div>
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title"><i class="fa fa-user-circle-o"></i> รายชื่อบัญชีผู้ใช้งานระบบบริการอิเล็กทรอนิกส์</h3>
+                <h3 class="box-title"><i class="fa fa-user-circle-o"></i> รายชื่อบัญชีสมาชิกสหกรณ์ที่ใช้งานระบบบริการอิเล็กทรอนิกส์</h3>
             </div>
             <!-- /.box-header -->
 

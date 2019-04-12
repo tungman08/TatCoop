@@ -47,6 +47,13 @@ class Loan extends Model
     }
 
     /**
+     * Get the attachments that uses by the loan.
+     */
+    public function attachments() {
+        return $this->hasMany(LoanAttachment::class);
+    }
+
+    /**
      * Get the payments that uses by the loan.
      */
     public function payments() {

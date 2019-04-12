@@ -268,7 +268,7 @@
 
                                         <td>&nbsp;</td>
                                         <td class="text-center">{{ $payment->period }}</td>
-                                        <td class="text-right">{{ number_format($payment->principle - $payment->interest, 2, '.', ',') }}</td>
+                                        <td class="text-right">{{ number_format($payment->principle + $payment->interest, 2, '.', ',') }}</td>
                                         <td class="text-right">{{ number_format($payment->principle, 2, '.', ',') }}</td>
                                         <td class="text-right">{{ number_format($payment->interest, 2, '.', ',') }}</td>
                                         <td class="text-right">{{ number_format($balance, 2, '.', ',') }}</td>

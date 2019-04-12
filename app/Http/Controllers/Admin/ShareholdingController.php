@@ -256,45 +256,6 @@ class ShareholdingController extends Controller
             ->with('callout_class', 'callout-success');
     }
 
-    // public function getAutoShareholding() {
-    //    return view('admin.shareholding.auto');
-    // }
-
-    // public function postAutoShareholding(Request $request) {
-    //     $date = Diamond::parse($request->input('month') . '-1')->endOfMonth();
-
-    //     $members = Member::active()
-    //         ->join('employees', 'members.profile_id', '=', 'employees.profile_id')
-    //         ->where('members.shareholding', '>', 0)
-    //         ->where('employees.employee_type_id', 1)
-    //         ->whereDate('members.start_date', '<', $date)
-    //         ->whereNotIn('members.id', function($query) use ($date) {
-    //             $query->from('shareholdings')
-    //                 ->whereMonth('pay_date', '=', $date->month)
-    //                 ->whereYear('pay_date', '=', $date->year)
-    //                 ->where('shareholding_type_id', 1)
-    //                 ->select('member_id');
-    //         })
-    //         ->select('members.*')->get();
-
-    //     DB::transaction(function() use ($members, $date) {
-    //         foreach($members as $member) {
-    //             $share = new Shareholding();
-    //             $share->pay_date = $date;
-    //             $share->shareholding_type_id = 1;
-    //             $share->amount = $member->shareholding * 10 ;
-    //             $share->remark = 'ป้อนข้อมูลอัตโนมัติ';
-    //             $member->shareholdings()->save($share);
-    //         }
-
-    //         History::addAdminHistory(Auth::guard($this->guard)->id(), 'ป้อนการชำระค่าหุ้นแบบอัตโนมัติ', 'ทำรายการชำระค่าหุ้นอัตโนมัติประจำเดือน' . $date->thai_format('F Y'));
-    //     });
-
-    //     return redirect()->action('Admin\ShareholdingController@getMember')
-    //         ->with('flash_message', 'ทำรายการชำระค่าหุ้นอัตโนมัติประจำเดือน' . $date->thai_format('F Y') . ' จำนวน ' . $members->count() . ' คน เรียบร้อยแล้ว')
-    //         ->with('callout_class', 'callout-success');
-    // }
-
     function getBilling($member_id, $paydate, $id) {
         $pay_date = Diamond::parse($paydate);
 		$shareholding = Shareholding::find($id);

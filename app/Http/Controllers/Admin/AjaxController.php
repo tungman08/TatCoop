@@ -629,74 +629,6 @@ class AjaxController extends Controller
         return compact('index', 'count', 'histories');
     }
 
-    public function postMembershareholding(Request $request) {
-        $date = Diamond::parse($request->input('date'))->endOfMonth();
-
-        $members = DB::table('members')
-            ->join('profiles', 'members.profile_id', '=', 'profiles.id')
-            ->join('employees', 'profiles.id', '=', 'employees.profile_id')
-            ->join('employee_types', 'employees.employee_type_id', '=', 'employee_types.id')
-            ->leftJoin('shareholdings', 'members.id', '=', 'shareholdings.member_id')
-            ->whereNull('members.leave_date')
-            ->where('members.shareholding', '>', 0)
-            ->where('employees.employee_type_id', 1)
-            ->whereDate('members.start_date', '<', $date)
-            ->whereNotIn('members.id', function($query) use ($date) {
-                $query->from('shareholdings')
-                    ->whereMonth('pay_date', '=', $date->month)
-                    ->whereYear('pay_date', '=', $date->year)
-                    ->where('shareholding_type_id', 1)
-                    ->select('member_id');
-            })
-            ->groupBy(['members.id', 'profiles.name', 'profiles.lastname', 'employee_types.name', 'members.shareholding'])
-            ->select([
-                DB::raw("LPAD(members.id, 5, '0') as code"),
-                DB::raw("CONCAT('<span class=\"text-primary\"><i class=\"fa fa-user fa-fw\"></i> ', IF(profiles.name = '<ข้อมูลถูกลบ>', profiles.name, CONCAT(profiles.name, ' ', profiles.lastname)), '</span>') as fullname"),
-                DB::raw("CONCAT('<span class=\"label label-primary\">', employee_types.name, '</span>') as typename"),
-                DB::raw("CONCAT(FORMAT(members.shareholding, 0), ' หุ้น') as shareholding"),
-                DB::raw("CONCAT(FORMAT(SUM(shareholdings.amount), 2), ' บาท') as amount")
-            ]);
-
-        return Datatables::queryBuilder($members)
-             ->make(true);
-    }
-
-    public function postMemberpayment(Request $request) {
-        $date = Diamond::parse($request->input('date'))->endOfMonth();
-
-        $members = Db::table('members')
-            ->join('profiles', 'members.profile_id', '=', 'profiles.id')
-            ->join('employees', 'profiles.id', '=', 'employees.profile_id')
-            ->join('employee_types', 'employees.employee_type_id', '=', 'employee_types.id')
-            ->join('loans', 'members.id', '=', 'loans.member_id')
-            ->where('employees.employee_type_id', 1)
-            ->whereDate('members.start_date', '<', $date)
-            ->whereNull('loans.completed_at')
-            ->groupBy('members.id')
-            ->select('members.id')
-            ->get();
-
-        $payments = collect([]);
-        foreach ($members as $query) {
-            $member = Member::find($query->id);
-            $payment = MemberProperty::getMonthlyPayment($member, $date);
-
-            $item = new stdClass();
-            $item->code = $member->memberCode;
-            $item->fullname = '<span class="text-primary"><i class="fa fa-user fa-fw"></i> ' . $member->profile->fullname . '</span>';
-            $item->typename = '<span class="label label-primary">' . $member->profile->employee->employee_type->name . '</span>';
-            $item->loanCount = number_format($member->loans->filter(function ($value, $key) { return is_null($value->completed_at); })->count(), 0, '.', ',');
-            $item->principle = number_format($payment->principle, 2, '.', ',');
-            $item->interest = number_format($payment->interest, 2, '.', ',');
-            $item->total = number_format($payment->principle + $payment->interest, 2, '.', ',');
-
-            $payments->push($item);
-        }
-
-        return Datatables::collection($payments)
-             ->make(true);
-    }
-
     public function getAccounts(Request $request) {
         $users = DB::table('users')
             ->join('members', 'users.member_id', '=', 'members.id')
@@ -1157,7 +1089,7 @@ class AjaxController extends Controller
                 ->select([
                     DB::raw("CONCAT('<span class=\"text-primary\"><i class=\"fa fa-money fa-fw\"></i> ', loan_types.name, '</span>') as loantype"),
                     DB::raw("loans.id as loanid"),
-                    DB::raw("loans.code as loancode"),
+                    DB::raw("CONCAT('<span class=\"label label-primary\">', loans.code, '<span>') as loancode"),
                     DB::raw("members.id as memberid"),
                     DB::raw("LPAD(members.id, 5, '0') as membercode"),
                     DB::raw("CONCAT(profiles.name, ' ', profiles.lastname) as membername"),

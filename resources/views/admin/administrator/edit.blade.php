@@ -10,7 +10,7 @@
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
             ['item' => 'จัดการเจ้าหน้าที่สหกรณ์', 'link' => '/admin/administrator'],
-            ['item' => 'ข้อมูลเจ้าหน้าที่สหกรณ์', 'link' => ''],
+            ['item' => 'ข้อมูลเจ้าหน้าที่สหกรณ์', 'link' => '/admin/administrator/' . $admin->id],
             ['item' => 'แก้ไข', 'link' => ''],
         ]])
     </section>

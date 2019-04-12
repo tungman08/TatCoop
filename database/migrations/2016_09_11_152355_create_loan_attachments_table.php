@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateLoanDocumentsTable extends Migration
+class CreateLoanAttachmentsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,9 +12,15 @@ class CreateLoanDocumentsTable extends Migration
      */
     public function up()
     {
-        Schema::create('loan_documents', function (Blueprint $table) {
+        Schema::create('loan_attachments', function (Blueprint $table) {
             $table->increments('id');
+
+            $table->integer('loan_id')->unsigned();
+            $table->foreign('loan_id')->references('id')
+                ->on('loans')->onDelete('cascade');
+
             $table->string('file');
+            $table->string('display');
             $table->timestamps();
         });
     }
@@ -26,6 +32,10 @@ class CreateLoanDocumentsTable extends Migration
      */
     public function down()
     {
+        Schema::table('loan_attachments', function (Blueprint $table) {
+            $table->dropForeign('loan_attachments_loan_id_foreign');
+        });
+
         Schema::drop('loan_documents');
     }
 }

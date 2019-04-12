@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+
 use App\Dividend;
 use App\Dividendmember;
 use App\Loan;
@@ -98,9 +99,9 @@ class ReportController extends Controller
             'ค่าหุ้น ก.ย.', 'เงินปันผล', 'ค่าหุ้น ต.ค.', 'เงินปันผล', 'ค่าหุ้น พ.ย.','เงินปันผล', 'ค่าหุ้น ธ.ค.', 'เงินปันผล', 
             'รวมเงินปันผล', 'รวมเงินเฉลี่ยคืน', 'รวมเป็นเงินทั้งสิ้น'];
 
-            Excel::create($filename, function($excel) use($filename, $dividend, $header, $members) {
+            Excel::create($filename, function($excel) use ($filename, $dividend, $header, $members) {
                 // sheet
-                $excel->sheet('รายละเอียดการปันผล', function($sheet) use($filename, $dividend, $header, $members) {
+                $excel->sheet('รายละเอียดการปันผล', function($sheet) use ($filename, $dividend, $header, $members) {
                     // disable auto size for sheet
                     $sheet->setAutoSize(false);
 
@@ -109,15 +110,19 @@ class ReportController extends Controller
 
                     // rate
                     $sheet->row(2, ['อัตราเงินปันผล', $dividend->shareholding_rate / 100]);
-                    $sheet->setColumnFormat(array(
+                    $sheet->setColumnFormat([
                         'B2' => '0.00%'
-                    ));
+                    ]);
+                    $sheet->row(3, ['อัตราเงินเฉลี่ยคืน', $dividend->loan_rate / 100]);
+                    $sheet->setColumnFormat([
+                        'B3' => '0.00%'
+                    ]);
 
                     // header
-                    $sheet->row(4, $header);
+                    $sheet->row(5, $header);
 
                     // data
-                    $row = 5;
+                    $row = 6;
                     foreach ($members as $member) {
                         $data = [];
                         $data[] = $member->memberCode;
@@ -184,16 +189,16 @@ class ReportController extends Controller
                         $row++;
                     }
 
-                    $sheet->setColumnFormat(array(
+                    $sheet->setColumnFormat([
                         "C5:AE$row" => '#,##0.00'
-                    ));
+                    ]);
                 });
             })->download('xlsx');
         }
         else {
-            Excel::create($filename, function($excel) use($filename) {
+            Excel::create($filename, function($excel) use ($filename) {
                 // sheet
-                $excel->sheet('รายละเอียดการปันผล', function($sheet) use($filename) {
+                $excel->sheet('รายละเอียดการปันผล', function($sheet) use ($filename) {
                     // disable auto size for sheet
                     $sheet->setAutoSize(false);
 
@@ -208,32 +213,37 @@ class ReportController extends Controller
     }
 
     private function shareholdings($date) {
-        $shareholdings = DB::select(DB::raw('select a.id_a as member_id, a.name, a.lastname, a.employee_type_name as employee_type_name, b.amount, a.total ' .
-            'from (' .
-            'select members.id as id_a, profiles.name as name, profiles.lastname as lastname, employee_types.name as employee_type_name, ' .
-            "(select coalesce(sum(s.amount), 0) from shareholdings s where s.pay_date <= date('" . Diamond::create($date->year, $date->month, $date->daysInMonth, 0, 0, 0) . "') and s.member_id = members.id) as total " .
-            'from tatcoop.members ' .
-            'inner join profiles on members.profile_id = profiles.id ' .
-            'inner join employees on members.profile_id = employees.profile_id ' .
-            'inner join employee_types on employees.employee_type_id = employee_types.id ' .
-            'where members.leave_date is null ' .
-            'group by members.id, profiles.name, profiles.lastname, employee_types.name' .
-            ') a ' .
-            'left join (' .
-            'select members.id as id_b, sum(shareholdings.amount) as amount ' .
-            'from tatcoop.members ' .
-            'inner join shareholdings on members.id = shareholdings.member_id ' .
-            "where members.leave_date is null and shareholdings.pay_date between date('" . Diamond::create($date->year, $date->month, 1, 0, 0, 0) . "') and date('" . Diamond::create($date->year, $date->month, $date->daysInMonth, 0, 0, 0) . "') " .
-            'group by members.id' .
-            ') b on a.id_a = b.id_b;'
-        ));
+        $shareholdings = DB::select(DB::raw("select lpad(b.id, 5, '0') as member_code, c.fullname, c.employee_type, b.a_amount, b.b_amount, c.total_shareholding " .
+            "from (" .
+                "select a.id, sum(case when a.type_id = 1 then a.amount else 0 end) as a_amount, sum(case when a.type_id = 2 then a.amount else 0 end) as b_amount " .
+                "from (" .
+                    "select m1.id, s1.shareholding_type_id as type_id, sum(s1.amount) as amount " .
+                    "from shareholdings s1 " .
+                    "inner join members m1 on s1.member_id = m1.id " .
+                    "where m1.leave_date is null " .
+                    "and s1.pay_date between '" . $date->format('Y-m-1') . "' and '" . $date->copy()->endOfMonth()->format('Y-m-d') . "' ".
+                    "group by m1.id, s1.shareholding_type_id" .
+                ") a " .
+                "group by a.id " .
+            ") b " .
+            "inner join (" .
+                "select m2.id, concat(p.name, ' ', p.lastname) as fullname, et.name as employee_type, sum(s2.amount) as total_shareholding " .
+                "from shareholdings s2 " .
+                "inner join members m2 on s2.member_id = m2.id " .
+                "inner join profiles p on m2.profile_id = p.id " .
+                "inner join employees e on m2.profile_id = e.profile_id " .
+                "inner join employee_types et on e.employee_type_id = et.id " .
+                "where m2.leave_date is null " .
+                "and s2.pay_date <= '" . $date->copy()->endOfMonth()->format('Y-m-d') . "' " .
+                "group by m2.id, p.name, p.lastname, et.name " .
+            ") c on b.id = c.id;"));
 
         $filename = 'ชำระค่าหุ้นประจำเดือน '. $date->thai_format('M Y');
-        $header = ['#', 'เลขทะเบียนสมาชิก', 'ชื่อ-นามสกุล', 'ประเภทสมาชิก', 'เงินค่าหุ้น', 'ค่าหุ้นสะสม'];
+        $header = ['#', 'เลขทะเบียนสมาชิก', 'ชื่อ-นามสกุล', 'ประเภทสมาชิก', 'ค่าหุ้นปกติ', 'ค่าหุ้นเงินสด', 'ค่าหุ้นสะสมรวม'];
 
-        Excel::create($filename, function($excel) use($filename, $header, $shareholdings) {
+        Excel::create($filename, function($excel) use ($filename, $header, $shareholdings) {
             // sheet
-            $excel->sheet('ชำระค่าหุ้น', function($sheet) use($filename, $header, $shareholdings) {
+            $excel->sheet('ชำระค่าหุ้น', function($sheet) use ($filename, $header, $shareholdings) {
                 // disable auto size for sheet
                 $sheet->setAutoSize(false);
 
@@ -248,19 +258,20 @@ class ReportController extends Controller
                 foreach ($shareholdings as $shareholding) {
                     $data = [];
                     $data[] = $row - 3;
-                    $data[] = str_pad($shareholding->member_id, 5, "0", STR_PAD_LEFT);
-                    $data[] = $shareholding->name . ' ' . $shareholding->lastname;
-                    $data[] = $shareholding->employee_type_name;
-                    $data[] = (!is_null($shareholding->amount)) ? $shareholding->amount : 0;
-                    $data[] = $shareholding->total;
+                    $data[] = $shareholding->member_code;
+                    $data[] = $shareholding->fullname;
+                    $data[] = $shareholding->employee_type;
+                    $data[] = $shareholding->a_amount;
+                    $data[] = $shareholding->b_amount;
+                    $data[] = $shareholding->total_shareholding;
 
                     $sheet->row($row, $data);
                     $row++;
                 }
 
-                $sheet->setColumnFormat(array(
-                    "E4:F$row" => '#,##0.00'
-                ));
+                $sheet->setColumnFormat([
+                    "E4:G$row" => '#,##0.00'
+                ]);
             });
         })->download('xlsx');
     }
@@ -280,9 +291,9 @@ class ReportController extends Controller
         $filename = 'ชำระเงินกู้ประจำเดือน '. $date->thai_format('M Y');
         $header = ['#', 'เลขทะเบียนสมาชิก', 'ชื่อ-นามสกุล', 'ประเภทเงินกู้', 'เลขที่สัญญา', 'เงินต้น', 'ดอกเบี้ย', 'รวม', 'เงินต้นคงเหลือ'];
 
-        Excel::create($filename, function($excel) use($filename, $header, $payments, $date) {
+        Excel::create($filename, function($excel) use ($filename, $header, $payments, $date) {
             // sheet
-            $excel->sheet('ชำระเงินกู้', function($sheet) use($filename, $header, $payments, $date) {
+            $excel->sheet('ชำระเงินกู้', function($sheet) use ($filename, $header, $payments, $date) {
                 // disable auto size for sheet
                 $sheet->setAutoSize(false);
 
@@ -310,9 +321,9 @@ class ReportController extends Controller
                     $row++;
                 }
 
-                $sheet->setColumnFormat(array(
+                $sheet->setColumnFormat([
                     "F4:I$row" => '#,##0.00'
-                ));
+                ]);
             });
         })->download('xlsx');
     }
@@ -322,9 +333,9 @@ class ReportController extends Controller
         $filename = 'สมาชิกสหกรณ์ '. Diamond::today()->thai_format('j M Y');
         $header = ['#', 'รหัสพนักงาน', 'ชื่อ', 'สกุล', 'เลขประจำตัวประชาชน', 'เลขทะเบียนสมาชิก', 'ที่อยู่', 'ตำบล/แขวง', 'อำเภอ/เขต', 'จังหวัด', 'รหัสไปรษณีย์', 'จำนวนหุ้น', 'จำนวนเงินค่าหุ้น', 'วันที่เข้าเป็นสมาชิก', 'ออกจากสมาชิกเมื่อ', 'ค่าทำเนียม', 'วัดเกิด', 'อายุ', 'อีเมล', 'สถานะ'];
 
-        Excel::create($filename, function($excel) use($filename, $members, $header) {
+        Excel::create($filename, function($excel) use ($filename, $members, $header) {
             // sheet
-            $excel->sheet('สมาชิกสหกรณ์', function($sheet) use($filename, $members, $header) {
+            $excel->sheet('สมาชิกสหกรณ์', function($sheet) use ($filename, $members, $header) {
                 // disable auto size for sheet
                 $sheet->setAutoSize(false);
 
@@ -382,9 +393,9 @@ class ReportController extends Controller
         $filename = 'สัญญาเงินกู้ที่กำลังผ่อนชำระ '. Diamond::today()->thai_format('j M Y');
         $header = ['#','ประเภทเงินกู้','เลขที่สัญญา','รหัสสมาชิก','ชื่อผู้กู้','วันที่กู้','วงเงินที่กู้','ผ่อนชำระไปแล้ว','เงินต้นคงเหลือ'];
 
-        Excel::create($filename, function($excel) use($filename, $collection, $header) {
+        Excel::create($filename, function($excel) use ($filename, $collection, $header) {
             // sheet
-            $excel->sheet('สัญญาเงินกู้ที่กำลังผ่อนชำระ', function($sheet) use($filename, $collection, $header) {
+            $excel->sheet('สัญญาเงินกู้ที่กำลังผ่อนชำระ', function($sheet) use ($filename, $collection, $header) {
                 // disable auto size for sheet
                 $sheet->setAutoSize(false);
 

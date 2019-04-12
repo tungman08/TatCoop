@@ -68,7 +68,7 @@ class MainMenu
             $officer = new MenuTree(['title' => 'ผู้ดูแลระบบ', 'icon' => 'fa-gears', 'url' => '/admin']);
             if ($super) $officer->add(new MenuItem(['title' => 'บัญชีเจ้าหน้าที่สหกรณ์', 'icon' => 'fa-user-circle-o', 'url' => '/admin/administrator']));
             if ($super || $admin) $officer->add(new MenuItem(['title' => 'บัญชีคณะกรรมการ', 'icon' => 'fa-user-circle-o', 'url' => '/admin/board']));
-            if ($super || $admin) $officer->add(new MenuItem(['title' => 'บัญชีผู้ใช้งานระบบ', 'icon' => 'fa-user-circle-o', 'url' => '/admin/account']));
+            if ($super || $admin) $officer->add(new MenuItem(['title' => 'บัญชีสมาชิกสหกรณ์', 'icon' => 'fa-user-circle-o', 'url' => '/admin/account']));
             if ($super || $admin) $officer->add(new MenuItem(['title' => 'จับรางวัล', 'icon' => 'fa-smile-o', 'url' => '/admin/reward']));
             $officer->add(new MenuItem(['title' => 'รายงานต่างๆ', 'icon' => 'fa-file-excel-o', 'url' => '/admin/report']));
             $officer->add(new MenuItem(['title' => 'สถิติการเข้าใช้งาน', 'icon' => 'fa-bar-chart', 'url' => '/admin/statistic']));

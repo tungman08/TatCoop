@@ -47,8 +47,8 @@
                         <thead>
                             <tr>
                                 <th style="width: 5%;">#</th>
-                                <th style="width: 15%;">ประเภทเงินกู้</th>
                                 <th style="width: 10%;">เลขที่สัญญา</th>
+                                <th style="width: 15%;">ประเภทเงินกู้</th>
                                 <th style="width: 10%;">รหัสสมาชิก</th>
                                 <th style="width: 20%;">ชื่อผู้กู้</th>
                                 <th style="width: 10%;">วันที่กู้</th>
@@ -137,8 +137,8 @@
             ],
             "columns": [
                 { "data": "index" },
-                { "data": "loantype" },
                 { "data": "loancode" },
+                { "data": "loantype" },
                 { "data": "membercode" },
                 { "data": "membername" },
                 { "data": "loandate" },

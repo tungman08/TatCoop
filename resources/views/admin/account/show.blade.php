@@ -4,12 +4,12 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
         <h1>
-            บัญชีผู้ใช้งานระบบฯ
+            บัญชีสมาชิกสหกรณ์
             <small>รายชื่อบัญชีของสมาชิกที่ใช้งานระบบบริการอิเล็กทรอนิกส์</small>
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'บัญชีผู้ใช้งานระบบ', 'link' => '/admin/account'],
+            ['item' => 'บัญชีสมาชิกสหกรณ์', 'link' => '/admin/account'],
             ['item' => $user->member->profile->fullname, 'link' => ''],
         ]])
     </section>
@@ -18,7 +18,7 @@
     <section class="content">
         <!-- Info boxes -->
         <div class="well">
-            <h4>บัญชีผู้ใช้งานระบบบริการอิเล็กทรอนิกส์</h4>
+            <h4>บัญชีสมาชิกสหกรณ์ที่ใช้งานระบบบริการอิเล็กทรอนิกส์</h4>
             <p>แสดงรายชื่อบัญชีของสมาชิกที่ได้ลงทะเบียนเข้าใช้งานระบบบริการอิเล็กทรอนิกส์</p>
         </div>
 
@@ -37,7 +37,7 @@
 
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title"><i class="fa fa-user-circle-o"></i> บัญชีผู้ใช้งานระบบบริการอิเล็กทรอนิกส์</h3>
+                <h3 class="box-title"><i class="fa fa-user-circle-o"></i> บัญชีสมาชิกสหกรณ์ที่ใช้งานระบบบริการอิเล็กทรอนิกส์</h3>
             </div>
             <!-- /.box-header -->
 
@@ -134,21 +134,22 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($user->user_histories->sortByDesc('created_at') as $index => $history)
-                            <tr>
-                                <td>{{ $index + 1 }}.</td>
-                                <td class="text-primary">
-                                    <i class="fa fa-clock-o fa-fw"></i> {{ Diamond::parse($history->created_at)->thai_format('j M Y') }} เวลา {{ Diamond::parse($history->created_at)->thai_format('H:i') }} น.
-                                </td>
-                                <td>{{ $history->history_type->name }}</td>
-                                <td>
-                                    @if (!empty($history->description))
-                                        <span>{{ $history->description }}</span>
-                                    @else
-                                        <span>-</span>
-                                    @endif
-                                </td>
-                            </tr>
+                            @php($count = 0)
+                            @foreach($user->user_histories->sortByDesc('created_at') as $history)
+                                <tr>
+                                    <td>{{ ++$count }}.</td>
+                                    <td class="text-primary">
+                                        <i class="fa fa-clock-o fa-fw"></i> {{ Diamond::parse($history->created_at)->thai_format('j M Y') }} เวลา {{ Diamond::parse($history->created_at)->thai_format('H:i') }} น.
+                                    </td>
+                                    <td>{{ $history->history_type->name }}</td>
+                                    <td>
+                                        @if (!empty($history->description))
+                                            <span>{{ $history->description }}</span>
+                                        @else
+                                            <span>-</span>
+                                        @endif
+                                    </td>
+                                </tr>
                             @endforeach
                         </tbody>
                     </table>

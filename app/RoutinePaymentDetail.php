@@ -11,7 +11,7 @@ class RoutinePaymentDetail extends Model
      *
      * @var string
      */
-	protected $table = 'routine_payment_details';
+    protected $table = 'routine_payment_details';
 
     /**
      * The attributes that are mass assignable.
@@ -19,7 +19,7 @@ class RoutinePaymentDetail extends Model
      * @var array
      */
     protected $fillable = [
-        'routine_payment_id', 'loan_id', 'status', 'pay_date', 'principle', 'interest'
+        'routine_payment_id', 'loan_id', 'status', 'pay_date', 'period', 'principle', 'interest'
     ];
 
     /**

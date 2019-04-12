@@ -117,6 +117,18 @@ class BoardController extends Controller
         }
     }
 
+    public function show($id) {
+        $board = Administrator::find($id);
+
+        if ($board->role_id != 3) {
+            return redirect()->to('admin/board');
+        }
+
+        return view('admin.board.show', [
+            'board' => $board
+        ]);
+    }
+
     /**
      * Show the form for editing the specified resource.
      *
@@ -194,7 +206,7 @@ class BoardController extends Controller
                 }
             });
 
-            return redirect()->action('Admin\BoardController@index')
+            return redirect()->action('Admin\BoardController@show', ['id' => $id])
                 ->with('flash_message', (!empty($request->input('new_password'))) ? 'แก้ไขข้อมูลผู้ใช้เรียบร้อยแล้ว ระบบได้ส่งอีเมลแจ้งผู้ใช้ด้วย username = \'' . $request->input('email') . '\' และ password = \'' . $request->input('new_password') . '\'' : 'แก้ไขข้อมูลผู้ใช้เรียบร้อยแล้ว')
                 ->with('callout_class', 'callout-success');
         }

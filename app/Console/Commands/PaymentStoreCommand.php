@@ -4,6 +4,8 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 
+use PaymentCalculator;
+
 class PaymentStoreCommand extends Command
 {
     /**
@@ -11,14 +13,14 @@ class PaymentStoreCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'command:name';
+    protected $signature = 'payment:store';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Store loan payment of members';
 
     /**
      * Create a new command instance.
@@ -37,6 +39,8 @@ class PaymentStoreCommand extends Command
      */
     public function handle()
     {
-        //
+        $result = PaymentCalculator::store();
+
+        $this->info(($result));
     }
 }

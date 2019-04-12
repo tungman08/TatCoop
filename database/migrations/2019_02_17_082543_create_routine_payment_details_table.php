@@ -25,6 +25,7 @@ class CreateRoutinePaymentDetailsTable extends Migration
 
             $table->boolean('status')->default(false);
             $table->date('pay_date');
+            $table->integer('period')->unsigned();
             $table->double('principle');
             $table->double('interest');
             $table->timestamps();

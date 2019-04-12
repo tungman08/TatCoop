@@ -42,12 +42,21 @@
         </div>
     @endif
 
-    <!-- recovery password flash session data -->
+   <!-- recovery password flash session data -->
     @if (session('status'))
-        <div class="alert alert-info alert-dismissible">
+        <div class="alert alert-success alert-dismissible">
             <button type="button" class="close" aria-hidden="true" data-dismiss="alert" data-tooltip="true" title="Close">&times;</button>
             <h4>การตั้งค่ารหัสผ่านใหม่</h4>
             {{ session('status') }}
+        </div>
+    @endif 
+
+    <!-- error flash session data -->
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible">
+            <button type="button" class="close" aria-hidden="true" data-dismiss="alert" data-tooltip="true" title="Close">&times;</button>
+            <h4>เกิดข้อผิดพลาด!</h4>
+            {{ session('error') }}
         </div>
     @endif
 

@@ -117,6 +117,18 @@ class AdminController extends Controller
         }
     }
 
+    public function show($id) {
+        $user = Administrator::find($id);
+
+        if ($user->role_id != 2) {
+            return redirect()->to('admin/administrator');
+        }
+
+        return view('admin.administrator.show', [
+            'user' => $user
+        ]);
+    }
+
     /**
      * Show the form for editing the specified resource.
      *
@@ -194,7 +206,7 @@ class AdminController extends Controller
                 }
             });
 
-            return redirect()->action('Admin\AdminController@index')
+            return redirect()->action('Admin\AdminController@show', ['id' => $id])
                 ->with('flash_message', (!empty($request->input('new_password'))) ? 'แก้ไขข้อมูลผู้ใช้เรียบร้อยแล้ว ระบบได้ส่งอีเมลแจ้งผู้ใช้ด้วย username = \'' . $request->input('email') . '\' และ password = \'' . $request->input('new_password') . '\'' : 'แก้ไขข้อมูลผู้ใช้เรียบร้อยแล้ว')
                 ->with('callout_class', 'callout-success');
         }

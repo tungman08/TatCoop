@@ -91,7 +91,7 @@
             <div class="box-body">
                 <button class="btn btn-primary btn-flat" style="margin-bottom: 15px;"
                     {{ (($is_super || $is_admin) ? '' : 'disabled') }}
-                    onclick="javascript:document.location = '/service/{{ $member->id }}/shareholding/create';">
+                    onclick="javascript:document.location.href = '/service/{{ $member->id }}/shareholding/create';">
                     <i class="fa fa-plus-circle"></i> ชำระเงินค่าหุ้น
                 </button>
 

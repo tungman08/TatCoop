@@ -4,6 +4,8 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 
+use PaymentCalculator;
+
 class PaymentCalculateCommand extends Command
 {
     /**
@@ -11,14 +13,14 @@ class PaymentCalculateCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'command:name';
+    protected $signature = 'payment:calculate {date? : The date that uses for calculate loan payment}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Calculate loan payment of members';
 
     /**
      * Create a new command instance.
@@ -37,6 +39,8 @@ class PaymentCalculateCommand extends Command
      */
     public function handle()
     {
-        //
+        $result = PaymentCalculator::calculate($this->argument('date'));
+
+        $this->info(($result));
     }
 }

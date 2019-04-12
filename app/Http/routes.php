@@ -228,6 +228,7 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
         Route::put('routine/shareholding/detail/{id}', 'RoutineShareholdingController@updateDetail');
         Route::delete('routine/shareholding/detail/{id}', 'RoutineShareholdingController@deleteDetail');
         Route::post('routine/shareholding/{id}/save', 'RoutineShareholdingController@save');
+        Route::post('routine/shareholding/{id}/report', 'RoutineShareholdingController@report');
         Route::resource('routine/shareholding', 'RoutineShareholdingController', ['only' => [ 'index', 'show' ]]);
 
         // Routine Loan Payment Route...
@@ -236,6 +237,7 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
         Route::put('routine/payment/detail/{id}', 'RoutinePaymentController@updateDetail');
         Route::delete('routine/payment/detail/{id}', 'RoutinePaymentController@deleteDetail');
         Route::post('routine/payment/{id}/save', 'RoutinePaymentController@save');
+        Route::post('routine/payment/{id}/report', 'RoutinePaymentController@report');
         Route::resource('routine/payment', 'RoutinePaymentController', ['only' => [ 'index', 'show' ]]);
 
         // Routine Available Loan Route...
@@ -273,14 +275,14 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
         Route::get('administrator/inactive', ['as' => 'admin.administrator.inactive', 'uses' => 'AdminController@getInactive']);
         Route::post('administrator/{id}/forcedelete', 'AdminController@postForceDelete');
         Route::post('administrator/{id}/restore', 'AdminController@postRestore');
-        Route::resource('administrator', 'AdminController', ['except' => [ 'show' ]]);
+        Route::resource('administrator', 'AdminController');
 
         //Board Account Route...
         Route::get('board/{id}/delete', ['as' => 'admin.board.delete', 'uses' => 'BoardController@getDelete']);
         Route::get('board/inactive', ['as' => 'admin.board.inactive', 'uses' => 'BoardController@getInactive']);
         Route::post('board/{id}/forcedelete', 'BoardController@postForceDelete');
         Route::post('board/{id}/restore', 'BoardController@postRestore');
-        Route::resource('board', 'BoardController', ['except' => [ 'show' ]]);
+        Route::resource('board', 'BoardController');
 
         // User Account Route...
         Route::resource('account', 'AccountController', ['only' => [ 'index', 'show', 'edit', 'update' ]]);

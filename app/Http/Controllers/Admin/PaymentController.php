@@ -165,12 +165,9 @@ class PaymentController extends Controller
                 $payment->interest = floatval(str_replace(',', '', $request->input('interest')));
                 $payment->save();
 
-                // $loan = Loan::find($loan_id); 
-                // $loan->completed_at = Diamond::parse($request->input('pay_date'));
-                // $loan->save();
                 $this->closeDate($loan_id);
     
-                History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'ปิดยอดเงินกู้ ' . $loan->code);
+                History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'ปิดยอดเงินกู้ ' . $payment->loan->code);
             });
 
             return redirect()->action('Admin\LoanController@show', [ 'member' => $member_id, 'loan' => $loan_id ])
@@ -187,53 +184,6 @@ class PaymentController extends Controller
             'loan' => Loan::find($loan_id)
         ]);
     }
-
-    // public function getAutoPayment() {
-    //    return view('admin.payment.auto');
-    // }
-
-    // public function postAutoPayment(Request $request) {
-    //    $date = Diamond::parse($request->input('month') . '-1')->endOfMonth();
-	
-    //    $members = Db::table('members')
-    //        ->join('profiles', 'members.profile_id', '=', 'profiles.id')
-    //        ->join('employees', 'profiles.id', '=', 'employees.profile_id')
-    //        ->join('employee_types', 'employees.employee_type_id', '=', 'employee_types.id')
-    //        ->join('loans', 'members.id', '=', 'loans.member_id')
-    //        ->where('employees.employee_type_id', 1)
-    //        ->whereDate('members.start_date', '<', $date)
-    //        ->whereNull('loans.completed_at')
-    //        ->groupBy('members.id')
-    //        ->select('members.id')
-    //        ->get();
-	
-    //    DB::transaction(function() use ($members, $date) {
-    //        foreach($members as $member) {
-    //            $loans = Loan::where('member_id', $member->id)
-    //                ->whereNull('completed_at')
-    //                ->get();
-	
-    //            foreach($loans as $loan) {
-    //                $pay = LoanCalculator::monthly_payment($loan, $date);
-	
-    //                if ($pay->principle > 0 && $pay->interest > 0) {
-    //                    $payment = new Payment();
-    //                    $payment->pay_date = $date;
-    //                    $payment->principle = $pay->principle;
-    //                    $payment->interest = $pay->interest;
-    
-    //                    $loan->payments()->save($payment);
-    //                }
-    //            }
-    //        }
-	
-    //        History::addAdminHistory(Auth::guard($this->guard)->id(), 'ป้อนการชำระเงินกู้แบบอัตโนมัติ', 'ทำรายการชำระเงินกู้อัตโนมัติประจำเดือน' . $date->thai_format('F Y'));
-    //    });
-	
-    //    return redirect()->action('Admin\LoanController@getMember')
-    //        ->with('flash_message', 'ทำรายการชำระเงินกู้อัตโนมัติประจำเดือน' . $date->thai_format('F Y') . ' จำนวน ' . $members->count() . ' คน เรียบร้อยแล้ว')
-    //        ->with('callout_class', 'callout-success');
-    // }
 
     public function edit($member_id, $loan_id, $payment_id) {
         return view('admin.payment.edit', [
@@ -281,8 +231,6 @@ class PaymentController extends Controller
 
                 $loan = Loan::find($loan_id); 
                 if (abs($loan->outstanding - $loan->payments->sum('principle')) < 0.01) {
-                    // $loan->completed_at = Diamond::parse($request->input('pay_date'));
-                    // $loan->save();
                     $this->closeDate($loan_id);
                 }
                 else {
@@ -312,8 +260,6 @@ class PaymentController extends Controller
 
             $loan = Loan::find($loan_id); 
             if (abs($loan->outstanding - $loan->payments->sum('principle')) < 0.01) {
-                // $loan->completed_at = $pay_date;
-                // $loan->save();
                 $this->closeDate($loan_id);
             }
             else {

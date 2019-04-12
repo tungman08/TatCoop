@@ -62,7 +62,7 @@
                         </thead>
                         <tbody>
                             @foreach($admins as $index => $user)
-                            <tr onclick="javascript: document.location.href  = '{{ url('/admin/administrator/' . $user->id . '/edit') }}';"
+                            <tr onclick="javascript: document.location.href  = '{{ action('Admin\AdminController@show', ['id' => $user->id]) }}';"
                                 style="cursor: pointer;">
                                 <td>{{ $index + 1 }}.</td>
                                 <td class="text-primary"><i class="fa fa-user-secret fa-fw"></i> {{ $user->email }}</td>

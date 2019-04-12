@@ -41,6 +41,21 @@
             {{ Form::model($detail, ['action' => ['Admin\RoutinePaymentController@updateDetail', $detail->id], 'method' => 'put', 'class' => 'form-horizontal']) }}
                 <div class="box-body">
                     <div class="form-group">
+                        {{ Form::label('period', 'งวดที่', [
+                            'class'=>'col-sm-2 control-label']) 
+                        }}
+
+                        <div class="col-sm-10">
+                            {{ Form::text('period', null, [
+                                'class'=>'form-control',
+                                'placeholder'=>'งวดที่',
+                                'autocomplete'=>'off',
+                                'onkeypress' => 'javascript:return isNumberKey(event);'])
+                            }}        
+                        </div>
+                    </div>
+
+                    <div class="form-group">
                         {{ Form::label('principle', 'เงินต้น', [
                             'class'=>'col-sm-2 control-label']) 
                         }}

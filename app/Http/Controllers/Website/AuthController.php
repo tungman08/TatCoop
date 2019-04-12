@@ -237,13 +237,15 @@ class AuthController extends Controller
 
         if (is_null($confirm)) {
             return redirect()->action('Website\AuthController@getLogin')
-                ->with('verified', 'คุณเคยทำการยืนยันอีเมลไปแล้ว ไม่ต้องยืนยันซ้ำอีก สามารถเข้าใช้งานระบบได้เลย')
-                ->withInput(['email' => $confirm->email]);
+                ->with('error', 'ไม่พบข้อมูลการยืนยันอีเมล ซึ่งอาจเกิดจากการทำการยืนยันไปแล้วหรือยังไม่เคยสมัครสมาชิก');
         }
 
         DB::transaction(function() use ($confirm) {
             $user = User::where('email', $confirm->email)->first();
-            $user->forceFill(['confirmed' => true])->save();
+
+            if (!is_null($user)) {
+                $user->forceFill(['confirmed' => true])->save();
+            }
 
             DB::table('user_confirmations')
                 ->where('token', $confirm->token)

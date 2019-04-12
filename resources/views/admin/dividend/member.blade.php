@@ -75,7 +75,7 @@
                                     @if ($dividend_year->rate_year == $year)
                                         <option value="{{ $dividend_year->rate_year }}" selected>เงินปันผล/เฉลี่ยคืนปี {{ $dividend_year->rate_year + 543 }}</option>
                                     @else 
-                                        <option value="{{ $dividend_year->rate_year }}">เงินปันผลปี {{ $dividend_year->rate_year + 543 }}</option>
+                                        <option value="{{ $dividend_year->rate_year }}">เงินปันผล/เฉลี่ยคืนปี {{ $dividend_year->rate_year + 543 }}</option>
                                     @endif
                                 @endforeach
                             </select>

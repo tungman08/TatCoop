@@ -72,7 +72,7 @@ class LoanController extends Controller
         $member = Member::find($id);
         $loan = Loan::find($loan_id);
         $payments = Payment::where('loan_id', $loan_id)
-            ->orderBy('period', 'desc')
+            ->orderBy('pay_date', 'desc')
             ->get();
 
          return view('admin.loan.show', [
@@ -248,6 +248,18 @@ class LoanController extends Controller
 
         $validator = Validator::make($request->all(), $rules);
         $validator->setAttributeNames($attributeNames);
+
+        $validator->after(function($validator) use ($request, $loan_id) {
+            $loan_type_id = Loan::find($loan_id)->loan_type_id;
+
+            if (Loan::where('id', '<>', $loan_id)
+                ->where('loan_type_id', $loan_type_id)
+                ->where('code', $request->input('code'))
+                ->count() > 0) {
+                    
+                $validator->errors()->add('duplicate', 'เลขที่สัญญาซ้ำ');
+            }
+        });
 
         if ($validator->fails()) {
             return redirect()->back()

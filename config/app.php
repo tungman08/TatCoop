@@ -225,6 +225,7 @@ return [
         'LoanManager' => App\Facades\LoanManager::class,
         'DividendCalculator' => App\Facades\DividendCalculator::class,
         'ShareholdingCalculator' => App\Facades\ShareholdingCalculator::class,
+        'PaymentCalculator' => App\Facades\PaymentCalculator::class,
         'Dashboard' => App\Facades\Dashboard::class,
         'FileManager' => App\Facades\FileManager::class,
     ],
