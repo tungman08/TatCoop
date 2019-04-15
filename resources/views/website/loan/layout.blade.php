@@ -87,7 +87,7 @@
 
     <!-- Footer -->
     <footer>
-        @include('website.documents.footer')
+        @include('website.layouts.footer')
     </footer>
 
     @section('scripts')

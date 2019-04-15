@@ -115,21 +115,8 @@
                     <!-- /.row -->
 
                     <div class="table-responsive">
-                        <table id="loan_attachments" class="table">
+                        <table id="loan_attachments" class="table table-info">
                             <tbody>
-                                @forelse ($loan->attachments as $attachment)
-                                    <tr>
-                                        @if ($is_super || $is_admin)
-                                            <td>{{ $attachment->display }}</td>
-                                        @else
-                                            <td>{{ $attachment->display }}</td>
-                                        @endif
-                                    </tr>                    
-                                @empty
-                                    <tr>
-                                        <td class="text-center">=== ไม่มีเอกสารแนบ ===</td>
-                                    </tr> 
-                                @endforelse
                             </tbody>
                         </table>
                         <!-- /.table -->
@@ -245,7 +232,7 @@
 
                     <input type="file" id="attachment" accept="application/pdf" />
 
-                    <button class="btn btn-primary btn-flat margin-t-lg margin-b-lg">
+                    <button id="btn_attachment" class="btn btn-primary btn-flat margin-t-lg margin-b-lg">
                         <i class="fa fa-save"></i> บันทึก
                     </button>
                 </div>
@@ -287,10 +274,110 @@
             ]
         }); 
 
+        show_attachment();
+
         $('#add_attachment').click(function () {
+            $('#attachment').val('');
             $('#attachmentModal').modal('show');
         });  
+
+        $('#btn_attachment').click(function () {
+            if ($('#attachment').get(0).files.length === 0) {
+                alert('กรุณาเลือกเอกสาร!!');
+            }
+            else {
+                $('#attachmentModal').modal('hide');
+
+                upload_attachment();
+            }
+        });
     }); 
+
+    function show_attachment() {
+        $.ajax({
+            url: '/service/loan/showfiles',
+            type: "post",
+            data: {
+                'id': $('#loan_id').val()
+            },
+            success: function(files) {
+                let target = $('#loan_attachments > tbody');
+                target.empty();
+
+                if (files.length > 0) {
+                    $.each(files, function(index, value) {
+                        let str = '<tr>';
+                        str += "<td><a href=\"https://www.tatcoop.com/storage/file/loans/" + value.file + "\" target=\"_blank\">";
+                        str += "<i class=\"fa fa-paperclip\"></i> " + value.display + "</a></td>";
+
+                        @if ($is_super || $is_admin)
+                            str += "<td class=\"text-right\"><a class=\"text-danger\" href=\"javascript: void();\" ";
+                            str += "onclick=\"javascript: var result = confirm('คุณต้องการลบเอกสารนี้ใช่ไหม?'); if (result) { delete_attachment(" + value.id + ") }\">";
+                            str += "<i class=\"fa fa-times-circle\"></i></a></td>"
+                        @endif
+
+                        str += '</tr>';
+
+                        target.append(str);
+                    });
+                }
+                else {
+                    target.append("<tr><td class=\"text-center\">=== ไม่มีเอกสารแนบ ===</td></tr>");
+                }
+            }
+        });
+    }
+
+    function upload_attachment() {
+        var file = $('#attachment').get(0).files[0];
+        var loan_id = $('#loan_id').val();
+
+        var formData = new FormData();
+        formData.append('file', file);
+        formData.append('loan_id', loan_id);
+ 
+        if(file.size < 20971520) {
+            $.ajax({
+                dataType: 'json',
+                url: '/service/loan/uploadfile',
+                type: 'post',
+                cache: false,
+                data: formData,
+                processData: false,
+                contentType: false,
+                error: function (xhr, ajaxOption, thrownError) {
+                    alert('Upload failed');
+                    console.log(xhr.responseText);
+                    console.log(thrownError);
+                },
+                success: function () {
+                    show_attachment();
+                }
+            });
+        }
+        else {
+            alert("File is to big");
+        }
+    }
+
+    function delete_attachment(attachment_id) {
+        $.ajax({
+            dataType: 'json',
+            url: '/service/loan/deletefile',
+            type: 'post',
+            cache: false,
+            data: {
+                'id': attachment_id
+            },
+            error: function(xhr, ajaxOption, thrownError) {
+                console.log(xhr.responseText);
+                console.log(thrownError);
+            },
+            success: function() {
+                show_attachment();
+            }
+        });
+    }
 
     jQuery.extend(jQuery.fn.dataTableExt.oSort, {
         "formatted-num-pre": function ( a ) {

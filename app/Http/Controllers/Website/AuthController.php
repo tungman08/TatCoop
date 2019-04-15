@@ -134,7 +134,7 @@ class AuthController extends Controller
                     $user->save();
                 }
 
-                return redirect()->action('Website\MemberController@show', [ 'id' => $user->member_id ]);
+                return redirect()->action('Website\MemberController@index');
             }
             else {
                 return redirect()->back()

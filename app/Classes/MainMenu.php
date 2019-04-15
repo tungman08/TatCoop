@@ -7,13 +7,13 @@ namespace App\Classes;
  */
 class MainMenu
 {
-    public function member($url, $id) {
+    public function member($url) {
         $menu = new Menu($url);
-        $menu->add(new MenuItem(['title' => 'หน้าหลัก', 'icon' => 'fa-home', 'url' => "/member/$id"]));
-        $menu->add(new MenuItem(['title' => 'ทุนเรือนหุ้น', 'icon' => 'fa-money', 'url' => "/member/$id/shareholding"]));
-        $menu->add(new MenuItem(['title' => 'การกู้ยืม', 'icon' => 'fa-credit-card', 'url' => "/member/$id/loan"]));
-        $menu->add(new MenuItem(['title' => 'การค้ำประกัน', 'icon' => 'fa-share-alt', 'url' => "/member/$id/guaruntee"]));
-        $menu->add(new MenuItem(['title' => 'เงินปันผล/เฉลี่ยคืน', 'icon' => 'fa-dollar', 'url' => "/member/$id/dividend"]));
+        $menu->add(new MenuItem(['title' => 'หน้าหลัก', 'icon' => 'fa-home', 'url' => "/member"]));
+        $menu->add(new MenuItem(['title' => 'ทุนเรือนหุ้น', 'icon' => 'fa-money', 'url' => "/member/shareholding"]));
+        $menu->add(new MenuItem(['title' => 'การกู้ยืม', 'icon' => 'fa-credit-card', 'url' => "/member/loan"]));
+        $menu->add(new MenuItem(['title' => 'การค้ำประกัน', 'icon' => 'fa-share-alt', 'url' => "/member/guaruntee"]));
+        $menu->add(new MenuItem(['title' => 'เงินปันผล/เฉลี่ยคืน', 'icon' => 'fa-dollar', 'url' => "/member/dividend"]));
 
         return $menu->display();
     }

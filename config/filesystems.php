@@ -64,6 +64,11 @@ return [
             'root' => storage_path('app/documents'),
         ],
 
+        'loans' => [
+            'driver' => 'local',
+            'root' => storage_path('app/loans'),
+        ],
+
         'carousels' => [
             'driver' => 'local',
             'root' => storage_path('app/carousels'),

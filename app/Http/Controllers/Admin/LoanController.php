@@ -12,6 +12,7 @@ use App\Member;
 use App\Payment;
 use App\PaymentType;
 use App\Loan;
+use App\LoanAttachment;
 use App\Shareholding;
 use DB;
 use Auth;
@@ -19,6 +20,8 @@ use Diamond;
 use History;
 use PDF;
 use LoanManager;
+use Storage;
+use Response;
 use Validator;
 
 class LoanController extends Controller
@@ -357,5 +360,45 @@ class LoanController extends Controller
 
         return PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])
             ->loadView('admin.loan.debtpdf', $data)->download('ทะเบียนหนี้-' . $member->profile->name . '-' . $member->profile->lastname . '-' . Diamond::today()->thai_format('j-M-Y') . '.pdf');
+    }
+
+    public function postShowFiles(Request $request) {
+        $id = $request->input('id');
+        $loan = Loan::find($id);
+
+        return $loan->attachments;
+    }
+
+    public function postUploadFile(Request $request) {
+        $file = $request->file('file');
+        $loan_id = $request->input('loan_id');
+
+        $display = mb_ereg_replace('\s+', ' ', basename($file->getClientOriginalName(), '.' . $file->getClientOriginalExtension()));
+        $filename = time() . uniqid() . '.' . $file->getClientOriginalExtension();
+        $path = ($file->getRealPath() != false) ? $file->getRealPath() : $file->getPathname();
+        Storage::disk('loans')->put($filename, file_get_contents($path));
+
+        LoanAttachment::create([
+            'loan_id' => $loan_id,
+            'display' => $display,
+            'file' => $filename
+        ]);
+
+        $loan = Loan::find($loan_id);
+        History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'เพิ่มเอกสารเงินกู้' . $loan->loanType->name . ' เลขที่ ' . $loan->code);
+
+        return Response::json(true);
+    }
+    
+    public function postDeleteFile(Request $request) {
+        $id = $request->input('id');
+        $document = LoanAttachment::find($id);
+        $loan = Loan::find($document->loan_id);
+        History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'ลบเอกสารเงินกู้' . $loan->loanType->name . ' เลขที่ ' . $loan->code);
+
+        Storage::disk('loans')->delete($document->file);
+        $document->delete();
+
+        return Response::json(true);
     }
 }

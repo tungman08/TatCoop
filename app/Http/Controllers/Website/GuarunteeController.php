@@ -10,7 +10,7 @@ use App\Http\Controllers\Controller;
 use Auth;
 use App\Member;
 
-class MemberController extends Controller
+class GuarunteeController extends Controller
 {
     /**
      * Only user authorize to access this section.
@@ -29,11 +29,11 @@ class MemberController extends Controller
     }
 
     public function index() {
-        $member = Member::find(Auth::user()->member_id);
+        $id = Auth::user()->member_id;
+        $member = Member::find($id);
 
-        return view('website.member.index', [
-            'member' => $member,
-            'histories' => Member::where('profile_id', $member->profile_id)->get(),
+        return view('website.guaruntee.index', [
+            'member' => $member
         ]);
     }
 }

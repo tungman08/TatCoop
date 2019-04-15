@@ -36,47 +36,36 @@ Route::group(['domain' => 'www.' . env('APP_DOMAIN'),
         Route::post('reset', 'PasswordController@postReset');
     });
 
-    // Member Shareholding Billing Route...
-    Route::group(['prefix' => '/member/{id}/shareholding/{shareholding_id}/billing/{date}'], function() {
-        Route::get('/print', ['as' => 'website.member.shareholding.billing.print', 'uses' => 'MemberController@getPrintShareholdingBilling']);
-        Route::get('/pdf', ['as' => 'website.member.shareholding.billing.pdf', 'uses' => 'MemberController@getPdfShareholdingBilling']);
-        Route::get('/', ['as' => 'website.member.shareholding.billing', 'uses' => 'MemberController@getShareholdingBilling']);
+    //Member Route...
+    Route::group(['prefix' => '/member'], function() {
+        // Shareholding Route...
+        Route::get('/shareholding/{shareholding_id}/billing/{date}/print', ['as' => 'website.shareholding.print', 'uses' => 'ShareholdingController@getPrint']);
+        Route::get('/shareholding/{shareholding_id}/billing/{date}/pdf', ['as' => 'website.shareholding.pdf', 'uses' => 'ShareholdingController@getPdf']);
+        Route::get('/shareholding/{shareholding_id}/billing/{date}', ['as' => 'website.shareholding.billing', 'uses' => 'ShareholdingController@getBilling']);
+        Route::resource('/shareholding', 'ShareholdingController', ['only' => [ 'index', 'show' ]]);
+
+        // Loan Route...
+        Route::get('/loan/{loan_id}/{payment_id}/billing/{date}/print', ['as' => 'website.member.loan.print', 'uses' => 'LoanController@getPrint']);
+        Route::get('/loan/{loan_id}/{payment_id}/billing/{date}/pdf', ['as' => 'website.member.loan.pdf', 'uses' => 'LoanController@getPdf']);
+        Route::get('/loan/{loan_id}/{payment_id}/billing/{date}', ['as' => 'website.member.loan.billing', 'uses' => 'LoanController@getBilling']);
+        Route::resource('/loan', 'LoanController', ['only' => [ 'index', 'show' ]]);
+
+        // Guaruntee Route...
+        Route::resource('/guaruntee', 'GuarunteeController', ['only' => [ 'index' ]]);
+
+        // Dividend Route...
+        Route::resource('/dividend', 'DividendController', ['only' => [ 'index' ]]);
+
+        // Profile Route...
+        Route::controller('/profile', 'ProfileController');
+
+        // Member Route...
+        Route::resource('/', 'MemberController', ['only' => [ 'index' ]]);
     });
-
-    // Member Shareholding Route...
-    Route::group(['prefix' => '/member/{id}/shareholding'], function() {
-		Route::get('/{month}', ['as' => 'website.member.shareholding.show', 'uses' => 'MemberController@getShowShareholding']);
-        Route::get('/', ['as' => 'website.member.shareholding', 'uses' => 'MemberController@getShareholding']);
-    });
-
-    // Member Shareholding Billing Route...
-    Route::group(['prefix' => '/member/{id}/loan/{loan_id}/{payment_id}/billing/{date}'], function() {
-        Route::get('/print', ['as' => 'website.member.loan.billing.print', 'uses' => 'MemberController@getPrintLoanBilling']);
-        Route::get('/pdf', ['as' => 'website.member.loan.billing.pdf', 'uses' => 'MemberController@getPdfLoanBilling']);
-        Route::get('/', ['as' => 'website.member.loan.billing', 'uses' => 'MemberController@getLoanBilling']);
-    });
-
-    // Member Loan Route...
-    Route::group(['prefix' => '/member/{id}/loan'], function() {
-        Route::get('/{loan_id}', ['as' => 'website.member.loan.show', 'uses' => 'MemberController@getShowLoan']);
-        Route::get('/', ['as' => 'website.member.loan', 'uses' => 'MemberController@getLoan']);
-    });
-
-    // Member Guaruntee Route...
-    Route::get('/member/{id}/guaruntee', ['as' => 'website.member.guaruntee', 'uses' => 'MemberController@getGuaruntee']);
-
-    // Member Dividend Route...
-    Route::get('/member/{id}/dividend', ['as' => 'website.member.dividend', 'uses' => 'MemberController@getDividend']);
-
-    // Member Route...
-    Route::get('/member/unauthorize', ['as' => 'website.member.unauthorize', 'uses' => 'MemberController@getUnauthorize']);
-    Route::resource('/member', 'MemberController', ['only' => ['index', 'show', 'edit', 'update']]);
 
     // Pre Loan Route...
-    Route::controller('/loan', 'LoanController');
+    Route::get('/loan/calculate', ['as' => 'website.loan.calculate', 'uses' => 'LoanController@getCalculate']);
 
-    // Profile Route...
-    Route::controller('/user', 'UserController');
 
     // Storage Route...
     Route::get('/storage/file/{directory}/{filename}', ['as' => 'website.storage.file', 'uses' => 'StorageController@getFile']);
@@ -93,10 +82,10 @@ Route::group(['domain' => 'www.' . env('APP_DOMAIN'),
     });
 
     // News Route...
-    Route::resource('news', 'NewsController');
+    Route::resource('news', 'NewsController', ['only' => [ 'index', 'show' ]]);
 
     // Knowledge Route...
-    Route::resource('knowledges', 'KnowledgeController');
+    Route::resource('knowledges', 'KnowledgeController', ['only' => [ 'index', 'show' ]]);
 
     // Homepage Route...
     Route::resource('/', 'HomeController', ['only' => [ 'index' ]]);  
@@ -191,6 +180,9 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
         Route::post('{member_id}/loan/create/special/outsider', 'SpecialLoanController@postCreateOutsiderLoan');
         Route::post('{member_id}/loan/create/refinance/employee', 'RefinanceController@getCreateEmployeeRefinance');
         Route::post('{member_id}/loan/create/refinance/outsider', 'RefinanceController@getCreateOutsiderRefinance');
+		Route::post('loan/showfiles', 'LoanController@postShowFiles');
+        Route::post('loan/uploadfile', 'LoanController@postUploadFile');
+		Route::post('loan/deletefile', 'LoanController@postDeleteFile');
         Route::resource('{member_id}/loan', 'LoanController');
         
         // Payment Route...

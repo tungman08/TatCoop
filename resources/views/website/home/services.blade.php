@@ -6,16 +6,9 @@
             </h4>
         </div>
         <div class="panel-body">
-            @if (Auth::guard('users')->check())
-                @php($member_id = App\User::find(Auth::guard('users')->id())->member_id)
-
-                <a href="{{ url('/member/' . $member_id ) }}" class="btn btn-primary center-block" target="_blank">เข้าใช้งานบริการอิเล็กทรอนิกส์</a>
-            @else
-                <a href="{{ url('/member') }}" class="btn btn-primary center-block" target="_blank">เข้าใช้งานบริการอิเล็กทรอนิกส์</a>
-            @endif
-
+            <a href="{{ action('Website\MemberController@index') }}" class="btn btn-primary center-block" target="_blank">เข้าใช้งานบริการอิเล็กทรอนิกส์</a>
             <br />
-            <a href="{{ url('/loan') }}" class="btn btn-success center-block">คำนวณสินเชื่อเงินกู้เบื้องต้น</a>
+            <a href="{{ action('Website\LoanController@getCalculate') }}" class="btn btn-success center-block">คำนวณสินเชื่อเงินกู้เบื้องต้น</a>
         </div>
     </div>
 </div>

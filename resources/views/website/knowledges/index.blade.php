@@ -1,4 +1,4 @@
-@extends('website.knowledges.layout')
+@extends('website.layouts.layout')
 
 @section('content')
     <div class="row">
