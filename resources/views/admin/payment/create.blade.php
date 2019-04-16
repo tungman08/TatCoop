@@ -114,13 +114,16 @@
                             'class'=>'col-sm-2 control-label']) 
                         }}
 
-                        <div class="col-sm-10 input-group" style="padding: 0 5px;">
-                            {{ Form::text('pay_date', Diamond::today()->format('Y-m-d'), [
-                                'id'=>'pay_date',
-                                'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
-                                'autocomplete'=>'off',
-                                'class'=>'form-control'])
-                            }}       
+                        <div class="col-sm-10">
+                            <div class="input-group">
+                                <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
+                                {{ Form::text('pay_date', Diamond::today()->format('Y-m-d'), [
+                                    'id'=>'pay_date',
+                                    'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
+                                    'autocomplete'=>'off',
+                                    'class'=>'form-control'])
+                                }} 
+                            </div>      
                         </div>
                     </div>
                     <div class="form-group">

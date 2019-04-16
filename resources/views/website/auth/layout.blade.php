@@ -17,26 +17,27 @@
 
     <title>:: สหกรณ์ออมทรัพย์สหภาพแรงงานรัฐวิสาหกิจการท่องเที่ยวแห่งประเทศไทย จำกัด ::</title>
 
-    <!-- Bootstrap Core CSS -->
-    {{ Html::style(elixir('css/bootstrap.css')) }}
-    {{ Html::style(elixir('css/miscellaneous.css')) }}
+    @section('styles')
+        <!-- Bootstrap Core CSS -->
+        {{ Html::style(elixir('css/bootstrap.css')) }}
+        {{ Html::style(elixir('css/miscellaneous.css')) }}
 
-    <!-- Font-Awesome Fonts -->
-    {{ Html::style(elixir('css/font-awesome.css')) }}
+        <!-- Font-Awesome Fonts -->
+        {{ Html::style(elixir('css/font-awesome.css')) }}
 
-    <!-- Admin-LTE -->
-    {{ Html::style(elixir('css/admin-lte.css')) }}
+        <!-- Admin-LTE -->
+        {{ Html::style(elixir('css/admin-lte.css')) }}
 
-    <!-- My Custom CSS -->
-    {{ Html::style(elixir('css/auth.css')) }}
+        <!-- My Custom CSS -->
+        {{ Html::style(elixir('css/auth.css')) }}
 
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
-
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    @show
 </head>
 
 <body class="hold-transition login-page" style="height: initial;">
@@ -79,21 +80,23 @@
     </footer>
     <!-- /footer -->
 
-    <!-- jQuery -->
-    {{ Html::script(elixir('js/jquery.js')) }}
+    @section('scripts')
+        <!-- jQuery -->
+        {{ Html::script(elixir('js/jquery.js')) }}
 
-    <!-- Bootstrap Core JavaScript -->
-    {{ Html::script(elixir('js/bootstrap.js')) }}
+        <!-- Bootstrap Core JavaScript -->
+        {{ Html::script(elixir('js/bootstrap.js')) }}
 
-    <!-- InputMask JavaScript -->
-    {{ Html::script(elixir('js/jquery.inputmask.js')) }}
+        <!-- InputMask JavaScript -->
+        {{ Html::script(elixir('js/jquery.inputmask.js')) }}
 
-    <!-- jQuery waitforimages JavaScript -->
-    {{ Html::script(elixir('js/jquery.waitforimages.js')) }}
+        <!-- jQuery waitforimages JavaScript -->
+        {{ Html::script(elixir('js/jquery.waitforimages.js')) }}
 
-    <!-- Custom JavaScript -->
-    {{ Html::script(elixir('js/auth.js')) }}
-    {{ Html::script(elixir('js/moment.js')) }}
+        <!-- Custom JavaScript -->
+        {{ Html::script(elixir('js/auth.js')) }}
+        {{ Html::script(elixir('js/moment.js')) }}
+    @show
 </body>
 
 </html>

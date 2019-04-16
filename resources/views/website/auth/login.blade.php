@@ -9,13 +9,18 @@
     <!-- /.login-logo -->
 
     {{ Form::open(['url' => '/auth/login', 'role' => 'form']) }}
-        <div class="form-group has-feedback">
-            {{ Form::text('email', old('email'), ['required', 'class'=>'form-control', 'placeholder'=>'อีเมล', 'autocomplete'=>'off']) }}
-            <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+        <div class="form-group">
+            <div class="input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
+                {{ Form::text('email', old('email'), ['required', 'class'=>'form-control', 'placeholder'=>'อีเมล', 'autocomplete'=>'off']) }}
+            </div>
         </div>
         <div class="form-group has-feedback">
-            {{ Form::password('password', ['required', 'class'=>'form-control', 'placeholder'=>'รหัสผ่าน']) }}
-            <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+            <div class="input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                {{ Form::password('password', ['id'=>'password', 'required', 'class'=>'form-control', 'placeholder'=>'รหัสผ่าน', 'style'=>'position: initial;']) }}
+                <span class="glyphicon glyphicon-eye-open form-control-feedback toggle-password" toggle="#password"></span>
+            </div>
         </div>
         <div class="row">
             <div class="col-xs-7">
@@ -73,4 +78,37 @@
     <a href="{{ url('/auth/register') }}" class="text-center">ลงทะเบียนใช้บริการอิเล็กทรอนิกส์</a>
 </div>
 <!-- /.login-box-body -->
+@endsection
+
+@section('styles')
+    @parent
+
+    <style>
+        .toggle-password {
+            cursor: pointer;
+            pointer-events: auto;
+            color: #777;
+        }
+    </style>
+@endsection
+
+@section('scripts')
+    @parent
+
+    <script>
+    $(document).ready(function () {
+        $(".toggle-password").click(function() {
+            $(this).toggleClass("glyphicon-eye-open glyphicon-eye-close");
+
+            var input = $($(this).attr("toggle"));
+
+            if (input.attr("type") == "password") {
+                input.attr("type", "text");
+            } 
+            else {
+                input.attr("type", "password");
+            }
+        });
+    });   
+    </script>
 @endsection

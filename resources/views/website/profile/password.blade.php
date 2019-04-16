@@ -47,25 +47,28 @@
                                 <img class="profile-user-img img-circle img-responsive" style="width: 200px; height: 200px; margin-bottom: 30px;" src="{{ asset('images/user.png') }}" alt="User Pic">
                             </div>
                             <div class=" col-md-9 col-lg-9 ">
-                                <div class="form-group">
+                                <div class="form-group has-feedback">
                                     {{ Form::label('password', 'รหัสผ่านปัจจุบัน') }}
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-lock"></i></span>
-                                        {{ Form::password('password', ['required', 'class'=>'form-control', 'placeholder'=>'Current Password']) }}
+                                        {{ Form::password('password', ['id'=>'password', 'required', 'class'=>'form-control', 'placeholder'=>'Current Password', 'style'=>'position: initial;']) }}
+                                        <span class="glyphicon glyphicon-eye-open form-control-feedback toggle-password" toggle="#password"></span>
                                     </div>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group has-feedback">
                                     {{ Form::label('new_password', 'รหัสผ่านใหม่') }}
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-lock"></i></span>
-                                        {{ Form::password('new_password', ['required', 'class'=>'form-control', 'placeholder'=>'New Password']) }}
+                                        {{ Form::password('new_password', ['id'=>'new_password', 'required', 'class'=>'form-control', 'placeholder'=>'New Password', 'style'=>'position: initial;']) }}
+                                        <span class="glyphicon glyphicon-eye-open form-control-feedback toggle-password" toggle="#new_password"></span>
                                     </div>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group has-feedback">
                                     {{ Form::label('new_password_confirmation', 'ยืนยันรหัสผ่านใหม่') }}
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-lock"></i></span>
-                                        {{ Form::password('new_password_confirmation', ['required', 'class'=>'form-control', 'placeholder'=>'Confirm Password']) }}
+                                        {{ Form::password('new_password_confirmation', ['id'=>'new_password_confirmation', 'required', 'class'=>'form-control', 'placeholder'=>'Confirm Password', 'style'=>'position: initial;']) }}
+                                        <span class="glyphicon glyphicon-eye-open form-control-feedback toggle-password" toggle="#new_password_confirmation"></span>
                                     </div>
                                 </div>
                                 @if ($errors->count() > 0)
@@ -99,8 +102,33 @@
 
 @section('styles')
     @parent
+    
+    <style>
+        .toggle-password {
+            cursor: pointer;
+            pointer-events: auto;
+            color: #777;
+        }
+    </style>
 @endsection
 
 @section('scripts')
     @parent
+    
+    <script>
+    $(document).ready(function () {
+        $(".toggle-password").click(function() {
+            $(this).toggleClass("glyphicon-eye-open glyphicon-eye-close");
+
+            var input = $($(this).attr("toggle"));
+
+            if (input.attr("type") == "password") {
+                input.attr("type", "text");
+            } 
+            else {
+                input.attr("type", "password");
+            }
+        });
+    });   
+    </script>
 @endsection

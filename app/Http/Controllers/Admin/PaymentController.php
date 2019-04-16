@@ -151,6 +151,22 @@ class PaymentController extends Controller
         $validator = Validator::make($request->all(), $rules);
         $validator->setAttributeNames($attributeNames);
 
+        $validator->after(function($validator) use ($member_id, $loan_id) {
+            $member = Member::find($member_id);
+            $loan = Loan::find($loan_id);
+
+            // เงื่อนไขการปิดยอดกู้สามัญ
+            if ($loan->loan_type_id == 1) {
+                $period = ($loan->payments->count() / $loan->period) * 100;
+                $payment = ($loan->payments->sum('principle') / $loan->outstanding) * 100;
+
+                // เงื่อนไขปิดยอด ต้องผ่อนไปแล้ว 1 ใน 10 หรือ ชำระเงินไปแล้ว 10%
+                if ($period < 10 && $payment < 10) { 
+                    $validator->errors()->add('tofast', 'ต้องผ่อนไปแล้ว 1 ใน 10 ของงวดทั้งหมด หรือ ชำระเงินไปแล้ว 10% ของเงินทั้งหมด');
+                }
+            }
+        });
+
         if ($validator->fails()) {
             return redirect()->back()
                 ->withErrors($validator)

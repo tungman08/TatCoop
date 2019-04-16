@@ -92,16 +92,9 @@
 
             <div class="box-body">
                 <div class="form-group">
-                    <label>
-                        <i class="fa fa-calendar fa-fw"></i>
-                        ปฏิทิน
-                    </label>
-                    <div class="input-group" id="datepicker" style="width: 250px;">
-                        <input type="text" id="month" class="form-control" value="{{ $date->format('Y-m') }}" />
-                        <span class="input-group-addon">
-                            <span class="fa fa-calendar">
-                            </span>
-                        </span>
+                    <div class="input-group">
+                        <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
+                        <input type="text" id="datepicker" class="form-control" value="{{ $date->format('Y-m') }}" />
                     </div>
                 </div>
                 <p class="help-block">กรุณาเลือกเดือนที่ต้องการแสดงข้อมูล</p>

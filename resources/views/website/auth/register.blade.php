@@ -9,31 +9,43 @@
     <!-- /.login-logo -->
 
     {{ Form::open(['url' => '/auth/register', 'role' => 'form']) }}
-        <div class="form-group has-feedback">
-            {{ Form::text('email', null, ['required', 'class'=>'form-control', 'placeholder'=>'อีเมล', 'autocomplete'=>'off']) }}
-            <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+        <div class="form-group">
+            <div class="input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
+                {{ Form::text('email', null, ['required', 'class'=>'form-control', 'placeholder'=>'อีเมล', 'autocomplete'=>'off']) }}
+            </div>
         </div>
         <div class="form-group has-feedback">
-            {{ Form::password('password', ['required', 'class'=>'form-control', 'placeholder'=>'รหัสผ่าน']) }}
-            <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+            <div class="input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                {{ Form::password('password', ['id'=>'password', 'required', 'class'=>'form-control', 'placeholder'=>'รหัสผ่าน', 'style'=>'position: initial;']) }}
+                <span class="glyphicon glyphicon-eye-open form-control-feedback toggle-password" toggle="#password"></span>
+            </div>
         </div>
         <div class="form-group has-feedback">
-            {{ Form::password('password_confirmation', ['required', 'class'=>'form-control', 'placeholder'=>'ยืนยันรหัสผ่าน']) }}
-            <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+            <div class="input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                {{ Form::password('password_confirmation', ['id'=>'password_confirmation', 'required', 'class'=>'form-control', 'placeholder'=>'ยืนยันรหัสผ่าน', 'style'=>'position: initial;']) }}
+                <span class="glyphicon glyphicon-eye-open form-control-feedback toggle-password" toggle="#password_confirmation"></span>
+            </div>
         </div>
-        <div class="form-group has-feedback">
-            {{ Form::text('citizen_code', null, ['required', 'class'=>'form-control', 'placeholder'=>'เลขประจำตัวประชาชน',
-                'data-inputmask'=>'\'mask\': \'9-9999-99999-99-9\',\'placeholder\':\'0\',\'removeMaskOnSubmit\':true',
-                'data-mask',
-                'autocomplete'=>'off']) }}
-            <span class="glyphicon glyphicon-qrcode form-control-feedback"></span>
+        <div class="form-group">
+            <div class="input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-qrcode"></i></span>
+                {{ Form::text('citizen_code', null, ['required', 'class'=>'form-control', 'placeholder'=>'เลขประจำตัวประชาชน',
+                    'data-inputmask'=>'\'mask\': \'9-9999-99999-99-9\',\'placeholder\':\'0\',\'removeMaskOnSubmit\':true',
+                    'data-mask',
+                    'autocomplete'=>'off']) }}
+            </div>
         </div>
-        <div class="form-group has-feedback">
-            {{ Form::text('member_id', null, ['required', 'id'=>'member_id', 'class'=>'form-control', 'placeholder'=>'เลขทะเบียนสมาชิกสหกรณ์',
-                'data-inputmask'=>'\'mask\': \'99999\',\'placeholder\':\'0\',\'removeMaskOnSubmit\':true',
-                'data-mask',
-                'autocomplete'=>'off']) }}
-            <span class="glyphicon glyphicon-qrcode form-control-feedback"></span>
+        <div class="form-group">
+            <div class="input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-qrcode"></i></span>
+                {{ Form::text('member_id', null, ['required', 'id'=>'member_id', 'class'=>'form-control', 'placeholder'=>'เลขทะเบียนสมาชิกสหกรณ์',
+                    'data-inputmask'=>'\'mask\': \'99999\',\'placeholder\':\'0\',\'removeMaskOnSubmit\':true',
+                    'data-mask',
+                    'autocomplete'=>'off']) }}
+            </div>
         </div>
         <div class="row">
             <div class="col-xs-7">
@@ -75,7 +87,6 @@
     <a href="{{ url('/auth/login') }}">ลงทะเบียนไว้แล้ว</a><br>
 </div>
 <!-- /.login-box-body -->
-@endsection
 
 <!-- Terms Modal -->
 <div id="termsModal" class="modal fade" role="dialog">
@@ -97,3 +108,37 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('styles')
+    @parent
+
+    <style>
+        .toggle-password {
+            cursor: pointer;
+            pointer-events: auto;
+            color: #777;
+        }
+    </style>
+@endsection
+
+@section('scripts')
+    @parent
+
+    <script>
+    $(document).ready(function () {
+        $(".toggle-password").click(function() {
+            $(this).toggleClass("glyphicon-eye-open glyphicon-eye-close");
+
+            var input = $($(this).attr("toggle"));
+
+            if (input.attr("type") == "password") {
+                input.attr("type", "text");
+            } 
+            else {
+                input.attr("type", "password");
+            }
+        });
+    });   
+    </script>
+@endsection

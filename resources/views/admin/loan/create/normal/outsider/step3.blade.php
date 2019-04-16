@@ -20,12 +20,15 @@
     {{ Form::label('loaned_at', 'วันที่ทำสัญญา', [
         'class'=>'control-label']) 
     }}
-    {{ Form::text('loaned_at', null, [
-        'id' => 'loaned_at',
-        'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
-        'autocomplete'=>'off',
-        'class'=>'form-control'])
-    }}             
+    <div class="input-group">
+        <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
+        {{ Form::text('loaned_at', null, [
+            'id' => 'loaned_at',
+            'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
+            'autocomplete'=>'off',
+            'class'=>'form-control'])
+        }}    
+    </div>            
 </div>
 
 <div class="table-responsive">

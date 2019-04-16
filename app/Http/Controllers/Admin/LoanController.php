@@ -125,8 +125,10 @@ class LoanController extends Controller
                 ]);
             }
         }
-        else { // มีสัญญากู้สามัญอยู่ ทำการรีไฟแนนซ์
-            return $this->createRefinance($member_id);
+        else { // ไม่สามารถกู้ได้   
+            return redirect()->back()
+                ->with('flash_message', 'ไม่สามารถกู้ได้ กรุณาปิดยอดสัญญาเงินกู้สามัญก่อน')
+                ->with('callout_class', 'callout-danger');
         }
     }
 
@@ -194,40 +196,6 @@ class LoanController extends Controller
         }
     }
 
-    protected function createRefinance($member_id) {
-        $member = Member::find($member_id);
-        $loan = Loan::where('member_id', $member_id)
-            ->where('loan_type_id', 1)
-            ->whereNotNull('code')
-            ->whereNull('completed_at')
-            ->first();
-
-        $period = ($loan->payments->count() / $loan->period) * 100;
-        $payment = ($loan->payments->sum('principle') / $loan->outstanding) * 100;
-
-        if ($period >= 10 || $payment >= 10) { // รีไฟแนนซ์ เงื่อนไข ผ่อนไปแล้ว 1 ใน 10 งวด หรือ ชำระเงินไปแล้ว 10%
-            if ($member->profile->employee->employee_type_id == 1) { // พนักงาน/ลูกจ้าง ททท.
-                return redirect()->route('service.loan.create.refinance.employee', [
-                    'member_id' => $member->id,
-                    'loan_id' => $loan->id,
-                    'step' => 1
-                ]);
-            }
-            else { // บุคคลภายนอก
-                return redirect()->route('service.loan.create.refinance.employee', [
-                    'member_id' => $member->id,
-                    'loan_id' => $loan->id,
-                    'step' => 1
-                ]);
-            }
-        }
-        else { // ไม่สามารถกู้ได้
-            return redirect()->back()
-                ->with('flash_message', 'ไม่สามารถกู้ได้ เนื่องจากมีสัญญาเงินกู้เดิมอยู่ และยังไม่สามารถทำรีไฟแนนซ์ได้')
-                ->with('callout_class', 'callout-danger'); 
-        }
-    }   
-    
     public function edit($id, $loan_id) {
         $member = Member::find($id);
         $loan = Loan::find($loan_id);

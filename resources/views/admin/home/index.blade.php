@@ -39,6 +39,9 @@
 @section('styles')
     @parent
 
+    <!-- Bootstrap DateTime Picker CSS -->
+    {!! Html::style(elixir('css/bootstrap-datetimepicker.css')) !!}
+
     <style>
         .flot-chart {
             height: 320px;
@@ -51,6 +54,7 @@
 
     <!-- Moment JS JavaScript -->
     {{ Html::script(elixir('js/moment.js')) }}
+    {!! Html::script(elixir('js/bootstrap-datetimepicker.js')) !!}
 
     <!-- jQuery Flot Chart JavaScript -->
     {!! Html::script(elixir('js/jquery.flot.js')) !!}
@@ -62,10 +66,23 @@
                 headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
             });
             
-            dashboard($('#filter_year').val());
+            dashboard($('#datepicker').val());
 
-            $('#filter_year').change(function() {
+            $('#datepicker').datetimepicker({
+                locale: moment.locale("th"),
+                viewMode: 'years',
+                minDate: moment('2018-01-01'),
+                maxDate: moment(),
+                format: 'YYYY',
+                useCurrent: false,
+                focusOnShow: false,
+                buddhism: true
+            }).on("dp.change", function (e) {
                 dashboard($(this).val());
+            }).on('dp.hide', function(e){
+                setTimeout(function() {
+                    $('#datepicker').data('DateTimePicker').viewMode('years');
+                }, 1);
             });
         });   
 

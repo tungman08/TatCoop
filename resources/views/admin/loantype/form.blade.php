@@ -31,14 +31,17 @@
             'class'=>'col-sm-2 control-label']) 
         }}
 
-        <div class="col-sm-10" style="padding: 0 5px;">
-            {{ Form::text('start_date', null, [
-                'id'=>'start_date',
-                'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
-                'autocomplete'=>'off',
-                'readonly'=>($edit) ? ($loantype->id == 1 || $loantype->id == 2) ? true : false : false,
-                'class'=>'form-control'])
-            }}       
+        <div class="col-sm-10">
+            <div class="input-group">
+                <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
+                {{ Form::text('start_date', null, [
+                    'id'=>'start_date',
+                    'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
+                    'autocomplete'=>'off',
+                    'readonly'=>($edit) ? ($loantype->id == 1 || $loantype->id == 2) ? true : false : false,
+                    'class'=>'form-control'])
+                }}
+            </div>       
         </div>
     </div>
     <div class="form-group">
@@ -46,14 +49,17 @@
             'class'=>'col-sm-2 control-label']) 
         }}
 
-        <div class="col-sm-10" style="padding: 0 5px;">
-            {{ Form::text('expire_date', null, [
-                'id'=>'expire_date',
-                'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
-                'autocomplete'=>'off',
-                'readonly'=>($edit) ? ($loantype->id == 1 || $loantype->id == 2) ? true : false : false,
-                'class'=>'form-control'])
-            }}       
+        <div class="col-sm-10">
+            <div class="input-group">
+                <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
+                {{ Form::text('expire_date', null, [
+                    'id'=>'expire_date',
+                    'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
+                    'autocomplete'=>'off',
+                    'readonly'=>($edit) ? ($loantype->id == 1 || $loantype->id == 2) ? true : false : false,
+                    'class'=>'form-control'])
+                }}
+            </div>       
         </div>
     </div>
 

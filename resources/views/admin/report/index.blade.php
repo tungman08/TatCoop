@@ -48,8 +48,10 @@
                     <div class="box-body">
                         <div class="form-group">
                             <label for="monthly">กรุณาเลือกเดือน</label>
-
-                            <input type="text" id="monthly" name="monthly" class="form-control" value="{{ Diamond::today()->format('Y-m') }}" />
+                            <div class="input-group">
+                                <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
+                                <input type="text" id="monthly" name="monthly" class="form-control" value="{{ Diamond::today()->format('Y-m') }}" />
+                            </div>
                         </div>
                         <!-- /.form-group -->
 
@@ -71,8 +73,10 @@
                     <div class="box-body">
                         <div class="form-group">
                             <label for="annual">กรุณาเลือกปี</label>
-
-                            <input type="text" id="annual" name="annual" class="form-control" value="{{ Diamond::today()->format('Y') }}" />
+                            <div class="input-group">
+                                <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
+                                <input type="text" id="annual" name="annual" class="form-control" value="{{ Diamond::today()->format('Y') }}" />
+                            </div>
                         </div>
                         <!-- /.form-group -->
 

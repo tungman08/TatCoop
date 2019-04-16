@@ -128,16 +128,18 @@
                 </div>
                 <div class="modal-body">
                     <label for="leave_date">วันที่ลาออก</label>
-                    <input type="text" id="leave_date" 
-                        placeholder="กรุณาเลือกจากปฏิทิน..." 
-                        autocomplete="off"
-                        class="form-control margin-b-lg" />
-
-                    <div class="text-center">
-                        <button id="leave_btn" class="btn btn-danger btn-flat margin-b-lg">
-                            <i class="fa fa-user-times"></i> ลาออก
-                        </button>
+                    <div class="input-group">
+                        <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
+                        <input type="text" id="leave_date" 
+                            placeholder="กรุณาเลือกจากปฏิทิน..." 
+                            autocomplete="off"
+                            class="form-control" />
                     </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="leave_btn" class="btn btn-danger btn-flat">
+                        <i class="fa fa-user-times"></i> ลาออก
+                    </button>
                 </div>
             </div>
         </div>

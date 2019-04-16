@@ -4,13 +4,16 @@
             'class'=>'col-sm-2 control-label']) 
         }}
 
-        <div class="col-sm-10" style="padding: 0 5px;">
-            {{ Form::text('pay_date', null, [
-                'id'=>'pay_date',
-                'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
-                'autocomplete'=>'off',
-                'class'=>'form-control'])
-            }}       
+        <div class="col-sm-10">
+            <div class="input-group">
+                <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
+                {{ Form::text('pay_date', null, [
+                    'id'=>'pay_date',
+                    'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
+                    'autocomplete'=>'off',
+                    'class'=>'form-control'])
+                }}    
+            </div>   
         </div>
     </div>
     <div class="form-group">
@@ -50,6 +53,19 @@
             }}        
         </div>
     </div>
+    
+    @if (!$edit)
+        <hr />
+        <div class="form-group">
+            {{ Form::label('attachment', 'เอกสารแนบ', [
+                'class'=>'col-sm-2 control-label']) 
+            }}
+            {{ Form::file ('attachment', [
+                'class'=>'form-control-file',
+                'style'=>'padding-top: 7px'])
+            }} 
+        </div>
+    @endif
 </div>
 
 <!-- /.box-body -->

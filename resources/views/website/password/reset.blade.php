@@ -15,12 +15,12 @@
             <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
         </div>
         <div class="form-group has-feedback">
-            {{ Form::password('password', ['required', 'class'=>'form-control', 'placeholder'=>'รหัสผ่าน']) }}
-            <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+            {{ Form::password('password', ['id'=>'password', 'required', 'class'=>'form-control', 'placeholder'=>'รหัสผ่าน']) }}
+            <span class="glyphicon glyphicon-eye-open form-control-feedback toggle-password" toggle="#password"></span>
         </div>
         <div class="form-group has-feedback">
-            {{ Form::password('password_confirmation', ['required', 'class'=>'form-control', 'placeholder'=>'ยืนยันรหัสผ่าน']) }}
-            <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+            {{ Form::password('password_confirmation', ['id'=>'password_confirmation', 'required', 'class'=>'form-control', 'placeholder'=>'ยืนยันรหัสผ่าน']) }}
+            <span class="glyphicon glyphicon-eye-open form-control-feedback toggle-password" toggle="#password_confirmation"></span>
         </div>
         <div class="row">
             <div class="col-xs-7">
@@ -44,4 +44,37 @@
     @endif
 </div>
 <!-- /.login-box-body -->
+@endsection
+
+@section('styles')
+    @parent
+
+    <style>
+        .toggle-password {
+            cursor: pointer;
+            pointer-events: auto;
+            color: #777;
+        }
+    </style>
+@endsection
+
+@section('scripts')
+    @parent
+
+    <script>
+    $(document).ready(function () {
+        $(".toggle-password").click(function() {
+            $(this).toggleClass("glyphicon-eye-open glyphicon-eye-close");
+
+            var input = $($(this).attr("toggle"));
+
+            if (input.attr("type") == "password") {
+                input.attr("type", "text");
+            } 
+            else {
+                input.attr("type", "password");
+            }
+        });
+    });   
+    </script>
 @endsection

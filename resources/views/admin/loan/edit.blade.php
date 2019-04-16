@@ -62,12 +62,15 @@
                         }}
 
                         <div class="col-sm-10">
-                            {{ Form::text('loaned_at', $loan->loaned_at, [
-                                'id' => 'loaned_at',
-                                'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
-                                'autocomplete'=>'off',
-                                'class'=>'form-control'])
-                            }}             
+                            <div class="input-group">
+                                <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
+                                {{ Form::text('loaned_at', $loan->loaned_at, [
+                                    'id' => 'loaned_at',
+                                    'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
+                                    'autocomplete'=>'off',
+                                    'class'=>'form-control'])
+                                }}  
+                            </div>           
                         </div>
                     </div>
                 </div>

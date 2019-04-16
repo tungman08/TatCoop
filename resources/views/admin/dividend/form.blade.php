@@ -1,17 +1,20 @@
 <div class="box-body">
     <div class="form-group">
-        {{ Form::label('rate_year', 'ประจำปี ค.ศ.', [
+        {{ Form::label('rate_year', 'ประจำปี', [
             'class'=>'col-sm-2 control-label']) 
         }}
 
-        <div class="col-sm-10" style="padding: 0 5px;">
-            {{ Form::text('rate_year', null, [
-                'id' => 'rate_year',
-                ($edit) ? 'readonly' : '',
-                'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
-                'autocomplete'=>'off',
-                'class'=>'form-control'])
-            }}       
+        <div class="col-sm-10">
+            <div class="input-group">
+                <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
+                {{ Form::text('rate_year', null, [
+                    'id' => 'rate_year',
+                    ($edit) ? 'readonly' : '',
+                    'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
+                    'autocomplete'=>'off',
+                    'class'=>'form-control'])
+                }}    
+            </div>   
         </div>
     </div>
     <div class="form-group">
@@ -45,13 +48,16 @@
             'class'=>'col-sm-2 control-label']) 
         }}
 
-        <div class="col-sm-10" style="padding: 0 5px;">
-            {{ Form::text('release_date', null, [
-                'id'=>'release_date',
-                'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
-                'autocomplete'=>'off',
-                'class'=>'form-control'])
-            }}       
+        <div class="col-sm-10">
+            <div class="input-group">
+                <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
+                {{ Form::text('release_date', null, [
+                    'id'=>'release_date',
+                    'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
+                    'autocomplete'=>'off',
+                    'class'=>'form-control'])
+                }}   
+            </div>    
         </div>
     </div>
 </div>
