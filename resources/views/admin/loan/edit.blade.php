@@ -9,9 +9,9 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการการกู้ยืม', 'link' => '/service/loan/member'],
-            ['item' => 'การกู้ยืม', 'link' => 'service/' . $member->id . '/loan'],
-            ['item' => 'สัญญากู้ยืม', 'link' => 'service/' . $member->id . '/loan/' . $loan->id],
+            ['item' => 'จัดการการกู้ยืม', 'link' => action('Admin\LoanController@getMember')],
+            ['item' => 'การกู้ยืม', 'link' => action('Admin\LoanController@index', ['member_id'=>$member->id])],
+            ['item' => 'สัญญากู้ยืม', 'link' => action('Admin\LoanController@show', ['member_id'=>$member->id, 'id'=>$loan->id])],
             ['item' => 'แก้ไข', 'link' => ''],
         ]])
     </section>
@@ -35,12 +35,26 @@
         <!-- Box content -->
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title"><i class="fa fa-credit-card"></i> สัญญาเงินกู้</h3>
+                @if ($is_super)
+                    {{ Form::open(['action' => ['Admin\LoanController@destroy', $member->id, $loan->id], 'method' => 'delete']) }}        
+                        <h3 class="box-title"><i class="fa fa-credit-card"></i> แก้ไขสัญญาเงินกู้</h3>
+
+                        {{ Form::button('<i class="fa fa-times"></i>', [
+                            'type'=>'submit',
+                            'data-tooltip'=>"true",
+                            'title'=>"ลบ",
+                            'class'=>'btn btn-danger btn-xs btn-flat pull-right', 
+                            'onclick'=>'javascript:return confirm(\'คุณต้องการลบรายการนี้ใช่ไหม ?\');'])
+                        }}
+                    {{ Form::close() }}
+                @else
+                    <h3 class="box-title"><i class="fa fa-credit-card"></i> แก้ไขสัญญาเงินกู้</h3>
+                @endif
             </div>
             <!-- /.box-header -->
 
             <!-- form start -->
-            {{ Form::model($loan, ['url' => '/service/' . $member->id . '/loan/' . $loan->id, 'method' => 'put', 'class' => 'form-horizontal']) }}
+            {{ Form::model($loan, ['action' => ['Admin\LoanController@update', $member->id, $loan->id], 'method' => 'put', 'class' => 'form-horizontal']) }}
                 <div class="box-body">
                     <div class="form-group">
                         {{ Form::label('code', 'เลขที่สัญญา', [
@@ -121,7 +135,7 @@
             format: 'YYYY-MM-DD',
             useCurrent: false,
             focusOnShow: false,
-            buddhism: true
+            buddhismEra: true
         });
     });
     </script>

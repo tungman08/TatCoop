@@ -10,17 +10,25 @@
 
     {{ Form::open(['url' => '/password/reset', 'role' => 'form']) }}
         {{ Form::hidden('token', $token) }}
-        <div class="form-group has-feedback">
-            {{ Form::text('email', isset($email) ? $email : old('email'), ['required', 'class'=>'form-control', 'placeholder'=>'อีเมล', 'autocomplete'=>'off']) }}
-            <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+        <div class="form-group">
+            <div class="input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
+                {{ Form::text('email', isset($email) ? $email : old('email'), ['required', 'class'=>'form-control', 'placeholder'=>'อีเมล', 'autocomplete'=>'off']) }}
+            </div>
         </div>
         <div class="form-group has-feedback">
-            {{ Form::password('password', ['id'=>'password', 'required', 'class'=>'form-control', 'placeholder'=>'รหัสผ่าน']) }}
-            <span class="glyphicon glyphicon-eye-open form-control-feedback toggle-password" toggle="#password"></span>
+            <div class="input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                {{ Form::password('password', ['id'=>'password', 'required', 'class'=>'form-control', 'placeholder'=>'รหัสผ่าน', 'style'=>'position: initial;']) }}
+                <span class="glyphicon glyphicon-eye-open form-control-feedback toggle-password" toggle="#password"></span>
+            </div>
         </div>
         <div class="form-group has-feedback">
-            {{ Form::password('password_confirmation', ['id'=>'password_confirmation', 'required', 'class'=>'form-control', 'placeholder'=>'ยืนยันรหัสผ่าน']) }}
-            <span class="glyphicon glyphicon-eye-open form-control-feedback toggle-password" toggle="#password_confirmation"></span>
+            <div class="input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                {{ Form::password('password_confirmation', ['id'=>'password_confirmation', 'required', 'class'=>'form-control', 'placeholder'=>'ยืนยันรหัสผ่าน', 'style'=>'position: initial;']) }}
+                <span class="glyphicon glyphicon-eye-open form-control-feedback toggle-password" toggle="#password_confirmation"></span>
+            </div>
         </div>
         <div class="row">
             <div class="col-xs-7">

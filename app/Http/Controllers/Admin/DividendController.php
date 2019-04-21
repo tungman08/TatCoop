@@ -35,51 +35,6 @@ class DividendController extends Controller
         $this->middleware('auth:admins');
     }
 
-    public function getMember() {
-        $dividend_years = Dividend::all();
-        $year = DB::select(DB::raw('select max(a.rate_year) as rate_year ' .
-            'from (' .
-            'select d.rate_year ' .
-            'from dividends d ' .
-            'inner join dividend_member dm on d.id = dm.dividend_id ' .
-            'group by d.rate_year ' .
-            'having count(dm.id) > 0 ' .
-            ') a;'));
-
-        return view('admin.dividend.member', [
-            'dividend_years' => collect($dividend_years),
-            'year' => $year[0]->rate_year
-        ]);
-    }
-
-    public function getMemberDividend($member_id, Request $request) {
-        $dividend_years = Dividend::all();
-        $year = is_null($request->input('year')) ? 
-            DB::select(DB::raw('select max(a.rate_year) as rate_year ' .
-                'from (' .
-                'select d.rate_year ' .
-                'from dividends d ' .
-                'inner join dividend_member dm on d.id = dm.dividend_id ' .
-                'group by d.rate_year ' .
-                'having count(dm.id) > 0 ' .
-                ') a;'))[0]->rate_year : 
-            $request->input('year');
-        $dividend = Dividend::where('rate_year', $year)->first();
-        $member = Member::find($member_id);
-
-        $dividends = Dividendmember::where('dividend_id', $dividend->id)
-            ->where('member_id', $member->id)
-            ->orderBy('dividend_date')
-            ->get();
-
-        return view('admin.dividend.show', [
-            'dividend_years' => collect($dividend_years),
-            'member' => $member,
-            'dividend' => $dividend,
-            'dividends' => $dividends
-        ]);
-    }
-
     public function index() {
         return view('admin.dividend.index', [
             'dividends' => Dividend::orderBy('rate_year', 'desc')->get()
@@ -176,17 +131,77 @@ class DividendController extends Controller
     }
 
     public function destroy($id) {
-        DB::transaction(function() use ($id) {
-            $dividend = Dividend::find($id);
+        $validator = Validator::make([], []);
 
-            History::addAdminHistory(Auth::guard($this->guard)->id(), 'ลบข้อมูล', 'ลบอัตราเงินปันผล ประจำปี ' . $dividend->rate_year + 543);
-
-            $dividend->delete();
+        $validator->after(function($validator) use ($id) {
+            if (Dividend::find($id)->members->count() > 0) {
+                $validator->errors()->add('used', 'ไม่สามารถลบได้เนื่องจากข้อมูลมีการใช้งานอยู่');
+            }
         });
 
-        return redirect()->action('Admin\DividendController@index')
-            ->with('flash_message', 'ลบข้อมูลอัตราเงินปันผลเรียบร้อยแล้ว')
-            ->with('callout_class', 'callout-success');
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+        else {
+            DB::transaction(function() use ($id) {
+                $dividend = Dividend::find($id);
+    
+                History::addAdminHistory(Auth::guard($this->guard)->id(), 'ลบข้อมูล', 'ลบอัตราเงินปันผล ประจำปี ' . $dividend->rate_year + 543);
+    
+                $dividend->delete();
+            });
+    
+            return redirect()->action('Admin\DividendController@index')
+                ->with('flash_message', 'ลบข้อมูลอัตราเงินปันผลเรียบร้อยแล้ว')
+                ->with('callout_class', 'callout-success');
+        }
+    }
+
+    public function getMember() {
+        $dividend_years = Dividend::all();
+        $year = DB::select(DB::raw('select max(a.rate_year) as rate_year ' .
+            'from (' .
+            'select d.rate_year ' .
+            'from dividends d ' .
+            'inner join dividend_member dm on d.id = dm.dividend_id ' .
+            'group by d.rate_year ' .
+            'having count(dm.id) > 0 ' .
+            ') a;'));
+
+        return view('admin.dividend.member', [
+            'dividend_years' => collect($dividend_years),
+            'year' => $year[0]->rate_year
+        ]);
+    }
+
+    public function getMemberDividend($member_id, Request $request) {
+        $dividend_years = Dividend::all();
+        $year = is_null($request->input('year')) ? 
+            DB::select(DB::raw('select max(a.rate_year) as rate_year ' .
+                'from (' .
+                'select d.rate_year ' .
+                'from dividends d ' .
+                'inner join dividend_member dm on d.id = dm.dividend_id ' .
+                'group by d.rate_year ' .
+                'having count(dm.id) > 0 ' .
+                ') a;'))[0]->rate_year : 
+            $request->input('year');
+        $dividend = Dividend::where('rate_year', $year)->first();
+        $member = Member::find($member_id);
+
+        $dividends = Dividendmember::where('dividend_id', $dividend->id)
+            ->where('member_id', $member->id)
+            ->orderBy('dividend_date')
+            ->get();
+
+        return view('admin.dividend.show', [
+            'dividend_years' => collect($dividend_years),
+            'member' => $member,
+            'dividend' => $dividend,
+            'dividends' => $dividends
+        ]);
     }
 
     public function getMemberEdit($member_id, $dividend_id) {
@@ -242,7 +257,7 @@ class DividendController extends Controller
             $dividend = Dividendmember::find($dividend_id);
             $year = Dividend::find($dividend->dividend_id)->rate_year;     
 
-            return redirect('/service/' . $member_id . '/dividend?year=' . $year)
+            return redirect()->action('Admin\DividendController@getMemberDividend', ['member_id'=>$member_id, 'year'=>$year])
                 ->with('flash_message', 'แก้ไขข้อมูลเงินปันผลเรียบร้อยแล้ว')
                 ->with('callout_class', 'callout-success');
         }

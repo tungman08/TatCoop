@@ -9,7 +9,7 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'ข้อมูลการค้ำประกัน', 'link' => '/service/guaruntee/member'],
+            ['item' => 'ข้อมูลการค้ำประกัน', 'link' => action('Admin\GuarunteeController@getMember')],
             ['item' => 'รายละเอียด', 'link' => '']
         ]])
     </section>
@@ -44,17 +44,17 @@
 
         <div class="row margin-b-md">
             <div class="col-md-5ths">
-                <button type="button" class="btn btn-block btn-primary btn-lg" onclick="javascript:document.location.href='{{ url('/service/member/' . $member->id) }}';">
+                <button type="button" class="btn btn-block btn-primary btn-lg" onclick="javascript:document.location.href='{{ action('Admin\MemberController@show', ['id'=>$member->id]) }}';">
                     <i class="fa fa-user fa-fw"></i> ข้อมูลสมาชิก
                 </button>
             </div>
             <div class="col-md-5ths">
-                <button type="button" class="btn btn-block btn-success btn-lg" onclick="javascript:document.location.href='{{ url('/service/' . $member->id . '/shareholding') }}';">
+                <button type="button" class="btn btn-block btn-success btn-lg" onclick="javascript:document.location.href='{{ action('Admin\ShareholdingController@index', ['member_id'=>$member->id]) }}';">
                     <i class="fa fa-money fa-fw"></i> ทุนเรือนหุ้น
                 </button>
             </div>            
             <div class="col-md-5ths">
-                <button type="button" class="btn btn-block btn-danger btn-lg" onclick="javascript:document.location.href='{{ url('/service/' . $member->id . '/loan') }}';">
+                <button type="button" class="btn btn-block btn-danger btn-lg" onclick="javascript:document.location.href='{{ action('Admin\LoanController@index', ['member_id'=>$member->id]) }}';">
                     <i class="fa fa-credit-card fa-fw"></i> การกู้ยืม
                 </button>
             </div>
@@ -64,7 +64,7 @@
                 </button>
             </div>
             <div class="col-md-5ths">
-                <button type="button" class="btn btn-block btn-purple btn-lg" onclick="javascript:document.location.href='{{ url('/service/' . $member->id . '/dividend') }}';">
+                <button type="button" class="btn btn-block btn-purple btn-lg" onclick="javascript:document.location.href='{{ action('Admin\DividendController@getMemberDividend', ['member_id'=>$member->id]) }}';">
                     <i class="fa fa-dollar fa-fw"></i> เงินปันผล
                 </button>
             </div>
@@ -94,7 +94,7 @@
                         </thead>
                         <tbody>
                             @foreach($member->sureties->filter(function ($value, $key) { return !is_null($value->code) && is_null($value->completed_at); }) as $index => $loan)
-                                <tr onclick="javascript: document.location.href  = '{{ url('service/' . $loan->member->id . '/loan/' . $loan->id) }}';" style="cursor: pointer;">
+                                <tr onclick="javascript: document.location.href  = '{{ action('Admin\LoanController@show', ['member_id'=>$loan->member->id, 'id'=>$loan->id]) }}';" style="cursor: pointer;">
                                     <td>{{ $index + 1 }}.</td>
                                     <td class="text-primary"><i class="fa fa-file-text-o fa-fw"></i> {{ $loan->code }}</td>
                                     <td>{{ $loan->member->profile->fullname }}</td>

@@ -76,7 +76,7 @@
                 format: 'YYYY',
                 useCurrent: false,
                 focusOnShow: false,
-                buddhism: true
+                buddhismEra: true
             }).on("dp.change", function (e) {
                 dashboard($(this).val());
             }).on('dp.hide', function(e){

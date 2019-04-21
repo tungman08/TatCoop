@@ -9,7 +9,7 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการสมาชิกสหกรณ์', 'link' => '/service/member'],
+            ['item' => 'จัดการสมาชิกสหกรณ์', 'link' => action('Admin\MemberController@index')],
             ['item' => 'เพิ่ม', 'link' => ''],
         ]])
 
@@ -34,12 +34,12 @@
         <!-- Horizontal Form -->
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title">เพิ่มสมาชิกสหกรณ์</h3>
+                <h3 class="box-title"><i class="fa fa-user-plus"></i> เพิ่มสมาชิกสหกรณ์</h3>
             </div>
             <!-- /.box-header -->
 
             <!-- form start -->
-            {{ Form::open(['url' => '/service/member', 'method' => 'post', 'class' => 'form-horizontal']) }}
+            {{ Form::open(['action' => 'Admin\MemberController@store', 'method' => 'post', 'class' => 'form-horizontal']) }}
                 @include('admin.member.form', ['edit' => false])
             {{ Form::close() }}
         </div>
@@ -92,7 +92,7 @@
             format: 'YYYY-MM-DD',
             useCurrent: false,
             focusOnShow: false,
-            buddhism: true
+            buddhismEra: true
         });
 
         $('#birth_date').datetimepicker({
@@ -101,7 +101,7 @@
             format: 'YYYY-MM-DD',
             useCurrent: false,
             focusOnShow: false,
-            buddhism: true
+            buddhismEra: true
         });
 
         $('#employee_code').blur(function() {

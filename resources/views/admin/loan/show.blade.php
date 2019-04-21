@@ -9,8 +9,8 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการการกู้ยืม', 'link' => '/service/loan/member'],
-            ['item' => 'การกู้ยืม', 'link' => 'service/' . $member->id . '/loan'],
+            ['item' => 'จัดการการกู้ยืม', 'link' => action('Admin\LoanController@getMember')],
+            ['item' => 'การกู้ยืม', 'link' => action('Admin\LoanController@index', ['member_id'=>$member->id])],
             ['item' => 'สัญญากู้ยืม', 'link' => ''],
         ]])
     </section>
@@ -79,14 +79,14 @@
                     @if (is_null($loan->completed_at))
                         <button type="button" class="btn btn-primary btn-flat"
                             {{ (($is_super || $is_admin) ? '' : 'disabled') }}
-                            onclick="javascript:document.location.href = '{{ url('/service/' . $member->id . '/loan/' . $loan->id . '/edit') }}';">
+                            onclick="javascript:document.location.href = '{{ action('Admin\LoanController@edit', ['member_id'=>$member->id, 'id'=>$loan->id]) }}';">
                             <i class="fa fa-pencil"></i> แก้ไขสัญญา
                         </button>
 
                         @if ($loan->loan_type_id == 1 && !$loan->shareholding)
                             <button type="button" class="btn btn-primary btn-flat"
                                 {{ (($is_super || $is_admin) ? '' : 'disabled') }}
-                                onclick="javascript:document.location.href = '{{ url('/service/' . $member->id . '/loan/' . $loan->id . '/sureties/edit') }}';">
+                                onclick="javascript:document.location.href = '{{ action('Admin\LoanController@getEditSureties', ['member_id'=>$member->id, 'id'=>$loan->id]) }}';">
                                 <i class="fa fa-pencil"></i> แก้ไขผู้ค้ำประกัน
                             </button>
                         @endif
@@ -152,7 +152,7 @@
                     <div class="btn-group">
                         <button id="create_loan" class="btn btn-primary btn-flat" style="margin-bottom: 15px;"
                             {{ (($is_super || $is_admin) ? '' : 'disabled') }}
-                            onclick="javascript:document.location.href = '{{ url('/service/' . $member->id . '/loan/' . $loan->id . '/payment/create') }}';">
+                            onclick="javascript:document.location.href = '{{ action('Admin\PaymentController@create', ['loan_id'=>$loan->id]) }}';">
                             <i class="fa fa-plus-circle fa-fw"></i> ชำระเงิน
                         </button>
                     </div>
@@ -161,14 +161,14 @@
                         <div class="btn-group">
                             <button id="create_loan" class="btn btn-primary btn-flat" style="margin-bottom: 15px;"
                                 {{ (($is_super || $is_admin) ? '' : 'disabled') }}
-                                onclick="javascript:document.location.href = '{{ url('/service/' . $member->id . '/loan/' . $loan->id . '/payment/close') }}';">
+                                onclick="javascript:document.location.href = '{{ action('Admin\PaymentController@getClose', ['loan_id'=>$loan->id]) }}';">
                                 <i class="fa fa-plus-circle fa-fw"></i> ปิดยอดเงินกู้
                             </button>
                         </div>
 
                         <div class="btn-group pull-right">
                             <button id="calculate_payment" class="btn btn-default btn-flat" style="margin-bottom: 15px;"
-                                onclick="javascript:document.location.href = '{{ url('/service/' . $member->id . '/loan/' . $loan->id . '/payment/calculate') }}';">
+                                onclick="javascript:document.location.href = '{{ action('Admin\PaymentController@getCalculate', ['loan_id'=>$loan->id]) }}';">
                                 <i class="fa fa-calculator fa-fw"></i> คำนวณยอดเงินที่ต้องการปิดยอดเงินกู้
                             </button>
                         </div>
@@ -190,7 +190,7 @@
                         </thead>
                         <tbody>
                             @foreach($payments as $index => $payment)
-                                <tr onclick="javascript: document.location.href  = '{{ url('/service/' . $member->id . '/loan/' . $loan->id . '/payment/' . $payment->id) }}';" style="cursor: pointer;">
+                                <tr onclick="javascript: document.location.href  = '{{ action('Admin\PaymentController@show', ['loan_id'=>$loan->id, 'id'=>$payment->id]) }}';" style="cursor: pointer;">
                                     <td>{{ $index + 1 }}.</td>
                                     <td class="text-primary"><i class="fa fa-credit-card fa-fw"></i> งวดที่ {{ $payment->period }}</td>
                                     <td>{{ Diamond::parse($payment->pay_date)->thai_format('d M Y') }}</td>

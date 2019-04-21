@@ -9,8 +9,8 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการทุนเรือนหุ้น', 'link' => '/service/shareholding/member'],
-            ['item' => 'ทุนเรือนหุ้น', 'link' => '/service/' . $member->id . '/shareholding'],
+            ['item' => 'จัดการทุนเรือนหุ้น', 'link' => action('Admin\ShareholdingController@getMember')],
+            ['item' => 'ทุนเรือนหุ้น', 'link' => action('Admin\ShareholdingController@index', ['member_id'=>$member->id])],
             ['item' => 'ชำระค่าหุ้น', 'link' => '']
         ]])
 
@@ -39,7 +39,7 @@
             <!-- /.box-header -->
 
             <!-- form start -->
-            {{ Form::open(['url' => '/service/' . $member->id . '/shareholding', 'method' => 'post', 'class' => 'form-horizontal', 'enctype'=>'multipart/form-data']) }}
+            {{ Form::open(['action' => ['Admin\ShareholdingController@store', $member->id], 'method' => 'post', 'class' => 'form-horizontal', 'enctype'=>'multipart/form-data']) }}
                 @include('admin.shareholding.form', ['edit' => false])
             {{ Form::close() }}
 
@@ -78,7 +78,7 @@
             format: 'YYYY-MM-DD',
             useCurrent: false,
             focusOnShow: false,
-            buddhism: true
+            buddhismEra: true
         });
     });
     </script>

@@ -9,9 +9,9 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการการกู้ยืม', 'link' => '/service/loan/member'],
-            ['item' => 'การกู้ยืม', 'link' => 'service/' . $member->id . '/loan'],
-            ['item' => 'สัญญากู้ยืม', 'link' => 'service/' . $member->id . '/loan/' . $loan->id],
+            ['item' => 'จัดการการกู้ยืม', 'link' => action('Admin\LoanController@getMember')],
+            ['item' => 'การกู้ยืม', 'link' => action('Admin\LoanController@index', ['member_id'=>$member->id])],
+            ['item' => 'สัญญากู้ยืม', 'link' => action('Admin\LoanController@show', ['member_id'=>$member->id, 'id'=>$loan->id])],
             ['item' => 'คำนวณยอดเงินที่ต้องการปิดยอดเงินกู้', 'link' => '']
         ]])
     </section>
@@ -165,7 +165,7 @@
             format: 'YYYY-MM-D',
             useCurrent: false,
             focusOnShow: false,
-            buddhism: true
+            buddhismEra: true
         }).on('dp.hide', function(e){
             setTimeout(function() {
                 $('#pay_date').data('DateTimePicker').viewMode('days');

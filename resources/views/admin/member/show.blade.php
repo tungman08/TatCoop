@@ -10,13 +10,13 @@
 
         @if (is_null($member->leave_date))
             @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-                ['item' => 'จัดการสมาชิกสหกรณ์', 'link' => '/service/member'],
+                ['item' => 'จัดการสมาชิกสหกรณ์', 'link' => action('Admin\MemberController@index')],
                 ['item' => 'ข้อมูลสมาชิกสหกรณ์', 'link' => ''],
             ]])
         @else
             @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-                ['item' => 'จัดการสมาชิกสหกรณ์', 'link' => '/service/member'],
-                ['item' => 'สมาชิกสหกรณ์ที่ลาออก', 'link' => '/service/member/inactive'],
+                ['item' => 'จัดการสมาชิกสหกรณ์', 'link' => action('Admin\MemberController@index')],
+                ['item' => 'สมาชิกสหกรณ์ที่ลาออก', 'link' => action('Admin\MemberController@getInactive')],
                 ['item' => 'ข้อมูลสมาชิกสหกรณ์', 'link' => ''],
             ]])
         @endif
@@ -73,22 +73,22 @@
                 </button>
             </div>
             <div class="col-md-5ths">
-                <button type="button" class="btn btn-block btn-success btn-lg" onclick="javascript:document.location.href='{{ url('/service/' . $member->id . '/shareholding') }}';">
+                <button type="button" class="btn btn-block btn-success btn-lg" onclick="javascript:document.location.href='{{ action('Admin\ShareholdingController@index', ['member_id'=>$member->id]) }}';">
                     <i class="fa fa-money fa-fw"></i> ทุนเรือนหุ้น
                 </button>
             </div>            
             <div class="col-md-5ths">
-                <button type="button" class="btn btn-block btn-danger btn-lg" onclick="javascript:document.location.href='{{ url('/service/' . $member->id . '/loan') }}';">
+                <button type="button" class="btn btn-block btn-danger btn-lg" onclick="javascript:document.location.href='{{ action('Admin\LoanController@index', ['member_id'=>$member->id]) }}';">
                     <i class="fa fa-credit-card fa-fw"></i> การกู้ยืม
                 </button>
             </div>
             <div class="col-md-5ths">
-                <button type="button" class="btn btn-block btn-warning btn-lg" onclick="javascript:document.location.href='{{ url('/service/' . $member->id . '/guaruntee') }}';">
+                <button type="button" class="btn btn-block btn-warning btn-lg" onclick="javascript:document.location.href='{{ action('Admin\GuarunteeController@index', ['member_id'=>$member->id]) }}';">
                     <i class="fa fa-share-alt fa-fw"></i> การค้ำประกัน
                 </button>
             </div>
             <div class="col-md-5ths">
-                <button type="button" class="btn btn-block btn-purple btn-lg" onclick="javascript:document.location.href='{{ url('/service/' . $member->id . '/dividend') }}';">
+                <button type="button" class="btn btn-block btn-purple btn-lg" onclick="javascript:document.location.href='{{ action('Admin\DividendController@getMemberDividend', ['member_id'=>$member->id]) }}';">
                     <i class="fa fa-dollar fa-fw"></i> เงินปันผล
                 </button>
             </div>
@@ -182,7 +182,7 @@
             format: 'YYYY-MM-DD',
             useCurrent: false,
             focusOnShow: false,
-            buddhism: true
+            buddhismEra: true
         });
 
         $('#leave_btn').click(function() {

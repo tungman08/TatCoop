@@ -90,6 +90,7 @@ class RoutinePaymentController extends Controller
             foreach ($routine->details as $detail) {
                 $payment = new Payment();
                 $payment->pay_date = $detail->pay_date;
+                $payment->period = $detail->period;
                 $payment->principle = $detail->principle;
                 $payment->interest = $detail->interest;
 
@@ -99,6 +100,10 @@ class RoutinePaymentController extends Controller
                 $detail->status = true;
                 $detail->save();
             }
+
+            $routine->status = true;
+            $routine->saved_date = Diamond::today();
+            $routine->save();
         });
 
         return redirect()->action('Admin\RoutinePaymentController@show', ['id' => $routine->id])
@@ -141,6 +146,7 @@ class RoutinePaymentController extends Controller
                 //save data
                 $payment = new Payment();
                 $payment->pay_date = $detail->pay_date;
+                $payment->period = $detail->period;
                 $payment->principle = $detail->principle;
                 $payment->interest = $detail->interest;
 

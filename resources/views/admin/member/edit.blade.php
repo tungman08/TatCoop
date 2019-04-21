@@ -9,8 +9,8 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการสมาชิกสหกรณ์', 'link' => '/service/member'],
-            ['item' => 'ข้อมูลสมาชิกสหกรณ์', 'link' => '/service/member/' . $member->id],
+            ['item' => 'จัดการสมาชิกสหกรณ์', 'link' => action('Admin\MemberController@index')],
+            ['item' => 'ข้อมูลสมาชิกสหกรณ์', 'link' => action('Admin\MemberController@show', ['id'=>$member->id])],
             ['item' => 'แก้ไข', 'link' => ''],
         ]])
 
@@ -35,12 +35,12 @@
         <!-- Horizontal Form -->
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title">แก้ไขข้อมูลสมาชิกสหกรณ์</h3>
+                <h3 class="box-title"><i class="fa fa-pencil"></i> แก้ไขข้อมูลสมาชิกสหกรณ์</h3>
             </div>
             <!-- /.box-header -->
 
             <!-- form start -->
-            {{ Form::model($member, ['route' => ['service.member.update', $member->id], 'method' => 'put', 'class' => 'form-horizontal']) }}
+            {{ Form::model($member, ['action' => ['Admin\MemberController@update', $member->id], 'method' => 'put', 'class' => 'form-horizontal']) }}
                 @include('admin.member.form', ['edit' => true, 'id' => $member->id])
             {{ Form::close() }}
         </div>
@@ -89,7 +89,7 @@
             format: 'YYYY-MM-DD',
             useCurrent: false,
             focusOnShow: false,
-            buddhism: true
+            buddhismEra: true
         });
 
         $('#birth_date').datetimepicker({
@@ -98,7 +98,7 @@
             format: 'YYYY-MM-DD',
             useCurrent: false,
             focusOnShow: false,
-            buddhism: true
+            buddhismEra: true
         });
     });
     </script>

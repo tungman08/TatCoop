@@ -9,10 +9,10 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการการกู้ยืม', 'link' => '/service/loan/member'],
-            ['item' => 'การกู้ยืม', 'link' => '/service/' . $member->id . '/loan'],
-            ['item' => 'สัญญากู้ยืม', 'link' => '/service/' . $member->id . '/loan/' . $loan->id],
-            ['item' => 'รายการผ่อนชำระ', 'link' => '/service/' . $member->id . '/loan/' . $loan->id . '/payment/' . $payment->id],
+            ['item' => 'จัดการการกู้ยืม', 'link' => action('Admin\LoanController@getMember')],
+            ['item' => 'การกู้ยืม', 'link' => action('Admin\LoanController@index', ['member_id'=>$member->id])],
+            ['item' => 'สัญญากู้ยืม', 'link' => action('Admin\LoanController@show', ['member_id'=>$member->id, 'id'=>$loan->id])],
+            ['item' => 'รายการผ่อนชำระ', 'link' => action('Admin\PaymentController@show', ['loan_id'=>$loan->id, 'id'=>$payment->id])],
             ['item' => 'แก้ไข', 'link' => ''],
         ]])
     </section>
@@ -77,7 +77,7 @@
             <div class="box-header with-border">
                 <input type="hidden" id="loan_id" value="{{ $loan->id }}" />
 
-                {{ Form::open(['url' => '/service/' . $member->id . '/loan/' . $loan->id . '/payment/' . $payment->id, 'method' => 'delete']) }}
+                {{ Form::open(['action' => ['Admin\PaymentController@destroy', $loan->id, $payment->id], 'method' => 'delete']) }}
                     <h3 class="box-title"><i class="fa fa-credit-card"></i> แก้ไขรายการผ่อนชำระ</h3>
     
                     {{ Form::button('<i class="fa fa-times"></i>', [
@@ -92,7 +92,7 @@
             <!-- /.box-header -->
 
             <!-- form start -->
-            {{ Form::model($payment, ['url' => '/service/' . $member->id . '/loan/' . $loan->id . '/payment/' . $payment->id, 'method' => 'put', 'class' => 'form-horizontal']) }}
+            {{ Form::model($payment, ['action' => ['Admin\PaymentController@update', $loan->id, $payment->id], 'method' => 'put', 'class' => 'form-horizontal']) }}
                 <div class="box-body">
                     <div class="form-group">
                         {{ Form::label('period', 'งวดที่', [
@@ -210,7 +210,7 @@
                 format: 'YYYY-MM-DD',
                 useCurrent: false,
                 focusOnShow: false,
-                buddhism: true
+                buddhismEra: true
             });
         });
 

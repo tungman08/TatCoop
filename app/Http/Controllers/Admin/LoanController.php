@@ -61,8 +61,8 @@ class LoanController extends Controller
         ]);
     }
 
-    public function index($id) {
-        $member = Member::find($id);
+    public function index($member_id) {
+        $member = Member::find($member_id);
 
         return view('admin.loan.index', [
             'member' => $member,
@@ -71,10 +71,10 @@ class LoanController extends Controller
         ]);
     }
 
-    public function show($id, $loan_id) {
-        $member = Member::find($id);
-        $loan = Loan::find($loan_id);
-        $payments = Payment::where('loan_id', $loan_id)
+    public function show($member_id, $id) {
+        $member = Member::find($member_id);
+        $loan = Loan::find($id);
+        $payments = Payment::where('loan_id', $id)
             ->orderBy('pay_date', 'desc')
             ->get();
 
@@ -196,9 +196,9 @@ class LoanController extends Controller
         }
     }
 
-    public function edit($id, $loan_id) {
-        $member = Member::find($id);
-        $loan = Loan::find($loan_id);
+    public function edit($member_id, $id) {
+        $member = Member::find($member_id);
+        $loan = Loan::find($id);
 
         return view('admin.loan.edit', [
             'member' => $member,
@@ -206,7 +206,7 @@ class LoanController extends Controller
         ]);  
     }
 
-    public function update($id, $loan_id, Request $request) {
+    public function update($member_id, $id, Request $request) {
         $rules = [
             'code' => 'required',
             'loaned_at' => 'required|date_format:Y-m-d'
@@ -220,10 +220,10 @@ class LoanController extends Controller
         $validator = Validator::make($request->all(), $rules);
         $validator->setAttributeNames($attributeNames);
 
-        $validator->after(function($validator) use ($request, $loan_id) {
-            $loan_type_id = Loan::find($loan_id)->loan_type_id;
+        $validator->after(function($validator) use ($request, $id) {
+            $loan_type_id = Loan::find($id)->loan_type_id;
 
-            if (Loan::where('id', '<>', $loan_id)
+            if (Loan::where('id', '<>', $id)
                 ->where('loan_type_id', $loan_type_id)
                 ->where('code', $request->input('code'))
                 ->count() > 0) {
@@ -238,8 +238,8 @@ class LoanController extends Controller
                 ->withInput();
         }
         else {
-            DB::transaction(function() use ($request, $loan_id) {
-                $loan = Loan::find($loan_id);
+            DB::transaction(function() use ($request, $id) {
+                $loan = Loan::find($id);
                 $loan->code = $request->input('code');
                 $loan->loaned_at = Diamond::parse($request->input('loaned_at'));
                 $loan->save();
@@ -247,14 +247,33 @@ class LoanController extends Controller
                 History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'แก้ไขข้อมูลสัญญาเงินกู้เลขที่ ' . $request->input('code'));
             });
 
-            return redirect()->action('Admin\LoanController@show', ['id' => $id, 'loan_id' => $loan_id])
+            return redirect()->action('Admin\LoanController@show', ['member_id' => $member_id, 'id' => $id])
                 ->with('flash_message', 'แก้ไขสัญญาเงินกู้เลขที่ ' . $request->input('code') . ' เรียบร้อยแล้ว')
                 ->with('callout_class', 'callout-success');
         }
     }
 
-    public function getCalSurety($id) {
-        $member = Member::find($id);
+    public function destroy($member_id, $id) {
+        $loan = Loan::find($id); 
+
+        DB::transaction(function() use ($loan) {
+            foreach ($loan->attachments as $attachment) {
+                Storage::disk('loans')->delete($attachment->file);
+            }
+
+            $loan_code = $loan->code;
+            $loan->delete();
+
+            History::addAdminHistory(Auth::guard($this->guard)->id(), 'ลบข้อมูล', 'ลบข้อมูลสัญญาเงินกู้เลขที่ ' . $loan_code);
+        });
+
+        return redirect()->action('Admin\LoanController@index', [ 'member_id' => $loan->member_id])
+            ->with('flash_message', 'ลบข้อมูลสัญญาเงินกู้เรียบร้อยแล้ว')
+            ->with('callout_class', 'callout-success');
+    }
+
+    public function getCalSurety($member_id) {
+        $member = Member::find($member_id);
 
         return view('admin.loan.calsurety', [
             'member' => $member

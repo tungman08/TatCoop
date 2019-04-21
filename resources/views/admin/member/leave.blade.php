@@ -9,8 +9,8 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการสมาชิกสหกรณ์', 'link' => '/service/member'],
-            ['item' => 'ข้อมูลสมาชิกสหกรณ์', 'link' => '/service/member/' . $member->id],
+            ['item' => 'จัดการสมาชิกสหกรณ์', 'link' => action('Admin\MemberController@index')],
+            ['item' => 'ข้อมูลสมาชิกสหกรณ์', 'link' => action('Admin\MemberController@show', ['id'=>$member->id])],
             ['item' => 'ลาออก', 'link' => ''],
         ]])
     </section>
@@ -103,7 +103,7 @@
             <!-- /.box-header -->
 
             <!-- form start -->
-            {{ Form::open(['url' => '/service/member/' . $member->id . '/leave', 'method' => 'post', 'class' => 'form-horizontal']) }}
+            {{ Form::open(['action' => ['Admin\MemberController@postLeave', $member->id], 'method' => 'post', 'class' => 'form-horizontal']) }}
                 <div class="box-body">
                     <div class="form-group padding-l-md padding-r-md">
                         {{ Form::label('member_code', 'รหัสสมาชิกที่ต้องการลาออก', [
@@ -190,7 +190,7 @@
             format: 'YYYY-MM-DD',
             useCurrent: false,
             focusOnShow: false,
-            buddhism: true
+            buddhismEra: true
         });
     });
     </script>

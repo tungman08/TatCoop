@@ -76,7 +76,7 @@
                 format: 'YYYY-MM-DD',
                 useCurrent: false,
                 focusOnShow: false,
-                buddhism: true
+                buddhismEra: true
             });
 
             $('#expire_date').datetimepicker({
@@ -85,7 +85,7 @@
                 format: 'YYYY-MM-DD',   
                 useCurrent: false,
                 focusOnShow: false,
-                buddhism: true
+                buddhismEra: true
             });
 
             $('#add_limit').click(function () {

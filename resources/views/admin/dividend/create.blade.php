@@ -32,7 +32,7 @@
 
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title">เพิ่มอัตราเงินปันผล/เฉลี่ยคืนประจำปี</h3>
+                <h3 class="box-title"><i class="fa fa-plus-circle"></i> เพิ่มอัตราเงินปันผล/เฉลี่ยคืนประจำปี</h3>
             </div>
             <!-- /.box-header -->
 
@@ -73,7 +73,7 @@
                 maxDate: moment(),
                 useCurrent: false,
                 focusOnShow: false,
-                buddhism: true
+                buddhismEra: true
             }).on('dp.hide', function(e){
                 setTimeout(function() {
                     $('#rate_year').data('DateTimePicker').viewMode('years');
@@ -86,7 +86,7 @@
                 format: 'YYYY-MM-DD',
                 useCurrent: false,
                 focusOnShow: false,
-                buddhism: true
+                buddhismEra: true
             });
         });
     </script>

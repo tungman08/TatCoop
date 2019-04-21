@@ -9,8 +9,8 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'ข้อมูลเงินปันผล/เฉลี่ยคืน', 'link' => 'service/dividend/member'],
-            ['item' => 'เงินปันผล/เฉลี่ยคืน', 'link' => 'service/' . $member->id . '/dividend/?year=' . $year],
+            ['item' => 'ข้อมูลเงินปันผล/เฉลี่ยคืน', 'link' => action('Admin\DividendController@getMember')],
+            ['item' => 'เงินปันผล/เฉลี่ยคืน', 'link' => action('Admin\DividendController@getMemberDividend', ['member_id'=>$member->id, 'year'=>$year])],
             ['item' => 'แก้ไข', 'link' => ''],
         ]])
     </section>
@@ -38,7 +38,7 @@
             <!-- /.box-header -->
 
             <!-- form start -->
-            {{ Form::model($dividend, ['route' => ['service.dividendmember.edit', $member->id, $dividend->id], 'method' => 'post', 'class' => 'form-horizontal']) }}
+            {{ Form::model($dividend, ['action' => ['Admin\DividendController@postMemberUpdate', $member->id, $dividend->id], 'method' => 'post', 'class' => 'form-horizontal']) }}
                 <div class="box-body">
                     <div class="form-group">
                         {{ Form::label('dividend_name', 'ชื่อ', [

@@ -62,12 +62,12 @@
                 <button class="btn btn-primary btn-flat margin-b-md" type="button"
                     {{ (($is_super || $is_admin) ? '' : 'disabled') }}
                     data-tooltip="true" title="เพิ่มสมาชิกสหกรณ์"
-                    onclick="javascript:document.location.href='{{ url('/service/member/create') }}';">
+                    onclick="javascript:document.location.href='{{ action('Admin\MemberController@create') }}';">
                     <i class="fa fa-user-plus"></i> เพิ่มสมาชิกสหกรณ์
                 </button>
 
                 <button class="btn btn-default btn-flat margin-b-md pull-right" type="button" data-tooltip="true" title="สมาชิกสหกรณ์ที่ลาออก"
-                    onclick="javascript:document.location.href='{{ url('/service/member/inactive') }}';">
+                    onclick="javascript:document.location.href='{{ action('Admin\MemberController@getInactive') }}';">
                     <i class="fa fa-trash"></i> แสดงสมาชิกที่ลาออก
                 </button>
 

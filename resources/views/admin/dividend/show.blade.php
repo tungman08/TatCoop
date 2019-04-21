@@ -9,7 +9,7 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'ข้อมูลเงินปันผล/เฉลี่ยคืน', 'link' => 'service/dividend/member'],
+            ['item' => 'ข้อมูลเงินปันผล/เฉลี่ยคืน', 'link' => action('Admin\DividendController@getMember')],
             ['item' => 'เงินปันผล/เฉลี่ยคืน', 'link' => ''],
         ]])
     </section>
@@ -50,22 +50,22 @@
 
         <div class="row margin-b-md">
             <div class="col-md-5ths">
-                <button type="button" class="btn btn-block btn-primary btn-lg" onclick="javascript:document.location.href='{{ url('/service/member/' . $member->id) }}';">
+                <button type="button" class="btn btn-block btn-primary btn-lg" onclick="javascript:document.location.href='{{ action('Admin\MemberController@show', ['id'=>$member->id]) }}';">
                     <i class="fa fa-user fa-fw"></i> ข้อมูลสมาชิก
                 </button>
             </div>
             <div class="col-md-5ths">
-                <button type="button" class="btn btn-block btn-success btn-lg" onclick="javascript:document.location.href='{{ url('/service/' . $member->id . '/shareholding') }}';">
+                <button type="button" class="btn btn-block btn-success btn-lg" onclick="javascript:document.location.href='{{ action('Admin\ShareholdingController@index', ['member_id'=>$member->id]) }}';">
                     <i class="fa fa-money fa-fw"></i> ทุนเรือนหุ้น
                 </button>
             </div>            
             <div class="col-md-5ths">
-                <button type="button" class="btn btn-block btn-danger btn-lg" onclick="javascript:document.location.href='{{ url('/service/' . $member->id . '/loan') }}';">
+                <button type="button" class="btn btn-block btn-danger btn-lg" onclick="javascript:document.location.href='{{ action('Admin\LoanController@index', ['member_id'=>$member->id]) }}';">
                     <i class="fa fa-credit-card fa-fw"></i> การกู้ยืม
                 </button>
             </div>
             <div class="col-md-5ths">
-                <button type="button" class="btn btn-block btn-warning btn-lg" onclick="javascript:document.location.href='{{ url('/service/' . $member->id . '/guaruntee') }}';">
+                <button type="button" class="btn btn-block btn-warning btn-lg" onclick="javascript:document.location.href='{{ action('Admin\GuarunteeController@index', ['member_id'=>$member->id]) }}';">
                     <i class="fa fa-share-alt fa-fw"></i> การค้ำประกัน
                 </button>
             </div>
@@ -103,9 +103,9 @@
                             <select class="form-control" id="selectyear" autocomplete="off">
                                 @foreach($dividend_years as $year)
                                     @if ($year->rate_year == $dividend->rate_year)
-                                        <option value="{{ $year->rate_year }}" selected>เงินปันผลปี {{ $year->rate_year + 543 }}</option>
+                                        <option value="{{ $year->rate_year }}" selected>ปี {{ $year->rate_year + 543 }}</option>
                                     @else 
-                                        <option value="{{ $year->rate_year }}">เงินปันผลปี {{ $year->rate_year + 543 }}</option>
+                                        <option value="{{ $year->rate_year }}">ปี {{ $year->rate_year + 543 }}</option>
                                     @endif
                                 @endforeach
                             </select>
@@ -134,7 +134,7 @@
                             @php($total = 0)
                             @foreach ($dividends as $dividend)
                                 @if ($is_super || $is_admin)
-                                <tr onclick="javascript: document.location.href  = '{{ url('/service/' . $member->id . '/dividend/' . $dividend->id . '/edit') }}';" style="cursor: pointer;">
+                                <tr onclick="javascript: document.location.href  = '{{ action('Admin\DividendController@getMemberEdit', ['member_id'=>$member->id, 'id'=>$dividend->id]) }}';" style="cursor: pointer;">
                                 @endif
                                     <td class="text-primary">{{ $dividend->dividend_name }}</td>
                                     <td class="text-right">{{ number_format($dividend->shareholding, 2, '.', ',') }}</td>

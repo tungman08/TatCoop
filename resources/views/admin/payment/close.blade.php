@@ -9,9 +9,9 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการการกู้ยืม', 'link' => '/service/loan/member'],
-            ['item' => 'การกู้ยืม', 'link' => '/service/' . $member->id . '/loan'],
-            ['item' => 'สัญญากู้ยืม', 'link' => '/service/' . $member->id . '/loan/' . $loan->id],
+            ['item' => 'จัดการการกู้ยืม', 'link' => action('Admin\LoanController@getMember')],
+            ['item' => 'การกู้ยืม', 'link' => action('Admin\LoanController@index', ['member_id'=>$member->id])],
+            ['item' => 'สัญญากู้ยืม', 'link' => action('Admin\LoanController@show', ['member_id'=>$member->id, 'id'=>$loan->id])],
             ['item' => 'ปิดยอดเงินกู้', 'link' => ''],
         ]])
     </section>
@@ -111,7 +111,7 @@
             <!-- /.box-header -->
 
             <!-- form start -->
-            {{ Form::open(['url' => '/service/' . $member->id . '/loan/' . $loan->id . '/payment/close', 'method' => 'post', 'class' => 'form-horizontal']) }}
+            {{ Form::open(['action' => ['Admin\PaymentController@postClose', $loan->id], 'method' => 'post', 'class' => 'form-horizontal']) }}
                 <div class="box-body">
                     <div class="form-group">
                         {{ Form::label('pay_date', 'วันที่ชำระ', [
@@ -252,7 +252,7 @@
                 format: 'YYYY-MM-DD',
                 useCurrent: false,
                 focusOnShow: false,
-                buddhism: true
+                buddhismEra: true
             });
 
             $('#calculate').click(function () {

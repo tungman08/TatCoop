@@ -9,8 +9,8 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการการกู้ยืม', 'link' => '/service/loan/member'],
-            ['item' => 'การกู้ยืม', 'link' => 'service/' . $loan->member->id . '/loan'],
+            ['item' => 'จัดการการกู้ยืม', 'link' => action('Admin\LoanController@getMember')],
+            ['item' => 'การกู้ยืม', 'link' => action('Admin\LoanController@index', ['member_id'=>$loan->member_id])],
             ['item' => 'ทำสัญญาเงินกู้', 'link' => ''],
         ]])
     </section>
@@ -41,7 +41,7 @@
                     <!-- /.box-header -->
 
                     <!-- form start -->
-                    {{ Form::model($loan, ['url' => '/service/' . $loan->member_id . '/loan/create/special/outsider', 'method' => 'post', 'class' => 'form-horizontal']) }}
+                    {{ Form::model($loan, ['action' => ['Admin\SpecialLoanController@getCreateOutsiderLoan', $loan->member_id], 'method' => 'post', 'class' => 'form-horizontal']) }}
                         {{ Form::hidden('id', null, ['id' => 'id']) }}
                         {{ Form::hidden('member_id', null, ['id' => 'member_id']) }}
 
@@ -122,7 +122,7 @@
             format: 'YYYY-MM-DD',
             useCurrent: false,
             focusOnShow: false,
-            buddhism: true
+            buddhismEra: true
         });
 
         if ($('#dataTables-loan').length) {

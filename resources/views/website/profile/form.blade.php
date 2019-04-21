@@ -90,13 +90,16 @@
             'class'=>'col-sm-2 control-label']) 
         }}
 
-        <div class="col-sm-10" style="padding: 0 5px;">
-            {{ Form::text('profile[birth_date]', null, [
-                'id' => 'birth_date',
-                'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
-                'autocomplete'=>'off',
-                'class'=>'form-control'])
-            }}       
+        <div class="col-sm-10">
+            <div class="input-group">
+                <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
+                {{ Form::text('profile[birth_date]', null, [
+                    'id' => 'birth_date',
+                    'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
+                    'autocomplete'=>'off',
+                    'class'=>'form-control'])
+                }}   
+            </div>    
         </div>
     </div>
     <div class="form-group">

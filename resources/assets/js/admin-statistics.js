@@ -9,7 +9,7 @@
         format: 'YYYY-MM',
         useCurrent: false,
         focusOnShow: false,
-        buddhism: true
+        buddhismEra: true
     }).on("dp.change", function (e) {
         $('.display-month').html(thai_date(e.date));
         detail_statistic(e.date);

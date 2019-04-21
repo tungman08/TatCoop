@@ -33,12 +33,12 @@
 
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title">แก้อัตราเงินปันผล/เฉลี่ยคืนประจำปี</h3>
+                <h3 class="box-title"><i class="fa fa-pencil"></i> แก้อัตราเงินปันผล/เฉลี่ยคืนประจำปี</h3>
 
                 <div class="btn-group pull-right">
                     <button type="button" class="btn btn-danger btn-xs"
                         data-tooltip="true" title="ลบ"
-                        onclick="javascript:return confirm('คุณต้องการลบรายการนี้ใช่ไหม ?');">
+                        onclick="javascript:var result = confirm('คุณต้องการลบรายการนี้ใช่ไหม ?'); if (result) { $('#delete_form').submit(); }">
                         <i class="fa fa-times"></i>
                     </button>
                 </div>
@@ -51,6 +51,9 @@
             {{ Form::close() }}
         </div>
         <!-- /.box -->
+
+        {{ Form::open(['action' => ['Admin\DividendController@destroy', $dividend->id], 'id' => 'delete_form', 'method' => 'delete']) }}
+        {{ Form::close() }}
     </section>
     <!-- /.content -->
 @endsection
@@ -80,7 +83,7 @@
                 viewMode: 'years',
                 useCurrent: false,
                 focusOnShow: false,
-                buddhism: true
+                buddhismEra: true
             }).on('dp.hide', function(e){
                 setTimeout(function() {
                     $('#rate_year').data('DateTimePicker').viewMode('years');
@@ -93,7 +96,7 @@
                 format: 'YYYY-MM-DD',
                 useCurrent: false,
                 focusOnShow: false,
-                buddhism: true
+                buddhismEra: true
             });
         });
     </script>

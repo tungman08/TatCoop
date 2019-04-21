@@ -9,8 +9,8 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการทุนเรือนหุ้น', 'link' => '/service/shareholding/member'],
-            ['item' => 'ทุนเรือนหุ้น', 'link' => '/service/' . $member->id . '/shareholding'],
+            ['item' => 'จัดการทุนเรือนหุ้น', 'link' => action('Admin\ShareholdingController@getMember')],
+            ['item' => 'ทุนเรือนหุ้น', 'link' => action('Admin\ShareholdingController@index', ['member_id'=>$member->id])],
             ['item' => Diamond::parse($shareholding->pay_date)->thai_format('M Y'), 'link' => action('Admin\ShareholdingController@getShow', ['member_id'=>$member->id, 'paydate'=>Diamond::parse($shareholding->pay_date)->format('Y-n-1')])],
             ['item' => 'รายละเอียด', 'link' => action('Admin\ShareholdingController@getDetail', ['member_id'=>$member->id, 'paydate'=>Diamond::parse($shareholding->pay_date)->format('Y-n-1'), 'id'=>$shareholding->id])],
             ['item' => 'แก้ไข', 'link' => ''],
@@ -36,7 +36,7 @@
 
         <div class="box box-primary">
             <div class="box-header with-border">
-                {{ Form::open(['url' => '/service/' . $member->id . '/shareholding/' . $shareholding->id, 'method' => 'delete']) }}
+                {{ Form::open(['action' => ['Admin\ShareholdingController@destroy', $member->id, $shareholding->id], 'method' => 'delete']) }}
                     <h3 class="box-title"><i class="fa fa-edit"></i> แก้ไขการชำระค่าหุ้น</h3>
 
                     {{ Form::button('<i class="fa fa-times"></i>', [
@@ -51,7 +51,7 @@
             <!-- /.box-header -->
 
             <!-- form start -->
-            {{ Form::model($shareholding, ['url' => ['/service/' . $member->id . '/shareholding', $shareholding->id], 'method' => 'put', 'class' => 'form-horizontal']) }}
+            {{ Form::model($shareholding, ['action' => ['Admin\ShareholdingController@update', $member->id, $shareholding->id], 'method' => 'put', 'class' => 'form-horizontal']) }}
                 @include('admin.shareholding.form', ['edit' => true])
             {{ Form::close() }}
 
@@ -92,7 +92,7 @@
             format: 'YYYY-MM-DD',
             useCurrent: false,
             focusOnShow: false,
-            buddhism: true
+            buddhismEra: true
         });
     });
     </script>

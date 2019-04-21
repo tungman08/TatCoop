@@ -9,9 +9,9 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการการกู้ยืม', 'link' => '/service/loan/member'],
-            ['item' => 'การกู้ยืม', 'link' => '/service/' . $member->id . '/loan'],
-            ['item' => 'สัญญากู้ยืม', 'link' => '/service/' . $member->id . '/loan/' . $loan->id],
+            ['item' => 'จัดการการกู้ยืม', 'link' => action('Admin\LoanController@getMember')],
+            ['item' => 'การกู้ยืม', 'link' => action('Admin\LoanController@index', ['member_id'=>$member->id])],
+            ['item' => 'สัญญากู้ยืม', 'link' => action('Admin\LoanController@show', ['member_id'=>$member->id, 'id'=>$loan->id])],
             ['item' => 'รายการผ่อนชำระ', 'link' => ''],
         ]])
     </section>
@@ -89,13 +89,13 @@
                     <!-- /.box-header -->
 
                     <div class="box-body">
-                        <button class="btn btn-primary btn-flat margin-b-sm" onclick="javascript:document.location.href='{{ url('/service/' . $member->id . '/loan/' . $loan->id . '/payment/billing/' . $payment->id . '/' . Diamond::parse($payment->pay_date)->format('Y-n-j')) }}';">
+                        <button class="btn btn-primary btn-flat margin-b-sm" onclick="javascript:document.location.href='{{ action('Admin\PaymentController@getBilling', ['payment_id'=>$payment->id,'paydate'=>Diamond::parse($payment->pay_date)->format('Y-n-j')]) }}';">
                             <i class="fa fa-file-text-o"></i> ใบเสร็จรับเงินการชำระเงินกู้
                         </button>
 
                         <button class="btn btn-primary btn-flat margin-b-sm pull-right"
                             {{ (($is_super || $is_admin) ? '' : 'disabled') }}
-                            onclick="javascript:document.location.href  = '{{ url('/service/' . $member->id . '/loan/' . $loan->id . '/payment/' . $payment->id . '/edit') }}';">
+                            onclick="javascript:document.location.href  = '{{ action('Admin\PaymentController@edit', ['loan_id'=>$loan->id, 'id'=>$payment->id]) }}';">
                             <i class="fa fa-pencil"></i> แก้ไข
                         </button>
 

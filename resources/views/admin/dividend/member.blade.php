@@ -73,9 +73,9 @@
                             <select class="form-control" id="selectyear" autocomplete="off">
                                 @foreach($dividend_years as $dividend_year)
                                     @if ($dividend_year->rate_year == $year)
-                                        <option value="{{ $dividend_year->rate_year }}" selected>เงินปันผล/เฉลี่ยคืนปี {{ $dividend_year->rate_year + 543 }}</option>
+                                        <option value="{{ $dividend_year->rate_year }}" selected>ปี {{ $dividend_year->rate_year + 543 }}</option>
                                     @else 
-                                        <option value="{{ $dividend_year->rate_year }}">เงินปันผล/เฉลี่ยคืนปี {{ $dividend_year->rate_year + 543 }}</option>
+                                        <option value="{{ $dividend_year->rate_year }}">ปี {{ $dividend_year->rate_year + 543 }}</option>
                                     @endif
                                 @endforeach
                             </select>
@@ -153,7 +153,7 @@
         summery($('#selectyear').val());
 
         $('#dataTables-users tbody').on('click', 'tr', function() {
-            document.location.href  = '/service/' + parseInt($(this).children("td").first().html()).toString() + '/dividend/?year=' + $('#selectyear').val();            
+            document.location.href  = '/service/dividend/member/' + parseInt($(this).children("td").first().html()).toString() + '/?year=' + $('#selectyear').val();            
         }); 
 
         $('#selectyear').change(function() {

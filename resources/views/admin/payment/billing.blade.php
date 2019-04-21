@@ -9,10 +9,10 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการการกู้ยืม', 'link' => '/service/loan/member'],
-            ['item' => 'การกู้ยืม', 'link' => '/service/' . $member->id . '/loan'],
-            ['item' => 'สัญญากู้ยืม', 'link' => '/service/' . $member->id . '/loan/' . $loan->id],
-            ['item' => 'รายการผ่อนชำระ', 'link' => '/service/' . $member->id . '/loan/' . $loan->id . '/payment/' . $payment->id],
+            ['item' => 'จัดการการกู้ยืม', 'link' => action('Admin\LoanController@getMember')],
+            ['item' => 'การกู้ยืม', 'link' => action('Admin\LoanController@index', ['member_id'=>$member->id])],
+            ['item' => 'สัญญากู้ยืม', 'link' => action('Admin\LoanController@show', ['member_id'=>$member->id, 'id'=>$loan->id])],
+            ['item' => 'รายการผ่อนชำระ', 'link' => action('Admin\PaymentController@show', ['loan_id'=>$loan->id, 'id'=>$payment->id])],
             ['item' => 'ใบเสร็จรับเงิน', 'link' => '']
         ]])
     </section>
@@ -27,11 +27,11 @@
             <!-- this row will not appear when printing -->
             <div class="row no-print" style="margin-top: 30px;">
                 <div class="col-xs-12">
-                    <a href="{{ url('/service/' . $member->id . '/loan/' . $loan->id . '/payment/print/' . $payment->id . '/' . $date->format('Y-n-j')) }}" target="_blank" class="btn btn-default btn-flat"><i class="fa fa-print"></i> พิมพ์</a>
+                    <a href="{{ action('Admin\PaymentController@getPrintBilling', ['payment_id'=>$payment->id, 'paydate'=>$date->format('Y-n-j')]) }}" target="_blank" class="btn btn-default btn-flat"><i class="fa fa-print"></i> พิมพ์</a>
                     <button type="button"
                         class="btn btn-primary btn-flat pull-right"
                         style="margin-right: 5px;"
-                        onclick="javascript:document.location.href  = '{{ url('/service/' . $member->id . '/loan/' . $loan->id . '/payment/pdf/' . $payment->id . '/' . $date->format('Y-m-d')) }}';">
+                        onclick="javascript:document.location.href  = '{{ action('Admin\PaymentController@getPdfBilling', ['payment_id'=>$payment->id, 'paydate'=>$date->format('Y-n-j')]) }}';">
                         <i class="fa fa-download"></i> บันทึกเป็น PDF
                     </button>
                 </div>

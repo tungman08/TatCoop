@@ -596,7 +596,7 @@
                     monthsViewHeader.eq(0).addClass('disabled');
                 }
 
-                monthsViewHeader.eq(1).text((options.buddhism) ? viewDate.year() + 543 : viewDate.year());
+                monthsViewHeader.eq(1).text((options.buddhismEra) ? viewDate.year() + 543 : viewDate.year());
 
                 if (!isValid(viewDate.clone().add(1, 'y'), 'y')) {
                     monthsViewHeader.eq(2).addClass('disabled');
@@ -631,14 +631,14 @@
                     yearsViewHeader.eq(0).addClass('disabled');
                 }
 
-                yearsViewHeader.eq(1).text((options.buddhism) ? (startYear.year() + 543) + '-' + (endYear.year() + 543) : startYear.year() + '-' + endYear.year());
+                yearsViewHeader.eq(1).text((options.buddhismEra) ? (startYear.year() + 543) + '-' + (endYear.year() + 543) : startYear.year() + '-' + endYear.year());
 
                 if (options.maxDate && options.maxDate.isBefore(endYear, 'y')) {
                     yearsViewHeader.eq(2).addClass('disabled');
                 }
 
                 while (!startYear.isAfter(endYear, 'y')) {
-                    html += '<span data-action="selectYear" class="year' + (startYear.isSame(date, 'y') && !unset ? ' active' : '') + (!isValid(startYear, 'y') ? ' disabled' : '') + '">' + ((options.buddhism) ? (startYear.year() + 543) : startYear.year()) + '</span>';
+                    html += '<span data-action="selectYear" class="year' + (startYear.isSame(date, 'y') && !unset ? ' active' : '') + (!isValid(startYear, 'y') ? ' disabled' : '') + '">' + ((options.buddhismEra) ? (startYear.year() + 543) : startYear.year()) + '</span>';
                     startYear.add(1, 'y');
                 }
 
@@ -665,7 +665,7 @@
                     decadesViewHeader.eq(0).addClass('disabled');
                 }
 
-                decadesViewHeader.eq(1).text((options.buddhism) ? (startDecade.year() + 543) + '-' + (endDecade.year() + 543) : startDecade.year() + '-' + endDecade.year());
+                decadesViewHeader.eq(1).text((options.buddhismEra) ? (startDecade.year() + 543) + '-' + (endDecade.year() + 543) : startDecade.year() + '-' + endDecade.year());
 
                 if (startDecade.isSame(moment({ y: 2000 })) || (options.maxDate && options.maxDate.isBefore(endDecade, 'y'))) {
                     decadesViewHeader.eq(2).addClass('disabled');
@@ -676,13 +676,13 @@
                     minDateDecade = options.minDate && options.minDate.isAfter(startDecade, 'y') && options.minDate.year() <= endDecadeYear;
                     maxDateDecade = options.maxDate && options.maxDate.isAfter(startDecade, 'y') && options.maxDate.year() <= endDecadeYear;
                     html += '<span data-action="selectDecade" class="decade' + (date.isAfter(startDecade) && date.year() <= endDecadeYear ? ' active' : '') +
-                        (!isValid(startDecade, 'y') && !minDateDecade && !maxDateDecade ? ' disabled' : '') + '" data-selection="' + (startDecade.year() + 6) + '">' + ((options.buddhism) ? (startDecade.year() + 1 + 543) + ' - ' + (startDecade.year() + 12 + 543) : (startDecade.year() + 1) + ' - ' + (startDecade.year() + 12)) + '</span>';
+                        (!isValid(startDecade, 'y') && !minDateDecade && !maxDateDecade ? ' disabled' : '') + '" data-selection="' + (startDecade.year() + 6) + '">' + ((options.buddhismEra) ? (startDecade.year() + 1 + 543) + ' - ' + (startDecade.year() + 12 + 543) : (startDecade.year() + 1) + ' - ' + (startDecade.year() + 12)) + '</span>';
                     startDecade.add(12, 'y');
                 }
                 html += '<span></span><span></span><span></span>'; //push the dangling block over, at least this way it's even
 
                 decadesView.find('td').html(html);
-                decadesViewHeader.eq(1).text((options.buddhism) ? (startedAt.year() + 1 + 543) + '-' + (startDecade.year() + 543) : (startedAt.year() + 1) + '-' + (startDecade.year()));
+                decadesViewHeader.eq(1).text((options.buddhismEra) ? (startedAt.year() + 1 + 543) + '-' + (startDecade.year() + 543) : (startedAt.year() + 1) + '-' + (startDecade.year()));
             },
 
             fillDate = function () {
@@ -703,7 +703,7 @@
                 daysViewHeader.eq(2).find('span').attr('title', options.tooltips.nextMonth);
 
                 daysView.find('.disabled').removeClass('disabled');
-                daysViewHeader.eq(1).text((options.buddhism) ? viewDate.clone().add(543, 'years').format(options.dayViewHeaderFormat) : viewDate.format(options.dayViewHeaderFormat));
+                daysViewHeader.eq(1).text((options.buddhismEra) ? viewDate.clone().add(543, 'years').format(options.dayViewHeaderFormat) : viewDate.format(options.dayViewHeaderFormat));
 
                 if (!isValid(viewDate.clone().subtract(1, 'M'), 'M')) {
                     daysViewHeader.eq(0).addClass('disabled');
@@ -1008,7 +1008,7 @@
                 },
 
                 selectYear: function (e) {
-                    var year = ((options.buddhism) ? (parseInt($(e.target).text(), 10) - 543) : parseInt($(e.target).text(), 10)) || 0;
+                    var year = ((options.buddhismEra) ? (parseInt($(e.target).text(), 10) - 543) : parseInt($(e.target).text(), 10)) || 0;
                     viewDate.year(year);
                     if (currentViewMode === minViewModeNumber) {
                         setValue(date.clone().year(viewDate.year()));
@@ -2327,16 +2327,16 @@
             return picker;
         };
 
-        picker.buddhism = function (buddhism) {
+        picker.buddhismEra = function (buddhismEra) {
             if (arguments.length === 0) {
-                return options.buddhism;
+                return options.buddhismEra;
             }
 
-            if (typeof buddhism !== 'boolean') {
-                throw new TypeError('buddhism() expects a boolean parameter');
+            if (typeof buddhismEra !== 'boolean') {
+                throw new TypeError('buddhismEra() expects a boolean parameter');
             }
 
-            options.buddhism = buddhism;
+            options.buddhismEra = buddhismEra;
 
             return picker;
         };
@@ -2644,7 +2644,7 @@
         disabledHours: false,
         enabledHours: false,
         viewDate: false,
-        buddhism: false
+        buddhismEra: false
     };
 
     return $.fn.datetimepicker;

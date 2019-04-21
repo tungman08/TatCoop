@@ -145,7 +145,7 @@
         });   
 
         $('#dataTables-users tbody').on('click', 'tr', function() {
-            document.location.href  = '/service/' + parseInt($(this).children("td").first().html()).toString() + '/guaruntee';            
+            document.location.href  = '/service/guaruntee/member/' + parseInt($(this).children("td").first().html()).toString();            
         });         
     });   
     

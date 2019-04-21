@@ -61,6 +61,7 @@ class MainMenu
             $database->add(new MenuItem(['title' => 'เงื่อนไขการค้ำประกัน', 'icon' => 'fa-id-card-o', 'url' => '/database/bailsman']));
             $database->add(new MenuItem(['title' => 'อัตราเงินปันผล/เฉลี่ยคืน', 'icon' => 'fa-heart', 'url' => '/database/dividend']));
             $database->add(new MenuItem(['title' => 'รูปแบบใบรับเงิน', 'icon' => 'fa-file-text-o', 'url' => '/database/billing']));
+            $database->add(new MenuItem(['title' => 'คำนำหน้านาม', 'icon' => 'fa-th-large', 'url' => '/database/prefix']));
             $menu->add($database);
         }
 
@@ -179,7 +180,12 @@ class MenuItem extends Properties
 
     // display
     public function display($url) {
-        $menu = ($url == url($this->url)) ? '<li class="active">' : '<li>';
+        if (url($url) == url($this->url)) {
+            $menu = '<li class="active">';
+        }
+        else {
+            $menu = ($this->url != '/') ? (starts_with(url($url), url($this->url))) ? '<li class="active">' : '<li>' : '<li>';
+        }
         $menu .= '<a href="' . url($this->url) . '">';
         $menu .= '<i class="fa ' . $this->icon . '"></i> <span>' . $this->title . '</span>';
 
@@ -283,7 +289,7 @@ class MenuTree extends Properties
 
     // display
     public function display($url) {
-        $menu = (str_contains($url, url($this->url))) ? '<li class="treeview active">' : '<li class="treeview">';
+        $menu = (starts_with(url($url), url($this->url))) ? '<li class="treeview active">' : '<li class="treeview">';
         $menu .= '<a href="#">';
         $menu .= '<i class="fa ' . $this->icon . '"></i> <span>' . $this->title . '</span>';
         $menu .= '<i class="fa fa-angle-left pull-right"></i>';

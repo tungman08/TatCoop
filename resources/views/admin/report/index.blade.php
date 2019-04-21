@@ -128,7 +128,7 @@
             format: 'YYYY',
             useCurrent: false,
             focusOnShow: false,
-            buddhism: true
+            buddhismEra: true
         });
 
         $('#monthly').datetimepicker({
@@ -137,7 +137,7 @@
             format: 'YYYY-MM',
             useCurrent: false,
             focusOnShow: false,
-            buddhism: true
+            buddhismEra: true
         });
     });
 
