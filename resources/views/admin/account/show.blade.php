@@ -9,7 +9,7 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'บัญชีสมาชิกสหกรณ์', 'link' => '/admin/account'],
+            ['item' => 'บัญชีสมาชิกสหกรณ์', 'link' => action('Admin\AccountController@index')],
             ['item' => $user->member->profile->fullname, 'link' => ''],
         ]])
     </section>
@@ -66,7 +66,7 @@
                 <!-- /.table-responsive --> 
 
                 <button class="btn btn-primary btn-flat margin-b-md" type="button"
-                    onclick="javascript:document.location.href='{{ url('/admin/account/' . $user->member->id . '/edit') }}';">
+                    onclick="javascript:document.location.href='{{ action('Admin\AccountController@edit', ['id'=>$user->member->id]) }}';">
                     <i class="fa fa-edit"></i> แก้ไขอีเมลบัญชีผู้ใช้
                 </button>
 

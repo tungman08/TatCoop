@@ -9,7 +9,7 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'ข้อมูลประเภทเงินกู้', 'link' => '/database/loantype'],
+            ['item' => 'ข้อมูลประเภทเงินกู้', 'link' => action('Admin\LoanTypeController@index')],
             ['item' => 'เพิ่ม', 'link' => ''],
         ]])
 
@@ -39,7 +39,7 @@
             <!-- /.box-header -->
 
             <!-- form start -->
-            {{ Form::open(['url' => '/database/loantype', 'method' => 'post', 'class' => 'form-horizontal']) }}
+            {{ Form::open(['action' => 'Admin\LoanTypeController@store', 'method' => 'post', 'class' => 'form-horizontal']) }}
                 @include('admin.loantype.form', ['edit' => false])
             {{ Form::close() }}
         </div>

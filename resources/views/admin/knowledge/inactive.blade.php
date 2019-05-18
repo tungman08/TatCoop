@@ -9,7 +9,7 @@
     </h1>
 
     @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-        ['item' => 'จัดการสาระน่ารู้', 'link' => '/website/knowledge'],
+        ['item' => 'จัดการสาระน่ารู้', 'link' => action('Admin\KnowledgeController@index')],
         ['item' => 'สาระน่ารู้ที่ถูกลบ', 'link' => ''],
     ]])
 
@@ -55,13 +55,13 @@
                                 <td>{{ Diamond::parse($inactive->created_at)->thai_format('Y-m-d') }}</td>
                                 <td>{{ Diamond::parse($inactive->deleted_at)->thai_format('Y-m-d') }}</td>
                                 <td>
-                                    {{ Form::open(['url' => '/website/knowledge/' . $inactive->id . '/restore', 'method' => 'post', 'class' => 'btn-group']) }}
+                                    {{ Form::open(['action' => ['Admin\KnowledgeController@postRestore', $inactive->id], 'method' => 'post', 'class' => 'btn-group']) }}
                                         {{ Form::button('<i class="fa fa-search"></i>', [
                                             'type' => 'button',
                                             'class'=>'btn btn-default btn-xs btn-flat',
 											'data-tooltip'=>true,
 											'title'=>'รายละเอียด',
-                                            'onclick'=>"javascript:document.location.href='/website/knowledge/inactive/" . $inactive->id . "';"])
+                                            'onclick'=>'javascript:document.location.href="' . action('Admin\KnowledgeController@getShowInactive', ['id'=>$inactive->id]) . '";'])
                                         }}
                                         {{ Form::button('<i class="fa fa-rotate-left"></i>', [
                                             'type' => 'submit',
@@ -72,7 +72,7 @@
                                         }}
                                     {{ Form::close() }}
 
-                                    {{ Form::open(['url' => '/website/knowledge/' . $inactive->id . '/forcedelete', 'method' => 'post', 'class' => 'btn-group']) }}
+                                    {{ Form::open(['action' => ['Admin\KnowledgeController@postForceDelete', $inactive->id], 'method' => 'post', 'class' => 'btn-group']) }}
 										{{ Form::hidden('hidden-' . $inactive->id, null, ['class' => 'btn']) }}
                                         {{ Form::button('<i class="fa fa-trash"></i>', [
                                             'type' => 'submit',

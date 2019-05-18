@@ -109,7 +109,7 @@
                         </thead>
                         <tbody>
                             @foreach($shareholdings as $index => $share)
-                                <tr onclick="javascript: document.location.href  = '{{ action('Admin\ShareholdingController@getShow', ['member_id'=>$member->id, 'paydate'=>$share->paydate]) }}';" style="cursor: pointer;">
+                                <tr onclick="javascript: document.location.href  = '{{ action('Admin\ShareholdingController@getMonth', ['member_id'=>$member->id, 'pay_date'=>$share->paydate]) }}';" style="cursor: pointer;">
                                     <td>{{ $index + 1 }}.</td>
                                     <td class="text-primary"><i class="fa fa-money fa-fw"></i> {{ Diamond::parse($share->paydate)->thai_format('F Y') }}</td>
                                     <td>{{ number_format($share->amount, 2, '.', ',') }} บาท</td>

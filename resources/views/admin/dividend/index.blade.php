@@ -47,7 +47,7 @@
 
             <div class="box-body">
                 <button class="btn btn-primary btn-flat margin-b-md" type="button" data-tooltip="true" title="เพิ่มอัตราเงินปันผล/เฉลี่ยคืนประจำปี"
-                    onclick="javascript:document.location.href='{{ url('/database/dividend/create') }}';">
+                    onclick="javascript:document.location.href='{{ action('Admin\DividendController@create') }}';">
                     <i class="fa fa-plus"></i> เพิ่มอัตราเงินปันผล/เฉลี่ยคืนประจำปี
                 </button>
 
@@ -64,7 +64,7 @@
                         </thead>
                         <tbody>
                             @foreach($dividends->sortByDesc('rate_year') as $index => $dividend)
-                                <tr style="cursor: pointer;" onclick="javascript: document.location.href = '{{ url('/database/dividend/' . $dividend->id . '/edit') }}';">
+                                <tr style="cursor: pointer;" onclick="javascript: document.location.href = '{{ action('Admin\DividendController@edit', ['id'=>$dividend->id]) }}';">
                                     <td>{{ $index + 1 }}.</td>
                                     <td class="text-primary">ปี {{ $dividend->rate_year + 543 }}</td>
                                     <td>{{ number_format($dividend->shareholding_rate, 1, '.', ',') }} %</td>

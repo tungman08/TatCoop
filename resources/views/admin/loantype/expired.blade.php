@@ -9,7 +9,7 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการประเภทเงินกู้', 'link' => '/database/loantype'],
+            ['item' => 'จัดการประเภทเงินกู้', 'link' => action('Admin\LoanTypeController@index')],
             ['item' => 'หมดอายุ', 'link' => ''],
         ]])
     </section>
@@ -49,7 +49,7 @@
                         </thead>
                         <tbody>
                             @foreach($loantypes as $index => $type)
-                            <tr onclick="javascript: document.location.href  = '{{ url('/database/loantype/expired/' . $type->id) }}';"
+                            <tr onclick="javascript: document.location.href  = '{{ action('Admin\LoanTypeController@getExpiredDetail', ['id'=>$type->id]) }}';"
                                 style="cursor: pointer;">
                                 <td>{{ $index + 1 }}.</td>
                                 <td class="text-primary"><i class="fa fa-credit-card fa-fw"></i> {{ $type->name }}</td>

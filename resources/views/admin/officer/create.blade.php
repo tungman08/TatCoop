@@ -9,7 +9,7 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการเจ้าหน้าที่สหกรณ์', 'link' => '/admin/administrator'],
+            ['item' => 'จัดการเจ้าหน้าที่สหกรณ์', 'link' => action('Admin\AdminController@index')],
             ['item' => 'เพิ่ม', 'link' => ''],
         ]])
     </section>
@@ -38,8 +38,8 @@
             <!-- /.box-header -->
 
             <!-- form start -->
-            {{ Form::open(['url' => '/admin/administrator', 'method' => 'post', 'class' => 'form-horizontal']) }}
-                @include('admin.administrator.form', ['edit' => false])
+            {{ Form::open(['action' => ['Admin\AdminController@store'], 'method' => 'post', 'class' => 'form-horizontal']) }}
+                @include('admin.officer.form', ['edit' => false])
             {{ Form::close() }}
         </div>
         <!-- /.box -->

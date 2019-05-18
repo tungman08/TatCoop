@@ -5,7 +5,7 @@
     <div class="col-lg-12">
         <h3 class="page-header">
             <ol class="breadcrumb">
-                <li><a href="{{ url('/') }}"><i class="fa fa-home fa-fw"></i></a></li>
+                <li><a href="{{ action('Website\HomeController@index') }}"><i class="fa fa-home fa-fw"></i></a></li>
                 @if (empty($link))
                     <li class="active">{{ $header }}</li>
                 @else

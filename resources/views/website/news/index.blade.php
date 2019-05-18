@@ -5,7 +5,7 @@
         <div class="col-lg-12">
             <h3 class="page-header">
                 <ol class="breadcrumb">
-                    <li><a href="{{ url('/') }}"><i class="fa fa-home fa-fw"></i></a></li>
+                    <li><a href="{{ action('Website\HomeController@index') }}"><i class="fa fa-home fa-fw"></i></a></li>
                     <li class="active">ข่าวสารสำหรับสมาชิก</li>            
                 </ol>
             </h3>
@@ -22,13 +22,13 @@
                             <div class="caption">
                                 <h4 class="pull-right">&nbsp;</h4>
                                 <h4>
-                                    <a href="{{ url('/news/' . $item->id) }}">{{ $item->title }}</a>
+                                    <a href="{{ action('Website\NewsController@show', ['id'=>$item->id]) }}" data-tooltip="true" title="{{ $item->title }}">{{ $item->title }}</a>
                                 </h4>
                                 {{--<p>{!! html_entity_decode($item->content) !!}</p>--}}
                             </div>
-                            <div class="ratings">
-                                <p class="pull-right">อ่าน: {{ number_format($item->viewer, 0, '.', ',') }}</p>
-                                <p><i class="fa fa-clock-o"></i> {{ (Diamond::now()->diff(Diamond::parse($item->created_at))->days > 1) ? Diamond::parse($item->created_at)->thai_format('j M Y') : Diamond::parse($item->created_at)->thai_diffForHumans() }}</p>
+                            <div class="ratings text-left">
+                                <span><i class="fa fa-clock-o"></i> {{ (Diamond::now()->diff(Diamond::parse($item->created_at))->days > 1) ? Diamond::parse($item->created_at)->thai_format('j M Y') : Diamond::parse($item->created_at)->thai_diffForHumans() }}</span>
+                                <span class="pull-right">อ่าน: {{ number_format($item->viewer, 0, '.', ',') }}</span>
                             </div>
                         </div>
                     </div>

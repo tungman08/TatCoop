@@ -9,7 +9,7 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการเงินปันผล/เฉลี่ยคืน', 'link' => '/database/dividend'],
+            ['item' => 'จัดการเงินปันผล/เฉลี่ยคืน', 'link' => action('Admin\DividendController@index')],
             ['item' => 'เพิ่ม', 'link' => ''],
         ]])
     </section>
@@ -37,7 +37,7 @@
             <!-- /.box-header -->
 
             <!-- form start -->
-            {{ Form::open(['url' => '/database/dividend', 'method' => 'post', 'class' => 'form-horizontal']) }}
+            {{ Form::open(['action' => 'Admin\DividendController@store', 'method' => 'post', 'class' => 'form-horizontal']) }}
                 @include('admin.dividend.form', ['edit' => false])
             {{ Form::close() }}
         </div>

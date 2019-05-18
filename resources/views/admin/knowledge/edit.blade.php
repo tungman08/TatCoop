@@ -9,8 +9,8 @@
     </h1>
 
     @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-        ['item' => 'จัดการสาระน่ารู้', 'link' => '/website/knowledge'],
-        ['item' => 'แสดงรายละเอียด', 'link' => '/website/knowledge/' . $knowledge->id],
+        ['item' => 'จัดการสาระน่ารู้', 'link' => action('Admin\KnowledgeController@index')],
+        ['item' => 'แสดงรายละเอียด', 'link' => action('Admin\KnowledgeController@show', ['id'=>$knowledge->id])],
         ['item' => 'แก้ไข', 'link' => ''],
     ]])
 
@@ -42,7 +42,7 @@
                     <!-- /.box-header -->
 
                     <!-- form start -->
-                    {{ Form::model($knowledge, ['route' => ['website.knowledge.update', $knowledge->id], 'method' => 'put', 'class' => 'form-horizontal']) }}
+                    {{ Form::model($knowledge, ['action' => ['Admin\KnowledgeController@update', $knowledge->id], 'method' => 'put', 'class' => 'form-horizontal']) }}
                         @include('admin.knowledge.form', ['edit' => true])
                     {{ Form::close() }}          
                 </div>

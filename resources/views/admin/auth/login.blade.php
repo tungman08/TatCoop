@@ -8,7 +8,7 @@
     </div>
     <!-- /.login-logo -->
 
-    {{ Form::open(['url' => '/auth/login', 'role' => 'form']) }}
+    {{ Form::open(['action' => 'Admin\AuthController@postLogin', 'method' => 'post', 'role' => 'form']) }}
         <div class="form-group">
             <div class="input-group">
                 <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>

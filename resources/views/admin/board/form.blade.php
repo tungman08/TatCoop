@@ -93,7 +93,7 @@
     @if ($edit)
         {{ Form::button('<i class="fa fa-trash"></i> ลบ', [
             'class'=>'btn btn-danger btn-flat pull-right', 
-            'onclick'=>'javascript:document.location.href = "/admin/board/' . $id . '/delete";'])
+            'onclick'=>'javascript:document.location.href = "' . action('Admin\BoardController@getDelete', ['id'=>$id]) . '";'])
         }}
     @endif
 </div>

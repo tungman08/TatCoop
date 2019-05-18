@@ -8,7 +8,7 @@
     </div>
     <!-- /.login-logo -->
 
-    {{ Form::open(['url' => '/auth/login', 'role' => 'form']) }}
+    {{ Form::open(['action' => 'Website\AuthController@postLogin', 'method'=>'post', 'role' => 'form']) }}
         <div class="form-group">
             <div class="input-group">
                 <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
@@ -74,8 +74,8 @@
         </div>
     @endif
 
-    <a href="{{ url('/password/email') }}">ลืมรหัสผ่าน ?</a><br>
-    <a href="{{ url('/auth/register') }}" class="text-center">ลงทะเบียนใช้บริการอิเล็กทรอนิกส์</a>
+    <a href="{{ action('Website\PasswordController@getEmail') }}">ลืมรหัสผ่าน ?</a><br>
+    <a href="{{ action('Website\AuthController@getRegister') }}" class="text-center">ลงทะเบียนใช้บริการอิเล็กทรอนิกส์</a>
 </div>
 <!-- /.login-box-body -->
 @endsection

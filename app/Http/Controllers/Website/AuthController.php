@@ -37,7 +37,7 @@ class AuthController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/member';
+    protected $redirectTo = '/member/home';
 
     /**
      * Where to redirect users after logout.

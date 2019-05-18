@@ -8,8 +8,8 @@
         <small>รายละเอียดข้อมูลใบเสร็จรับเงินค่างวดของสมาชิก</small>
     </h1>
     @include('website.member.breadcrumb', ['breadcrumb' => [
-        ['item' => 'การกู้ยืม', 'link' => '/member/loan'],
-        ['item' => 'สัญญาเงินกู้', 'link' => '/member/loan/' . $loan->id],
+        ['item' => 'การกู้ยืม', 'link' => action('Website\LoanController@index')],
+        ['item' => 'สัญญาเงินกู้', 'link' => action('Website\LoanController@show', ['id'=>$loan->id])],
         ['item' => 'ใบเสร็จรับเงิน', 'link' => '']
     ]])
     </section>
@@ -24,11 +24,11 @@
             <!-- this row will not appear when printing -->
             <div class="row no-print" style="margin-top: 30px;">
                 <div class="col-xs-12">
-                    <a href="{{ url('/member/loan/' . $loan->id . '/' . $payment->id . '/billing/' . $date->format('Y-m-d') . '/print') }}" target="_blank" class="btn btn-default btn-flat"><i class="fa fa-print"></i> พิมพ์</a>
+                    <a href="{{ action('Website\LoanController@getPrint', ['loan_id'=>$loan->id, 'payment_id'=>$payment->id, 'date'=>$date->format('Y-m-d')]) }}" target="_blank" class="btn btn-default btn-flat"><i class="fa fa-print"></i> พิมพ์</a>
                     <button type="button"
                         class="btn btn-primary btn-flat pull-right"
                         style="margin-right: 5px;"
-                        onclick="javascript:document.location.href  = '{{ url('/member/loan/' . $loan->id . '/' . $payment->id . '/billing/' . $date->format('Y-m-d') . '/pdf') }}';">
+                        onclick="javascript:document.location.href  = '{{ action('Website\LoanController@getPdf', ['loan_id'=>$loan->id, 'payment_id'=>$payment->id, 'date'=>$date->format('Y-m-d')]) }}';">
                         <i class="fa fa-download"></i> บันทึกเป็น PDF
                     </button>
                 </div>

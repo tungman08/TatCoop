@@ -9,7 +9,7 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการคณะกรรมการ', 'link' => '/admin/board'],
+            ['item' => 'จัดการคณะกรรมการ', 'link' => action('Admin\BoardController@index')],
             ['item' => 'เพิ่ม', 'link' => ''],
         ]])
     </section>
@@ -38,7 +38,7 @@
             <!-- /.box-header -->
 
             <!-- form start -->
-            {{ Form::open(['url' => '/admin/board', 'method' => 'post', 'class' => 'form-horizontal']) }}
+            {{ Form::open(['action' => 'Admin\BoardController@store', 'method' => 'post', 'class' => 'form-horizontal']) }}
                 @include('admin.board.form', ['edit' => false])
             {{ Form::close() }}
         </div>

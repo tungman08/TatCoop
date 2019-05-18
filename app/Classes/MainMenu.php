@@ -9,7 +9,7 @@ class MainMenu
 {
     public function member($url) {
         $menu = new Menu($url);
-        $menu->add(new MenuItem(['title' => 'หน้าหลัก', 'icon' => 'fa-home', 'url' => "/member"]));
+        $menu->add(new MenuItem(['title' => 'หน้าหลัก', 'icon' => 'fa-home', 'url' => "/member/home"]));
         $menu->add(new MenuItem(['title' => 'ทุนเรือนหุ้น', 'icon' => 'fa-money', 'url' => "/member/shareholding"]));
         $menu->add(new MenuItem(['title' => 'การกู้ยืม', 'icon' => 'fa-credit-card', 'url' => "/member/loan"]));
         $menu->add(new MenuItem(['title' => 'การค้ำประกัน', 'icon' => 'fa-share-alt', 'url' => "/member/guaruntee"]));
@@ -29,10 +29,10 @@ class MainMenu
         if ($super || $admin || $viewer) {
             $service = new MenuTree(['title' => 'บริการสมาชิก', 'icon' => 'fa-tag', 'url' => '/service']);
             $service->add(new MenuItem(['title' => 'สมาชิกสหกรณ์', 'icon' => 'fa-users', 'url' => '/service/member']));
-            $service->add(new MenuItem(['title' => 'ทุนเรือนหุ้น', 'icon' => 'fa-money', 'url' => '/service/shareholding/member']));
-            $service->add(new MenuItem(['title' => 'การกู้ยืม', 'icon' => 'fa-credit-card', 'url' => '/service/loan/member']));
-            $service->add(new MenuItem(['title' => 'การค้ำประกัน', 'icon' => 'fa-share-alt', 'url' => '/service/guaruntee/member']));
-            $service->add(new MenuItem(['title' => 'เงินปันผล/เฉลี่ยคืน', 'icon' => 'fa-heart-o', 'url' => '/service/dividend/member']));
+            $service->add(new MenuItem(['title' => 'ทุนเรือนหุ้น', 'icon' => 'fa-money', 'url' => '/service/shareholding']));
+            $service->add(new MenuItem(['title' => 'การกู้ยืม', 'icon' => 'fa-credit-card', 'url' => '/service/loan']));
+            $service->add(new MenuItem(['title' => 'การค้ำประกัน', 'icon' => 'fa-share-alt', 'url' => '/service/guaruntee']));
+            $service->add(new MenuItem(['title' => 'เงินปันผล/เฉลี่ยคืน', 'icon' => 'fa-heart-o', 'url' => '/service/dividend']));
             $menu->add($service);
         }
         
@@ -67,7 +67,7 @@ class MainMenu
 
         if ($super || $admin || $viewer) {
             $officer = new MenuTree(['title' => 'ผู้ดูแลระบบ', 'icon' => 'fa-gears', 'url' => '/admin']);
-            if ($super) $officer->add(new MenuItem(['title' => 'บัญชีเจ้าหน้าที่สหกรณ์', 'icon' => 'fa-user-circle-o', 'url' => '/admin/administrator']));
+            if ($super) $officer->add(new MenuItem(['title' => 'บัญชีเจ้าหน้าที่สหกรณ์', 'icon' => 'fa-user-circle-o', 'url' => '/admin/officer']));
             if ($super || $admin) $officer->add(new MenuItem(['title' => 'บัญชีคณะกรรมการ', 'icon' => 'fa-user-circle-o', 'url' => '/admin/board']));
             if ($super || $admin) $officer->add(new MenuItem(['title' => 'บัญชีสมาชิกสหกรณ์', 'icon' => 'fa-user-circle-o', 'url' => '/admin/account']));
             if ($super || $admin) $officer->add(new MenuItem(['title' => 'จับรางวัล', 'icon' => 'fa-smile-o', 'url' => '/admin/reward']));

@@ -143,7 +143,7 @@
         });   
 
         $('#dataTables-users tbody').on('click', 'tr', function() {
-            document.location.href  = '/service/shareholding/member/' + parseInt($(this).children("td").first().html()).toString();            
+            document.location.href  = '/service/shareholding/member/' + parseInt($(this).children("td").first().html()).toString() + '/payment';            
         });         
     }); 
    

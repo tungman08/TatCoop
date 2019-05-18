@@ -9,8 +9,8 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการคณะกรรมการ', 'link' => '/admin/board'],
-            ['item' => 'ข้อมูลคณะกรรมการ', 'link' => '/admin/board/' . $board->id],
+            ['item' => 'จัดการคณะกรรมการ', 'link' => action('Admin\BoardController@index')],
+            ['item' => 'ข้อมูลคณะกรรมการ', 'link' => action('Admin\BoardController@show', ['id'=>$board->id])],
             ['item' => 'แก้ไข', 'link' => ''],
         ]])
     </section>
@@ -39,7 +39,7 @@
             <!-- /.box-header -->
 
             <!-- form start -->
-            {{ Form::model($board, ['route' => ['admin.board.update', $board->id], 'method' => 'put', 'class' => 'form-horizontal']) }}
+            {{ Form::model($board, ['action' => ['Admin\BoardController@update', $board->id], 'method' => 'put', 'class' => 'form-horizontal']) }}
                 {{ Form::hidden('board_id', $board->id, ['id'=>'board_id']) }}
 
                 @include('admin.board.form', ['edit' => true, 'id' => $board->id])

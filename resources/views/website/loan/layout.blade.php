@@ -62,7 +62,7 @@
         <div class="container">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
-                <a class="navbar-brand" href="{{ url('/') }}">สอ.สรทท.</a>
+                <a class="navbar-brand" href="{{ action('Website\HomeController@index') }}">สอ.สรทท.</a>
             </div>
         </div>
         <!-- /.container -->

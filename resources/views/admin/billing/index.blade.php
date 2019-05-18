@@ -24,12 +24,12 @@
             <div style="padding-top: 20px;">
                 @if (empty($billing))
                     <button class="btn btn-primary btn-flat" type="button" data-tooltip="true" title="เพิ่มชื่อผู้จัดการ/เหรัญญิก"
-                        onclick="javascript:document.location.href='{{ url('/database/billing/create') }}';">
+                        onclick="javascript:document.location.href='{{ action('Admin\BillingController@create') }}';">
                         <i class="fa fa-plus-circle"></i> เพิ่มชื่อผู้จัดการ/เหรัญญิก
                     </button>
                 @else
                     <button class="btn btn-primary btn-flat" type="button" data-tooltip="true" title="แก้ไขชื่อผู้จัดการ/เหรัญญิก"
-                        onclick="javascript:document.location.href='{{ url('/database/billing/' . $billing->id . '/edit') }}';">
+                        onclick="javascript:document.location.href='{{ action('Admin\BillingController@edit', ['id'=>$billing->id]) }}';">
                         <i class="fa fa-edit"></i> แก้ไขชื่อผู้จัดการ/เหรัญญิก
                     </button>
                 @endif

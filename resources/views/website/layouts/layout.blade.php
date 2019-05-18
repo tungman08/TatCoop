@@ -15,7 +15,7 @@
     <meta name="author" content="Tungm@n" />
     <meta name="csrf-token" content="{{ csrf_token() }}" />
 
-    <title>:: สหกรณ์ออมทรัพย์สหภาพแรงงานรัฐวิสาหกิจการท่องเที่ยวแห่งประเทศไทย ::</title>
+    <title>:: สหกรณ์ออมทรัพย์สหภาพแรงงานรัฐวิสาหกิจการท่องเที่ยวแห่งประเทศไทย จำกัด ::</title>
 
     <!-- Bootstrap Core CSS -->
     {{ Html::style(elixir('css/bootstrap.css')) }}
@@ -26,6 +26,7 @@
 
     <!-- Custom CSS -->
     {{ Html::style(elixir('css/metisMenu.css')) }}
+    {{ Html::style(elixir('css/homepage.css')) }}
     {{ Html::style(elixir('css/announce.css')) }}
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -44,7 +45,7 @@
         <div class="container">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
-                <a class="navbar-brand" href="{{ url('/') }}">สอ.สรทท.</a>
+                <a class="navbar-brand" href="{{ action('Website\HomeController@index') }}">สอ.สรทท.</a>
             </div>
         </div>
         <!-- /.container -->

@@ -37,12 +37,12 @@
             <div class="pull-left">
                 {{ Form::button('<i class="fa fa-user"></i> ข้อมูลผู้ใช้งาน', [
                     'class' => 'btn btn-default btn-flat',
-                    'onclick' => 'javascript:document.location.href = "' . url('/user/profile') . '"']) }}
+                    'onclick' => 'javascript:document.location.href = "' . action('Admin\UserController@getProfile') . '"']) }}
             </div>
             <div class="pull-right">
                 {{ Form::button('<i class="fa fa-sign-out"></i> ออกจากระบบ', [
                     'class' => 'btn btn-default btn-flat',
-                    'onclick' => 'javascript:var result = confirm(\'คุณต้องการออกจากระบบใช่ไหม ?\'); if (result) { document.location.href = "' . url('/auth/logout') . '" }']) }}
+                    'onclick' => 'javascript:var result = confirm(\'คุณต้องการออกจากระบบใช่ไหม ?\'); if (result) { document.location.href = "' . action('Admin\AuthController@getLogout') . ';" }']) }}
             </div>
         </li>
     </ul>

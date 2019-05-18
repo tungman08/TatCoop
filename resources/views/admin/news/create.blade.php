@@ -9,7 +9,7 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการข่าวสารสำหรับสมาชิก', 'link' => '/website/news'],
+            ['item' => 'จัดการข่าวสารสำหรับสมาชิก', 'link' => action('Admin\NewsController@index')],
             ['item' => 'เพิ่ม', 'link' => ''],
         ]])
     </section>
@@ -38,7 +38,7 @@
             <!-- /.box-header -->
 
             <!-- form start -->
-            {{ Form::open(['url' => '/website/news', 'method' => 'post', 'class' => 'form-horizontal']) }}
+            {{ Form::open(['action' => 'Admin\NewsController@store', 'method' => 'post', 'class' => 'form-horizontal']) }}
                 @include('admin.news.form', ['edit' => false])
             {{ Form::close() }}    
         </div>

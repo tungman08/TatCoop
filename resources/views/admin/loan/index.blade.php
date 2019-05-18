@@ -170,7 +170,7 @@
                         @endforeach
                     </select>
                     <button class="btn btn-primary btn-flat margin-t-lg margin-b-lg"
-                        onclick="javascript:document.location.href='/service/loan/member/{{ $member->id }}/' + $('#loantype').val() + '/create';">
+                        onclick="javascript:document.location.href='/service/loan/member/{{ $member->id }}/loantype/' + $('#loantype').val() + '/createloan';">
                         <i class="fa fa-file-o"></i> ทำสัญญา
                     </button>
                 </div>

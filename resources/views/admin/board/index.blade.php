@@ -42,11 +42,11 @@
 
             <div class="box-body">
                 <button class="btn btn-primary btn-flat" style="margin-top: 15px; margin-bottom: 15px;"
-                    onclick="javascript:document.location.href='{{ url('/admin/board/create') }}';">
+                    onclick="javascript:document.location.href='{{ action('Admin\BoardController@create') }}';">
                     <i class="fa fa-user-plus"></i> เพื่อบัญชีคณะกรรมการ
                 </button>
                 <button class="btn btn-default btn-flat pull-right" style="margin-top: 15px; margin-bottom: 15px;"
-                    onclick="javascript:document.location.href='{{ url('/admin/board/inactive') }}';">
+                    onclick="javascript:document.location.href='{{ action('Admin\BoardController@getInactive') }}';">
                     <i class="fa fa-trash"></i> คณะกรรมการที่ถูกลบ
                 </button>
 

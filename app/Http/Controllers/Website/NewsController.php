@@ -11,7 +11,7 @@ use App\News;
 class NewsController extends Controller
 {
     public function index() {
-        $newses = News::orderBy('id', 'desc')->paginate(8);
+        $newses = News::orderBy('id', 'desc')->paginate(16);
 
         return view('website.news.index', [
             'newses' => $newses

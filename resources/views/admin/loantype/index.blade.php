@@ -42,15 +42,15 @@
 
             <div class="box-body">
                 <button class="btn btn-primary btn-flat margin-b-md" type="button" data-tooltip="true" title="เพิ่มประเภทเงินกู้"
-                    onclick="javascript:document.location.href='{{ url('/database/loantype/create') }}';">
+                    onclick="javascript:document.location.href='{{ action('Admin\LoanTypeController@create') }}';">
                     <i class="fa fa-plus"></i> เพิ่มประเภทเงินกู้
                 </button>
                 <button class="btn btn-default btn-flat margin-b-md pull-right" type="button" data-tooltip="true" title="สมาชิกประเภทเงินกู้ที่ถูกลบ"
-                    onclick="javascript:document.location.href='{{ url('/database/loantype/inactive') }}';">
+                    onclick="javascript:document.location.href='{{ action('Admin\LoanTypeController@getInactive') }}';">
                     <i class="fa fa-trash"></i> แสดงประเภทเงินกู้ที่ถูกลบ
                 </button>
                 <button class="btn btn-default btn-flat margin-b-md margin-r-sm pull-right" type="button" data-tooltip="true" title="สมาชิกประเภทเงินกู้ที่หมดอายุ"
-                    onclick="javascript:document.location.href='{{ url('/database/loantype/expired') }}';">
+                    onclick="javascript:document.location.href='{{ action('Admin\LoanTypeController@getExpired') }}';">
                     <i class="fa fa-ban"></i> แสดงประเภทเงินกู้ที่สิ้นสุดการใช้
                 </button>
 
@@ -68,7 +68,7 @@
                         </thead>
                         <tbody>
                             @foreach($loantypes as $index => $type)
-                            <tr onclick="javascript: document.location.href  = '{{ url('/database/loantype/' . $type->id) }}';"
+                            <tr onclick="javascript: document.location.href  = '{{ action('Admin\LoanTypeController@show', ['id'=>$type->id]) }}';"
                                 style="cursor: pointer;">
                                 <td>{{ $index + 1 }}.</td>
                                 <td class="text-primary"><i class="fa fa-credit-card fa-fw"></i> {{ $type->name }}</td>

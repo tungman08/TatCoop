@@ -9,7 +9,7 @@
     </h1>
 
     @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-        ['item' => 'จัดการสาระน่ารู้', 'link' => '/website/knowledge'],
+        ['item' => 'จัดการสาระน่ารู้', 'link' => action('Admin\KnowledgeController@index')],
         ['item' => 'แสดงรายละเอียด', 'link' => ''],
     ]])
 
@@ -42,7 +42,7 @@
                 <h3 class="box-title"><i class="fa fa-commenting"></i> สาระน่ารู้เกี่ยวกับสหกรณ์</h3>
                 <div class="btn-group pull-right">
                     <button type="button" class="btn btn-default btn-flat btn-xs"
-                        onclick="javascript:document.location.href='{{ url('/website/knowledge/' . $knowledge->id . '/edit') }}';">
+                        onclick="javascript:document.location.href='{{ action('Admin\KnowledgeController@edit', ['id'=>$knowledge->id]) }}';">
                         แก้ไข
                     </button>
                     <button type="button" class="btn btn-default btn-flat dropdown-toggle btn-xs" data-toggle="dropdown">
@@ -50,16 +50,14 @@
                         <span class="sr-only">Toggle Dropdown</span>
                     </button>
                     <ul class="dropdown-menu" role="menu">
-                        <li><a style="cursor: pointer;" onclick="javascript:document.location.href='{{ url('/website/knowledge/' . $knowledge->id . '/edit') }}';"><i class="fa fa-edit"></i> แก้ไข</a></li>
-                        <li><a style="cursor: pointer;" onclick="javascript:result = confirm('คุณต้องการลบรายการนี้ใช่ไหม ?'); if (result) { $('#delete_item').click(); }"><i class="fa fa-trash"></i> ลบ</a></li>
+                        <li><a style="cursor: pointer;" onclick="javascript:document.location.href='{{ action('Admin\KnowledgeController@edit', ['id'=>$knowledge->id]) }}';"><i class="fa fa-edit"></i> แก้ไข</a></li>
+                        <li><a style="cursor: pointer;" onclick="javascript:result = confirm('คุณต้องการลบรายการนี้ใช่ไหม ?'); if (result) { $('#delete_form').submit(); }"><i class="fa fa-trash"></i> ลบ</a></li>
                     </ul>
                 </div>
             </div>
             <!-- /.box-header -->
 
-            {{ Form::open(['url' => '/website/knowledge/' . $knowledge->id]) }}
-                {{ Form::hidden('_method', 'delete') }}
-                {{ Form::submit('Delete', ['id' => 'delete_item', 'style' => 'display: none;']) }}
+            {{ Form::open(['action' => ['Admin\KnowledgeController@destroy', $knowledge->id], 'method' => 'delete', 'id' => 'delete_form']) }}
             {{ Form::close() }}    
 
             <div class="box-body">

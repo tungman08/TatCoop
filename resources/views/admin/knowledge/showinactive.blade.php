@@ -9,8 +9,8 @@
     </h1>
 
     @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-        ['item' => 'จัดการสาระน่ารู้', 'link' => '/website/knowledge'],
-		['item' => 'สาระน่ารู้ที่ถูกลบ', 'link' => '/website/knowledge/inactive'],
+        ['item' => 'จัดการสาระน่ารู้', 'link' => action('Admin\KnowledgeController@index')],
+		['item' => 'สาระน่ารู้ที่ถูกลบ', 'link' => action('Admin\KnowledgeController@getInactive')],
         ['item' => 'แสดงรายละเอียด', 'link' => ''],
     ]])
 

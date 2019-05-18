@@ -9,7 +9,7 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'ผู้ใช้งาน', 'link' => '/user/profile'],
+            ['item' => 'ผู้ใช้งาน', 'link' => action('Admin\UserController@getProfile')],
             ['item' => 'เปลี่ยนรหัสผ่าน', 'link' => ''],
         ]])
     </section>
@@ -31,18 +31,18 @@
                     <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
                         <i class="fa fa-minus"></i>
                     </button>
-                    <button type="button" class="btn btn-box-tool" data-toggle="tooltip" title="Close" onclick="javascript:location.href='{{ url('/user/profile') }}';">
+                    <button type="button" class="btn btn-box-tool" data-toggle="tooltip" title="Close" onclick="javascript:location.href='{{ action('Admin\UserController@getProfile') }}';">
                         <i class="fa fa-times"></i>
                     </button>
                 </div>
             </div>
             <!-- /.box-title -->
 
-            {{ Form::open(['url' => '/user/password', 'role' => 'form']) }}
+            {{ Form::open(['action' => 'Admin\UserController@postPassword', 'method' => 'post', 'role' => 'form']) }}
                 <div class="box-body">
                     <div class="panel-body">
                         <div class="row">
-                            <div class="col-md-3 col-lg-3 " align="center">
+                            <div class="col-md-3 col-lg-3" align="center">
                                 <img class="profile-user-img img-circle img-responsive" style="width: 200px; height: 200px; margin-bottom: 30px;" src="{{ asset('images/user.png') }}" alt="User Pic">
                             </div>
                             <div class=" col-md-9 col-lg-9 ">

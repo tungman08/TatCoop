@@ -9,7 +9,7 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการคณะกรรมการ', 'link' => '/admin/board'],
+            ['item' => 'จัดการคณะกรรมการ', 'link' => action('Admin\BoardController@index')],
             ['item' => 'แก้ไขคณะกรรมการ', 'link' => ''],
         ]])
     </section>
@@ -27,7 +27,7 @@
             </div>
             <!-- /.box-header -->
             <div class="box-body">
-                {{ Form::open(['route' => ['admin.board.destroy', $board->id], 'method' => 'delete', 'role' => 'form']) }}
+                {{ Form::open(['action' => ['Admin\BoardController@destroy', $board->id], 'method' => 'delete', 'role' => 'form']) }}
                     <div class="box-body">
                         <div class="row">
                             <div class="col-lg-6">

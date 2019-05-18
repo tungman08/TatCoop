@@ -13,13 +13,13 @@
                     <div class="caption">
                         <h4 class="pull-right">&nbsp;</h4>
                         <h4>
-                            <a href="{{ url('/knowledges/' . $item->id) }}" data-tooltip="true" title="{{ $item->title }}">{{ $item->title }}</a>
+                            <a href="{{ action('Website\KnowledgeController@show', ['id'=>$item->id]) }}" data-tooltip="true" title="{{ $item->title }}">{{ $item->title }}</a>
                         </h4>
                         {{--<p>{!! html_entity_decode($item->content) !!}</p>--}}
                     </div>
-                    <div class="ratings">
-                        <p class="pull-right">อ่าน: {{ number_format($item->viewer, 0, '.', ',') }}</p>
-                        <p><i class="fa fa-clock-o"></i> {{ (Diamond::now()->diff(Diamond::parse($item->created_at))->days > 2) ? Diamond::parse($item->created_at)->thai_format('j M Y') : Diamond::parse($item->created_at)->thai_diffForHumans() }}</p>
+                    <div class="ratings text-left">
+                        <span><i class="fa fa-clock-o"></i> {{ (Diamond::now()->diff(Diamond::parse($item->created_at))->days > 2) ? Diamond::parse($item->created_at)->thai_format('j M Y') : Diamond::parse($item->created_at)->thai_diffForHumans() }}</span>
+                        <span class="pull-right">อ่าน: {{ number_format($item->viewer, 0, '.', ',') }}</span>
                     </div>      
                 </div>
             </div>
@@ -32,7 +32,7 @@
         @if($knowledges->count() > 0)
             <div class="col-sm-12 col-lg-12 col-md-12">
                 <h4>
-                    <a href="{{ url('/knowledges') }}">&gt;&gt; ดูสาระน่ารู้ทั้งหมด</a>
+                    <a href="{{ action('Website\KnowledgeController@index') }}">&gt;&gt; ดูสาระน่ารู้ทั้งหมด</a>
                 </h4>
             </div>      
         @endif       

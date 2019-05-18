@@ -213,8 +213,49 @@ class ReportController extends Controller
     }
 
     private function shareholdings($date) {
-        $shareholdings = DB::select(DB::raw("select lpad(b.id, 5, '0') as member_code, c.fullname, c.employee_type, b.a_amount, b.b_amount, c.total_shareholding " .
+        // เฉพาะคนที่จ่าย
+        // $shareholdings = DB::select(DB::raw("select lpad(b.id, 5, '0') as member_code, c.fullname, c.employee_type, b.a_amount, b.b_amount, c.total_shareholding " .
+        //     "from (" .
+        //         "select a.id, sum(case when a.type_id = 1 then a.amount else 0 end) as a_amount, sum(case when a.type_id = 2 then a.amount else 0 end) as b_amount " .
+        //         "from (" .
+        //             "select m1.id, s1.shareholding_type_id as type_id, sum(s1.amount) as amount " .
+        //             "from shareholdings s1 " .
+        //             "inner join members m1 on s1.member_id = m1.id " .
+        //             "where m1.leave_date is null " .
+        //             "and s1.pay_date between '" . $date->format('Y-m-1') . "' and '" . $date->copy()->endOfMonth()->format('Y-m-d') . "' ".
+        //             "group by m1.id, s1.shareholding_type_id" .
+        //         ") a " .
+        //         "group by a.id " .
+        //     ") b " .
+        //     "inner join (" .
+        //         "select m2.id, concat(p.name, ' ', p.lastname) as fullname, et.name as employee_type, sum(s2.amount) as total_shareholding " .
+        //         "from shareholdings s2 " .
+        //         "inner join members m2 on s2.member_id = m2.id " .
+        //         "inner join profiles p on m2.profile_id = p.id " .
+        //         "inner join employees e on m2.profile_id = e.profile_id " .
+        //         "inner join employee_types et on e.employee_type_id = et.id " .
+        //         "where m2.leave_date is null " .
+        //         "and s2.pay_date <= '" . $date->copy()->endOfMonth()->format('Y-m-d') . "' " .
+        //         "group by m2.id, p.name, p.lastname, et.name " .
+        //     ") c on b.id = c.id;"));
+
+        // ทั้งหมด
+        $shareholdings = DB::select(DB::raw("select lpad(b.id, 5, '0') as member_code, b.fullname, b.employee_type, " .
+            "case when c.a_amount is not null then c.a_amount else 0 end as a_amount, " .
+            "case when c.b_amount is not null then c.b_amount else 0 end as b_amount, " . 
+            "b.total_shareholding " .
             "from (" .
+                "select m2.id, concat(p.name, ' ', p.lastname) as fullname, et.name as employee_type, sum(s2.amount) as total_shareholding " .
+                "from shareholdings s2 " .
+                "inner join members m2 on s2.member_id = m2.id " .
+                "inner join profiles p on m2.profile_id = p.id " .
+                "inner join employees e on m2.profile_id = e.profile_id " .
+                "inner join employee_types et on e.employee_type_id = et.id " .
+                "where m2.leave_date is null " .
+                "and s2.pay_date <= '" . $date->copy()->endOfMonth()->format('Y-m-d') . "' " .
+                "group by m2.id, p.name, p.lastname, et.name " .
+                ") b " .
+            "left join (" .
                 "select a.id, sum(case when a.type_id = 1 then a.amount else 0 end) as a_amount, sum(case when a.type_id = 2 then a.amount else 0 end) as b_amount " .
                 "from (" .
                     "select m1.id, s1.shareholding_type_id as type_id, sum(s1.amount) as amount " .
@@ -225,17 +266,6 @@ class ReportController extends Controller
                     "group by m1.id, s1.shareholding_type_id" .
                 ") a " .
                 "group by a.id " .
-            ") b " .
-            "inner join (" .
-                "select m2.id, concat(p.name, ' ', p.lastname) as fullname, et.name as employee_type, sum(s2.amount) as total_shareholding " .
-                "from shareholdings s2 " .
-                "inner join members m2 on s2.member_id = m2.id " .
-                "inner join profiles p on m2.profile_id = p.id " .
-                "inner join employees e on m2.profile_id = e.profile_id " .
-                "inner join employee_types et on e.employee_type_id = et.id " .
-                "where m2.leave_date is null " .
-                "and s2.pay_date <= '" . $date->copy()->endOfMonth()->format('Y-m-d') . "' " .
-                "group by m2.id, p.name, p.lastname, et.name " .
             ") c on b.id = c.id;"));
 
         $filename = 'ชำระค่าหุ้นประจำเดือน '. $date->thai_format('M Y');

@@ -44,7 +44,7 @@
                                 </a>
                             </li>
                         </ul>
-                        <a href="{{ url('/user/password') }}" class="btn btn-primary btn-block"><b>เปลี่ยนรหัสผ่าน</b></a>
+                        <a href="{{ action('Admin\UserController@getPassword') }}" class="btn btn-primary btn-block"><b>เปลี่ยนรหัสผ่าน</b></a>
                     </div>
                     <!-- /.box-body -->
                 </div>

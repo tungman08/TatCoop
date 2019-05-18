@@ -9,7 +9,7 @@
     </h1>
 
     @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-        ['item' => 'จัดการข่าวสารสำหรับสมาชิก', 'link' => '/website/news'],
+        ['item' => 'จัดการข่าวสารสำหรับสมาชิก', 'link' => action('Admin\NewsController@index')],
         ['item' => 'ข่าวสารสำหรับสมาชิกที่ถูกลบ', 'link' => ''],
     ]])
 
@@ -55,13 +55,13 @@
                                 <td>{{ Diamond::parse($inactive->created_at)->thai_format('Y-m-d') }}</td>
                                 <td>{{ Diamond::parse($inactive->deleted_at)->thai_format('Y-m-d') }}</td>
                                 <td>
-                                    {{ Form::open(['url' => '/website/news/' . $inactive->id . '/restore', 'method' => 'post', 'class' => 'btn-group']) }}
+                                    {{ Form::open(['action' => ['Admin\NewsController@postRestore', $inactive->id], 'method' => 'post', 'class' => 'btn-group']) }}
 									    {{ Form::button('<i class="fa fa-search"></i>', [
                                             'type' => 'button',
                                             'class'=>'btn btn-default btn-xs btn-flat',
 											'data-tooltip'=>true,
 											'title'=>'รายละเอียด',
-                                            'onclick'=>"javascript:document.location.href='/website/news/inactive/" . $inactive->id . "';"])
+                                            'onclick'=>'javascript:document.location.href=' . action('Admin\NewsController@getShowInactive', ['id'=>$inactive->id]) . '";'])
                                         }}
                                         {{ Form::button('<i class="fa fa-rotate-left"></i>', [
                                             'type' => 'submit',
@@ -74,7 +74,7 @@
 										{{ Form::hidden('hidden1-' . $inactive->id, null, ['class' => 'btn']) }}
                                     {{ Form::close() }}
 
-                                    {{ Form::open(['url' => '/website/news/' . $inactive->id . '/forcedelete', 'method' => 'post', 'class' => 'btn-group']) }}
+                                    {{ Form::open(['action' => ['Admin\NewsController@postForceDelete', $inactive->id], 'method' => 'post', 'class' => 'btn-group']) }}
 										{{ Form::hidden('hidden-' . $inactive->id, null, ['class' => 'btn']) }}
                                         {{ Form::button('<i class="fa fa-trash"></i>', [
                                             'type' => 'submit',

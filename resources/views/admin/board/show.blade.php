@@ -9,7 +9,7 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการคณะกรรมการ', 'link' => '/admin/board'],
+            ['item' => 'จัดการคณะกรรมการ', 'link' => action('Admin\BoardController@index')],
             ['item' => 'ข้อมูลคณะกรรมการ', 'link' => '']
         ]])
     </section>

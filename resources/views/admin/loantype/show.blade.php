@@ -9,7 +9,7 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการประเภทเงินกู้', 'link' => '/database/loantype'],
+            ['item' => 'จัดการประเภทเงินกู้', 'link' => action('Admin\LoanTypeController@index')],
             ['item' => 'ประเภทเงินกู้', 'link' => ''],
         ]])
     </section>
@@ -18,7 +18,7 @@
     <section class="content">
         <!-- Info boxes -->
         <div class="well">
-            {{ Form::open(['url' => '/database/loantype/' . $loantype->id, 'method' => 'delete']) }}
+            {{ Form::open(['action' => ['Admin\LoanTypeController@destroy', $loantype->id], 'method' => 'delete']) }}
                 <h4>
                     การจัดการประเภทเงินกู้ของสหกรณ์
 
@@ -37,7 +37,7 @@
 
             @include('admin.loantype.info', ['loantype' => $loantype])
 
-            <button class="btn btn-primary btn-flat" onclick="javascript:document.location.href = '/database/loantype/{{ $loantype->id }}/edit';">
+            <button class="btn btn-primary btn-flat" onclick="javascript:document.location.href = '{{ action('Admin\LoanTypeController@edit', ['id'=>$loantype->id]) }}';">
                 <i class="fa fa-edit"></i> แก้ไขประเภทสัญญา
             </button>
         </div>
@@ -68,7 +68,7 @@
                 <h3 class="box-title"><i class="fa fa-credit-card"></i> สัญญาเงินกู้ที่ใช้ประเภทเงินกู้นี้ (กำลังผ่อนชำระจำนวน {{ number_format($loantype->loans->filter(function ($value, $key) { return !empty($value->code) && empty($value->completed_at); })->count()) }} สัญญา)</h3>
                 <div class="btn-group pull-right">
                     <button type="button" class="btn btn-default btn-flat btn-xs"
-                        onclick="javascript:document.location.href='{{ url('/database/loantype/' . $loantype->id . '/finished') }}';">
+                        onclick="javascript:document.location.href='{{ action('Admin\LoanTypeController@getFinished', ['id'=>$loantype->id]) }}';">
                         <i class="fa fa-check-circle-o"></i> สัญญาเงินกู้ที่ชำระหมดแล้ว
                     </button>
                 </div>            
@@ -98,7 +98,7 @@
                                     $code = explode('/', $value->code);
                                     return $code[1] . $code[0];
                                 }) as $index => $loan)
-                                <tr onclick="javascript: document.location.href  = '{{ url('/service/' . $loan->member->id . '/loan/' . $loan->id) }}';" style="cursor: pointer;">
+                                <tr onclick="javascript: document.location.href = '{{ action('Admin\LoanController@show', ['member_id'=>$loan->member->id, 'id'=>$loan->id]) }}';" style="cursor: pointer;">
                                     <td>{{ $index + 1 }}.</td>
                                     <td class="text-primary"><i class="fa fa-credit-card fa-fw"></i> {{ $loan->code }}</td>
                                     <td>{{ $loan->member->profile->fullname }}</td>

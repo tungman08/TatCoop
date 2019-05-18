@@ -9,8 +9,8 @@
     </h1>
 
     @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-        ['item' => 'จัดการข่าวสารสำหรับสมาชิก', 'link' => '/website/news'],
-		['item' => 'ข่าวสารสำหรับสมาชิกที่ถูกลบ', 'link' => '/website/news/inactive'],
+        ['item' => 'จัดการข่าวสารสำหรับสมาชิก', 'link' => action('Admin\NewsController@index')],
+		['item' => 'ข่าวสารสำหรับสมาชิกที่ถูกลบ', 'link' => action('Admin\NewsController@getInactive')],
         ['item' => 'แสดงรายละเอียด', 'link' => ''],
     ]])
 

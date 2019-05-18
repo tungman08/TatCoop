@@ -103,7 +103,7 @@
         });
     
         $('#dataTables tbody').on('click', 'tr', function() {
-            document.location.href  = '/service/' + parseInt($(this).data('memberid')) + '/loan/' + parseInt($(this).data('loanid'));            
+            document.location.href  = '/service/loan/member/' + parseInt($(this).data('memberid')) + '/detail/' + parseInt($(this).data('loanid'));            
         }); 
     });   
     

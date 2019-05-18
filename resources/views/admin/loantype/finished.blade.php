@@ -9,8 +9,8 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการประเภทเงินกู้', 'link' => '/database/loantype'],
-            ['item' => 'ประเภทเงินกู้', 'link' => '/database/loantype/' . $loantype->id],
+            ['item' => 'ข้อมูลประเภทเงินกู้', 'link' => action('Admin\LoanTypeController@index')],
+            ['item' => 'ประเภทเงินกู้', 'link' => action('Admin\LoanTypeController@show', ['id'=>$loantype->id])],
             ['item' => 'สัญญาเงินกู้ที่ชำระหมดแล้ว', 'link' => ''],
         ]])
     </section>
@@ -51,7 +51,7 @@
                                     $code = explode('/', $value->code);
                                     return $code[1] . $code[0];
                                 }) as $loan)
-                                <tr style="cursor: pointer;" onclick="javascript: document.location.href  = '/service/{{ $loan->member->id }}/loan/{{ $loan->id }}';">
+                                <tr style="cursor: pointer;" onclick="javascript: document.location.href  = '{{ action('Admin\LoanController@show', ['member_id'=>$loan->member->id, 'id'=>$loan->id]) }}';">
                                     <td>{{ ++$index }}</td>
                                     <td class="text-primary"><i class="fa fa-credit-card fa-fw"></i>{{ $loan->code }}</td>
                                     <td>{{ $loan->member->profile->fullname }}</td>

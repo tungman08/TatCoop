@@ -8,7 +8,7 @@
         <!-- link -->
         <li class="header">บริการของ สอ.สรทท.</li>
         <li>
-            <a href="{{ url('/') }}" target="_blank">
+            <a href="{{ action('Website\HomeController@index') }}" target="_blank">
                 <i class="fa fa-circle-o text-yellow"></i> 
                 <span>เว็บไซต์ สอ.สรทท.</span>
             </a>

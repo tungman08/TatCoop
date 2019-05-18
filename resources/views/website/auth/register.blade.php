@@ -8,7 +8,7 @@
     </div>
     <!-- /.login-logo -->
 
-    {{ Form::open(['url' => '/auth/register', 'role' => 'form']) }}
+    {{ Form::open(['action' => 'Website\AuthController@postRegister', 'method'=>'post', 'role' => 'form']) }}
         <div class="form-group">
             <div class="input-group">
                 <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
@@ -84,7 +84,7 @@
         </div>
     @endif
 
-    <a href="{{ url('/auth/login') }}">ลงทะเบียนไว้แล้ว</a><br>
+    <a href="{{ action('Website\AuthController@getLogin') }}">ลงทะเบียนไว้แล้ว</a><br>
 </div>
 <!-- /.login-box-body -->
 

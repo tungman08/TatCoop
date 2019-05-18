@@ -9,8 +9,8 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการข่าวสารสำหรับสมาชิก', 'link' => '/website/news'],
-            ['item' => 'แสดงรายละเอียด', 'link' => '/website/news/' . $news->id],
+            ['item' => 'จัดการข่าวสารสำหรับสมาชิก', 'link' => action('Admin\NewsController@index')],
+            ['item' => 'แสดงรายละเอียด', 'link' => action('Admin\NewsController@show', ['id'=>$news->id])],
             ['item' => 'แก้ไข', 'link' => ''],
         ]])
 
@@ -42,7 +42,7 @@
                     <!-- /.box-header -->
 
                     <!-- form start -->
-                    {{ Form::model($news, ['route' => ['website.news.update', $news->id], 'method' => 'put', 'class' => 'form-horizontal']) }}
+                    {{ Form::model($news, ['action' => ['Admin\NewsController@update', $news->id], 'method' => 'put', 'class' => 'form-horizontal']) }}
                         @include('admin.news.form', ['edit' => true])
                     {{ Form::close() }}            
                 </div>

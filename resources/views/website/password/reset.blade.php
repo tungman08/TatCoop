@@ -8,7 +8,7 @@
     </div>
     <!-- /.login-logo -->
 
-    {{ Form::open(['url' => '/password/reset', 'role' => 'form']) }}
+    {{ Form::open(['action' => 'Website\PasswordController@postReset', 'role' => 'form', 'method' => 'post']) }}
         {{ Form::hidden('token', $token) }}
         <div class="form-group">
             <div class="input-group">

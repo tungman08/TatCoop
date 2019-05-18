@@ -47,7 +47,7 @@ class AdminController extends Controller
      * @return Response
      */
     public function index() {
-        return view('admin.administrator.index', [
+        return view('admin.officer.index', [
             'admins' => Administrator::admin()->get()
         ]);
     }
@@ -58,7 +58,7 @@ class AdminController extends Controller
      * @return Response
      */
     public function create() {
-        return view('admin.administrator.create');
+        return view('admin.officer.create');
     }
 
     /**
@@ -121,10 +121,10 @@ class AdminController extends Controller
         $user = Administrator::find($id);
 
         if ($user->role_id != 2) {
-            return redirect()->to('admin/administrator');
+            return redirect()->action('Admin\AdminController@index');
         }
 
-        return view('admin.administrator.show', [
+        return view('admin.officer.show', [
             'user' => $user
         ]);
     }
@@ -139,10 +139,10 @@ class AdminController extends Controller
         $user = Administrator::find($id);
 
         if ($user->role_id != 2) {
-            return redirect()->to('admin/administrator');
+            return redirect()->action('Admin/AdminController@index');
         }
 
-        return view('admin.administrator.edit', [
+        return view('admin.officer.edit', [
             'user' => $user
         ]);
     }
@@ -153,7 +153,7 @@ class AdminController extends Controller
      * @param  int  $id
      * @return Response
      */
-    public function update(Request $request, $id) {
+    public function update($id, Request $request) {
         $rules = [
             'name' => 'required', 
             'lastname' => 'required', 
@@ -218,7 +218,7 @@ class AdminController extends Controller
      * @param  int  $id
      * @return Response
      */
-    public function destroy(Request $request, $id) {
+    public function destroy($id, Request $request) {
         $rules = [
             'email' => 'required', 
         ];
@@ -265,10 +265,10 @@ class AdminController extends Controller
         $user = Administrator::find($id);
 
         if ($user->role_id != 2) {
-            return redirect()->to('admin/administrator');
+            return redirect()->action('Admin/AdminController@index');
         }
 
-        return view('admin.administrator.delete', [
+        return view('admin.officer.delete', [
             'user' => $user
         ]);
     }
@@ -283,7 +283,7 @@ class AdminController extends Controller
             ->where('role_id', 2)
             ->get();
 
-        return view('admin.administrator.inactive', [
+        return view('admin.officer.inactive', [
             'admins' => $admins
         ]);
     }

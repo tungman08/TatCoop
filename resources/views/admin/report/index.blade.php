@@ -92,7 +92,7 @@
     </section>
     <!-- /.content -->
 
-    {{ Form::open(['url' => '/admin/report/export', 'method' => 'post', 'id' => 'export']) }}
+    {{ Form::open(['action' => 'Admin\ReportController@postExport', 'method' => 'post', 'id' => 'export']) }}
         {{ Form::hidden('report', '', [ 'id' => 'report' ]) }}
         {{ Form::hidden('reporttype', '', [ 'id' => 'reporttype' ]) }}
         {{ Form::hidden('date', '', [ 'id' => 'date' ]) }}

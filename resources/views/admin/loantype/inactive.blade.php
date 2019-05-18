@@ -9,7 +9,7 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการประเภทเงินกู้', 'link' => '/database/loantype'],
+            ['item' => 'จัดการประเภทเงินกู้', 'link' => action('Admin\LoanTypeController@index')],
             ['item' => 'ถูกลบ', 'link' => ''],
         ]])
 
@@ -60,7 +60,7 @@
                                     <table>
                                         <tr>
                                             <td>
-                                                {{ Form::open(['url' => '/database/loantype/' . $type->id . '/restore', 'method' => 'post']) }}
+                                                {{ Form::open(['action' => ['Admin\LoanTypeController@postRestore', $type->id], 'method' => 'post']) }}
                                                     {{ Form::button('<i class="fa fa-rotate-left"></i>', [
                                                         'type' => 'submit',
                                                         'class'=>'btn btn-default btn-xs btn-flat',
@@ -69,7 +69,7 @@
                                                 {{ Form::close() }}
                                             </td>
                                             <td>
-                                                {{ Form::open(['url' => '/database/loantype/' . $type->id . '/forcedelete', 'method' => 'post']) }}
+                                                {{ Form::open(['action' => ['Admin\LoanTypeController@postForceDelete', $type->id], 'method' => 'post']) }}
                                                     {{ Form::button('<i class="fa fa-trash"></i>', [
                                                         'type' => 'submit',
                                                         'class'=>'btn btn-default btn-xs btn-flat', 

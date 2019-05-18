@@ -9,8 +9,8 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'บัญชีสมาชิกสหกรณ์', 'link' => '/admin/account'],
-            ['item' => $user->member->profile->fullname, 'link' => '/admin/account/' . $user->member->id ],
+            ['item' => 'บัญชีสมาชิกสหกรณ์', 'link' => action('Admin\AccountController@index')],
+            ['item' => $user->member->profile->fullname, 'link' => action('Admin\AccountController@show', ['id'=>$user->member->id]) ],
             ['item' => 'แก้ไขบัญชีผู้ใช้', 'link' => ''],
         ]])
     </section>
@@ -37,7 +37,7 @@
             </div>
             <!-- /.box-header -->
 
-            {{ Form::model($user, ['route' => ['admin.account.update', $user->id], 'method' => 'put', 'class' => 'form-horizontal']) }}
+            {{ Form::model($user, ['action' => ['Admin\AccountController@update', $user->id], 'method' => 'put', 'class' => 'form-horizontal']) }}
                 <div class="box-body">
                     <div class="form-group">
                         {{ Form::label('email', 'อีเมลบัญชีผู้ใช้เดิม', [

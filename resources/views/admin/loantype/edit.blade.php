@@ -9,8 +9,8 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'ข้อมูลประเภทเงินกู้', 'link' => '/database/loantype'],
-            ['item' => 'ประเภทเงินกู้', 'link' => '/database/loantype/' . $loantype->id],
+            ['item' => 'ข้อมูลประเภทเงินกู้', 'link' => action('Admin\LoanTypeController@index')],
+            ['item' => 'ประเภทเงินกู้', 'link' => action('Admin\LoanTypeController@show', ['id'=>$loantype->id])],
             ['item' => 'แก้ไขประเภทสัญญา', 'link' => ''],
         ]])
 
@@ -40,7 +40,7 @@
             <!-- /.box-header -->
 
             <!-- form start -->
-            {{ Form::model($loantype, ['route' => ['database.loantype.update', $loantype->id], 'method' => 'put', 'class' => 'form-horizontal']) }}
+            {{ Form::model($loantype, ['action' => ['Admin\LoanTypeController@update', $loantype->id], 'method' => 'put', 'class' => 'form-horizontal']) }}
                 @include('admin.loantype.form', ['edit' => true])
             {{ Form::close() }}
         </div>

@@ -40,7 +40,7 @@
                         <h5 class="subheading">เว็บไซต์</h5>
                         <p>
                             <i class="fa fa-globe fa-fw"></i>
-                            <a href="{{ url('/') }}" target="_blank">
+                            <a href="{{ action('Website\HomeController@index') }}" target="_blank">
                                 สหกรณ์ออมทรัพย์สหภาพแรงงานรัฐวิสาหกิจการท่องเที่ยวแห่งประเทศไทย จำกัด
                             </a>
                         </p>

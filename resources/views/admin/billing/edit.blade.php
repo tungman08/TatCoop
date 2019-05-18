@@ -9,7 +9,7 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการใบรับเงิน', 'link' => 'database/billing'],
+            ['item' => 'จัดการใบรับเงิน', 'link' => action('Admin\BillingController@index')],
             ['item' => 'แก้ไข', 'link' => '']
         ]])
     </section>

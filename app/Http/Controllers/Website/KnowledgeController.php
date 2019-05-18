@@ -11,7 +11,7 @@ use App\Knowledge;
 class KnowledgeController extends Controller
 {
     public function index() {
-        $knowledges = Knowledge::orderBy('id', 'desc')->paginate(8);
+        $knowledges = Knowledge::orderBy('id', 'desc')->paginate(16);
 
         return view('website.knowledges.index', [
             'knowledges' => $knowledges

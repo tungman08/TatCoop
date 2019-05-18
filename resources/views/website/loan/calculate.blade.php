@@ -3,7 +3,7 @@
 @section('content')
     <h3 class="page-header">
         <ol class="breadcrumb">
-            <li><a href="{{ url('/') }}"><i class="fa fa-home fa-fw"></i></a></li>
+            <li><a href="{{ action('Website\HomeController@index') }}"><i class="fa fa-home fa-fw"></i></a></li>
             <li class="active">คำนวณสินเชื่อเงินกู้เบื้องต้น</li>
         </ol>
     </h3>

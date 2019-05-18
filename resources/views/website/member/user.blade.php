@@ -39,12 +39,12 @@
             <div class="pull-left">
                 {{ Form::button('<i class="fa fa-user"></i> ข้อมูลสมาชิก', [
                     'class' => 'btn btn-default btn-flat',
-                    'onclick' => 'javascript:document.location.href = "' . action('Website\ProfileController@getIndex') . '"']) }}
+                    'onclick' => 'javascript:document.location.href = "' . action('Website\ProfileController@getIndex') . '";']) }}
             </div>
             <div class="pull-right">
                 {{ Form::button('<i class="fa fa-sign-out"></i> ออกจากระบบ', [
                     'class' => 'btn btn-default btn-flat',
-                    'onclick' => 'javascript:var result = confirm(\'คุณต้องการออกจากระบบใช่ไหม ?\'); if (result) { document.location.href = "' . url('/auth/logout') . '" }']) }}
+                    'onclick' => 'javascript:var result = confirm(\'คุณต้องการออกจากระบบใช่ไหม ?\'); if (result) { document.location.href = "' . action('Website\AuthController@getLogout') . '"; }']) }}
             </div>
         </li>
     </ul>

@@ -9,8 +9,8 @@
     </h1>
 
    <ol class="breadcrumb">
-        <li><a href="{{ url('/member') }}"><i class="fa fa-home"></i> หน้าหลัก</a></li>
-        <li><a href="{{ url('/member/profile') }}">ข้อมูลสมาชิก</a></li>
+        <li><a href="{{ action('Website\MemberController@index') }}"><i class="fa fa-home"></i> หน้าหลัก</a></li>
+        <li><a href="{{ action('Website\ProfileController@getIndex') }}">ข้อมูลสมาชิก</a></li>
         <li class="active">เปลี่ยนรหัสผ่าน</li>
     </ol>
     </section>
@@ -32,7 +32,7 @@
                     <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
                         <i class="fa fa-minus"></i>
                     </button>
-                    <button type="button" class="btn btn-box-tool" data-toggle="tooltip" title="Close" onclick="javascript:location.href='{{ url('/user/profile') }}';">
+                    <button type="button" class="btn btn-box-tool" data-toggle="tooltip" title="Close" onclick="javascript:location.href='{{ action('Website\ProfileController@getIndex') }}';">
                         <i class="fa fa-times"></i>
                     </button>
                 </div>

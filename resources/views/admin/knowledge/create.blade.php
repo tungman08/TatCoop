@@ -9,7 +9,7 @@
     </h1>
 
     @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-        ['item' => 'จัดการสาระน่ารู้', 'link' => '/website/knowledge'],
+        ['item' => 'จัดการสาระน่ารู้', 'link' => action('Admin\KnowledgeController@index')],
         ['item' => 'เพิ่ม', 'link' => ''],
     ]])
 
@@ -39,7 +39,7 @@
             <!-- /.box-header -->
 
             <!-- form start -->
-            {{ Form::open(['url' => '/website/knowledge', 'method' => 'post', 'class' => 'form-horizontal']) }}
+            {{ Form::open(['action' => 'Admin\KnowledgeController@store', 'method' => 'post', 'class' => 'form-horizontal']) }}
                 @include('admin.knowledge.form', ['edit' => false])
             {{ Form::close() }}          
         </div>

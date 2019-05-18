@@ -42,11 +42,11 @@
 
             <div class="box-body">
                 <button class="btn btn-primary btn-flat" style="margin-top: 15px; margin-bottom: 15px;"
-                    onclick="javascript:document.location.href='{{ url('/admin/administrator/create') }}';">
+                    onclick="javascript:document.location.href='{{ action('Admin\AdminController@create') }}';">
                     <i class="fa fa-user-plus"></i> เพื่อบัญชีเจ้าหน้าที่สหกรณ์
                 </button>
                 <button class="btn btn-default btn-flat pull-right" style="margin-top: 15px; margin-bottom: 15px;"
-                    onclick="javascript:document.location.href='{{ url('/admin/administrator/inactive') }}';">
+                    onclick="javascript:document.location.href='{{ action('Admin\AdminController@getInactive') }}';">
                     <i class="fa fa-trash"></i> เจ้าหน้าที่สหกรณ์ที่ถูกลบ
                 </button>
 

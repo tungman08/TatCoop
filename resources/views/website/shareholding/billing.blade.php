@@ -24,11 +24,11 @@
             <!-- this row will not appear when printing -->
             <div class="row no-print" style="margin-top: 30px;">
                 <div class="col-xs-12">
-                    <a href="{{ url('/member/shareholding/' . $shareholding->id . '/billing/' . Diamond::parse($shareholding->pay_date)->format('Y-n-d') . '/print') }}" target="_blank" class="btn btn-default btn-flat"><i class="fa fa-print"></i> พิมพ์</a>
+                    <a href="{{ action('Website\ShareholdingController@getPrint', ['shareholding_id'=>$shareholding->id, 'date'=>Diamond::parse($shareholding->pay_date)->format('Y-n-d')]) }}" target="_blank" class="btn btn-default btn-flat"><i class="fa fa-print"></i> พิมพ์</a>
                     <button type="button"
                         class="btn btn-primary btn-flat pull-right"
                         style="margin-right: 5px;"
-                        onclick="javascript:document.location.href  = '{{ url('/member/shareholding/' . $shareholding->id . '/billing/' . Diamond::parse($shareholding->pay_date)->format('Y-n-d') . '/pdf') }}';">
+                        onclick="javascript:document.location.href  = '{{ action('Website\ShareholdingController@getPdf', ['shareholding_id'=>$shareholding->id, 'date'=>Diamond::parse($shareholding->pay_date)->format('Y-n-d')]) }}';">
                         <i class="fa fa-download"></i> บันทึกเป็น PDF
                     </button>
                 </div>

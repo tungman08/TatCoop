@@ -8,7 +8,7 @@
     </div>
     <!-- /.login-logo -->
 
-    {{ Form::open(['url' => '/password/email', 'role' => 'form']) }}
+    {{ Form::open(['action' => 'Website\PasswordController@postEmail', 'role' => 'form', 'method' => 'post']) }}
         <div class="form-group has-feedback">
             {{ Form::text('email', null, ['required', 'class'=>'form-control', 'placeholder'=>'อีเมลที่ใช้ลงทะเบียน', 'autocomplete'=>'off']) }}
             <span class="glyphicon glyphicon-envelope form-control-feedback"></span>

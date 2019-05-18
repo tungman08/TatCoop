@@ -9,8 +9,8 @@
         </h1>
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
-            ['item' => 'จัดการเจ้าหน้าที่สหกรณ์', 'link' => '/admin/administrator'],
-            ['item' => 'ข้อมูลเจ้าหน้าที่สหกรณ์', 'link' => '/admin/administrator/' . $admin->id],
+            ['item' => 'จัดการเจ้าหน้าที่สหกรณ์', 'link' => action('Admin\AdminController@index')],
+            ['item' => 'ข้อมูลเจ้าหน้าที่สหกรณ์', 'link' => action('Admin\AdminController@show', ['id'=>$user->id])],
             ['item' => 'แก้ไข', 'link' => ''],
         ]])
     </section>
@@ -39,10 +39,10 @@
             <!-- /.box-header -->
 
             <!-- form start -->
-            {{ Form::model($user, ['route' => ['admin.administrator.update', $user->id], 'method' => 'put', 'class' => 'form-horizontal']) }}
+            {{ Form::model($user, ['action' => ['Admin\AdminController@update', $user->id], 'method' => 'put', 'class' => 'form-horizontal']) }}
                 {{ Form::hidden('admin_id', $user->id, ['id'=>'admin_id']) }}
 
-                @include('admin.administrator.form', ['edit' => true, 'id' => $user->id])
+                @include('admin.officer.form', ['edit' => true, 'id' => $user->id])
             {{ Form::close() }}
         </div>
         <!-- /.box -->

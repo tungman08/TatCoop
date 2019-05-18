@@ -1,5 +1,5 @@
 <!-- Header Brand -->
-<a href="{{ url('/') }}" class="logo">
+<a href="{{ action('Website\HomeController@index') }}" class="logo">
     <!-- mini logo for sidebar mini 50x50 pixels -->
     <span class="logo-mini"><b>สอ.</b></span>
     <!-- logo for regular state and mobile devices -->

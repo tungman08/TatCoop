@@ -67,7 +67,7 @@ class PaymentCalculator {
                 ->where(function ($query) use ($mydate) {
                     $query->whereYear('members.leave_date', '>', $mydate->year)
                         ->orWhereNull('members.leave_date'); })
-                ->whereNotNUull('loans.code')
+                ->whereNotNull('loans.code')
                 ->whereNull('loans.completed_at')
                 ->select([
                     'members.id as id',
