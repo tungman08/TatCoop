@@ -13,4 +13,5 @@ database/seeds/EmployeesTableSeeder.php
 .env.example
 artisan
 composer.lock
+package-lock.json
 TatCoop.*
