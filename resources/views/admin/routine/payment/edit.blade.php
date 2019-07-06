@@ -10,7 +10,7 @@
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
             ['item' => 'ชำระเงินกู้ปกติ', 'link' => action('Admin\RoutinePaymentController@index')],
-            ['item' => Diamond::parse($detail->routine->calculated_date)->thai_format('M Y'), 'link' => action('Admin\RoutineShareholdingController@show', ['id' => $detail->routine->id])],
+            ['item' => Diamond::parse($detail->routine->calculated_date)->thai_format('M Y'), 'link' => action('Admin\RoutinePaymentController@show', ['id' => $detail->routine->id])],
             ['item' => 'แก้ไข', 'link' => '']
         ]])
     </section>
@@ -33,12 +33,12 @@
 
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title"><i class="fa fa-gbp"></i> รายการชำระเงินกู้ปกติ</h3>
+                <h3 class="box-title"><i class="fa fa-sticky-note"></i> รายการชำระเงินกู้ปกติ</h3>
             </div>
             <!-- /.box-header -->
 
             <!-- form start -->
-            {{ Form::model($detail, ['action' => ['Admin\RoutinePaymentController@updateDetail', $detail->id], 'method' => 'put', 'class' => 'form-horizontal']) }}
+            {{ Form::model($detail, ['action' => ['Admin\RoutinePaymentController@updateDetail', $detail->routine->id, $detail->id], 'method' => 'put', 'class' => 'form-horizontal']) }}
                 <div class="box-body">
                     <div class="form-group">
                         {{ Form::label('period', 'งวดที่', [

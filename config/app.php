@@ -228,6 +228,7 @@ return [
         'PaymentCalculator' => App\Facades\PaymentCalculator::class,
         'Dashboard' => App\Facades\Dashboard::class,
         'FileManager' => App\Facades\FileManager::class,
+        'Routine' => App\Facades\Routine::class,
     ],
 
 ];

@@ -25,23 +25,21 @@
                     <tr>
                         <th style="width:20%;">ชื่อผู้สมาชิก:</th>
                         <td>{{ ($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' : $member->profile->fullname }}</td>
-                    </tr>
+                    </tr>                    
                     <tr>
-                        <th>เงินปันผล/เฉลี่ยคืนปี:</th>
-                        <td><span class="year">{{ $dividend->rate_year + 543 }}</span></td>
+                        <th>รหัสสมาชิก:</th>
+                        <td>{{ $member->memberCode }}</td>
                     </tr>  
                     <tr>
-                        <th>เงินปันผลรวม (อัตรา <span id="shareholding_rate">{{ $dividend->shareholding_rate }}</span>%):</th>
-                        <td><span id="shareholding_dividend">{{ number_format($dividends->sum('shareholding_dividend'), 2, '.', ',') }}</span> บาท</td>
-                    </tr>
-                    <tr>
-                        <th>เงินเฉลี่ยคืนรวม (อัตรา <span id="loan_rate">{{ $dividend->loan_rate }}</span>%):</td>
-                        <td><span id="interest_dividend">{{ number_format($dividends->sum('interest_dividend'), 2, '.', ',') }}</span> บาท</td>
-                    </tr>
-                    <tr>
-                        <th>รวมทั้งสิ้น</td>
-                        <td id="grand-total">{{ number_format($dividends->sum('shareholding_dividend') + $dividends->sum('interest_dividend'), 2, '.', ',') }} บาท</td>
-                    </tr>
+                        <th>ประเภทสมาชิก:</th>
+                        <td>
+                            @if (is_null($member->leave_date))
+                                <span class="label label-primary">{{ $member->profile->employee->employee_type->name }}</span>
+                            @else
+                                <span class="label label-danger">ลาออก</span>
+                            @endif
+                        </td>
+                    </tr>   
                 </table>
                 <!-- /.table -->
             </div>  
@@ -92,7 +90,7 @@
 
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title"><i class="fa fa-heart-o"></i> เงินปันผล/เฉลี่ยคืนปี <span class="year">{{ $dividend->rate_year + 543 }}</span></h3>
+                <h3 class="box-title"><i class="fa fa-heart-o"></i> เงินปันผล/เฉลี่ยคืน</h3>
             </div>
             <!-- /.box-header -->
 
@@ -116,6 +114,34 @@
                 </div>
                 <!-- /.form-group -->
 
+                <div class="table-responsive">
+                    <table class="table table-info">
+                        <tr>
+                            <th style="width:20%; border-top: 1px solid #fff;">เงินปันผลรวม (อัตรา <span id="shareholding_rate">{{ $dividend->shareholding_rate }}</span>%):</th>
+                            <td style="border-top: 1px solid #fff;"><span id="shareholding_dividend">{{ number_format($dividends->sum('shareholding_dividend'), 2, '.', ',') }}</span> บาท</td>
+                        </tr>
+                        <tr>
+                            <th>เงินเฉลี่ยคืนรวม (อัตรา <span id="loan_rate">{{ $dividend->loan_rate }}</span>%):</td>
+                            <td><span id="interest_dividend">{{ number_format($dividends->sum('interest_dividend'), 2, '.', ',') }}</span> บาท</td>
+                        </tr>
+                        <tr>
+                            <th>รวมทั้งสิ้น</td>
+                            <td id="grand-total">{{ number_format($dividends->sum('shareholding_dividend') + $dividends->sum('interest_dividend'), 2, '.', ',') }} บาท</td>
+                        </tr>
+                    </table>
+                    <!-- /.table -->
+                </div>  
+                <!-- /.table-responsive --> 
+            </div>
+        </div>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title"><i class="fa fa-heart-o"></i> รายละเอียดเงินปันผล/เฉลี่ยคืนปี <span class="year">{{ $dividend->rate_year + 543 }}</span></h3>
+            </div>
+            <!-- /.box-header -->
+
+            <div class="box-body">
                 <div class="table-responsive" style=" margin-top: 10px;">
                     <input type="hidden" id="is_super" value="{{ $is_super }}"/>
                     <input type="hidden" id="is_admin" value="{{ $is_admin }}"/>

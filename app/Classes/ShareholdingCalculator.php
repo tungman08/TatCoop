@@ -22,6 +22,16 @@ class ShareholdingCalculator {
         return 'Nothing';
     }
 
+    public function approve($date) {
+        $setting = RoutineSetting::find(1);
+        
+        if ($setting->approve_status == true) {
+            return $this->check($date);
+        }
+
+        return 'Nothing';
+    }
+
     public function store() {
         $setting = RoutineSetting::find(1);
 
@@ -90,6 +100,46 @@ class ShareholdingCalculator {
         return $result;
     }
 
+    protected function check($date) {
+        $result = 'Nothing';
+
+        if (!empty($date)) {
+            if (Diamond::createFromFormat('Y-m-d', $date) === false) {
+                $result = 'Invalid date format.';
+            }
+            else {
+                $mydate = Diamond::parse($date);
+                $result = $this->setapprove($mydate);
+            }
+        }
+        else {
+            $mydate = Diamond::today();
+            $result = $this->setapprove($mydate);
+        }
+
+        return $result;
+    }
+
+    protected function setapprove($date) {
+        $routines = RoutineShareholding::whereNull('approved_date')
+            ->whereNull('saved_date')
+            ->where('status', false)
+            ->get();
+
+        if ($routines->count() > 0) {
+            foreach ($routines as $routine) {
+                DB::transaction(function() use ($routine, $date) {
+                    $routine->approve_date = $date;
+                    $routine->save();
+                });
+            }
+
+            return 'Approved all shareholding to database successfully.';
+        }
+
+        return 'Nothing';
+    }
+
     protected function save() {
         $this->updateStatus();
         
@@ -122,7 +172,7 @@ class ShareholdingCalculator {
                 });
             }
 
-            return 'Save all shareholding to database successfully.';
+            return 'Saved all shareholding to database successfully.';
         }
 
         return 'Nothing';

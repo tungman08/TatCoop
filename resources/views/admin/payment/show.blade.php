@@ -122,6 +122,10 @@
                                         <th>รวม</th>
                                         <td>{{ number_format($payment->principle + $payment->interest, 2, '.', ',') }} บาท</td>
                                     </tr>
+                                    <tr>
+                                        <th>หมายเหตุ</th>
+                                        <td>{{ $payment->remark }}</td>
+                                    </tr>
                                 </tbody>
                             </table>
                             <!-- /.table -->

@@ -100,9 +100,8 @@ class AdminController extends Controller
                 $admin->lastname = $request->input('lastname');
                 $admin->email = strtolower($request->input('email'));
                 $admin->password = $request->input('new_password');
-                $role->admins()->save();
+                $role->admins()->save($admin);
 
-                History::addAdminHistory($admin->id, 'สร้างบัญชีเจ้าหน้าที่สหกรณ์');
                 History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'เพิ่มบัญชี ' . $admin->fullname . ' (' . $admin->email . ') เป็นเจ้าหน้าที่สหกรณ์');
 
                 Mail::send('admin.emails.newadmin', ['email' => $request->input('email'), 'password' => $request->input('new_password')], function($message) use ($admin) {

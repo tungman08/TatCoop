@@ -16,6 +16,7 @@ class CreateRoutineSettingsTable extends Migration
             $table->increments('id');
             $table->enum('name', ['shareholding', 'payment']);
             $table->boolean('calculate_status')->default(false);
+            $table->boolean('approve_status')->default(false);
             $table->boolean('save_status')->default(false);
             $table->timestamps();
         });

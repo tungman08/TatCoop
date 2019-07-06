@@ -14,6 +14,7 @@ use PDF;
 use Storage;
 use FileManager;
 use Response;
+use Routine;
 use stdClass;
 use Validator;
 use App\Billing;
@@ -287,9 +288,9 @@ class ShareholdingController extends Controller
             'billno' => Diamond::parse($shareholding->pay_date)->thai_format('Y') . str_pad($shareholding->id, 8, '0', STR_PAD_LEFT),
 			'billing' => Billing::latest()->first()
         ]);
-     }
+    }
 
-     public function getPdfBilling($member_id, $pay_date, $id) {
+    public function getPdfBilling($member_id, $pay_date, $id) {
         $pay_date = Diamond::parse($pay_date);
 		$shareholding = Shareholding::find($id);
 		$total_shareholding = Shareholding::where('member_id', $member_id)
@@ -307,9 +308,9 @@ class ShareholdingController extends Controller
 
         return PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])
             ->loadView('admin.shareholding.pdf', $data)->download('ใบเสร็จรับเงินค่าหุ้นเดือน-' . Diamond::parse($shareholding->pay_date)->thai_format('M-Y') . '.pdf');
-     }
+    }
 
-     public function postUploadFile(Request $request) {
+    public function postUploadFile(Request $request) {
 		$id = $request->input('shareholding_id');
 		$file = $request->file('file');
 
@@ -333,9 +334,9 @@ class ShareholdingController extends Controller
         $data->display = $display;
 
         return Response::json($data);
-     }
+    }
 
-	 public function postDeleteFile(Request $request) {
+	public function postDeleteFile(Request $request) {
 		$id = $request->input('id');
 		$attachment = ShareholdingAttachment::find($id);
 		$shareholding_id = $attachment->shareholding_id;
@@ -349,5 +350,44 @@ class ShareholdingController extends Controller
         $data->count = $shareholding->attachments->count();
 
         return Response::json($data);
-     }
+    }
+
+    public function getAdjust($member_id) {
+        return view('admin.shareholding.adjust', [
+            'member' => Member::find($member_id)
+        ]);
+    }
+
+    public function putAdjust($member_id, Request $request) {
+        $rules = [
+            'shareholding' => 'required|numeric', 
+        ];
+
+        $attributeNames = [
+            'shareholding' => 'จำนวนหุ้น', 
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+        $validator->setAttributeNames($attributeNames);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+        else {
+            DB::transaction(function() use ($request, $member_id) {
+                $member = Member::find($member_id);
+                $member->shareholding = $request->input('shareholding');
+                $member->save();
+
+                Routine::shareholding(Diamond::today(), $member->id);
+                History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'แก้ไขข้อมูลของสมาชิกสหกรณ์ ชื่อ คุณ' . $member->profile->name . ' ' . $member->profile->lastname);
+            });
+
+            return redirect()->action('Admin\ShareholdingController@index', ['id' => $member_id])
+                ->with('flash_message', 'ข้อมูลคุณ ' . $request->input('profile')['name'] . ' ' . $request->input('profile')['lastname'] . ' ถูกแก้ไขเรียบร้อยแล้ว')
+                ->with('callout_class', 'callout-success');
+        }
+    }
 }

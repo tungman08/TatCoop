@@ -19,12 +19,28 @@
         <!-- Info boxes -->
         <div class="well">
             <h4>ชำระเงินกู้ปกติ</h4>    
-            <p>
-                ให้ผู้ดูแลระบบตรวจสอบความถูกต้องของข้อมูลที่ระบบคำนวณค่ายอดเงินที่ได้ถูกต้องหรือไม่<br />
-                หากไม่ทำการตรวจสอบ การใช้การบันทึกอัตโนมัติจะไม่ทำงาน
-            </p>  
+            <div class="table-responsive">
+                <table class="table table-info">
+                    <tr>
+                        <th style="width:20%;">จำนวนสัญญา:</th>
+                        <td>{{ number_format($details->count(), 0, '.', ',') }} สัญญา</td>
+                    </tr>
+                    <tr>
+                        <th>จำนวนเงินทั้งหมดที่ส่งตัดเงินเดือน:</th>
+                        <td>{{ number_format($routine->details->sum('principle') + $routine->details->sum('interest'), 2, '.', ',') }} บาท</td>
+                    </tr>  
+                    @if (is_null($routine->approved_date) && !$routine->status)
+                        <tr>
+                            <th>เหลือเวลาแก้ไขข้อมูล</th>
+                            <td>{{ Diamond::parse($routine->calculated_date)->copy()->startOfMonth()->addDays(Routine::dday() - 1)->thai_diffForHumans(Diamond::today()) }}</td>
+                        </tr>
+                    @endif
+                </table>
+                <!-- /.table -->
+            </div>  
+            <!-- /.table-responsive --> 
             
-            <div class="form-group" style="margin-bottom: 0px;">
+            <!-- <div class="form-group" style="margin-bottom: 0px;">
                 <input type="hidden" id="routine_status" value="{{ $routine->status }}" />
                 <input type="hidden" id="month_id" value="{{ $routine->id }}" />
                 <div id="approve-toggle" class="toggle-btn">
@@ -32,7 +48,7 @@
                     <input type="checkbox" id="approve" class="cb-value" />
                     <span class="round-btn"></span>
                 </div>
-            </div>
+            </div> -->
         </div>
 
         @if(Session::has('flash_message'))
@@ -58,36 +74,16 @@
 
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title"><i class="fa fa-gbp"></i> รายละเอียดยอดการชำระเงินกู้ปกติ ของสมาชิกประเภทพนักงาน/ลูกจ้าง ททท. ประจำเดือน{{ Diamond::parse($routine->calculated_date)->thai_format('F Y') }}</h3>
+                <h3 class="box-title"><i class="fa fa-sticky-note"></i> รายละเอียดยอดการชำระเงินกู้ปกติ ของสมาชิกประเภทพนักงาน/ลูกจ้าง ททท. ประจำเดือน{{ Diamond::parse($routine->calculated_date)->thai_format('F Y') }}</h3>
             </div>
             <!-- /.box-header -->
 
             <div class="box-body">
-            <div class="row">
-                <div class="col-md-6">
-                    {{ Form::open(['action' => ['Admin\RoutinePaymentController@save', $routine->id], 'method' => 'post', 'class' => 'form', 'onsubmit' => "return confirm('คุณต้องการบันทึกข้อมูลทั้งหมดใช่ไหม?');"]) }}
-                        {{ Form::button('<i class="fa fa-floppy-o"></i> บันทึกทั้งหมด', [
-                            'id'=>'save_all',
-                            'type' => 'submit', 
-                            'class'=>'btn btn-primary btn-flat margin-b-md',
-                            'disabled'=>true])
-                        }}  
-                    {{ Form::close() }}
-                    </div>
-                    <!--/.col-->
-
-                    <div class="col-md-6">
-                        {{ Form::open(['action' => ['Admin\RoutinePaymentController@report', $routine->id], 'method' => 'post', 'class' => 'form']) }}
-                            {{ Form::button('<i class="fa fa-file-excel-o"></i> บันทึกเป็น Excel', [
-                                'id'=>'report',
-                                'type' => 'submit', 
-                                'class'=>'btn btn-default btn-flat margin-b-md pull-right'])
-                            }}  
-                        {{ Form::close() }}
-                    </div>
-                    <!--/.col-->
-                </div>
-                <!--/.row-->
+                @if (is_null($routine->approved_date) && !$routine->status)
+                    <button class="btn btn-primary btn-flat margin-b-md" onclick="javascript:document.location.href='{{ action('Admin\RoutinePaymentController@createDetail', ['routine_id' => $routine->id]) }}';"> 
+                        <i class="fa fa-plus"></i> เพิ่ม
+                    </button>
+                @endif
 
                 <div class="table-responsive" style=" margin-top: 10px;">
                     <table id="dataTables" class="table table-hover dataTable" width="100%">
@@ -116,14 +112,18 @@
                                     <td>{{ $detail->interest }}</td>
                                     <td>{{ $detail->total }}</td>
                                     <td>
-                                        @if (!$detail->status || (is_null($routine->approved_at) && !$routine->status && Diamond::today()->greaterThan(Diamond::parse($routine->saved_at))))
+                                        @if (!is_null($routine->approved_date) && $routine->status) 
+                                            <span class="label label-primary">บันทึกข้อมูลแล้ว</span>
+                                        @elseif (!is_null($routine->approved_date) && !$routine->status)
+                                            <span class="label label-info">นำส่งข้อมูลแล้ว</span>
+                                        @elseif (is_null($routine->approved_date) && !$routine->status)
                                             <div class="btn-group">
                                                 {{--<button type="button" class="btn btn-default btn-flat btn-xs"
                                                     onclick="javascript: save_detail({{ $detail->id }});">
                                                     <i class="fa fa-floppy-o"></i>
                                                 </button>--}}
                                                 <button type="button" class="btn btn-default btn-flat btn-xs"
-                                                    onclick="javascript: document.location.href='{{ action('Admin\RoutinePaymentController@editDetail', ['id' => $detail->id]) }}';">
+                                                    onclick="javascript: document.location.href='{{ action('Admin\RoutinePaymentController@editDetail', ['routine_id' => $routine->id, 'id' => $detail->id]) }}';">
                                                     <i class="fa fa-pencil"></i>
                                                 </button>
                                                 <button type="button" class="btn btn-default btn-flat btn-xs"
@@ -131,8 +131,6 @@
                                                     <i class="fa fa-trash"></i>
                                                 </button>
                                             </div>
-                                        @else 
-                                            <span class="label label-primary">บันทึกข้อมูลแล้ว</span>
                                         @endif
                                     </td>
                                 </tr>
@@ -140,11 +138,7 @@
                         </tbody>
                     </table>
 
-                    {{ Form::open(['action' => ['Admin\RoutinePaymentController@saveDetail'], 'id' => 'save_detail_form', 'method' => 'post', 'role' => 'form', 'onsubmit' => "return confirm('คุณต้องการบันทึกข้อมูลนี้ใช่ไหม?');"]) }}
-                        {{ Form::hidden('detail_id', null, [ 'id' => 'detail_id' ]) }}
-                    {{ Form::close() }}
-
-                    {{ Form::open(['action' => ['Admin\RoutinePaymentController@deleteDetail', 0], 'id' => 'delete_delete_form', 'method' => 'delete', 'role' => 'form', 'onsubmit' => "return confirm('คุณต้องการลบข้อมูลนี้ใช่ไหม?');"]) }}
+                    {{ Form::open(['action' => ['Admin\RoutinePaymentController@deleteDetail', $routine->id, 0], 'id' => 'delete_delete_form', 'method' => 'delete', 'role' => 'form', 'onsubmit' => "return confirm('คุณต้องการลบข้อมูลนี้ใช่ไหม?');"]) }}
                     {{ Form::close() }}
                 </div>
                 <!-- /.table-responsive -->
@@ -185,17 +179,17 @@
                 headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
             });
 
-            $('#approve-toggle').click(() => {
-                let routine = $('#routine_status').val();
-                let id = $('#month_id').val();
-                let status = $('#approve').is(':checked');
+            // $('#approve-toggle').click(() => {
+            //     let routine = $('#routine_status').val();
+            //     let id = $('#month_id').val();
+            //     let status = $('#approve').is(':checked');
 
-                if (routine !== "1") {
-                    toggle(id, status);
-                }   
-            });
+            //     if (routine !== "1") {
+            //         toggle(id, status);
+            //     }   
+            // });
 
-            init($('#month_id').val());
+            // init($('#month_id').val());
 
             $('#dataTables').dataTable({
                 "iDisplayLength": 25,

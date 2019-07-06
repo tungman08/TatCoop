@@ -19,8 +19,10 @@ class Kernel extends ConsoleKernel
         Commands\ViewMakeCommand::class,
         Commands\DividendCommand::class,
         Commands\PaymentCalculateCommand::class,
+        Commands\PaymentApproveCommand::class,
         Commands\PaymentStoreCommand::class,
         Commands\ShareholdingCalculateCommand::class,
+        Commands\ShareholdingApproveCommand::class,
         Commands\ShareholdingStoreCommand::class,
     ];
 

@@ -48,20 +48,30 @@
                         <th>ดอกเบี้ยสะสม:</th>
                         <td>{{ number_format($loan->payments->sum('interest'), 2, '.', ',') }} บาท</td>
                     </tr>
-                    <tr>
-                        <th>ผู้ค้ำประกัน:</th>
-                        <td>
-                            <ul class="list-info">
-                                @foreach($loan->sureties as $item)
-                                    <li>{{ $item->profile->fullname }} (ค้ำประกันจำนวน {{ number_format($item->pivot->amount, 2, '.', ',')  }}  บาท)</li>
-                                @endforeach
-                            </ul>
-                        </td>
-                    </tr>
+                    @if ($loan->sureties->count() > 0)
+                        <tr>
+                            <th>ผู้ค้ำประกัน:</th>
+                            <td>
+                                <ul class="list-info">
+                                    @foreach($loan->sureties as $item)
+                                        <li>{{ $item->profile->fullname }} (ค้ำประกันจำนวน {{ number_format($item->pivot->amount, 2, '.', ',')  }}  บาท)</li>
+                                    @endforeach
+                                </ul>
+                            </td>
+                        </tr>
+                    @endif
                 </table>
                 <!-- /.table -->
             </div>  
             <!-- /.table-responsive --> 
+
+            @if ($member->profile->employee->employee_type_id == 1)
+                <p>
+                    <strong>หมายเหตุ:</strong> (สำหรับสมาชิกที่เป็นพนักงาน/ลูกจ้าง ททท. ที่นำส่งตัดบัญชีเงินเดือน)<br />
+                    1. หากชำระค่าเงินกู้ระหว่างวันที่ 1-9 ระบบจะทำการปรับปรุงข้อมูลการนำส่งตัดบัญชีเงินเดือนใหม่ กรุณาตรวจสอบข้อมูลการนำส่งอีกครั้ง<br />
+                    2. หากชำระค่าเงินกู้ตั้งแต่วันที่ 10 ถึงสิ้นเดือน จะเป็นระยะปลอดดอกเบี้ย
+                </p>
+            @endif
         </div>
 
         @if ($errors->count() > 0)

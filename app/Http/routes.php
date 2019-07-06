@@ -150,6 +150,8 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
         Route::post('/shareholding/showfiles', 'ShareholdingController@postShowFiles');
         Route::post('/shareholding/uploadfile', 'ShareholdingController@postUploadFile');
         Route::post('/shareholding/deletefile', 'ShareholdingController@postDeleteFile');
+        Route::get('/shareholding/member/{member_id}/edit', ['as' => 'service.shareholding.adjust', 'uses' => 'ShareholdingController@getAdjust']);
+        Route::put('/shareholding/member/{member_id}', 'ShareholdingController@putAdjust');
         Route::get('/shareholding/member/{member_id}/payment/month/{pay_date}', ['as' => 'service.shareholding.month', 'uses' => 'ShareholdingController@getMonth']);
         Route::get('/shareholding/member/{member_id}/payment/month/{pay_date}/billing/{id}', ['as' => 'service.shareholding.billing', 'uses' => 'ShareholdingController@getBilling']);
         Route::get('/shareholding/member/{member_id}/payment/month/{pay_date}/print/{id}', ['as' => 'service.shareholding.print', 'uses' => 'ShareholdingController@getPrintBilling']);
@@ -204,28 +206,36 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
         Route::post('/dividend/member/{member_id}/detail/{dividend_id}/update', 'DividendController@postMemberUpdate'); 
     });
 
+    // Routine Route...
+    Route::group(['prefix' => '/routine'], function() {
+        // Routine Shareholding Payment Route...
+        Route::get('/shareholding/{routine_id}/detail/create', ['as' => 'routine.shareholding.detail.create', 'uses' => 'RoutineShareholdingController@createDetail']);
+        Route::post('/shareholding/{routine_id}/detail', 'RoutineShareholdingController@storeDetail');
+        Route::get('/shareholding/{routine_id}/detail/{id}/edit', ['as' => 'routine.shareholding.detail.edit', 'uses' => 'RoutineShareholdingController@editDetail']);
+        Route::put('/shareholding/{routine_id}/detail/{id}', 'RoutineShareholdingController@updateDetail');
+        Route::delete('/shareholding/{routine_id}/detail/{id}', 'RoutineShareholdingController@deleteDetail');
+        Route::post('/shareholding/ajax/calculate', 'RoutineShareholdingController@ajaxcalculate');
+        Route::resource('/shareholding', 'RoutineShareholdingController', ['only' => [ 'index', 'show' ]]);
+
+        // Routine Loan Payment Route...
+        Route::get('/payment/{routine_id}/detail/create', ['as' => 'routine.payment.detail.create', 'uses' => 'RoutinePaymentController@createDetail']);
+        Route::post('/payment/{routine_id}/detail', 'RoutinePaymentController@storeDetail');
+        Route::get('/payment/{routine_id}/detail/{id}/edit', ['as' => 'routine.payment.detail.edit', 'uses' => 'RoutinePaymentController@editDetail']);
+        Route::put('/payment/{routine_id}/detail/{id}', 'RoutinePaymentController@updateDetail');
+        Route::delete('/payment/{routine_id}/detail/{id}', 'RoutinePaymentController@deleteDetail');
+        Route::post('/payment/ajax/calculate', 'RoutinePaymentController@ajaxcalculate');
+        Route::post('/payment/ajax/payment', 'RoutinePaymentController@ajaxpayment');
+        Route::resource('/payment', 'RoutinePaymentController', ['only' => [ 'index', 'show' ]]);
+
+        // Routine Setting Route...
+        Route::post('/setting/{id}', 'RoutineSettingController@update');
+        Route::resource('/setting', 'RoutineSettingController', ['only' => [ 'index' ]]);
+    });
+
     // Co-op Route...
     Route::group(['prefix' => '/coop'], function() {
         // Loan List Route...
         Route::get('/loanlist', ['as' => 'coop.loan.loanlist', 'uses' => 'LoanController@getLoanList']);
-
-        // Routine Shareholding Payment Route...
-        Route::post('/routine/shareholding/detail', 'RoutineShareholdingController@saveDetail');
-        Route::get('/routine/shareholding/detail/{id}/edit', ['as' => 'coop.routine.shareholding.detail.edit', 'uses' => 'RoutineShareholdingController@editDetail']);
-        Route::put('/routine/shareholding/detail/{id}', 'RoutineShareholdingController@updateDetail');
-        Route::delete('/routine/shareholding/detail/{id}', 'RoutineShareholdingController@deleteDetail');
-        Route::post('/routine/shareholding/{id}/save', 'RoutineShareholdingController@save');
-        Route::post('/routine/shareholding/{id}/report', 'RoutineShareholdingController@report');
-        Route::resource('/routine/shareholding', 'RoutineShareholdingController', ['only' => [ 'index', 'show' ]]);
-
-        // Routine Loan Payment Route...
-        Route::post('/routine/payment/detail', 'RoutinePaymentController@saveDetail');
-        Route::get('/routine/payment/detail/{id}/edit', ['as' => 'coop.routine.payment.detail.edit', 'uses' => 'RoutinePaymentController@editDetail']);
-        Route::put('/routine/payment/detail/{id}', 'RoutinePaymentController@updateDetail');
-        Route::delete('/routine/payment/detail/{id}', 'RoutinePaymentController@deleteDetail');
-        Route::post('/routine/payment/{id}/save', 'RoutinePaymentController@save');
-        Route::post('/routine/payment/{id}/report', 'RoutinePaymentController@report');
-        Route::resource('/routine/payment', 'RoutinePaymentController', ['only' => [ 'index', 'show' ]]);
 
         // Routine Available Loan Route...
         Route::get('/available/loan', ['as' => 'coop.available.loan', 'uses' => 'LoanController@getAvailable']);

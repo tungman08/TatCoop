@@ -10,6 +10,11 @@
                 <a href="javascript:void(0);" onclick="javascript:reportexport('loans', 'monthly');"><i class="fa fa-file-excel-o"></i> ชำระเงินกู้ประจำเดือน</a>
             </td>
         </tr>
+        <tr>
+            <td>
+                <a href="javascript:void(0);" onclick="javascript:reportexport('routine', 'monthly');"><i class="fa fa-file-excel-o"></i> นำส่งตัดบัญชีเงินเดือน</a>
+            </td>
+        </tr>
     </table>
 </div>
 <!-- /.table-responsive -->

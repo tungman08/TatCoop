@@ -150,9 +150,22 @@
                             {{ Form::text('interest', null, [
                                 'readonly' => false,
                                 'class'=>'form-control', 
-                                'placeholder'=>'กรุณากดปุมคำนวณ...', 
+                                'placeholder'=>'ตัวอย่าง: 100000', 
                                 'autocomplete'=>'off',
                                 'onkeypress' => 'javascript:return isNumberKey(event);'])
+                            }}        
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ Form::label('remark', 'หมายเหตุ', [
+                            'class'=>'col-sm-2 control-label']) 
+                        }}
+
+                        <div class="col-sm-10">
+                            {{ Form::text('remark', null, [
+                                'readonly' => false,
+                                'class'=>'form-control', 
+                                'autocomplete' =>'off'])
                             }}        
                         </div>
                     </div>

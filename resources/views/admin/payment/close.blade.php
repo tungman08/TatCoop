@@ -48,20 +48,30 @@
                         <th>ดอกเบี้ยสะสม:</th>
                         <td>{{ number_format($loan->payments->sum('interest'), 2, '.', ',') }} บาท</td>
                     </tr>
-                    <tr>
-                        <th>ผู้ค้ำประกัน:</th>
-                        <td>
-                            <ul class="list-info">
-                                @foreach($loan->sureties as $item)
-                                    <li>{{ $item->profile->fullname }} (ค้ำประกันจำนวน {{ number_format($item->pivot->amount, 2, '.', ',')  }}  บาท)</li>
-                                @endforeach
-                            </ul>
-                        </td>
-                    </tr>
+                    @if ($loan->sureties->count() > 0)
+                        <tr>
+                            <th>ผู้ค้ำประกัน:</th>
+                            <td>
+                                <ul class="list-info">
+                                    @foreach($loan->sureties as $item)
+                                        <li>{{ $item->profile->fullname }} (ค้ำประกันจำนวน {{ number_format($item->pivot->amount, 2, '.', ',')  }}  บาท)</li>
+                                    @endforeach
+                                </ul>
+                            </td>
+                        </tr>
+                    @endif
                 </table>
                 <!-- /.table -->
             </div>  
             <!-- /.table-responsive --> 
+
+            @if ($member->profile->employee->employee_type_id == 1)
+                <p>
+                    <strong>หมายเหตุ:</strong> (สำหรับสมาชิกที่เป็นพนักงาน/ลูกจ้าง ททท. ที่นำส่งตัดบัญชีเงินเดือน)<br />
+                    1. หากปิดยอดเงินกู้ระหว่างวันที่ 1-9 ระบบจะทำการลบข้อมูลการนำส่งตัดบัญชีเงินเดือนออก กรุณาตรวจสอบข้อมูลการนำส่งอีกครั้ง<br />
+                    2. หากปิดยอดเงินกู้ตั้งแต่วันที่ 10 ถึงสิ้นเดือน ระบบจะคำนวณเงินที่ต้องใช้ โดยทำการคำนวณดอกเบี้ยถึงวันที่ทำการปิดยอด และหักส่วนของเงินที่นำส่ง
+                </p>
+            @endif
         </div>
 
         @if ($errors->count() > 0)
@@ -74,34 +84,8 @@
 
        <div class="box box-primary">
             @php
-                $header = '';
-
-                if ($member->profile->employee->employee_type_id == 1) {
-                    // พนักงาน/ลูกจ้าง
-                    if ($loan->payments->count() > 0) {
-                        // ผ่อนแล้ว
-                        $last_pay_date = Diamond::parse($loan->payments->max('pay_date'));
-
-                        if ($last_pay_date->gt(Diamond::today())) {
-                            // หักบัญชีอัตโนมัติในเดือนนี้ไปแล้ว
-                            $start = $loan->payments->count() > 1 ? Diamond::parse($loan->payments->orderBy('pay_date')->skip(1)->take(1)->first()->pay_date)->thai_format('d M Y') : Diamond::parse($loan->loaned_at)->thai_format('d M Y');
-                            $header = $start . ' ถึงวันที่มาชำระ';
-                        }
-                        else {
-                            // ยังไม่ได้หักบัญชีอัตโนมัติในเดือนนี้
-                            $header = Diamond::parse($loan->payments->max('pay_date'))->thai_format('d M Y') . ' ถึงวันที่มาชำระ';
-                        }
-                    }
-                    else {
-                        // ยังไม่เคยผ่อน
-                        $header = Diamond::parse($loan->loaned_at)->thai_format('d M Y') . ' ถึงวันที่มาชำระ';
-                    }
-                }
-                else {
-                    // บุคคลภายนอก
-                    $start = $loan->payments->count() > 0 ? Diamond::parse($loan->payments->max('pay_date'))->thai_format('d M Y') : Diamond::parse($loan->loaned_at)->thai_format('d M Y');
-                    $header = $start . ' ถึงวันที่มาชำระ';
-                }
+                $start = $loan->payments->count() > 0 ? Diamond::parse($loan->payments->max('pay_date'))->thai_format('d M Y') : Diamond::parse($loan->loaned_at)->thai_format('d M Y');
+                $header = $start . ' ถึงวันที่มาชำระ';
             @endphp
 
             <div class="box-header with-border">
@@ -141,7 +125,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        {{ Form::label('total', 'จำนวนเงินที่ต้องการชำระ', [
+                        {{ Form::label('total', 'จำนวนเงินที่ต้องชำระ', [
                             'class'=>'col-sm-2 control-label']) 
                         }}
 
@@ -180,19 +164,6 @@
                                 'placeholder'=>'กรุณากดปุมคำนวณ...', 
                                 'autocomplete'=>'off'])
                             }}        
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        {{ Form::label('remark', 'หมายเหตุ', [
-                            'class'=>'col-sm-2 control-label']) 
-                        }}
-                        <div class="col-sm-10">
-                            {{ Form::text('remark', null, [
-                                'readonly' => true,
-                                'class'=>'form-control', 
-                                'placeholder'=>'กรุณากดปุมคำนวณ...', 
-                                'autocomplete'=>'off'])
-                            }}            
                         </div>
                     </div>
                 </div>
@@ -284,7 +255,6 @@
                         $('#principle').val($.number(result.principle, 2));
                         $('#interest').val($.number(result.interest, 2));
                         $('#total').val($.number(result.total, 2));
-                        $('#remark').val(result.remark);
 
                         $('#save').removeAttr("disabled");
                     }

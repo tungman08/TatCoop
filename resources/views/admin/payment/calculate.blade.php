@@ -48,16 +48,18 @@
                         <th>ดอกเบี้ยสะสม:</th>
                         <td>{{ number_format($loan->payments->sum('interest'), 2, '.', ',') }} บาท</td>
                     </tr>
-                    <tr>
-                        <th>ผู้ค้ำประกัน:</th>
-                        <td>
-                            <ul class="list-info">
-                                @foreach($loan->sureties as $item)
-                                    <li>{{ $item->profile->fullname }} (ค้ำประกันจำนวน {{ number_format($item->pivot->amount, 2, '.', ',')  }}  บาท)</li>
-                                @endforeach
-                            </ul>
-                        </td>
-                    </tr>
+                    @if ($loan->sureties->count() > 0)
+                        <tr>
+                            <th>ผู้ค้ำประกัน:</th>
+                            <td>
+                                <ul class="list-info">
+                                    @foreach($loan->sureties as $item)
+                                        <li>{{ $item->profile->fullname }} (ค้ำประกันจำนวน {{ number_format($item->pivot->amount, 2, '.', ',')  }}  บาท)</li>
+                                    @endforeach
+                                </ul>
+                            </td>
+                        </tr>
+                    @endif
                 </table>
                 <!-- /.table -->
             </div>  
@@ -76,13 +78,22 @@
                     <input type="hidden" id="loan_id" value="{{ $loan->id }}" />
 
                     <div class="form-group">
-                        <label for="pay_date" class="col-sm-2 control-label">วันที่ชำระ</label>
-                        <div class="col-sm-10 input-group" style="padding: 0 5px;">
-                            <input type="text" name="pay_date" id="pay_date"
-                                placeholder="กรุณาเลือกจากปฏิทิน..."
-                                autocomplete="off" class="form-control" />  
+                            {{ Form::label('pay_date', 'วันที่ชำระ', [
+                                'class'=>'col-sm-2 control-label']) 
+                            }}
+    
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
+                                    {{ Form::text('pay_date', Diamond::today()->format('Y-m-d'), [
+                                        'id'=>'pay_date',
+                                        'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
+                                        'autocomplete'=>'off',
+                                        'class'=>'form-control'])
+                                    }} 
+                                </div>      
+                            </div>
                         </div>
-                    </div>
                     <div class="form-group">
                         <div class="col-md-offset-2 padding-l-xs">
                             <button type="button" id="calculate" class="btn btn-default btn-flat">
@@ -112,14 +123,6 @@
                             <input type="text" id="total" readonly="readonly"
                                 placeholder="กรุณากดปุมคำนวณ..."
                                 class="form-control" />      
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="remark" class="col-sm-2 control-label">หมายเหตุ</label>
-                        <div class="col-sm-10">
-                            <input type="text" id="remark" readonly="readonly"
-                                placeholder="กรุณากดปุมคำนวณ..."
-                                class="form-control" />        
                         </div>
                     </div>
                 </form>
@@ -196,7 +199,6 @@
                         $('#principle').val($.number(result.principle, 2));
                         $('#interest').val($.number(result.interest, 2));
                         $('#total').val($.number(result.total, 2));
-                        $('#remark').val(result.remark);
                     }
                 });
             }

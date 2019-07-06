@@ -12,6 +12,8 @@ use App\Member;
 use App\Loan;
 use App\Payment;
 use App\PaymentAttachment;
+use App\RoutinePayment;
+use App\RoutinePaymentDetail;
 use LoanCalculator;
 use Validator;
 use FileManager;
@@ -21,6 +23,7 @@ use History;
 use Auth;
 use PDF;
 use Response;
+use Routine;
 use Storage;
 use stdClass;
 
@@ -110,6 +113,7 @@ class PaymentController extends Controller
                     $payment->attachments()->save($attachment);
                 }
 
+                Routine::payment(Diamond::parse($request->input('pay_date')), $loan->id);  
                 History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'ป้อนการชำระเงินกู้ ' . $loan->code);
             });
 
@@ -177,6 +181,7 @@ class PaymentController extends Controller
                 $payment->pay_date = Diamond::parse($request->input('pay_date'));
                 $payment->principle = floatval(str_replace(',', '', $request->input('principle')));
                 $payment->interest = floatval(str_replace(',', '', $request->input('interest')));
+                $payment->remark = !empty($request->input('remark')) ? $request->input('remark') : null;
                 $payment->save();
 
                 if (abs($loan->outstanding - $loan->payments->sum('principle')) < 0.01) {
@@ -252,7 +257,6 @@ class PaymentController extends Controller
 
         $validator->after(function($validator) use ($loan_id) {
             $loan = Loan::find($loan_id);
-            $member = $loan->member;
 
             // เงื่อนไขการปิดยอดกู้สามัญ
             if ($loan->loan_type_id == 1) {
@@ -273,22 +277,27 @@ class PaymentController extends Controller
         }
         else {
             DB::transaction(function() use ($request, $loan_id) {
+                $loan = Loan::find($loan_id);
+                $pay_date = Diamond::parse($request->input('pay_date'));
+                $refund = $this->refund($loan_id, $pay_date);
+
                 $payment = new Payment();
                 $payment->loan_id = $loan_id;
-                $payment->pay_date = Diamond::parse($request->input('pay_date'));
+                $payment->period = ($loan->payments->count() > 0) ? $loan->payments->max('period') + 1 : 1;
+                $payment->pay_date = $pay_date;
                 $payment->principle = floatval(str_replace(',', '', $request->input('principle')));
                 $payment->interest = floatval(str_replace(',', '', $request->input('interest')));
+                $payment->remark = !empty($refund) ? $refund : null;
                 $payment->save();
 
                 $this->closeDate($loan_id);
-    
+
+                Routine::closeloan($pay_date, $loan_id);
                 History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'ปิดยอดเงินกู้ ' . $payment->loan->code);
             });
 
             return redirect()->action('Admin\LoanController@show', [ 'member_id' => Loan::find($loan_id)->member_id, 'id' => $loan_id ])
-                ->with('flash_message', ($request->input('remark') != '-') 
-                    ? 'ข้อมูลการปิดยอดเงินกู้ถูกป้อนเรียบร้อยแล้ว (' . $request->input('remark') . ')' 
-                    : 'ข้อมูลการปิดยอดเงินกู้ถูกป้อนเรียบร้อยแล้ว')
+                ->with('flash_message', 'ข้อมูลการปิดยอดเงินกู้ถูกป้อนเรียบร้อยแล้ว')
                 ->with('callout_class', 'callout-success');
         }
     }
@@ -401,5 +410,30 @@ class PaymentController extends Controller
 
         $loan->completed_at = Diamond::parse($last_pay_date);
         $loan->save(); 
+    }
+
+    protected function refund($loan_id, $date) {
+        $result = '';
+        $loan = Loan::find($loan_id);
+        $startOfMonth = $date->copy()->startOfMonth();
+        $d_day = $startOfMonth->copy()->addDays(Routine::dday() - 1); // วันที่ 10
+
+        if ($date->greaterThanOrEqualTo($d_day)) {
+            if ($loan->member->profile->employee->employee_type_id == 1) {
+                if (RoutinePayment::where('calculated_date', $startOfMonth)->count() > 0) {
+                    $routine = RoutinePayment::where('calculated_date', $startOfMonth)->first();
+
+                    if (RoutinePaymentDetail::where('routine_payment_id', $routine->id)->where('loan_id', $loan->id)->count() > 0) {
+                        $detail = RoutinePaymentDetail::where('routine_payment_id', $routine->id)
+                            ->where('loan_id', $loan->id)
+                            ->first();
+
+                        $result = 'คืนเงิน ' . number_format($detail->principle + $detail->interest, 2, '.', ',') . ' บาท';
+                    }
+                }
+            }
+        }
+
+        return $result;
     }
 }

@@ -4,7 +4,7 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
         <h1>
-            ชำระเงินกู้ปกติ
+            ค่าชำระเงินกู้ปกติเพื่อตัดบัญชีเงินเดือน
             <small>ชำระเงินกู้ปกติ สำหรับสมาชิกประเภทพนักงาน/ลูกจ้าง ททท.</small>
         </h1>
 
@@ -17,34 +17,18 @@
     <section class="content">
         <!-- Info boxes -->
         <div class="well">
-            <h4>ชำระเงินกู้ปกติ</h4>    
+            <h4>ค่าชำระเงินกู้ปกติเพื่อตัดบัญชีเงินเดือน</h4>    
             <p>
                 ระบบจะคำนวณยอดเงินที่ต้องชำระค่าเงินกู้รายเดือนของสมาชิกประเภทพนักงาน/ลูกจ้าง ททท.<br />
-                โดยจะคำนวณยอดเงินใน<u>ทุกๆ วันที่ 1 ของเดือน</u><br />
-                เพื่อให้ผู้ดูแลระบบตรวจสอบยอดที่คำนวณได้ว่าถูกต้องหรือไม่<br />
+                โดยระบบจะทำการคำนวณยอดเงินใน<u>ทุกๆ วันที่ 1 ของเดือน</u><br />
+                เพื่อให้เจ้าหน้าที่ทำการส่งตัดบัญชีเงินเดือนล่วงหน้า<u>ในทุกๆ วันที่ 10 ของเดือน</u><br />
                 และทำการบันทึกยอดเงินลงฐานข้อมูลจริงใน<u>ทุกๆ วันสุดท้ายของเดือนนั้นๆ</u><br />
             </p>  
-            
-            <div class="form-group" style="margin-bottom: 0px;">
-                <div id="auto_calculate" class="toggle-btn">
-                    <label class="toggle-label">คำนวณชำระเงินกู้ปกติอัตโนมัติ (ทุกๆ วันที่ 1 ของเดือน)</label>
-                    <input type="checkbox" id="calculate" class="cb-value" />
-                    <span class="round-btn"></span>
-                </div>
-            </div>
-
-            <div class="form-group" style="margin-bottom: 0px; display: none;">
-                <div id="auto_save" class="toggle-btn">
-                    <label class="toggle-label">บันทึกชำระเงินกู้ปกติอัตโนมัติ (ทุกๆ วันสุดท้ายของเดือน)</label>
-                    <input type="checkbox" id="save" class="cb-value" />
-                    <span class="round-btn"></span>
-                </div>
-            </div>
         </div>
 
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title"><i class="fa fa-gbp"></i> รายการชำระเงินกู้ปกติ</h3>
+                <h3 class="box-title"><i class="fa fa-sticky-note"></i> รายการนำส่งค่าชำระเงินกู้ปกติเพื่อตัดบัญชีเงินเดือน</h3>
             </div>
             <!-- /.box-header -->
 
@@ -76,11 +60,10 @@
                                         @if (!is_null($routine->approved_date) && $routine->status) 
                                             <span class="label label-primary">บันทึกข้อมูลแล้ว</span>
                                         @elseif (!is_null($routine->approved_date) && !$routine->status)
-                                            <span class="label label-info">ตรวจสอบแล้ว</span>
-                                        @elseif (is_null($routine->approved_date) && !$routine->status && Diamond::today()->lessThan(Diamond::parse($routine->saved_at)))
-                                            <span class="label label-warning">ยังไม่ได้ตรวจสอบ</span>
+                                            <span class="label label-info">นำส่งข้อมูลแล้ว</span>
+                                        @elseif (is_null($routine->approved_date) && !$routine->status)
+                                            <span class="label label-warning">รอนำข้อมูลส่ง</span>
                                         @else
-                                            <!-- is_null($routine->approved_date) && !$routine->status && Diamond::today()->greaterThan(Diamond::parse($routine->saved_at)) -->
                                             <span class="label label-danger">หมดอายุ</span> 
                                         @endif
                                     </td>
@@ -129,7 +112,7 @@
             });
 
             $('#dataTables').dataTable({
-                "iDisplayLength": 25,
+                "iDisplayLength": 10,
                 "columnDefs": [
                     { type: 'formatted-num', targets: 2 },
                     { type: 'formatted-num', targets: 3 },
@@ -138,19 +121,19 @@
                 ]
             });
 
-            $('#auto_calculate').click(() => {
-                let status = $('#calculate').is(':checked');
+            // $('#auto_calculate').click(() => {
+            //     let status = $('#calculate').is(':checked');
 
-                toggle_calculate(status);
-            });
+            //     toggle_calculate(status);
+            // });
 
-            $('#auto_save').click(() => {
-                let status = $('#save').is(':checked');
+            // $('#auto_save').click(() => {
+            //     let status = $('#save').is(':checked');
 
-                toggle_save(status);
-            });
+            //     toggle_save(status);
+            // });
 
-            init();
+            // init();
         });
 
         function init() {

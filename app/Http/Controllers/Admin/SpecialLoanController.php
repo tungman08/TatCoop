@@ -15,6 +15,7 @@ use History;
 use LoanCalculator;
 use LoanManager;
 use Validator;
+use Routine;
 
 class SpecialLoanController extends Controller
 {
@@ -154,13 +155,18 @@ class SpecialLoanController extends Controller
                 ->withInput();
         }
         else {
-            $loan = Loan::find($request->input('id'));
-            $loan->code = $request->input('loan_code');
-            $loan->loaned_at = Diamond::parse($request->input('loaned_at'));
-            $loan->step = 2;
-            $loan->save();
+            DB::transaction(function() use ($request) {
+                $loan = Loan::find($request->input('id'));
+                $loan->code = $request->input('loan_code');
+                $loan->loaned_at = Diamond::parse($request->input('loaned_at'));
+                $loan->step = 2;
+                $loan->save();
+                
+                Routine::createloan(Diamond::parse($request->input('loaned_at')), $loan->id);
+                History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'ทำสัญญากู้ยืมเลขที่ ' . $request->input('loan_code'));
+            });
 
-            History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'ทำสัญญากู้ยืมเลขที่ ' . $request->input('loan_code'));
+            $loan = Loan::find($request->input('id'));
 
             return redirect()->action('Admin\LoanController@index', [
                 'member_id' => $loan->member_id
@@ -276,13 +282,17 @@ class SpecialLoanController extends Controller
                 ->withInput();
         }
         else {
-            $loan = Loan::find($request->input('id'));
-            $loan->code = $request->input('loan_code');
-            $loan->loaned_at = Diamond::parse($request->input('loaned_at'));
-            $loan->step = 2;
-            $loan->save();
+            DB::transaction(function() use ($request) {
+                $loan = Loan::find($request->input('id'));
+                $loan->code = $request->input('loan_code');
+                $loan->loaned_at = Diamond::parse($request->input('loaned_at'));
+                $loan->step = 2;
+                $loan->save();
 
-            History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'ทำสัญญากู้ยืมเลขที่ ' . $request->input('loan_code'));
+                History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'ทำสัญญากู้ยืมเลขที่ ' . $request->input('loan_code'));
+            });
+
+            $loan = Loan::find($request->input('id'));
 
             return redirect()->action('Admin\LoanController@index', [
                 'member_id' => $loan->member_id

@@ -42,7 +42,7 @@
             <div class="pull-right">
                 {{ Form::button('<i class="fa fa-sign-out"></i> ออกจากระบบ', [
                     'class' => 'btn btn-default btn-flat',
-                    'onclick' => 'javascript:var result = confirm(\'คุณต้องการออกจากระบบใช่ไหม ?\'); if (result) { document.location.href = "' . action('Admin\AuthController@getLogout') . ';" }']) }}
+                    'onclick' => 'javascript:var result = confirm(\'คุณต้องการออกจากระบบใช่ไหม ?\'); if (result) { document.location.href = "' . action('Admin\AuthController@getLogout') . '"; }']) }}
             </div>
         </li>
     </ul>

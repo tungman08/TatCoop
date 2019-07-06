@@ -37,10 +37,16 @@ class MainMenu
         }
         
         if ($super || $admin) {
+            $routine = new MenuTree(['title' => 'นำส่งตัดเงินเดือน', 'icon' => 'fa-clock-o', 'url' => '/routine']);
+            $routine->add(new MenuItem(['title' => 'ชำระค่าหุ้นปกติ', 'icon' => 'fa-sticky-note', 'url' => '/routine/shareholding']));
+            $routine->add(new MenuItem(['title' => 'ชำระเงินกู้ปกติ', 'icon' => 'fa-sticky-note-o', 'url' => '/routine/payment']));
+            if ($super) $routine->add(new MenuItem(['title' => 'ตั้งค่าการนำส่ง', 'icon' => 'fa-gear', 'url' => '/routine/setting']));
+            $menu->add($routine);
+        }
+
+        if ($super || $admin) {
             $coop = new MenuTree(['title' => 'เครื่องมือช่วย', 'icon' => 'fa-briefcase', 'url' => '/coop']);
             $coop->add(new MenuItem(['title' => 'สัญญาเงินกู้', 'icon' => 'fa-usd', 'url' => '/coop/loanlist']));
-            $coop->add(new MenuItem(['title' => 'ชำระค่าหุ้นปกติ', 'icon' => 'fa-eur', 'url' => '/coop/routine/shareholding']));
-            $coop->add(new MenuItem(['title' => 'ชำระเงินกู้ปกติ', 'icon' => 'fa-gbp', 'url' => '/coop/routine/payment']));
             $coop->add(new MenuItem(['title' => 'ความสามารถในการกู้', 'icon' => 'fa-jpy', 'url' => '/coop/available/loan']));
             $coop->add(new MenuItem(['title' => 'ความสามารถในการค้ำ', 'icon' => 'fa-btc', 'url' => '/coop/available/bailsman']));
             $menu->add($coop);

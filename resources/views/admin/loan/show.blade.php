@@ -180,11 +180,12 @@
                         <thead>
                             <tr>
                                 <th style="width: 10%;">#</th>
-                                <th style="width: 17%;">งวดที่</th>
-                                <th style="width: 17%;">วันที่ชำระ</th>
-                                <th style="width: 17%;">เงินต้น</th>
-                                <th style="width: 17%;">ดอกเบี้ย</th>
-                                <th style="width: 17%;">รวม</th>
+                                <th style="width: 10%;">งวดที่</th>
+                                <th style="width: 15%;">วันที่ชำระ</th>
+                                <th style="width: 15%;">เงินต้น</th>
+                                <th style="width: 15%;">ดอกเบี้ย</th>
+                                <th style="width: 15%;">รวม</th>
+                                <th style="width: 15%;">หมายเหตุ</th>
                                 <th style="width: 5%;">&nbsp;</th>
                             </tr>
                         </thead>
@@ -197,6 +198,7 @@
                                     <td>{{ number_format($payment->principle, 2, '.', ',') }} บาท</td>
                                     <td>{{ number_format($payment->interest, 2, '.', ',') }} บาท</td>
                                     <td>{{ number_format($payment->principle + $payment->interest, 2, '.', ',') }} บาท</td>
+                                    <td>{{ $payment->remark }}</td>
 									<td>{!! ($payment->attachments->count() > 0) ? '<i class="fa fa-paperclip"></i>' : '&nbsp;' !!}</td>
                                 </tr>
                             @endforeach

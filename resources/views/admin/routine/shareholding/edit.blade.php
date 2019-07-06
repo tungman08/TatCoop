@@ -10,7 +10,7 @@
 
         @include('admin.layouts.breadcrumb', ['breadcrumb' => [
             ['item' => 'ชำระค่าหุ้นปกติ', 'link' => action('Admin\RoutineShareholdingController@index')],
-            ['item' => Diamond::parse($detail->routine->calculated_date)->thai_format('M Y'), 'link' => action('Admin\RoutineShareholdingController@show', ['id' => $detail->routine->id])],
+            ['item' => Diamond::parse($detail->routine->calculated_date)->thai_format('M Y'), 'link' => action('Admin\RoutineShareholdingController@show', ['id' => $detail->routine_shareholding_id])],
             ['item' => 'แก้ไข', 'link' => '']
         ]])
     </section>
@@ -33,13 +33,13 @@
 
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title"><i class="fa fa-eur"></i> รายการชำระค่าหุ้นปกติ</h3>
+                <h3 class="box-title"><i class="fa fa-sticky-note-o"></i> รายการชำระค่าหุ้นปกติ</h3>
             </div>
             <!-- /.box-header -->
 
             <!-- form start -->
-            {{ Form::model($detail, ['action' => ['Admin\RoutineShareholdingController@updateDetail', $detail->id], 'method' => 'put', 'class' => 'form-horizontal']) }}
-            <div class="box-body">
+            {{ Form::model($detail, ['action' => ['Admin\RoutineShareholdingController@updateDetail', $detail->routine->id, $detail->id], 'method' => 'put', 'class' => 'form-horizontal']) }}
+                <div class="box-body">
                     <div class="form-group">
                         {{ Form::label('shareholding', 'จำนวนหุ้น', [
                             'class'=>'col-sm-2 control-label']) 

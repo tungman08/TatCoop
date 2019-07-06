@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
+use Response;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
@@ -10,6 +11,7 @@ use App\Http\Controllers\Controller;
 use App\RoutineSetting;
 use App\RoutinePayment;
 use App\RoutinePaymentDetail;
+use App\Member;
 use App\Loan;
 use App\Payment;
 use Validator;
@@ -18,6 +20,7 @@ use Diamond;
 use Excel;
 use PHPExcel_Shared_Date as ExcelDate;
 use stdClass;
+use LoanCalculator;
 
 class RoutinePaymentController extends Controller
 {
@@ -40,9 +43,9 @@ class RoutinePaymentController extends Controller
     public function index() {
         $setting = RoutineSetting::find(2);
 
-        if ($setting->save_status == true) {
-            $this->updateStatus();
-        }
+        // if ($setting->save_status == true) {
+        //     $this->updateStatus();
+        // }
 
         $routines = RoutinePayment::orderBy('calculated_date', 'desc')
             ->get();
@@ -80,90 +83,148 @@ class RoutinePaymentController extends Controller
         ]);
     }
 
-    public function save($id) {
-        $this->updateStatus();
+    // public function save($id) {
+    //     $this->updateStatus();
         
-        $routine = RoutinePayment::find($id);
+    //     $routine = RoutinePayment::find($id);
 
-        DB::transaction(function() use ($routine) {
-            //save data
-            foreach ($routine->details as $detail) {
-                $payment = new Payment();
-                $payment->pay_date = $detail->pay_date;
-                $payment->period = $detail->period;
-                $payment->principle = $detail->principle;
-                $payment->interest = $detail->interest;
+    //     DB::transaction(function() use ($routine) {
+    //         //save data
+    //         foreach ($routine->details as $detail) {
+    //             $payment = new Payment();
+    //             $payment->pay_date = $detail->pay_date;
+    //             $payment->period = $detail->period;
+    //             $payment->principle = $detail->principle;
+    //             $payment->interest = $detail->interest;
 
-                $loan = Loan::find($detail->loan_id);
-                $loan->payments()->save($payment);
+    //             $loan = Loan::find($detail->loan_id);
+    //             $loan->payments()->save($payment);
 
-                $detail->status = true;
-                $detail->save();
-            }
+    //             $detail->status = true;
+    //             $detail->save();
+    //         }
 
-            $routine->status = true;
-            $routine->saved_date = Diamond::today();
-            $routine->save();
-        });
+    //         $routine->status = true;
+    //         $routine->saved_date = Diamond::today();
+    //         $routine->save();
+    //     });
 
-        return redirect()->action('Admin\RoutinePaymentController@show', ['id' => $routine->id])
-            ->with('flash_message', 'บันทึกข้อมูลการชำระค่าเงินกู้ทั้งหมดลงฐานข้อมูลเรียบร้อยเรียบร้อยแล้ว')
-            ->with('callout_class', 'callout-success');
+    //     return redirect()->action('Admin\RoutinePaymentController@show', ['id' => $routine->id])
+    //         ->with('flash_message', 'บันทึกข้อมูลการชำระค่าเงินกู้ทั้งหมดลงฐานข้อมูลเรียบร้อยเรียบร้อยแล้ว')
+    //         ->with('callout_class', 'callout-success');
+    // }
+
+    public function createDetail($routine_id) {
+        $routine = RoutinePayment::find($routine_id);
+
+        return view('admin.routine.payment.create', [
+            'routine' => $routine
+        ]);
     }
 
-    public function saveDetail(Request $request) {
-        $detail_id = $request->input('detail_id');
-        $detail = RoutinePaymentDetail::find($detail_id);
-
+    public function storeDetail($routine_id, Request $request) {
         $rules = [
-            'detail_id' => 'required|numeric',
+            'loan_id' => 'required|numeric',
+            'pay_date' => 'required|date_format:Y-m-d', 
+            'period' => 'required|numeric',
+            'principle' => 'required|numeric',
+            'interest' => 'required|numeric',
         ];
 
         $attributeNames = [
-            'detail_id' => 'ไอดี',
+            'loan_id' => 'รหัสสมาชิก',
+            'pay_date' => 'วันที่ชำระ', 
+            'period' => 'งวดที่',
+            'principle' => 'จำนวนเงินต้น',
+            'interest' => 'จำนวนดอกเบี้ย',
         ];
-
+ 
         $validator = Validator::make($request->all(), $rules);
         $validator->setAttributeNames($attributeNames);
 
-        $validator->after(function($validator) use ($detail) {
-            //conflict check
-            $payment = Payment::where('loan_id', $detail->loan_id)
-                ->whereMonth('pay_date', Diamond::parse($detail->pay_date)->month)
-                ->whereYear('pay_date', Diamond::parse($detail->pay_date)->year)
-                ->get();
-
-            if ($payment->count() > 0) {
-                $validator->errors()->add('conflict', 'ข้อมูลการชำระค่าเงินกู้ของสมาชิกมีความขัดแย้งกัน กรุณาตรวจสอบอีกครั้ง');
+        $validator->after(function ($validator)use ($request, $routine_id) {
+            if (RoutinePaymentDetail::where('routine_payment_id', $routine_id)
+                ->where('loan_id', $request->input('loan_id'))->count() > 0) {
+                $validator->errors()->add('error', 'สัญญาเงินกู้นี้มีข้อมูลอยู่แล้ว');
             }
         });
 
         if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator);
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
         }
         else {
-            DB::transaction(function() use ($detail) {
-                //save data
-                $payment = new Payment();
-                $payment->pay_date = $detail->pay_date;
-                $payment->period = $detail->period;
-                $payment->principle = $detail->principle;
-                $payment->interest = $detail->interest;
-
-                $loan = Loan::find($detail->loan_id);
-                $loan->payments()->save($payment);
-
-                $detail->status = true;
+            DB::transaction(function() use ($request, $routine_id) {
+                $detail = new RoutinePaymentDetail();
+                $detail->routine_payment_id = $routine_id;
+                $detail->loan_id = $request->input('loan_id');
+                $detail->pay_date = Diamond::parse($request->input('pay_date'));
+                $detail->period = $request->input('period');
+                $detail->principle = $request->input('principle');
+                $detail->interest = $request->input('interest');
                 $detail->save();
             });
 
-            return redirect()->action('Admin\RoutinePaymentController@show', ['id' => $detail->routine->id])
-                ->with('flash_message', 'บันทึกข้อมูลการชำระค่าเงินกู้ลงฐานข้อมูลเรียบร้อยเรียบร้อยแล้ว')
+            return redirect()->action('Admin\RoutinePaymentController@show', ['routine_id' => $routine_id])
+                ->with('flash_message', 'เพิ่มข้อมูลการชำระเงินกู้เรียบร้อยแล้ว')
                 ->with('callout_class', 'callout-success');
         }
     }
+    
+    // public function saveDetail(Request $request) {
+    //     $detail_id = $request->input('detail_id');
+    //     $detail = RoutinePaymentDetail::find($detail_id);
 
-    public function editDetail($id) {
+    //     $rules = [
+    //         'detail_id' => 'required|numeric',
+    //     ];
+
+    //     $attributeNames = [
+    //         'detail_id' => 'ไอดี',
+    //     ];
+
+    //     $validator = Validator::make($request->all(), $rules);
+    //     $validator->setAttributeNames($attributeNames);
+
+    //     $validator->after(function($validator) use ($detail) {
+    //         //conflict check
+    //         $payment = Payment::where('loan_id', $detail->loan_id)
+    //             ->whereMonth('pay_date', Diamond::parse($detail->pay_date)->month)
+    //             ->whereYear('pay_date', Diamond::parse($detail->pay_date)->year)
+    //             ->get();
+
+    //         if ($payment->count() > 0) {
+    //             $validator->errors()->add('conflict', 'ข้อมูลการชำระค่าเงินกู้ของสมาชิกมีความขัดแย้งกัน กรุณาตรวจสอบอีกครั้ง');
+    //         }
+    //     });
+
+    //     if ($validator->fails()) {
+    //         return redirect()->back()->withErrors($validator);
+    //     }
+    //     else {
+    //         DB::transaction(function() use ($detail) {
+    //             //save data
+    //             $payment = new Payment();
+    //             $payment->pay_date = $detail->pay_date;
+    //             $payment->period = $detail->period;
+    //             $payment->principle = $detail->principle;
+    //             $payment->interest = $detail->interest;
+
+    //             $loan = Loan::find($detail->loan_id);
+    //             $loan->payments()->save($payment);
+
+    //             $detail->status = true;
+    //             $detail->save();
+    //         });
+
+    //         return redirect()->action('Admin\RoutinePaymentController@show', ['id' => $detail->routine->id])
+    //             ->with('flash_message', 'บันทึกข้อมูลการชำระค่าเงินกู้ลงฐานข้อมูลเรียบร้อยเรียบร้อยแล้ว')
+    //             ->with('callout_class', 'callout-success');
+    //     }
+    // }
+
+    public function editDetail($routine_id, $id) {
         $detail = RoutinePaymentDetail::find($id);
 
         return view('admin.routine.payment.edit', [
@@ -171,7 +232,7 @@ class RoutinePaymentController extends Controller
         ]);
     }
 
-    public function updateDetail($id, Request $request) {
+    public function updateDetail($routine_id, $id, Request $request) {
         $rules = [
             'period' => 'required',
             'principle' => 'required',
@@ -208,7 +269,7 @@ class RoutinePaymentController extends Controller
         }
     }
 
-    public function deleteDetail($id) {
+    public function deleteDetail($routine_id, $id) {
         $detail = RoutinePaymentDetail::find($id);
         $routine_id = $detail->routine->id;
         $detail->delete();
@@ -282,23 +343,64 @@ class RoutinePaymentController extends Controller
         })->download('xlsx');
     }
 
-    protected function updateStatus() {
-        $routines = RoutinePayment::where('status', false)
-            ->get();
+    public function ajaxcalculate(Request $request) {
+        $member = Member::find($request->input('member_id'));
 
-        foreach ($routines as $routine) {
-            
+        if (is_null($member)) {
+            return Response::json(['error' => 'ไม่พบรหัสสมาชิกนี้']);
+        }
+        else if ($member->profile->employee->employee_type_id != 1) {
+            return Response::json(['error' => 'ต้องเป็นสมาชิกประเภทพนักงาน/ลูกจ้าง ททท. เท่านั้น']);
+        }
+        else if ($member->loans->count() == 0) {
+            return Response::json(['error' => 'สมาชิกไม่มีสัญญาเงินกู้']);
+        }
+        else if ($member->loans->filter(function ($item) { return !is_null($item['code']) && is_null($item['completed_at']); })->count() == 0) {
+            return Response::json(['error' => 'สมาชิกไม่มีสัญญาเงินกู้']);
         }
 
-        // also would work, temporary turn off auto timestamps
-        with($model = new RoutinePaymentDetail)->timestamps = false;
+        $loans = [];
+        foreach ($member->loans->filter(function ($item) { return !is_null($item['code']) && is_null($item['completed_at']); }) as $loan) {
+            $loans[$loan->id] =  'เลขที่: ' . $loan->code .' : ' . $loan->loanType->name;
+        }
 
-        $model->join('payments', function ($query) {
-            $query->on('routine_payment_details.loan_id', '=', 'payments.loan_id')
-                ->on('routine_payment_details.pay_date', '=', 'payments.pay_date'); })
-        ->where('routine_payment_details.status', false)
-        ->update([
-            'routine_payment_details.status' => true
-        ]);
+        $result = new stdClass();
+        $result->fullname = $member->profile->fullname;
+        $result->loans = $loans;
+
+        return Response::json($result);
     }
+
+    public function ajaxpayment(Request $request) {
+        $loan = Loan::find($request->input('loan_id'));
+        $pay_date = Diamond::parse($request->input('pay_date'));
+        $payment = LoanCalculator::monthly_payment($loan, $pay_date);
+
+        $result = new stdClass();
+        $result->period = ($loan->payments->count() > 0) ? $loan->payments->max('period') + 1 : 1;
+        $result->principle = $payment->principle;
+        $result->interest = $payment->interest;
+
+        return Response::json($result);
+    }
+
+    // protected function updateStatus() {
+    //     $routines = RoutinePayment::where('status', false)
+    //         ->get();
+
+    //     foreach ($routines as $routine) {
+            
+    //     }
+
+    //     // also would work, temporary turn off auto timestamps
+    //     with($model = new RoutinePaymentDetail)->timestamps = false;
+
+    //     $model->join('payments', function ($query) {
+    //         $query->on('routine_payment_details.loan_id', '=', 'payments.loan_id')
+    //             ->on('routine_payment_details.pay_date', '=', 'payments.pay_date'); })
+    //     ->where('routine_payment_details.status', false)
+    //     ->update([
+    //         'routine_payment_details.status' => true
+    //     ]);
+    // }
 }

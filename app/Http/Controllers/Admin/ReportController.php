@@ -72,6 +72,9 @@ class ReportController extends Controller
             case 'loans':
                 $this->loans($date);
                 break;
+            case 'routine':
+                $this->routine($date);
+                break;
         }
     }
 
@@ -450,6 +453,10 @@ class ReportController extends Controller
                 ]);
             });
         })->download('xlsx');
+    }
+
+    private function routine($date) {
+        
     }
 
     private function getExcelColumn($val) {

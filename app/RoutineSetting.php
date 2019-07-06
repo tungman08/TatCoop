@@ -19,7 +19,7 @@ class RoutineSetting extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'calculate_status', 'save_status'
+        'name', 'calculate_status', 'approve_status', 'save_status'
     ];
 
     /**

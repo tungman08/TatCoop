@@ -208,20 +208,6 @@
             }}
         </div>
     </div>
-    <div class="form-group">
-        {{ Form::label('shareholding', 'จำนวนหุ้นต่อเดือน (หุ้น)', [
-            'class'=>'col-sm-2 control-label']) 
-        }}
-
-        <div class="col-sm-10">
-            {{ Form::text('shareholding', null, [
-                'id' => 'shareholding',
-                'class'=>'form-control', 
-                'placeholder'=>'ตัวอย่าง: 100', 
-                'autocomplete'=>'off'])
-            }}
-        </div>
-    </div>
 </div>
 <!-- /.box-body -->
 

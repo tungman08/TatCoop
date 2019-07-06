@@ -26,10 +26,21 @@
                         <th style="width:20%;">ชื่อผู้สมาชิก:</th>
                         <td>{{ ($member->profile->name == '<ข้อมูลถูกลบ>') ? '<ข้อมูลถูกลบ>' : $member->profile->fullname }}</td>
                     </tr>
-                    <tr>
-                        <th>จำนวนค่าหุ้นรายเดือน:</th>
-                        <td>{{ ($member->shareholding > 0) ? number_format($member->shareholding, 0, '.', ',') . ' หุ้น': '-' }}</td>
-                    </tr>
+                    @if ($member->profile->employee->employee_type_id == 1)
+                        <tr>
+                            <th>จำนวนหุ้นรายเดือน:</th>
+                            <td>
+                                {{ number_format($member->shareholding, 0, '.', ',') }} หุ้น
+
+                                <button class="btn btn-xs btn-primary btn-flat margin-l-xl"
+                                    {{ (($is_super || $is_admin) ? '' : 'disabled') }}
+                                    title="ปรับปรุงหุ้นรายเดือน"
+                                    onclick="javascript:document.location.href = '{{ action('Admin\ShareholdingController@getAdjust', ['member_id' => $member->id]) }}';">
+                                    ปรับปรุงหุ้นรายเดือน
+                                </button>
+                            </td>
+                        </tr>
+                    @endif
                     <tr>
                         <th>จำนวนทุนเรือนหุ้นสะสม:</th>
                         <td>{{ number_format($member->shareHoldings->sum('amount'), 2, '.', ',') }} บาท</td>
@@ -39,19 +50,6 @@
             </div>  
             <!-- /.table-responsive --> 
         </div>
-
-        @if(Session::has('flash_message'))
-            <div class="callout {{ Session::get('callout_class') }}">
-                <h4>แจ้งข้อความ!</h4>
-                <p>
-                    {{ Session::get('flash_message') }}
-
-                    @if(Session::has('flash_link'))
-                        <a href="{{ Session::get('flash_link') }}">Undo</a>
-                    @endif
-                </p>
-            </div>
-        @endif
 
         <div class="row margin-b-md">
             <div class="col-md-5ths">
@@ -81,6 +79,19 @@
             </div>
         </div>
         <!-- /.row -->
+
+        @if(Session::has('flash_message'))
+            <div class="callout {{ Session::get('callout_class') }}">
+                <h4>แจ้งข้อความ!</h4>
+                <p>
+                    {{ Session::get('flash_message') }}
+
+                    @if(Session::has('flash_link'))
+                        <a href="{{ Session::get('flash_link') }}">Undo</a>
+                    @endif
+                </p>
+            </div>
+        @endif
 
         <div class="box box-primary">
             <div class="box-header with-border">

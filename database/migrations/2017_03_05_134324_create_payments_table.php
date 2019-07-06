@@ -23,6 +23,7 @@ class CreatePaymentsTable extends Migration
             $table->integer('period');
             $table->double('principle');
             $table->double('interest');
+            $table->string('remark');
             $table->timestamps();
         });
     }

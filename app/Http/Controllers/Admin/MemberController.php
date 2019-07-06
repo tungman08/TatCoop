@@ -76,11 +76,11 @@ class MemberController extends Controller
     public function store(Request $request) {
         $rules = [
             'start_date' => 'required|date_format:Y-m-d',
-            //'profile.employee.code' => 'required|digits:5', 
+            // 'profile.employee.code' => 'required|digits:5', 
             'profile.name' => 'required',
             'profile.lastname' => 'required', 
             'profile.citizen_code' => 'required|digits:13', 
-            'shareholding' => 'required|numeric', 
+            // 'shareholding' => 'required|numeric', 
             'profile.birth_date' => 'date_format:Y-m-d', 
             'profile.address' => 'required'
         ];
@@ -91,7 +91,7 @@ class MemberController extends Controller
             'profile.name' => 'ชื่อสมาชิก',
             'profile.lastname' => 'นามสกุล',
             'profile.citizen_code' => 'หมายเลขประจำตัวประชาชน',
-            'shareholding' => 'จำนวนหุ้น', 
+            // 'shareholding' => 'จำนวนหุ้น', 
             'profile.birth_date' => 'วันเกิด',
             'profile.address' => 'ที่อยู่', 
         ];
@@ -155,7 +155,8 @@ class MemberController extends Controller
 
                 $member = new Member();
                 $member->profile_id = $profile->id;
-                $member->shareholding = ($request->input('profile')['employee']['employee_type_id'] == 1) ? $request->input('shareholding') : 0;
+                //$member->shareholding = ($request->input('profile')['employee']['employee_type_id'] == 1) ? $request->input('shareholding') : 0;
+                $member->shareholding = 0;
                 $member->fee = ($is_employee) ? 200 : 100;
                 $member->start_date = Diamond::parse($request->input('start_date'));
                 $member->save();
@@ -203,22 +204,22 @@ class MemberController extends Controller
     {
         $rules = [
             'start_date' => 'required|date_format:Y-m-d',
-            //'profile.employee.code' => 'required|digits:5', 
+            // 'profile.employee.code' => 'required|digits:5', 
             'profile.name' => 'required',
             'profile.lastname' => 'required', 
             'profile.citizen_code' => 'required|digits:13', 
-            'shareholding' => 'required|numeric', 
+            // 'shareholding' => 'required|numeric', 
             'profile.birth_date' => 'date_format:Y-m-d', 
             'profile.address' => 'required', 
         ];
 
         $attributeNames = [
             'start_date' => 'วันที่สมัครเป็นสมาชิก',
-            //'profile.employee.code' => 'รหัสพนักงาน', 
+            // 'profile.employee.code' => 'รหัสพนักงาน', 
             'profile.name' => 'ชื่อสมาชิก',
             'profile.lastname' => 'นามสกุล',
             'profile.citizen_code' => 'หมายเลขประจำตัวประชาชน',
-            'shareholding' => 'จำนวนหุ้น', 
+            // 'shareholding' => 'จำนวนหุ้น', 
             'profile.birth_date' => 'วันเกิด',
             'profile.address' => 'ที่อยู่', 
         ];
@@ -235,7 +236,7 @@ class MemberController extends Controller
         else {
             DB::transaction(function() use ($request, $id) {
                 $member = Member::find($id);
-                $member->shareholding = ($request->input('profile')['employee']['employee_type_id'] == 1) ? $request->input('shareholding') : 0;
+                // $member->shareholding = ($request->input('profile')['employee']['employee_type_id'] == 1) ? $request->input('shareholding') : 0;
                 $member->start_date = Diamond::parse($request->input('start_date'));
                 $member->save();
 

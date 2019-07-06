@@ -21,6 +21,7 @@ use History;
 use Statistic;
 use stdClass;
 use Storage;
+use Routine;
 use App\VisitorStatistic;
 use App\UserStatistic;
 use App\AdministratorStatistic;
@@ -43,7 +44,9 @@ use App\KnowledgeAttachment;
 use App\Loan;
 use App\RoutineSetting;
 use App\RoutinePayment;
+use App\RoutinePaymentDetail;
 use App\RoutineShareholding;
+use App\RoutineShareholdingDetail;
 use App\LoanType;
 use App\User;
 use Datatables;
@@ -1020,30 +1023,61 @@ class AjaxController extends Controller
 
     public function postCalculate(Request $request) {
         $loan = Loan::find($request->input('loan_id'));
-        $member = Member::find($loan->member_id);
-        $pay_date = Diamond::parse($request->input('pay_date'))->format('Y-m-j');
+        $pay_date = Diamond::parse($request->input('pay_date'));
         $pay_amount = $request->input('pay_amount');
-        $summary = LoanCalculator::normal_payment($loan, $pay_amount, $pay_date);
+
+        $startOfMonth = $pay_date->copy()->startOfMonth();
+        $d_day = $startOfMonth->copy()->addDays(Routine::dday() - 1);
+
+        $has_routine = false;
+        if (RoutinePayment::where('calculated_date', $startOfMonth)->count() > 0) {
+            $routine = RoutinePayment::where('calculated_date', $startOfMonth)->first();
+
+            if (RoutinePaymentDetail::where('routine_payment_id', $routine->id)->where('loan_id', $loan->id)->count() > 0) {
+                $has_routine = true;
+            }
+        }
 
         $result = new stdClass();
-        $result->principle = $summary->principle;
-        $result->interest = $summary->interest;
-        $result->total = $summary->principle + $summary->interest;
+        if ($has_routine) {
+            // วันที่จ่าย < วันที่ 10 และมีการนำส่งตัดเงินเดือน
+            if ($pay_date->lessThan($d_day)) {
+                // คิดดอกเบี้ยปกติถึงวันที่จ่าย
+                $summary = LoanCalculator::normal_payment($loan, $pay_amount, $pay_date->format('Y-m-j'));
+                $result->principle = $summary->principle;
+                $result->interest = $summary->interest;
+                $result->total = $summary->principle + $summary->interest;
+            }
+            else {
+                // ปลอดดอกเบี้ย
+                $result->principle = $pay_amount;
+                $result->interest = 0;
+                $result->total = $pay_amount;
+            }
+        }
+        else {
+            // คิดดอกเบี้ยปกติถึงวันที่จ่าย
+            $summary = LoanCalculator::normal_payment($loan, $pay_amount, $pay_date->format('Y-m-j'));
+            $result->principle = $summary->principle;
+            $result->interest = $summary->interest;
+            $result->total = $summary->principle + $summary->interest;
+        }
 
         return Response::json($result);
     }
 
     public function postClosecalculate(Request $request) {
+        $date = Diamond::parse($request->input('pay_date'));
+        $startOfMonth = $date->copy()->startOfMonth();
+        $endOfMonth = $date->copy()->endOfMonth();
+        $d_day = $startOfMonth->copy()->addDays(Routine::dday() - 1); // วันที่ 10
+
         $loan = Loan::find($request->input('loan_id'));
-        $member = Member::find($loan->member_id);
-        $pay_date = Diamond::parse($request->input('pay_date'))->format('Y-m-j');
-        $summary = LoanCalculator::close_payment($loan, $pay_date);
-        
+        $summary = LoanCalculator::close_payment($loan, $date->format('Y-m-j'));
         $result = new stdClass();
         $result->principle = $summary->principle;
         $result->interest = $summary->interest;
-        $result->total = $summary->principle + $summary->interest;
-        $result->remark = $summary->refund > 0 ? 'คืนเงินจำนวน ' . number_format($summary->refund, 2, '.', ',') . ' บาท' : '-';
+        $result->total = ($summary->principle + $summary->interest);
 
         return Response::json($result);
     }

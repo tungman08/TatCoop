@@ -113,5 +113,9 @@ class AppServiceProvider extends ServiceProvider
         App::bind('filemanager', function() {
             return new \App\Classes\FileManager;
         }); 
+
+        App::bind('routine', function() {
+            return new \App\Classes\Routine;
+        }); 
     }
 }
