@@ -51,16 +51,15 @@ class ShareholdingController extends Controller
 
     public function index($member_id) {
         $member = Member::find($member_id);
-        $shareholdings = Shareholding::where('member_id', $member->id)
-            ->select(
-                DB::raw('concat(year(pay_date), \'-\', month(pay_date), \'-1\') as paydate'),
-                DB::raw('str_to_date(concat(\'1/\', month(pay_date), \'/\', year(pay_date)), \'%d/%m/%Y\') as name'),
-                DB::raw('(sum(if(member_id = ' . $member->id . ' and shareholding_type_id = 1, amount, 0))) as amount'),
-                DB::raw('(sum(if(member_id = ' . $member->id . ' and shareholding_type_id = 2, amount, 0))) as amount_cash'),
-                DB::raw('(select sum(s.amount) from shareholdings s where s.member_id = ' . $member->id . ' and s.pay_date < date(paydate)) as total_shareholding'))
-            ->groupBy(DB::raw('year(pay_date)'), DB::raw('month(pay_date)'))
-            ->orderBy('total_shareholding', 'desc')
-            ->get();
+        $shareholdings = DB::select(DB::raw("select concat(year(pay_date), '-', month(pay_date), '-1') as paydate, " .
+            "str_to_date(concat('1/', month(pay_date), '/', year(pay_date)), '%d/%m/%Y') as name, " .
+            "sum(if(shareholding_type_id = 1, amount, 0)) as amount, " .
+            "sum(if(shareholding_type_id = 2, amount, 0)) as amount_cash, " .
+            "(select sum(s.amount) from shareholdings s where s.member_id = " . $member_id . " and s.pay_date < date(paydate)) as total_shareholding " .
+            "from shareholdings " .
+            "where member_id = " . $member_id . " " .
+            "group by year(pay_date), month(pay_date) " .
+            "order by name desc;"));
 
         return view('admin.shareholding.index', [
             'member' => $member,

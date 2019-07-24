@@ -100,7 +100,7 @@ class DividendCalculator {
                         $dividend_member->shareholding_dividend = $member_dividend->shareholding_dividend;
                         $dividend_member->interest = $member_dividend->interest;
                         $dividend_member->interest_dividend = $member_dividend->interest_dividend;
-                        $dividend->members()->save();
+                        $dividend->members()->save($dividend_member);
                     });
                 }
             }

@@ -28,6 +28,7 @@ use App\User;
 use App\LoanType;
 use App\Loan;
 use App\Payment;
+use Routine;
 
 class MemberController extends Controller
 {    
@@ -161,6 +162,7 @@ class MemberController extends Controller
                 $member->start_date = Diamond::parse($request->input('start_date'));
                 $member->save();
 
+                Routine::shareholding(Diamond::today(), $member->id);
                 History::addAdminHistory(Auth::guard($this->guard)->id(), 'สร้างข้อมูลสมาชิกใหม่', 'คุณ' . $profile->name . ' ' . $profile->lastname . ' สมัครเป็นสมาชิกสหกรณ์');
             });
 
@@ -355,6 +357,7 @@ class MemberController extends Controller
 
                 foreach ($loans as $loan) {
                     $payment = new Payment();
+                    $payment->period = ($loan->payments->count() > 0) ? $loan->payments->max('period') + 1 : 1;
                     $payment->pay_date = $leave_date;
                     $payment->principle = $loan->outstanding - $loan->payments->sum('principle');
                     $payment->interest = LoanCalculator::loan_interest($loan, $leave_date);

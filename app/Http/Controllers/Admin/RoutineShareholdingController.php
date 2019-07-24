@@ -16,8 +16,6 @@ use App\Shareholding;
 use Validator;
 use DB;
 use Diamond;
-use Excel;
-use PHPExcel_Shared_Date as ExcelDate;
 use stdClass;
 
 class RoutineShareholdingController extends Controller

@@ -38,9 +38,13 @@
                         <td>{{ number_format($loan->outstanding, 2, '.', ',') }} บาท</td>
                     </tr>  
                     <tr>
-                        <th>จำนวนงวดผ่อนชำระ:</th>
-                        <td>{{ number_format($loan->period, 0, '.', ',') }} งวด (ชำระงวดละ {{ number_format(LoanCalculator::pmt($loan->rate, $loan->outstanding, $loan->period), 2, '.', ',') }} บาท)</td>
-                    </tr> 
+                        <th>ชำระงวดละ:</th>
+                        <td>{{ ($loan->pmt == 0) ? number_format(LoanCalculator::pmt($loan->rate, $loan->outstanding, $loan->period), 2, '.', ',') : number_format($loan->pmt, 2, '.', ',') }} บาท</td>
+                    </tr>
+                    <tr>
+                        <th>เงินต้นคงเหลือ:</th>
+                        <td>{{ number_format(round($loan->outstanding - $loan->payments->sum('principle'), 2), 2, '.', ',') }} บาท</td>
+                    </tr>
                     <tr>
                         <th>เงินต้นคงเหลือ:</th>
                         <td>{{ number_format($loan->outstanding - $loan->payments->sum('principle'), 2, '.', ',') }} บาท</td>
@@ -106,6 +110,18 @@
                                 'autocomplete'=>'off',
                                 'onkeypress' => 'javascript:return isNumberKey(event);'])
                             }}  
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ Form::label('payment_method_id', 'ประเภท', [
+                            'class'=>'col-sm-2 control-label']) 
+                        }}
+                
+                        <div class="col-sm-10">
+                            {{ Form::select('payment_method_id', $payment_methods->lists('name', 'id'), null, [
+                                'id' => 'payment_method_id',
+                                'class' => 'form-control']) 
+                            }}      
                         </div>
                     </div>
                     <div class="form-group">

@@ -111,7 +111,7 @@
                             <td class="text-right">{{ number_format($payment->interest, 2, '.', ',') }}</td>
                             <td class="text-right">{{ number_format($balance, 2, '.', ',') }}</td>
                             <td>&nbsp;</td>
-                            <td>&nbsp;</td>
+                            <td>{{ ($payment->payment_method_id == 2) ? (!empty($payment->remark)) ? $payment->remark : '&nbsp;' : '&nbsp;' }}</td>
                         </tr>
                     @endforeach
                 </tbody>

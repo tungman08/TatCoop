@@ -23,6 +23,7 @@ use LoanManager;
 use Storage;
 use Response;
 use Validator;
+use LoanCalculator;
 
 class LoanController extends Controller
 {
@@ -66,7 +67,7 @@ class LoanController extends Controller
 
         return view('admin.loan.index', [
             'member' => $member,
-            'loans' => Loan::where('member_id', $member->id)->whereNotNull('code')->orderBy('completed_at', 'asc')->orderBy('loaned_at', 'desc')->get(),
+            'loans' => Loan::where('member_id', $member->id)->whereNotNull('code')->orderBy('loaned_at', 'desc')->orderBy('completed_at', 'asc')->get(),
             'loantypes' => LoanType::active()->get()
         ]);
     }
@@ -387,5 +388,47 @@ class LoanController extends Controller
         $document->delete();
 
         return Response::json(true);
+    }
+
+    public function getPmt($member_id, $id) {
+        $member = Member::find($member_id);
+        $loan = Loan::find($id);
+
+        return view('admin.loan.pmt', [
+            'member' => $member,
+            'loan' => $loan
+        ]);
+    }
+
+    public function postPmt($member_id, $id, Request $request) {
+        $rules = [
+            'pmt' => 'required|numeric', 
+        ];
+
+        $attributeNames = [
+            'pmt' => 'PMT', 
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+        $validator->setAttributeNames($attributeNames);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+        else {
+            DB::transaction(function() use ($request, $id) {
+                $loan = Loan::find($id);
+                $loan->pmt = ($request->input('pmt') == LoanCalculator::pmt($loan->rate, $loan->outstanding, $loan->period)) ? 0 : $request->input('pmt');
+                $loan->save();
+
+                History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'แก้ไขค่า PMT ของ สัญญาเงินกู้ประเภท ' . $loan->loanType->name . ' เลขที่ ' . $loan->code . ' ของ ' . $loan->member->profile->fullname);
+            });
+
+            return redirect()->action('Admin\LoanController@show', ['member_id' => $member_id, 'id' => $id])
+                ->with('flash_message', 'ข้อมูลค่า PMT ถูกแก้ไขเรียบร้อยแล้ว')
+                ->with('callout_class', 'callout-success');
+        }
     }
 }

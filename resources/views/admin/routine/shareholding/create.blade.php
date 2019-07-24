@@ -33,7 +33,7 @@
 
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title"><i class="fa fa-sticky-note-o"></i> รายการชำระเงินกู้ปกติ</h3>
+                <h3 class="box-title"><i class="fa fa-sticky-note-o"></i> รายการชำระค่าหุ้นปกติ</h3>
             </div>
             <!-- /.box-header -->
 

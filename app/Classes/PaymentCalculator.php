@@ -98,8 +98,8 @@ class PaymentCalculator {
                     $detail->loan_id = $member->loan_id;
                     $detail->pay_date = Diamond::parse($mydate->endOfMonth()->format('Y-m-d'));
                     $detail->period = ($loan->payments->count() > 0) ? $loan->payments->max('period') + 1 : 1;
-                    $detail->principle = $payment->principle;
-                    $detail->interest = $payment->interest;
+                    $detail->principle = round($payment->principle, 2);
+                    $detail->interest = round($payment->interest, 2);
                     $detail->save();
                 }
             });

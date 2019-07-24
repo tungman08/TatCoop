@@ -41,7 +41,7 @@
 
                         <div class="form-group" style="margin-bottom: 0px;">
                             <div id="shareholding_approve" class="toggle-btn{{ ($shareholding->approve_status) ? ' active' : '' }}">
-                                <label class="toggle-label">ทำรายงานการนำส่งจำนวนเงินค่าหุ้นปกติทุกๆ วันที่ 10 ของเดือน เวลา 1.00 น.</label>
+                                <label class="toggle-label">ทำรายงานการนำส่งจำนวนเงินค่าหุ้นปกติทุกๆ วันที่ 10 ของเดือน เวลา 23.00 น.</label>
                                 <input type="checkbox" id="cb_shareholding_approve" class="cb-value" style="display: none;" {{ ($shareholding->approve_status) ? ' checked' : '' }}/>
                                 <span class="round-btn"></span>
                             </div>
@@ -79,7 +79,7 @@
 
                         <div class="form-group" style="margin-bottom: 0px;">
                             <div id="payment_approve" class="toggle-btn{{ ($payment->approve_status) ? ' active' : '' }}">
-                                <label class="toggle-label">ทำรายงานการนำส่งจำนวนเงินค่าชำระเงินกู้ปกติทุกๆ วันที่ 10 ของเดือน เวลา 1.00 น.</label>
+                                <label class="toggle-label">ทำรายงานการนำส่งจำนวนเงินค่าชำระเงินกู้ปกติทุกๆ วันที่ 10 ของเดือน เวลา 23.00 น.</label>
                                 <input type="checkbox" id="cb_payment_approve" class="cb-value" style="display: none;" {{ ($payment->approve_status) ? ' checked' : '' }}/>
                                 <span class="round-btn"></span>
                             </div>

@@ -19,7 +19,7 @@ class Payment extends Model
      * @var array
      */
     protected $fillable = [
-        'loan_id', 'pay_date', 'period', 'principle', 'interest', 'remark'
+        'loan_id', 'payment_method_id', 'pay_date', 'period', 'principle', 'interest', 'remark'
     ];
 
     /**
@@ -34,6 +34,13 @@ class Payment extends Model
      */
     public function loan() {
         return $this->belongsTo(Loan::class);
+    }
+
+    /**
+     * Get the loan that uses by the payment.
+     */
+    public function PaymentMethod() {
+        return $this->belongsTo(PaymentMethod::class);
     }
 
     /**

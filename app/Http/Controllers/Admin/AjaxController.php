@@ -863,7 +863,7 @@ class AjaxController extends Controller
     public function postLoan(Request $request) {
         $loan = Loan::find($request->input('loan_id'));
 
-        $payment = collect(LoanCalculator::payment($loan->loanType->rate, $loan->paymentType->id, $loan->outstanding, $loan->period, Diamond::today()));
+        $payment = collect(LoanCalculator::payment($loan->loanType->rate, $loan->pmt, $loan->paymentType->id, $loan->outstanding, $loan->period, Diamond::today()));
 
         $info = (object)[
             'rate' => $loan->loanType->rate,
@@ -1024,53 +1024,20 @@ class AjaxController extends Controller
     public function postCalculate(Request $request) {
         $loan = Loan::find($request->input('loan_id'));
         $pay_date = Diamond::parse($request->input('pay_date'));
-        $pay_amount = $request->input('pay_amount');
-
-        $startOfMonth = $pay_date->copy()->startOfMonth();
-        $d_day = $startOfMonth->copy()->addDays(Routine::dday() - 1);
-
-        $has_routine = false;
-        if (RoutinePayment::where('calculated_date', $startOfMonth)->count() > 0) {
-            $routine = RoutinePayment::where('calculated_date', $startOfMonth)->first();
-
-            if (RoutinePaymentDetail::where('routine_payment_id', $routine->id)->where('loan_id', $loan->id)->count() > 0) {
-                $has_routine = true;
-            }
-        }
+        $pmt = ($loan->pmt == 0) ? LoanCalculator::pmt($loan->rate, $loan->outstanding, $loan->period) : $loan->pmt;
+        $summary = LoanCalculator::normal_payment($loan, $pmt, $pay_date->format('Y-m-j'));
 
         $result = new stdClass();
-        if ($has_routine) {
-            // วันที่จ่าย < วันที่ 10 และมีการนำส่งตัดเงินเดือน
-            if ($pay_date->lessThan($d_day)) {
-                // คิดดอกเบี้ยปกติถึงวันที่จ่าย
-                $summary = LoanCalculator::normal_payment($loan, $pay_amount, $pay_date->format('Y-m-j'));
-                $result->principle = $summary->principle;
-                $result->interest = $summary->interest;
-                $result->total = $summary->principle + $summary->interest;
-            }
-            else {
-                // ปลอดดอกเบี้ย
-                $result->principle = $pay_amount;
-                $result->interest = 0;
-                $result->total = $pay_amount;
-            }
-        }
-        else {
-            // คิดดอกเบี้ยปกติถึงวันที่จ่าย
-            $summary = LoanCalculator::normal_payment($loan, $pay_amount, $pay_date->format('Y-m-j'));
-            $result->principle = $summary->principle;
-            $result->interest = $summary->interest;
-            $result->total = $summary->principle + $summary->interest;
-        }
+        $result->principle = $summary->principle;
+        $result->interest = $summary->interest;
+        $result->total = $summary->principle + $summary->interest;
+        $result->balance = $loan->outstanding - ($loan->payments->sum('principle') + $summary->principle);
 
         return Response::json($result);
     }
 
     public function postClosecalculate(Request $request) {
         $date = Diamond::parse($request->input('pay_date'));
-        $startOfMonth = $date->copy()->startOfMonth();
-        $endOfMonth = $date->copy()->endOfMonth();
-        $d_day = $startOfMonth->copy()->addDays(Routine::dday() - 1); // วันที่ 10
 
         $loan = Loan::find($request->input('loan_id'));
         $summary = LoanCalculator::close_payment($loan, $date->format('Y-m-j'));
@@ -1224,7 +1191,7 @@ class AjaxController extends Controller
             "สามารถค้ำประกันผู้อื่นได้อีก " . number_format(2 - $surety, 0, '.', ',') . " สัญญา ในวงเงิน " . number_format($salary_available - $surety_amount, 2, '.', ',') . " บาท" : 
             "ไม่สามารถค้ำประกันผู้อื่นได้ เนื่องจากไม่มีวงเงินที่ใช้ค้ำประกันเหลือแล้ว" :
             "ไม่สามารถค้ำประกันผู้อื่นได้ เนื่องจากค้ำประกันครบ 2 สัญญาแล้ว" :
-            "ไม่สามารถค้ำประกันผู้อื่นได้ เนื่องจากเงินเดือนสุทธิน้อยกว่า " . number_format($min_netsalary, 2, '.', ',') . " บาท";
+            "ไม่สามารถค้ำประกันผู้อื่นได้ เนื่องจากเงินเดือนสุทธิน้อยกว่า " . number_format($limit->other_netsalary, 2, '.', ',') . " บาท";
 
         return Response::json($bailsman);
     }

@@ -100,8 +100,8 @@ class AjaxController extends Controller
         $period = $request->input('period');
         $loanType = LoanType::find($loan_type_id);
 
-        $general = collect(LoanCalculator::payment($loanType->rate, 1, $outstanding, $period, Diamond::parse($request->input('start'))));
-        $stable = collect(LoanCalculator::payment($loanType->rate, 2, $outstanding, $period, Diamond::parse($request->input('start'))));
+        $general = collect(LoanCalculator::payment($loanType->rate, 0, 1, $outstanding, $period, Diamond::parse($request->input('start'))));
+        $stable = collect(LoanCalculator::payment($loanType->rate, 0, 2, $outstanding, $period, Diamond::parse($request->input('start'))));
 
         $info = (object)[
             'rate' => $loanType->rate,

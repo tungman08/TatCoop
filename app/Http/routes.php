@@ -181,6 +181,8 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
         Route::get('/loan/member/{member_id}/create/special/outsider', ['as' => 'service.loan.create.special.outsider', 'uses' => 'SpecialLoanController@getCreateOutsiderLoan']);
         Route::post('/loan/member/{member_id}/create/special/outsider', 'SpecialLoanController@postCreateOutsiderLoan');
         Route::get('/loan/member/{member_id}/detail/{loan_id}/sureties/edit', ['as' => 'service.loan.sureties.edit', 'uses' => 'LoanController@getEditSureties']);
+        Route::get('/loan/member/{member_id}/detail/{id}/pmt', ['as' => 'service.loan.pmt', 'uses' => 'LoanController@getPmt']);
+        Route::post('/loan/member/{member_id}/detail/{id}/pmt', 'LoanController@postPmt');
         Route::resource('/loan/member/{member_id}/detail', 'LoanController');
         Route::get('/loan', ['as' => 'service.loan.member', 'uses' => 'LoanController@getMember']);
 
@@ -265,7 +267,7 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
         Route::resource('/billing', 'BillingController', ['except' => [ 'show', 'destroy' ]]);     
         
         // Prefix Route...
-        Route::resource('/prefix', 'PrefixController', ['except' => [ 'show', 'destroy' ]]);     
+        Route::resource('/prefix', 'PrefixController', ['except' => [ 'show' ]]);     
     });
 
     // Admin Route...

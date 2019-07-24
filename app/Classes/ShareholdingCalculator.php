@@ -85,12 +85,14 @@ class ShareholdingCalculator {
                 $routine->save();
     
                 foreach ($members as $member) {
-                    $detail = new RoutineShareholdingDetail();
-                    $detail->routine_shareholding_id = $routine->id;
-                    $detail->member_id = $member->id;
-                    $detail->pay_date = Diamond::parse($mydate->endOfMonth()->format('Y-m-d'));
-                    $detail->amount = $member->shareholding * 10;
-                    $detail->save();
+                    if ($member->shareholding > 0) {
+                        $detail = new RoutineShareholdingDetail();
+                        $detail->routine_shareholding_id = $routine->id;
+                        $detail->member_id = $member->id;
+                        $detail->pay_date = Diamond::parse($mydate->endOfMonth()->format('Y-m-d'));
+                        $detail->amount = $member->shareholding * 10;
+                        $detail->save();
+                    }
                 }
             });
 

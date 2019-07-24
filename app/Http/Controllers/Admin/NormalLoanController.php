@@ -16,6 +16,7 @@ use LoanCalculator;
 use LoanManager;
 use Validator;
 use Routine;
+use DB;
 
 class NormalLoanController extends Controller
 {
@@ -191,12 +192,12 @@ class NormalLoanController extends Controller
 
     protected function validateEmployeeStep3(Request $request) {
         $rules = [
-            //'loan_code' => 'required|unique:loans,code',
+            'loan_code' => 'required',
             'loaned_at' => 'required|date_format:Y-m-d'
         ];
         
         $attributeNames = [
-            //'loan_code' => 'รหัสสัญญากู้ยืม',
+            'loan_code' => 'รหัสสัญญากู้ยืม',
             'loaned_at' => 'วันที่ทำสัญญา'
         ];
 
@@ -212,6 +213,7 @@ class NormalLoanController extends Controller
             DB::transaction(function() use ($request) {
                 $loan = Loan::find($request->input('id'));
                 $loan->code = $request->input('loan_code');
+                $loan->pmt = 0;
                 $loan->loaned_at = Diamond::parse($request->input('loaned_at'));
                 $loan->step = 3;
                 $loan->save();
@@ -371,12 +373,12 @@ class NormalLoanController extends Controller
 
     protected function validateOutsiderStep3(Request $request) {
         $rules = [
-            //'loan_code' => 'required|unique:loans,code',
+            'loan_code' => 'required',
             'loaned_at' => 'required|date_format:Y-m-d'
         ];
         
         $attributeNames = [
-            //'loan_code' => 'รหัสสัญญากู้ยืม',
+            'loan_code' => 'รหัสสัญญากู้ยืม',
             'loaned_at' => 'วันที่ทำสัญญา'
         ];
 
@@ -392,6 +394,7 @@ class NormalLoanController extends Controller
             DB::transaction(function() use ($request) {
                 $loan = Loan::find($request->input('id'));
                 $loan->code = $request->input('loan_code');
+                $loan->pmt = 0;
                 $loan->loaned_at = Diamond::parse($request->input('loaned_at'));
                 $loan->step = 3;
                 $loan->save();

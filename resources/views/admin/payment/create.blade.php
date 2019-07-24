@@ -38,8 +38,12 @@
                     </tr>  
                     <tr>
                         <th>จำนวนงวดผ่อนชำระ:</th>
-                        <td>{{ number_format($loan->period, 0, '.', ',') }} งวด (ชำระงวดละ {{ number_format(LoanCalculator::pmt($loan->rate, $loan->outstanding, $loan->period), 2, '.', ',') }} บาท)</td>
-                    </tr> 
+                        <td>{{ number_format($loan->period, 0, '.', ',') }} งวด</td>
+                    </tr>
+                    <tr>
+                        <th>ชำระงวดละ:</th>
+                        <td>{{ ($loan->pmt == 0) ? number_format(LoanCalculator::pmt($loan->rate, $loan->outstanding, $loan->period), 2, '.', ',') : number_format($loan->pmt, 2, '.', ',') }} บาท</td>
+                    </tr>
                     <tr>
                         <th>เงินต้นคงเหลือ:</th>
                         <td>{{ number_format($loan->outstanding - $loan->payments->sum('principle'), 2, '.', ',') }} บาท</td>
@@ -68,8 +72,8 @@
             @if ($member->profile->employee->employee_type_id == 1)
                 <p>
                     <strong>หมายเหตุ:</strong> (สำหรับสมาชิกที่เป็นพนักงาน/ลูกจ้าง ททท. ที่นำส่งตัดบัญชีเงินเดือน)<br />
-                    1. หากชำระค่าเงินกู้ระหว่างวันที่ 1-9 ระบบจะทำการปรับปรุงข้อมูลการนำส่งตัดบัญชีเงินเดือนใหม่ กรุณาตรวจสอบข้อมูลการนำส่งอีกครั้ง<br />
-                    2. หากชำระค่าเงินกู้ตั้งแต่วันที่ 10 ถึงสิ้นเดือน จะเป็นระยะปลอดดอกเบี้ย
+                    1. หากชำระค่าเงินกู้ระหว่างวันที่ 1-10 ระบบจะทำการปรับปรุงข้อมูลการนำส่งตัดบัญชีเงินเดือนใหม่ กรุณาตรวจสอบข้อมูลการนำส่งอีกครั้ง<br />
+                    2. หากชำระค่าเงินกู้หลังวันที่ 10 ถึงสิ้นเดือน ระบบจะคำนวณเงินที่ต้องใช้ โดยทำการคำนวณดอกเบี้ยถึงวันที่ทำการปิดยอด และหักส่วนของเงินที่นำส่ง
                 </p>
             @endif
         </div>
@@ -120,6 +124,18 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        {{ Form::label('payment_method_id', 'ประเภท', [
+                            'class'=>'col-sm-2 control-label']) 
+                        }}
+                
+                        <div class="col-sm-10">
+                            {{ Form::select('payment_method_id', $payment_methods->lists('name', 'id'), 2, [
+                                'id' => 'payment_method_id',
+                                'class' => 'form-control']) 
+                            }}      
+                        </div>
+                    </div>
+                    <div class="form-group">
                         {{ Form::label('pay_date', 'วันที่ชำระ', [
                             'class'=>'col-sm-2 control-label']) 
                         }}
@@ -134,20 +150,6 @@
                                     'class'=>'form-control'])
                                 }} 
                             </div>      
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        {{ Form::label('amount', 'จำนวนเงินที่ต้องการชำระ', [
-                            'class'=>'col-sm-2 control-label']) 
-                        }}
-
-                        <div class="col-sm-10">
-                            {{ Form::text('amount', null, [
-                                'class'=>'form-control', 
-                                'placeholder'=>'ตัวอย่าง: 10000', 
-                                'autocomplete'=>'off',
-                                'onkeypress' => 'javascript:return isNumberKey(event);'])
-                            }}  
                         </div>
                     </div>
                     <div class="form-group">
@@ -188,6 +190,36 @@
                                 'autocomplete'=>'off',
                                 'onkeypress' => 'javascript:return isNumberKey(event);'])
                             }}        
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ Form::label('total', 'จำนวนเงินที่ต้องชำระ', [
+                            'class'=>'col-sm-2 control-label']) 
+                        }}
+
+                        <div class="col-sm-10">
+                            {{ Form::text('total', null, [
+                                'class'=>'form-control', 
+                                'readonly' => true,
+                                'placeholder'=>'กรุณากดปุมคำนวณ...', 
+                                'autocomplete'=>'off',
+                                'onkeypress' => 'javascript:return isNumberKey(event);'])
+                            }}  
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ Form::label('balance', 'เงินต้นคงเหลือ', [
+                            'class'=>'col-sm-2 control-label']) 
+                        }}
+
+                        <div class="col-sm-10">
+                            {{ Form::text('balance', null, [
+                                'class'=>'form-control', 
+                                'readonly' => true,
+                                'placeholder'=>'กรุณากดปุมคำนวณ...', 
+                                'autocomplete'=>'off',
+                                'onkeypress' => 'javascript:return isNumberKey(event);'])
+                            }}  
                         </div>
                     </div>
                     <hr />
@@ -249,8 +281,6 @@
                 headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
             });
 
-            $("#save").attr("disabled", true);
-
             $('#pay_date').datetimepicker({
                 locale: moment.locale('th'),
                 viewMode: 'days',
@@ -267,13 +297,11 @@
 
         function calculateLoan(id) {
             var date = $('#pay_date').val();
-            var amount = $('#amount').val();
 
-            if (date != '' && amount != '') {
+            if (date != '') {
                 var formData = new FormData();
                     formData.append('loan_id', $('#loan_id').val());
                     formData.append('pay_date', moment(date));
-                    formData.append('pay_amount', amount);
 
                 $.ajax({
                     dataType: 'json',
@@ -291,20 +319,12 @@
                         $('#principle').val($.number(result.principle, 2));
                         $('#interest').val($.number(result.interest, 2));
                         $('#total').val($.number(result.total, 2));
-
-                        //if (result.interest >= 0) {
-                            $('#save').removeAttr("disabled");
-                        //}              
+                        $('#balance').val($.number(result.balance, 2));         
                     }
                 });
             }
             else {
-                if (date == '') {
-                    alert('กรุณาเลือกวันที่จากปฏิทิน');
-                }
-                else {
-                    alert('กรุณาป้อนจำนวนเงินที่ต้องการชำระ');
-                }
+                alert('กรุณาเลือกวันที่จากปฏิทิน');
             }
         }
         

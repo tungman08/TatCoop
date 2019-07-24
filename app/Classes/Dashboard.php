@@ -273,15 +273,16 @@ class Dashboard {
         $result->push($ticks);
 
         foreach ($array as $data) {
+            $sorted = $data->sortBy('monthname');
             $amounts = [];
 
-            for ($i = 1; $i < $data->min('monthname'); $i++) {
-                $amounts[] = [$i, 0];
-            }
+            $i = 1;
+            foreach ($sorted as $row) {
+                while ($i < $row->monthname) {
+                    $amounts[] = [$i++, 0];
+                }
 
-            foreach ($data->sortBy('monthname') as $row) {
-                $amounts[] = [$i, $row->amount];
-                $i++;
+                $amounts[] = [$i++, $row->amount];
             }
 
             for ($i = count($amounts) + 1; $i <= 12; $i++) {

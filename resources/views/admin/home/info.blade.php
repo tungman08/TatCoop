@@ -1,5 +1,5 @@
 <div class="row">
-    <div class="col-md-4 col-sm-4 col-xs-12">
+    <div class="col-md-4 col-sm-6 col-xs-12">
         <div class="info-box">
             <span class="info-box-icon bg-aqua"><i class="fa fa-users"></i></span>
 
@@ -13,7 +13,7 @@
     </div>
     <!-- /.col -->
 
-    <div class="col-md-4 col-sm-4 col-xs-12">
+    <div class="col-md-4 col-sm-6 col-xs-12">
         <div class="info-box">
             <span class="info-box-icon bg-green"><i class="fa fa-btc"></i></span>
 
@@ -30,7 +30,7 @@
     <!-- fix for small devices only -->
     <div class="clearfix visible-sm-block"></div>
 
-    <div class="col-md-4 col-sm-4 col-xs-12">
+    <div class="col-md-4 col-sm-6 col-xs-12">
         <div class="info-box">
             <span class="info-box-icon bg-yellow"><i class="fa fa-btc"></i></span>
 

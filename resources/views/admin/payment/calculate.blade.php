@@ -38,8 +38,12 @@
                     </tr>  
                     <tr>
                         <th>จำนวนงวดผ่อนชำระ:</th>
-                        <td>{{ number_format($loan->period, 0, '.', ',') }} งวด (ชำระงวดละ {{ number_format(LoanCalculator::pmt($loan->rate, $loan->outstanding, $loan->period), 2, '.', ',') }} บาท)</td>
-                    </tr> 
+                        <td>{{ number_format($loan->period, 0, '.', ',') }} งวด</td>
+                    </tr>
+                    <tr>
+                        <th>ชำระงวดละ:</th>
+                        <td>{{ ($loan->pmt == 0) ? number_format(LoanCalculator::pmt($loan->rate, $loan->outstanding, $loan->period), 2, '.', ',') : number_format($loan->pmt, 2, '.', ',') }} บาท</td>
+                    </tr>
                     <tr>
                         <th>เงินต้นคงเหลือ:</th>
                         <td>{{ number_format($loan->outstanding - $loan->payments->sum('principle'), 2, '.', ',') }} บาท</td>

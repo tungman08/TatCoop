@@ -195,7 +195,7 @@
                 $('#member_code').html(result.member_code);
                 $('#member_name').html(result.member_name);
                 $('#member_type').html('<span class=\"label label-primary\">' + result.member_type + '</span>');
-                $('#loans').html($.number(result.loans, 0) + ' สัญญา' + ((result.loans > 0) ? ' <a href=\"/service/' + parseInt(result.member_code) + '/loan\">[ดูรายละเอียดการกู้]</a>' : ''));
+                $('#loans').html($.number(result.loans, 0) + ' สัญญา' + ((result.loans > 0) ? ' <a href=\"/service/loan/member/' + parseInt(result.member_code) + '/detail\">[ดูรายละเอียดการกู้]</a>' : ''));
                 $('#shareholding').html($.number(result.shareholding, 2) + ' บาท');
                 $('#amount').html($.number(result.amount, 2) + ' บาท');
                 $('#result').html(result.message);
@@ -217,7 +217,7 @@
                 $('#member_code').html(result.member_code);
                 $('#member_name').html(result.member_name);
                 $('#member_type').html('<span class=\"label label-primary\">' + result.member_type + '</span>');
-                $('#loans').html($.number(result.loans, 0) + ' สัญญา' + ((result.loans > 0) ? ' <a href=\"/service/' + parseInt(result.member_code) + '/loan\">[ดูรายละเอียดการกู้]</a>' : ''));
+                $('#loans').html($.number(result.loans, 0) + ' สัญญา' + ((result.loans > 0) ? ' <a href=\"/service/loan/member/' + parseInt(result.member_code) + '/detail\">[ดูรายละเอียดการกู้]</a>' : ''));
                 $('#shareholding').html($.number(result.shareholding, 2) + ' บาท');
                 $('#amount').html($.number(result.amount, 2) + ' บาท');
                 $('#result').html(result.message);

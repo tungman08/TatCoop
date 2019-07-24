@@ -237,14 +237,14 @@
 
         function isNumberKey(evt){
             var charCode = (evt.which) ? evt.which : event.keyCode
-            if (charCode != 8 && charCode != 127 && charCode != 45 && charCode != 46 (charCode < 48 || charCode > 57))
+            if (charCode != 8 && charCode != 127 && charCode != 45 && charCode != 46 && (charCode < 48 || charCode > 57))
                 return false;
             return true;
         }
 
         function number_format(n, dp){
-            var w = n.toFixed(dp), k = w|0, b = n < 0 ? 1 : 0,
-                u = Math.abs(w-k), d = (''+u.toFixed(dp)).substr(2, dp),
+            var w = parseFloat(n).toFixed(dp), k = w|0, b = n < 0 ? 1 : 0,
+                u = Math.abs(w-k), d = ('' + parseFloat(u).toFixed(dp)).substr(2, dp),
                 s = ''+k, i = s.length, r = '';
             while ( (i-=3) > b ) { r = ',' + s.substr(i, 3) + r; }
             return s.substr(0, i + 3) + r + (d ? '.'+d: '');

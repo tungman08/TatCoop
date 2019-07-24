@@ -63,7 +63,7 @@ class PrefixController extends Controller
         else {
             DB::transaction(function() use ($request) {
                 $prefix = new Prefix();
-                $prefix->prefix = $request->input('name');
+                $prefix->name = $request->input('name');
                 $prefix->save();
     
                 History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'เพิ่มคำนำหน้านาม');

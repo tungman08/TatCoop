@@ -100,9 +100,8 @@ class BoardController extends Controller
                 $board->lastname = $request->input('lastname');
                 $board->email = strtolower($request->input('email'));
                 $board->password = $request->input('new_password');
-                $role->admins()->save();
+                $role->admins()->save($board);
 
-                History::addAdminHistory($board->id, 'สร้างบัญชีคณะกรรมการ');
                 History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'เพิ่มบัญชี ' . $board->fullname . ' (' . $board->email . ') เป็นคณะกรรมการ');
 
                 Mail::send('admin.emails.newboard', ['email' => $request->input('email'), 'password' => $request->input('new_password')], function($message) use ($board) {

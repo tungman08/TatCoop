@@ -37,7 +37,11 @@
                             <tr>
                                 <th>ประเภทเงินกู้:</th>
                                 <td><span class="label label-primary">{{ $loan->loanType->name }}<span></td>
-                            </tr>  
+                            </tr>
+                            <tr>
+                                <th>เลขที่สัญญา:</th>
+                                <td>{{ $loan->code }}</td>
+                            </tr>
                             <tr>
                                 <th>วันที่กู้:</th>
                                 <td>{{ Diamond::parse($loan->loaned_at)->thai_format('j F Y') }}</td>
@@ -48,8 +52,23 @@
                             </tr>  
                             <tr>
                                 <th>จำนวนงวดผ่อนชำระ:</th>
-                                <td>{{ number_format($loan->period, 0, '.', ',') }} งวด (ชำระงวดละ {{ number_format(LoanCalculator::pmt($loan->rate, $loan->outstanding, $loan->period), 2, '.', ',') }} บาท)</td>
-                            </tr> 
+                                <td>{{ number_format($loan->period, 0, '.', ',') }} งวด</td>
+                            </tr>
+                            <tr>
+                                <th>ชำระงวดละ:</th>
+                                <td>
+                                    {{ ($loan->pmt == 0) ? number_format(LoanCalculator::pmt($loan->rate, $loan->outstanding, $loan->period), 2, '.', ',') : number_format($loan->pmt, 2, '.', ',') }} บาท
+
+                                    @if ($loan->completed_at == null)
+                                        <button class="btn btn-xs btn-primary btn-flat margin-l-xl"
+                                            {{ (($is_super || $is_admin) ? '' : 'disabled') }}
+                                            title="แก้ไข PMT"
+                                            onclick="javascript:document.location.href = '{{ action('Admin\LoanController@getPmt', ['member_id' => $member->id, 'id' => $loan->id]) }}';">
+                                            แก้ไข PMT
+                                        </button>
+                                    @endif
+                                </td>
+                            </tr>
                             <tr>
                                 <th>เงินต้นคงเหลือ:</th>
                                 <td>{{ number_format(round($loan->outstanding - $loan->payments->sum('principle'), 2), 2, '.', ',') }} บาท</td>
@@ -181,12 +200,12 @@
                             <tr>
                                 <th style="width: 10%;">#</th>
                                 <th style="width: 10%;">งวดที่</th>
-                                <th style="width: 15%;">วันที่ชำระ</th>
-                                <th style="width: 15%;">เงินต้น</th>
-                                <th style="width: 15%;">ดอกเบี้ย</th>
-                                <th style="width: 15%;">รวม</th>
-                                <th style="width: 15%;">หมายเหตุ</th>
-                                <th style="width: 5%;">&nbsp;</th>
+                                <th style="width: 10%;">ประเภท</th>
+                                <th style="width: 14%;">วันที่ชำระ</th>
+                                <th style="width: 14%;">เงินต้น</th>
+                                <th style="width: 14%;">ดอกเบี้ย</th>
+                                <th style="width: 14%;">รวม</th>
+                                <th style="width: 14%;">หมายเหตุ</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -194,12 +213,12 @@
                                 <tr onclick="javascript: document.location.href  = '{{ action('Admin\PaymentController@show', ['loan_id'=>$loan->id, 'id'=>$payment->id]) }}';" style="cursor: pointer;">
                                     <td>{{ $index + 1 }}.</td>
                                     <td class="text-primary"><i class="fa fa-credit-card fa-fw"></i> งวดที่ {{ $payment->period }}</td>
+                                    <td><span class="label label-primary">{{ ($payment->payment_method_id == 1) ? 'ปกติ' : 'เงินสด' }}</span></td>
                                     <td>{{ Diamond::parse($payment->pay_date)->thai_format('d M Y') }}</td>
                                     <td>{{ number_format($payment->principle, 2, '.', ',') }} บาท</td>
                                     <td>{{ number_format($payment->interest, 2, '.', ',') }} บาท</td>
                                     <td>{{ number_format($payment->principle + $payment->interest, 2, '.', ',') }} บาท</td>
                                     <td>{{ $payment->remark }}</td>
-									<td>{!! ($payment->attachments->count() > 0) ? '<i class="fa fa-paperclip"></i>' : '&nbsp;' !!}</td>
                                 </tr>
                             @endforeach
                         </tbody>

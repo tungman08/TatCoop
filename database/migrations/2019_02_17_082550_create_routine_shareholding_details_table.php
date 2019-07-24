@@ -38,6 +38,9 @@ class CreateRoutineShareholdingDetailsTable extends Migration
     public function down()
     {
         Schema::table('routine_payment_details', function (Blueprint $table) {
+            $table->dropColumn('amount');
+            $table->dropColumn('pay_date');
+            $table->dropColumn('status');
             $table->dropForeign('routine_shareholding_details_routine_shareholding_id_foreign');
             $table->dropForeign('routine_shareholding_details_member_id_foreign');
         });

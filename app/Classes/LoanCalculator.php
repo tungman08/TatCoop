@@ -7,6 +7,7 @@ use App\Bailsman;
 use App\Loan;
 use App\Payment;
 use App\Member;
+use App\RoutineShareholding;
 
 class LoanCalculator {
     const DAYS_IN_YEAR = 365;
@@ -19,10 +20,10 @@ class LoanCalculator {
         return round(($outstanding + ($outstanding * ($rate / 100) * ($period / 12))) / $period, 0);
     }
 
-    public function payment($rate, $payment_type, $outstanding, $period, Diamond $start) {
+    public function payment($rate, $pmt, $payment_type, $outstanding, $period, Diamond $start) {
         return ($payment_type == 1) ? 
-            $this->payment_general($rate, $outstanding, $period, $start) : 
-            $this->payment_stable($rate, $outstanding, $period, $start);
+            $this->payment_general($rate, ($pmt == 0) ? $this->pmt($rate, $outstanding, $period) : $pmt, $outstanding, $period, $start) : 
+            $this->payment_stable($rate, ($pmt == 0) ? $this->pmt($rate, $outstanding, $period) : $pmt, $outstanding, $period, $start);
     }
 
     public function total_interest(Member $member, Diamond $date) {
@@ -48,7 +49,7 @@ class LoanCalculator {
         $lastPay = ($loan->payments->count() > 0) ? Diamond::parse($loan->payments->max('pay_date')) : Diamond::parse($loan->loaned_at);
         $days = $lastPay->diffInDays($date, false);
         $balance = ($loan->payments->count() > 0) ? $loan->outstanding - $loan->payments->sum('principle') : $loan->outstanding;
-        $pmt = $this->pmt($loan->rate, $loan->outstanding, $loan->period);
+        $pmt = ($loan->pmt == 0) ? $this->pmt($loan->rate, $loan->outstanding, $loan->period) : $loan->pmt;
         $rate = ($loan->rate / 100 / LoanCalculator::DAYS_IN_YEAR) * $days;
         
         if ($loan->paymentType->id == 1) {
@@ -124,24 +125,79 @@ class LoanCalculator {
     }
 
     public function close_payment($loan, $date) {
+        $day = 10;
+        $close_date = Diamond::parse($date);
         $dayRate = $loan->rate / 100 / LoanCalculator::DAYS_IN_YEAR;
-
-        $balance = $loan->outstanding - $loan->payments->sum('principle');
         $last_payment_date = !is_null($loan->payments->max('pay_date')) ? Diamond::parse($loan->payments->max('pay_date')) : Diamond::parse($loan->loaned_at);
-        $days = $last_payment_date->diffInDays(Diamond::parse($date), false);
+        $days = $last_payment_date->diffInDays($close_date, false);
 
+        $startOfMonth = $close_date->copy()->startOfMonth();
+        $endOfMonth = $close_date->copy()->endOfMonth();
+        $d_day = $startOfMonth->copy()->addDays($day - 1); // วันที่ 10
         $result = new stdClass();
-        $result->principle = $balance;
-        $result->interest = $balance * $dayRate * $days;
+
+        if ($loan->member->profile->employee->employee_type_id == 1) { 
+            // พนักงาน/ลูกจ้าง
+            if ($loan->member->shareholding > 0) {
+                // นำส่งตัดเงินเดือน
+                if ($close_date->lessThan($d_day)) {
+                    // ปิดก่อนวันที่ 10
+                    $balance = $loan->outstanding - $loan->payments->sum('principle');
+     
+                    $result->principle = $balance;
+                    $result->interest = $balance * $dayRate * $days;
+                }
+                else {
+                    // ปิดหลังวันที่ 10 คำนวณนำส่งใหม่
+                    if (RoutineShareholding::where('calculated_date', $startOfMonth)->count() > 0) {
+                        $routine = RoutineShareholding::where('calculated_date', $startOfMonth)->first();
+
+                        if ($routine != null) {
+                            $pmt = ($loan->pmt == 0) ? $this->pmt($loan->rate, $loan->outstanding, $loan->period) : $loan->pmt;
+                            $balance = $loan->outstanding - $loan->payments->sum('principle');
+                            $routine = (($pmt < $balance) ? $pmt : $balance) / (1 + ($dayRate * $close_date->diffInDays($endOfMonth, false)));
+                            $payment = $loan->outstanding - $loan->payments->sum('principle') - $routine;
+
+                            $result->principle = $payment;
+                            $result->interest = $payment * $dayRate * $days;
+                        }
+                        else {
+                            $balance = $loan->outstanding - $loan->payments->sum('principle');
+     
+                            $result->principle = $balance;
+                            $result->interest = $balance * $dayRate * $days;
+                        }
+                    }
+                    else {
+                        $balance = $loan->outstanding - $loan->payments->sum('principle');
+     
+                        $result->principle = $balance;
+                        $result->interest = $balance * $dayRate * $days;   
+                    }
+                }
+            }
+            else {
+                // ไม่ได้นำส่งตัดเงินเดือน
+                $balance = $loan->outstanding - $loan->payments->sum('principle');
+     
+                $result->principle = $balance;
+                $result->interest = $balance * $dayRate * $days;
+            }
+        }
+        else {
+            // บุคคลภายนอก
+            $balance = $loan->outstanding - $loan->payments->sum('principle');
+     
+            $result->principle = $balance;
+            $result->interest = $balance * $dayRate * $days;
+        }
 
         return $result;
     }
 
-    protected function payment_general($rate, $outstanding, $period, Diamond $start) {
+    protected function payment_general($rate, $pmt, $outstanding, $period, Diamond $start) {
         $data = [];
         $forward = $outstanding;
-
-        $pmt = $this->pmt($rate, $outstanding, $period);
 
         for ($i = 0; $i < $period; $i++) {
             $date = $start->addMonths(1);
@@ -170,11 +226,9 @@ class LoanCalculator {
         return $data;
     }
 
-    protected function payment_stable($rate, $outstanding, $period, Diamond $start) {
+    protected function payment_stable($rate, $pmt, $outstanding, $period, Diamond $start) {
         $data = [];
         $forward = $outstanding;
-
-        $pmt = $this->pmt($rate, $outstanding, $period);
 
         for ($i = 0; $i < $period; $i++) {
             $date = $start->addMonths(1);
