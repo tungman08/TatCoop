@@ -96,7 +96,7 @@
                             $balance -= $payment->principle;
                         @endphp  
                         <tr>
-                            <td class="text-center">{{ Diamond::parse($payment->pay_date)->thai_format('j M Y') }}</td>
+                            <td class="text-center">{{ Diamond::parse($payment->pay_date)->thai_format('j M y') }}</td>
 
                             @if ($count == 1)
                                 <td class="text-center">{{ $loan->period }} งวด</td>

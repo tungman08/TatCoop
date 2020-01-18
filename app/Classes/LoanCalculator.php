@@ -7,7 +7,7 @@ use App\Bailsman;
 use App\Loan;
 use App\Payment;
 use App\Member;
-use App\RoutineShareholding;
+use App\RoutinePaymentDetail;
 
 class LoanCalculator {
     const DAYS_IN_YEAR = 365;
@@ -124,11 +124,119 @@ class LoanCalculator {
         return $result;
     }
 
-    public function close_payment($loan, $date) {
+    public function normal_payment_2($loan, $lastpay, $paydate, $amount) {
         $day = 10;
-        $close_date = Diamond::parse($date);
+        $pay_date = Diamond::parse($paydate);
         $dayRate = $loan->rate / 100 / LoanCalculator::DAYS_IN_YEAR;
-        $last_payment_date = !is_null($loan->payments->max('pay_date')) ? Diamond::parse($loan->payments->max('pay_date')) : Diamond::parse($loan->loaned_at);
+        $last_payment_date = Diamond::parse($lastpay);
+        $days = $last_payment_date->diffInDays($pay_date, false);
+
+        $startOfMonth = $pay_date->copy()->startOfMonth();
+        $endOfMonth = $pay_date->copy()->endOfMonth();
+        $d_day = $startOfMonth->copy()->addDays($day - 1); // วันที่ 10
+        $result = new stdClass();
+
+        if ($loan->member->profile->employee->employee_type_id == 1) { 
+            // พนักงาน/ลูกจ้าง
+            if ($loan->member->shareholding > 0) {
+                // นำส่งตัดเงินเดือน คำนวณนำส่งใหม่
+                if (RoutinePaymentDetail::where('loan_id', $loan->id)->whereDate('pay_date', '=', $endOfMonth->toDateString())->count() > 0) {
+                    $routine = RoutinePaymentDetail::where('loan_id', $loan->id)->whereDate('pay_date', '=', $endOfMonth->toDateString())->first();
+
+                    if ($routine != null) {
+                        $pmt = ($loan->pmt == 0) ? $this->pmt($loan->rate, $loan->outstanding, $loan->period) : $loan->pmt;
+                        $balance = $loan->outstanding - $loan->payments->sum('principle');
+                        $interest = $balance * $dayRate * $days;
+                        $routine_pay = (($pmt < $balance) ? $pmt : $balance) / (1 + ($dayRate * $pay_date->diffInDays($endOfMonth, false)));
+
+                        $result->cal = "{$last_payment_date->thai_format('j M Y')} - {$pay_date->thai_format('d M Y')}";
+                        $result->period = ($loan->payments->count() > 0) ? $loan->payments->max('period') + 1 : 1;
+                        $result->principle = $amount - $interest;
+                        $result->interest = $interest;
+                
+                        if ($endOfMonth->gt($pay_date->copy()->addDay(1))) {
+                            $result->routine_cal = "{$pay_date->copy()->addDay(1)->thai_format('j M Y')} - {$endOfMonth->thai_format('d M Y')}";
+                            $result->routine_period = ($loan->payments->count() > 0) ? $loan->payments->max('period') + 2 : 2;
+                            $result->routine_principle = $routine_pay;
+                            $result->routine_interest = $pmt - $routine_pay;
+                        }
+                        else {
+                            $result->routine_cal = '-';
+                            $result->routine_period = 0;
+                            $result->routine_principle = 0;
+                            $result->routine_interest = 0;
+                        }
+                    }
+                    else {
+                        $balance = $loan->outstanding - $loan->payments->sum('principle');
+                        $interest = $balance * $dayRate * $days;
+        
+                        $result->cal = "{$last_payment_date->thai_format('j M Y')} - {$pay_date->thai_format('d M Y')}";
+                        $result->period = ($loan->payments->count() > 0) ? $loan->payments->max('period') + 1 : 1;
+                        $result->principle = $amount - $interest;
+                        $result->interest = $interest;
+                
+                        $result->routine_cal = '-';
+                        $result->routine_period = 0;
+                        $result->routine_principle = 0;
+                        $result->routine_interest = 0;
+                    }
+                }
+                else {
+                    $balance = $loan->outstanding - $loan->payments->sum('principle');
+                    $interest = $balance * $dayRate * $days;
+    
+                    $result->cal = "{$last_payment_date->thai_format('j M Y')} - {$pay_date->thai_format('d M Y')}";
+                    $result->period = ($loan->payments->count() > 0) ? $loan->payments->max('period') + 1 : 1;
+                    $result->principle = $amount - $interest;
+                    $result->interest = $interest;
+            
+                    $result->routine_cal = '-';
+                    $result->routine_period = 0;
+                    $result->routine_principle = 0;
+                    $result->routine_interest = 0;
+                }
+            }
+            else {
+                // ไม่ได้นำส่งตัดเงินเดือน
+                $balance = $loan->outstanding - $loan->payments->sum('principle');
+                $interest = $balance * $dayRate * $days;
+
+                $result->cal = "{$last_payment_date->thai_format('j M Y')} - {$pay_date->thai_format('d M Y')}";
+                $result->period = ($loan->payments->count() > 0) ? $loan->payments->max('period') + 1 : 1;
+                $result->principle = $amount - $interest;
+                $result->interest = $interest;
+        
+                $result->routine_cal = '-';
+                $result->routine_period = 0;
+                $result->routine_principle = 0;
+                $result->routine_interest = 0;
+            }
+        }
+        else {
+            // บุคคลภายนอก ไม่ได้นำส่งตัดเงินเดือน
+            $balance = $loan->outstanding - $loan->payments->sum('principle');
+            $interest = $balance * $dayRate * $days;
+            
+            $result->cal = "{$last_payment_date->thai_format('j M Y')} - {$pay_date->thai_format('d M Y')}";
+            $result->period = ($loan->payments->count() > 0) ? $loan->payments->max('period') + 1 : 1;
+            $result->principle = $amount - $interest;
+            $result->interest = $interest;
+    
+            $result->routine_cal = '-';
+            $result->routine_period = 0;
+            $result->routine_principle = 0;
+            $result->routine_interest = 0;
+        }
+
+        return $result;
+    }
+
+    public function close_payment($loan, $lastpay, $paydate) {
+        $day = 10;
+        $close_date = Diamond::parse($paydate);
+        $dayRate = $loan->rate / 100 / LoanCalculator::DAYS_IN_YEAR;
+        $last_payment_date = Diamond::parse($lastpay);
         $days = $last_payment_date->diffInDays($close_date, false);
 
         $startOfMonth = $close_date->copy()->startOfMonth();
@@ -143,36 +251,56 @@ class LoanCalculator {
                 if ($close_date->lessThan($d_day)) {
                     // ปิดก่อนวันที่ 10
                     $balance = $loan->outstanding - $loan->payments->sum('principle');
-     
+
+                    $result->cal = "{$last_payment_date->thai_format('j M Y')} - {$close_date->thai_format('j M Y')}";
                     $result->principle = $balance;
                     $result->interest = $balance * $dayRate * $days;
+
+                    $result->routine_cal = "-";
+                    $result->routine_principle = 0;
+                    $result->routine_interest = 0;
                 }
                 else {
                     // ปิดหลังวันที่ 10 คำนวณนำส่งใหม่
-                    if (RoutineShareholding::where('calculated_date', $startOfMonth)->count() > 0) {
-                        $routine = RoutineShareholding::where('calculated_date', $startOfMonth)->first();
+                    if (RoutinePaymentDetail::where('loan_id', $loan->id)->whereDate('pay_date', '=', $endOfMonth->toDateString())->count() > 0) {
+                        $routine = RoutinePaymentDetail::where('loan_id', $loan->id)->whereDate('pay_date', '=', $endOfMonth->toDateString())->first();
 
                         if ($routine != null) {
                             $pmt = ($loan->pmt == 0) ? $this->pmt($loan->rate, $loan->outstanding, $loan->period) : $loan->pmt;
                             $balance = $loan->outstanding - $loan->payments->sum('principle');
-                            $routine = (($pmt < $balance) ? $pmt : $balance) / (1 + ($dayRate * $close_date->diffInDays($endOfMonth, false)));
-                            $payment = $loan->outstanding - $loan->payments->sum('principle') - $routine;
+                            $routine_pay = (($pmt < $balance) ? $pmt : $balance) / (1 + ($dayRate * $close_date->diffInDays($endOfMonth, false)));
+                            $payment = $balance - $routine_pay;
 
+                            $result->cal = "{$last_payment_date->thai_format('j M Y')} - {$close_date->thai_format('d M Y')}";
                             $result->principle = $payment;
-                            $result->interest = $payment * $dayRate * $days;
+                            $result->interest = $balance * $dayRate * $days;
+             
+                            $result->routine_cal = "{$close_date->copy()->addDay(1)->thai_format('j M Y')} - {$endOfMonth->thai_format('d M Y')}";
+                            $result->routine_principle = $routine_pay;
+                            $result->routine_interest = $pmt - $routine_pay;
                         }
                         else {
                             $balance = $loan->outstanding - $loan->payments->sum('principle');
      
+                            $result->cal = "{$last_payment_date->thai_format('j M Y')} - {$close_date->thai_format('d M Y')}";
                             $result->principle = $balance;
                             $result->interest = $balance * $dayRate * $days;
+
+                            $result->routine_cal = "-";
+                            $result->routine_principle = 0;
+                            $result->routine_interest = 0;
                         }
                     }
                     else {
                         $balance = $loan->outstanding - $loan->payments->sum('principle');
      
+                        $result->cal = "{$last_payment_date->thai_format('j M Y')} - {$close_date->thai_format('d M Y')}";
                         $result->principle = $balance;
-                        $result->interest = $balance * $dayRate * $days;   
+                        $result->interest = $balance * $dayRate * $days; 
+                        
+                        $result->routine_cal = "-";
+                        $result->routine_principle = 0;
+                        $result->routine_interest = 0;
                     }
                 }
             }
@@ -180,16 +308,102 @@ class LoanCalculator {
                 // ไม่ได้นำส่งตัดเงินเดือน
                 $balance = $loan->outstanding - $loan->payments->sum('principle');
      
+                $result->cal = "{$last_payment_date->thai_format('j M Y')} - {$close_date->thai_format('d M Y')}";
                 $result->principle = $balance;
                 $result->interest = $balance * $dayRate * $days;
+
+                $result->routine_cal = "-";
+                $result->routine_principle = 0;
+                $result->routine_interest = 0;
             }
         }
         else {
-            // บุคคลภายนอก
+            // บุคคลภายนอก ไม่ได้นำส่งตัดเงินเดือน
             $balance = $loan->outstanding - $loan->payments->sum('principle');
      
+            $result->cal = "{$last_payment_date->thai_format('j M Y')} - {$close_date->thai_format('d M Y')}";
             $result->principle = $balance;
             $result->interest = $balance * $dayRate * $days;
+
+            $result->routine_cal = "-";
+            $result->routine_principle = 0;
+            $result->routine_interest = 0;
+        }
+
+        return $result;
+    }
+
+    public function refinance_payment($loan, $lastpay, $paydate) {
+        $day = 10;
+        $close_date = Diamond::parse($paydate);
+        $dayRate = $loan->rate / 100 / LoanCalculator::DAYS_IN_YEAR;
+        $last_payment_date = Diamond::parse($lastpay);
+        $days = $last_payment_date->diffInDays($close_date, false);
+
+        $startOfMonth = $close_date->copy()->startOfMonth();
+        $endOfMonth = $close_date->copy()->endOfMonth();
+        $d_day = $startOfMonth->copy()->addDays($day - 1); // วันที่ 10
+        $result = new stdClass();
+
+        if ($loan->member->profile->employee->employee_type_id == 1) { 
+            // พนักงาน/ลูกจ้าง
+            if ($loan->member->shareholding > 0) {
+                // นำส่งตัดเงินเดือน
+                if ($close_date->lessThan($d_day)) {
+                    // ปิดก่อนวันที่ 10
+                    $balance = $loan->outstanding - $loan->payments->sum('principle');
+
+                    $result->cal = "{$last_payment_date->thai_format('j M Y')} - {$close_date->thai_format('j M Y')}";
+                    $result->principle = $balance;
+                    $result->interest = $balance * $dayRate * $days;
+
+                    $result->refund = 0;
+                }
+                else {
+                    // ปิดหลังวันที่ 10 คำนวณนำส่งใหม่
+                    $routine = RoutinePaymentDetail::where('loan_id', $loan->id)->whereDate('pay_date', '=', $endOfMonth->toDateString())->first();
+
+                    if ($routine != null) {
+                        $pmt = ($loan->pmt == 0) ? $this->pmt($loan->rate, $loan->outstanding, $loan->period) : $loan->pmt;
+                        $balance = $loan->outstanding - $loan->payments->sum('principle');
+
+                        $result->cal = "{$last_payment_date->thai_format('j M Y')} - {$close_date->thai_format('d M Y')}";
+                        $result->principle = $balance;
+                        $result->interest = $balance * $dayRate * $days;
+         
+                        $result->refund = (($pmt < $balance) ? $pmt : $balance) / (1 + ($dayRate * $close_date->diffInDays($endOfMonth, false)));
+                    }
+                    else {
+                        $balance = $loan->outstanding - $loan->payments->sum('principle');
+ 
+                        $result->cal = "{$last_payment_date->thai_format('j M Y')} - {$close_date->thai_format('d M Y')}";
+                        $result->principle = $balance;
+                        $result->interest = $balance * $dayRate * $days;
+
+                        $result->refund = 0;
+                    }
+                }
+            }
+            else {
+                // ไม่ได้นำส่งตัดเงินเดือน
+                $balance = $loan->outstanding - $loan->payments->sum('principle');
+     
+                $result->cal = "{$last_payment_date->thai_format('j M Y')} - {$close_date->thai_format('d M Y')}";
+                $result->principle = $balance;
+                $result->interest = $balance * $dayRate * $days;
+
+                $result->refund = 0;
+            }
+        }
+        else {
+            // บุคคลภายนอก ไม่ได้นำส่งตัดเงินเดือน
+            $balance = $loan->outstanding - $loan->payments->sum('principle');
+     
+            $result->cal = "{$last_payment_date->thai_format('j M Y')} - {$close_date->thai_format('d M Y')}";
+            $result->principle = $balance;
+            $result->interest = $balance * $dayRate * $days;
+
+            $result->refund = 0;
         }
 
         return $result;

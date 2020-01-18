@@ -108,7 +108,7 @@ class SpecialLoanController extends Controller
             // ตรวจสอบเงินเดือนสุทธิของผู้กู้ ลบด้วยยอดใหม่ที่ต้องหักแล้วต้องไม่น้อยกว่า 3,000 บาท
             LoanManager::check_netsalary($validator, $loan, $netsalary, $outstanding, $period, $payment_type);
 
-            // ตรวจสอบยอดรวมของเงินกู้ที่กำลังผ่อนชำระอยู่ (ยอดรวมทั้งหมดต้องไม่เกิน 1,200,000 บาท)
+            // ตรวจสอบยอดรวมของเงินกู้ที่กำลังผ่อนชำระอยู่ (ยอดรวมทั้งหมดต้องไม่เกิน 1,500,000 บาท)
             LoanManager::check_overflow($validator, $loan, $outstanding);
         });
 

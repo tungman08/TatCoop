@@ -97,7 +97,8 @@ class MemberController extends Controller
             'profile.address' => 'ที่อยู่', 
         ];
 
-        $employee = Employee::where('code', $request->input('profile')['employee']['code'])->first();
+        $employee_code = $request->input('profile')['employee']['code'];
+        $employee = ($employee_code != '00000') ? Employee::where('code', $employee_code)->first() : null;
         $is_employee = false;
         $member = null;
 
@@ -149,7 +150,7 @@ class MemberController extends Controller
                 if (!$is_employee) {
                     $employee = new Employee();
                     $employee->profile_id = $profile->id;
-                    $employee->code = (!isset($request->input('profile')['employee']['code']) || trim($request->input('profile')['employee']['code']) === '') ? '<ข้อมูลถูกลบ>' : $request->input('profile')['employee']['code'];
+                    $employee->code = ($request->input('profile')['employee']['code'] != '00000') ? $request->input('profile')['employee']['code'] : '<ข้อมูลถูกลบ>';
                     $employee->employee_type_id = $request->input('profile')['employee']['employee_type_id'];
                     $employee->save();
                 }

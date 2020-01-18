@@ -302,52 +302,66 @@ class ReportController extends Controller
             'group by lt.id, lt.name'));
 
         Excel::create($filename, function($excel) use ($filename, $header, $loan_types, $start_date, $end_date) {
-            foreach ($loan_types as $index => $loan_type) {
-                $payments = DB::select(DB::raw('select members.id as member_id, payments.loan_id as loan_id, profiles.name, ' .
-                    'profiles.lastname, loan_types.name as loan_types_name, loans.code as loan_code, ' .
-                    'sum(payments.principle) as principle, sum(payments.interest) as interest, loans.outstanding as outstanding, ' .
-                    "loans.outstanding - (select coalesce(sum(p.principle), 0) from tatcoop.payments p where p.pay_date <= date('" . $end_date . "') and p.loan_id = payments.loan_id) as balance " .
-                    'from tatcoop.payments ' .
-                    'inner join loans on payments.loan_id = loans.id ' .
-                    'inner join loan_types on loans.loan_type_id = loan_types.id ' .
-                    'inner join members on loans.member_id = members.id ' .
-                    'inner join profiles on members.profile_id = profiles.id ' .
-                    "where payments.pay_date between date('" . $start_date . "') and date('" . $end_date. "') " .
-                    'and loan_types.id = ' . $loan_type->id . ' ' .
-                    'group by members.id, profiles.name, profiles.lastname, loan_types.name, loans.code;'));
-
-                // sheet
-                $excel->sheet("ชำระเงินกู้ " . ($index + 1), function($sheet) use ($filename, $header, $payments, $loan_type) {
+            if (count($loan_types) > 0) {
+                foreach ($loan_types as $index => $loan_type) {
+                    $payments = DB::select(DB::raw('select members.id as member_id, payments.loan_id as loan_id, profiles.name, ' .
+                        'profiles.lastname, loan_types.name as loan_types_name, loans.code as loan_code, ' .
+                        'sum(payments.principle) as principle, sum(payments.interest) as interest, loans.outstanding as outstanding, ' .
+                        "loans.outstanding - (select coalesce(sum(p.principle), 0) from tatcoop.payments p where p.pay_date <= date('" . $end_date . "') and p.loan_id = payments.loan_id) as balance " .
+                        'from tatcoop.payments ' .
+                        'inner join loans on payments.loan_id = loans.id ' .
+                        'inner join loan_types on loans.loan_type_id = loan_types.id ' .
+                        'inner join members on loans.member_id = members.id ' .
+                        'inner join profiles on members.profile_id = profiles.id ' .
+                        "where payments.pay_date between date('" . $start_date . "') and date('" . $end_date. "') " .
+                        'and loan_types.id = ' . $loan_type->id . ' ' .
+                        'group by members.id, profiles.name, profiles.lastname, loan_types.name, loans.code;'));
+    
+                    // sheet
+                    $excel->sheet("ชำระเงินกู้ " . ($index + 1), function($sheet) use ($filename, $header, $payments, $loan_type) {
+                        // disable auto size for sheet
+                        $sheet->setAutoSize(false);
+    
+                        // title
+                        $sheet->row(1, [$filename . ' ' . $loan_type->name]);
+    
+                        // header
+                        $sheet->row(3, $header);
+    
+                        // data
+                        $row = 4;
+                        foreach ($payments as $payment) {
+                            $data = [];
+                            $data[] = $row - 3;
+                            $data[] = str_pad($payment->member_id, 5, "0", STR_PAD_LEFT);
+                            $data[] = $payment->name . ' ' . $payment->lastname;
+                            $data[] = $payment->loan_types_name;
+                            $data[] = $payment->loan_code;
+                            $data[] = $payment->principle;
+                            $data[] = $payment->interest;
+                            $data[] = $payment->principle + $payment->interest;
+                            $data[] = $payment->balance;
+    
+                            $sheet->row($row, $data);
+                            $row++;
+                        }
+    
+                        $sheet->setColumnFormat([
+                            "F4:I$row" => '#,##0.00'
+                        ]);
+                    });
+                }    
+            }
+            else {
+                $excel->sheet("ชำระเงินกู้", function($sheet) use ($filename, $header) {
                     // disable auto size for sheet
                     $sheet->setAutoSize(false);
 
                     // title
-                    $sheet->row(1, [$filename . ' ' . $loan_type->name]);
+                    $sheet->row(1, $filename);
 
                     // header
                     $sheet->row(3, $header);
-
-                    // data
-                    $row = 4;
-                    foreach ($payments as $payment) {
-                        $data = [];
-                        $data[] = $row - 3;
-                        $data[] = str_pad($payment->member_id, 5, "0", STR_PAD_LEFT);
-                        $data[] = $payment->name . ' ' . $payment->lastname;
-                        $data[] = $payment->loan_types_name;
-                        $data[] = $payment->loan_code;
-                        $data[] = $payment->principle;
-                        $data[] = $payment->interest;
-                        $data[] = $payment->principle + $payment->interest;
-                        $data[] = $payment->balance;
-
-                        $sheet->row($row, $data);
-                        $row++;
-                    }
-
-                    $sheet->setColumnFormat([
-                        "F4:I$row" => '#,##0.00'
-                    ]);
                 });
             }
         })->download('xlsx');
@@ -459,8 +473,8 @@ class ReportController extends Controller
             $rows = [
                 'previous_shareholding' => $previous_shareholding->count(),
                 'previous_payment' => $previous_payment->count(),
-                'shareholding' => $shareholding->count(),
-                'payment' => $payment->count()
+                'shareholding' => !is_array($shareholding) ? $shareholding->count() : 0,
+                'payment' => !is_array($payment) ? $payment->count() : 0
             ];
 
             // sheet

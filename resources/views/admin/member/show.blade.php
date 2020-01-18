@@ -107,6 +107,61 @@
             <!-- /.box-body -->
         </div>
         <!-- /.box -->
+
+        <div class="box box-default">
+            <div class="box-header with-border">
+                <h3 class="box-title"><i class="fa fa-user"></i> ผู้รับผลประโยชน์</h3>
+            </div>
+            <!-- /.box-header -->
+
+            <div class="box-body">
+                <input type="file" id="beneficiary" name="beneficiary" class="file-upload" accept="image/jpeg,application/pdf"
+                    onchange="javascript:uploadFile(this, {{ $member->id }});" />
+                <button class="btn btn-primary btn-flat margin-b-md"
+                    {{ (($is_super || $is_admin) ? '' : 'disabled') }} title="เพิ่มเอกสาร"
+                    onclick="$('#beneficiary').click();"><i class="fa fa-plus"></i> เพิ่มเอกสาร
+                </button>
+
+                <div class="table-responsive" style=" margin-top: 10px;">
+                    <table id="beneficiaries" class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>เอกสาร</th>
+                                <th>&nbsp;</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if ($member->beneficiaries->count() > 0)
+                                @foreach ($member->beneficiaries->sortByDesc('created_at') as $beneficiary)
+                                    <tr id="beneficiary-{{ $beneficiary->id }}">
+                                        <td>
+                                            <a href="{{ url(env('APP_URL') . '/storage/file/beneficiaries/' . $beneficiary->file) }}" target="_blank">
+                                                <i class="fa fa-paperclip"></i> {{ Diamond::parse($beneficiary->created_at)->thai_format('j M Y') }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            @if ($is_super || $is_admin)
+                                                <span class="text-danger" style="cursor: pointer;" onclick="javascript:var result = confirm('คุณต้องการลบเอกสารนี้ใช่ไหม?'); if (result) { deleteFile('{{ $beneficiary->id }}'); }"><i class="fa fa-times"></i></span>
+                                            @else
+                                                <span>&nbsp;</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @else
+                                <tr id="empty">
+                                    <td colspan="2" class="text-center">ไม่มีข้อมูล</td>
+                                </tr>
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.table-responsive -->
+
+            </div>
+            <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
     </section>
     <!-- /.content -->
 
@@ -193,5 +248,81 @@
             }
         });
     });
+
+    function uploadFile(doc, id) {
+        var file = $(doc).get(0).files[0];
+        var formData = new FormData();
+        formData.append('ID', id);
+        formData.append('File', file);
+
+        if(file.size < 20971520) {
+            $("tr[id=empty]").remove();
+            $("tr[id=uploading]").remove();
+            $('#beneficiaries > tbody').prepend('<tr id="uploading"><td id="caption" colspan="2" class="text-center"><i class="fa fa-spinner fa-pulse"></i> Uploading... (<span id="progress">0</span>%)</td></tr>');
+
+            $.ajax({
+                dataType: 'json',
+                url: '/ajax/uploadbeneficiary',
+                type: 'post',
+                cache: false,
+                data: formData,
+                processData: false,
+                contentType: false,
+                error: function(xhr, ajaxOption, thrownError) {
+                    $('#caption').addClass('text-danger');
+                    $('#caption').html('<i class="fa fa-times-circle fa-fw"></i> Upload failed.');
+                    console.log(xhr.responseText);
+                    console.log(thrownError);
+                },
+                beforeSend: function() {
+                    $('#caption').html('<i class="fa fa-spinner fa-pulse"></i> Uploading... (<span id="progress">0</span>%)');
+                },
+                xhr: function(){
+                    // get the native XmlHttpRequest object
+                    var xhr = $.ajaxSettings.xhr() ;
+                    // set the onprogress event handler
+                    xhr.upload.onprogress = function (evt) { $('#progress').html(Math.ceil((evt.loaded / evt.total) * 100)); };
+                    // set the onload event handler
+                    xhr.upload.onload = function (){ $('#caption').html('<i class="fa fa-clock-o fa-fw"></i> Please wait...'); };
+                    // return the customized object
+                    return xhr;
+                },
+                success: function (obj) {
+                    $("tr[id=uploading]").remove();
+                    $('#beneficiaries > tbody').prepend('<tr id="beneficiary-' + obj.id + 
+                        '"><td class="text-primary"><a href="' + obj.link + 
+                        '" target="_blank"><i class="fa fa-paperclip"></i> ' + obj.display +
+                        '</a></td><td><span class="text-danger" style="cursor: pointer;" onclick="javascript:var result = confirm(\'คุณต้องการลบเอกสารนี้ใช่ไหม?\'); if (result) { deleteFile(\'' + obj.id +
+                        '\'); }"><i class="fa fa-times"></i></span></td></tr>');
+                }
+            });
+        }
+        else {
+            alert('เอกสารที่ใช้ต้องมีขนาดไม่เกิน 20M');
+        }
+    }
+
+    function deleteFile(id) {
+        $.ajax({
+            dataType: 'json',
+            url: '/ajax/deletebeneficiary',
+            type: 'post',
+            cache: false,
+            data: {
+                'id': id
+            },
+            error: function(xhr, ajaxOption, thrownError) {
+                console.log(xhr.responseText);
+                console.log(thrownError);
+            },
+            success: function(id) {
+                $('#beneficiary-' + id).remove();
+
+                if ($('#beneficiaries > tbody > tr').length == 0) {
+                    $('#beneficiaries > tbody').prepend('<tr id="empty"><td colspan="2" class="text-center">ไม่มีข้อมูล</td></tr>');
+                }
+            }
+        });
+    }
     </script>
 @endsection

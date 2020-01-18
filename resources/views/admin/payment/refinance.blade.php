@@ -12,7 +12,7 @@
             ['item' => 'จัดการการกู้ยืม', 'link' => action('Admin\LoanController@getMember')],
             ['item' => 'การกู้ยืม', 'link' => action('Admin\LoanController@index', ['member_id'=>$member->id])],
             ['item' => 'สัญญากู้ยืม', 'link' => action('Admin\LoanController@show', ['member_id'=>$member->id, 'id'=>$loan->id])],
-            ['item' => 'ชำระเงิน', 'link' => ''],
+            ['item' => 'ปิดยอดเงินกู้เพื่อกู้ใหม่', 'link' => ''],
         ]])
     </section>
 
@@ -41,9 +41,8 @@
                         <td>{{ number_format($loan->period, 0, '.', ',') }} งวด</td>
                     </tr>
                     <tr>
-                        @php($pmt = ($loan->pmt == 0) ? LoanCalculator::pmt($loan->rate, $loan->outstanding, $loan->period) : $loan->pmt)
                         <th>ชำระงวดละ:</th>
-                        <td>{{ number_format($pmt, 2, '.', ',') }} บาท</td>
+                        <td>{{ ($loan->pmt == 0) ? number_format(LoanCalculator::pmt($loan->rate, $loan->outstanding, $loan->period), 2, '.', ',') : number_format($loan->pmt, 2, '.', ',') }} บาท</td>
                     </tr>
                     <tr>
                         <th>เงินต้นคงเหลือ:</th>
@@ -73,8 +72,8 @@
             @if ($member->profile->employee->employee_type_id == 1)
                 <p>
                     <strong>หมายเหตุ:</strong> (สำหรับสมาชิกที่เป็นพนักงาน/ลูกจ้าง ททท. ที่นำส่งตัดบัญชีเงินเดือน)<br />
-                    1. หากชำระค่าเงินกู้ระหว่างวันที่ 1-10 ระบบจะทำการปรับปรุงข้อมูลการนำส่งตัดบัญชีเงินเดือนใหม่ กรุณาตรวจสอบข้อมูลการนำส่งอีกครั้ง<br />
-                    2. หากชำระค่าเงินกู้หลังวันที่ 10 ถึงสิ้นเดือน ระบบจะคำนวณเงินที่ต้องใช้ โดยทำการคำนวณดอกเบี้ยถึงวันที่ทำการปิดยอด และหักส่วนของเงินที่นำส่ง
+                    1. หากปิดยอดเงินกู้ระหว่างวันที่ 1-10 ระบบจะทำการลบข้อมูลการนำส่งตัดบัญชีเงินเดือนออก กรุณาตรวจสอบข้อมูลการนำส่งอีกครั้ง<br />
+                    2. หากปิดยอดเงินกู้หลังวันที่ 10 ถึงสิ้นเดือน ระบบจะคำนวณเงินที่ต้องใช้ โดยทำการคำนวณดอกเบี้ยถึงวันที่ทำการปิดยอด และหักส่วนของเงินที่นำส่ง
                 </p>
             @endif
         </div>
@@ -87,15 +86,23 @@
             </div>
         @endif
 
-       <div class="box box-primary">
+        <!-- form start -->
+        {{ Form::open(['action' => ['Admin\PaymentController@postPrintRefinance', $loan->id], 'method' => 'post', 'target' => '_blank', 'id' => 'printrefinance']) }}
+            {{ Form::hidden('hidden_cal', null, ['id'=>'hidden_cal']) }}
+            {{ Form::hidden('hidden_principle', null, ['id'=>'hidden_principle']) }}
+            {{ Form::hidden('hidden_interest', null, ['id'=>'hidden_interest']) }}
+            {{ Form::hidden('hidden_total', null, ['id'=>'hidden_total']) }}
+        {{ Form::close() }}
+        
+        <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title"><i class="fa fa-credit-card"></i> เพิ่มการชำระเงินกู้</h3>
+                <h3 class="box-title"><i class="fa fa-credit-card"></i> ปิดยอดเงินกู้เพื่อกู้ใหม่</h3>
                 <input type="hidden" id="loan_id" value="{{ $loan->id }}" />
             </div>
             <!-- /.box-header -->
 
             <!-- form start -->
-            {{ Form::open(['action' => ['Admin\PaymentController@store', $loan->id], 'method' => 'post', 'class' => 'form-horizontal', 'enctype'=>'multipart/form-data']) }}
+            {{ Form::open(['action' => ['Admin\PaymentController@postRefinance', $loan->id], 'method' => 'post', 'class' => 'form-horizontal']) }}
                 <div class="box-body">
                     <div class="form-group">
                         {{ Form::label('lastpay_date', 'วันที่ชำระล่าสุด', [
@@ -112,6 +119,7 @@
                             </div>   
                         </div>
                     </div>
+
                     <div class="form-group">
                         {{ Form::label('pay_date', 'วันที่ต้องการชำระ', [
                             'class'=>'col-sm-2 control-label']) 
@@ -129,20 +137,6 @@
                         </div>
                     </div>
                     <div class="form-group">
-                            {{ Form::label('amount', 'เงินที่ต้องการชำระ', [
-                                'class'=>'col-sm-2 control-label']) 
-                            }}
-    
-                            <div class="col-sm-10">
-                                {{ Form::text('amount', $pmt, [
-                                    'class'=>'form-control', 
-                                    'placeholder'=>'กรุณาป้อนจำนวนเงินที่ต้องการชำระ', 
-                                    'autocomplete'=>'off',
-                                    'onkeypress' => 'javascript:return isNumberKey(event);'])
-                                }}  
-                            </div>
-                        </div>
-                    <div class="form-group">
                         <div class="col-md-offset-2 padding-l-xs">
                             <button type="button" id="calculate" class="btn btn-default btn-flat">
                                 <i class="fa fa-calculator"></i> คำนวณ
@@ -152,17 +146,13 @@
                     <div class="row">
                         <div class="col-sm-offset-2 col-sm-5 padding-l-none">
                             <div class="well">
-                                <i class="fa fa-money"></i> <strong>เงินที่ต้องนำจ่ายรายงวด</strong>
+                                <i class="fa fa-money"></i> <strong>เงินที่ต้องนำมาปิดยอด</strong>
+                                {{--<div class="pull-right"><a href="javascript:void(0);" onclick="javascript:$('#printclose').submit();"
+                                    class="btn btn-default btn-flat"><i class="fa fa-print"></i></a></div>--}}
                                 <hr />
                                 <div class="form-group" style="margin-left: 0px; margin-right: 0px;">
                                     <label for="cal">ช่วงเวลาคำนวณดอกเบี้ย</label>
                                     <input type="text" id="cal" name="cal" readonly="readonly"
-                                        placeholder="กรุณากดปุมคำนวณ..."
-                                        class="form-control" />  
-                                </div>
-                                <div class="form-group" style="margin-left: 0px; margin-right: 0px;">
-                                    <label for="period">งวดที่</label>
-                                    <input type="text" id="period" name="period" readonly="readonly"
                                         placeholder="กรุณากดปุมคำนวณ..."
                                         class="form-control" />  
                                 </div>
@@ -180,7 +170,7 @@
                                 </div>
                                 <div class="form-group" style="margin-left: 0px; margin-right: 0px;">
                                     <label for="total">รวม</label>
-                                    <input type="text" id="total" readonly="readonly"
+                                    <input type="text" id="total" name="total" readonly="readonly"
                                         placeholder="กรุณากดปุมคำนวณ..."
                                         class="form-control" />       
                                 </div>
@@ -193,40 +183,24 @@
                                 <i class="fa fa-money"></i> <strong>เงินที่หักนำส่งตัดบัญชีเงินเดือน</strong>
                                 <hr />
                                 <div class="form-group" style="margin-left: 0px; margin-right: 0px;">
-                                    <label for="routine_cal">ช่วงเวลาคำนวณดอกเบี้ย</label>
-                                    <input type="text" id="routine_cal" readonly="readonly"
+                                    <label for="routine_cal">จำนวนเงินที่ต้องคืน</label>
+                                    <input type="text" id="refund" readonly="readonly"
                                         placeholder="กรุณากดปุมคำนวณ..."
                                         class="form-control" />  
-                                </div>
-                                <div class="form-group" style="margin-left: 0px; margin-right: 0px;">
-                                    <label for="routine_period">งวดที่</label>
-                                    <input type="text" id="routine_period" readonly="readonly"
-                                        placeholder="กรุณากดปุมคำนวณ..."
-                                        class="form-control" />  
-                                </div>
-                                <div class="form-group" style="margin-left: 0px; margin-right: 0px;">
-                                    <label for="routine_principle">จำนวนเงินต้น</label>
-                                    <input type="text" id="routine_principle" readonly="readonly"
-                                        placeholder="กรุณากดปุมคำนวณ..."
-                                        class="form-control" />  
-                                </div>
-                                <div class="form-group" style="margin-left: 0px; margin-right: 0px;">
-                                    <label for="routine_interest">จำนวนดอกเบี้ย</label>
-                                    <input type="text" id="routine_interest" readonly="readonly"
-                                        placeholder="กรุณากดปุมคำนวณ..."
-                                        class="form-control" />       
-                                </div>
-                                <div class="form-group" style="margin-left: 0px; margin-right: 0px;">
-                                    <label for="routine_total">รวม</label>
-                                    <input type="text" id="routine_total" readonly="readonly"
-                                        placeholder="กรุณากดปุมคำนวณ..."
-                                        class="form-control" />       
                                 </div>
                             </div>
                         </div>
                         <!--/.col-->
                     </div>
                     <!--/.row-->
+                    <div class="form-group">
+                        <label for="summary" class="col-sm-2 control-label">ยอดรวมที่ต้องชำระ</label>
+                        <div class="col-sm-10">
+                            <input type="text" id="summary" readonly="readonly"
+                                placeholder="กรุณากดปุมคำนวณ..."
+                                class="form-control" />      
+                        </div>
+                    </div>
                 </div>
                 <!-- /.box-body -->
 
@@ -276,6 +250,8 @@
                 headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
             });
 
+            $("#save").attr("disabled", true);
+
             $('#pay_date').datetimepicker({
                 locale: moment.locale('th'),
                 viewMode: 'days',
@@ -292,60 +268,45 @@
 
         function calculateLoan(id) {
             var date = $('#pay_date').val();
-            var amount = $('#amount').val();
 
             if (date != '') {
-                if (amount != '') {
-                    var formData = new FormData();
+                var formData = new FormData();
                     formData.append('loan_id', $('#loan_id').val());
                     formData.append('lastpay_date', moment($('#lastpay_date').val()));
                     formData.append('pay_date', moment(date));
-                    formData.append('period', $('#period').val());
-                    formData.append('amount', amount);
 
-                    $.ajax({
-                        dataType: 'json',
-                        url: '/ajax/calculate',
-                        type: 'post',
-                        data: formData,
-                        processData: false,
-                        contentType: false,
-                        beforeSend: function() {
-                            $(".ajax-loading").css("display", "block");
-                        },
-                        success: function(result) {
-                            $(".ajax-loading").css("display", "none");
+                $.ajax({
+                    dataType: 'json',
+                    url: '/ajax/refinancecalculate',
+                    type: 'post',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    beforeSend: function() {
+                        $(".ajax-loading").css("display", "block");
+                    },
+                    success: function(result) {
+                        $(".ajax-loading").css("display", "none");
 
-                            $('#cal').val(result.cal);
-                            $('#period').val(result.period);
-                            $('#principle').val($.number(result.principle, 2));
-                            $('#interest').val($.number(result.interest, 2));
-                            $('#total').val($.number(result.total, 2));
+                        $('#cal').val(result.cal);
+                        $('#principle').val($.number(result.principle, 2));
+                        $('#interest').val($.number(result.interest, 2));
+                        $('#total').val($.number(result.total, 2));
 
-                            $('#routine_cal').val(result.routine_cal);
-                            $('#routine_period').val(result.routine_period);
-                            $('#routine_principle').val($.number(result.routine_principle, 2));
-                            $('#routine_interest').val($.number(result.routine_interest, 2));
-                            $('#routine_total').val($.number(result.routine_total, 2));
+                        // $('#hidden_cal').val(result.cal);
+                        // $('#hidden_principle').val($.number(result.principle, 2));
+                        // $('#hidden_interest').val($.number(result.interest, 2));
+                        // $('#hidden_total').val($.number(result.total, 2));
 
-                            $('#save').removeAttr("disabled");       
-                        }
-                    });
-                }
-                else {
-                    alert('กรุณาจำนวนเงินที่ต้องการชำระ');
-                }
+                        $('#refund').val($.number(result.refund, 2));
+
+                        $('#save').removeAttr("disabled");
+                    }
+                });
             }
             else {
                 alert('กรุณาเลือกวันที่จากปฏิทิน');
             }
         }
-        
-        function isNumberKey(evt){
-            var charCode = (evt.which) ? evt.which : event.keyCode
-            if (charCode != 8 && charCode != 127 && charCode != 45 && charCode != 46 && (charCode < 48 || charCode > 57))
-                return false;
-            return true;
-        }   
     </script>
 @endsection

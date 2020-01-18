@@ -120,7 +120,7 @@
                                     $summary += $shareholding->amount;
                                 @endphp
                                 <tr>
-                                    <td class="text-center">{{ Diamond::parse($shareholding->pay_date)->thai_format('j M Y') }}</td>
+                                    <td class="text-center">{{ Diamond::parse($shareholding->pay_date)->thai_format('j M y') }}</td>
                                     <td class="text-center">{{ number_format($forward->count() + $count, 0, '.', ',') }}</td>
                                     <td class="text-center">{{ number_format($shareholding->amount / 10, 0, '.', ',') }}</td>
                                     <td class="text-right">{{ number_format($shareholding->amount, 2, '.', ',') }}</td>
@@ -251,7 +251,7 @@
                                         $balance -= $payment->principle;
                                     @endphp  
                                     <tr>
-                                        <td class="text-center">{{ Diamond::parse($payment->pay_date)->thai_format('j M Y') }}</td>
+                                        <td class="text-center">{{ Diamond::parse($payment->pay_date)->thai_format('j M y') }}</td>
 
                                         @if ($count == 1)
                                             <td class="text-center">{{ $loan->period }} งวด</td>

@@ -139,7 +139,7 @@
                             </tbody>
                         </table>
                         <!-- /.table -->
-                    </div>  
+                    </div>
                     <!-- /.table-responsive --> 
                 </div>
                 <!-- /.col -->
@@ -172,16 +172,49 @@
                         <button id="create_loan" class="btn btn-primary btn-flat" style="margin-bottom: 15px;"
                             {{ (($is_super || $is_admin) ? '' : 'disabled') }}
                             onclick="javascript:document.location.href = '{{ action('Admin\PaymentController@create', ['loan_id'=>$loan->id]) }}';">
-                            <i class="fa fa-plus-circle fa-fw"></i> ชำระเงิน
+                            <i class="fa fa-plus-circle fa-fw"></i> ชำระเงินรายงวด
                         </button>
                     </div>
 
-                    @if ($loan->payments->sum('principle') >= ($loan->outstanding / 10))
+                    @if ($loan->loan_type_id == 1)
+                        @if ($loan->payments->count() >= ($loan->period / 10) /*&& $loan->payments->sum('principle') >= ($loan->outstanding / 10)*/)
+                            <div class="btn-group">
+                                <button id="close_loan" class="btn btn-primary btn-flat" style="margin-bottom: 15px;"
+                                    {{ (($is_super || $is_admin) ? '' : 'disabled') }}
+                                    onclick="javascript:document.location.href = '{{ action('Admin\PaymentController@getClose', ['loan_id'=>$loan->id]) }}';">
+                                    <i class="fa fa-plus-circle fa-fw"></i> ปิดยอดเงินกู้
+                                </button>
+                            </div>
+
+                            <div class="btn-group">
+                                <button id="close_loan" class="btn btn-primary btn-flat" style="margin-bottom: 15px;"
+                                    {{ (($is_super || $is_admin) ? '' : 'disabled') }}
+                                    onclick="javascript:document.location.href = '{{ action('Admin\PaymentController@getRefinance', ['loan_id'=>$loan->id]) }}';">
+                                    <i class="fa fa-plus-circle fa-fw"></i> ปิดยอดเงินกู้เพื่อกู้ใหม่
+                                </button>
+                            </div>
+
+                            <div class="btn-group pull-right">
+                                <button id="calculate_payment" class="btn btn-default btn-flat" style="margin-bottom: 15px;"
+                                    onclick="javascript:document.location.href = '{{ action('Admin\PaymentController@getCalculate', ['loan_id'=>$loan->id]) }}';">
+                                    <i class="fa fa-calculator fa-fw"></i> คำนวณยอดเงินที่ต้องการปิดยอดเงินกู้
+                                </button>
+                            </div>
+                        @endif
+                    @else
                         <div class="btn-group">
-                            <button id="create_loan" class="btn btn-primary btn-flat" style="margin-bottom: 15px;"
+                            <button id="close_loan" class="btn btn-primary btn-flat" style="margin-bottom: 15px;"
                                 {{ (($is_super || $is_admin) ? '' : 'disabled') }}
                                 onclick="javascript:document.location.href = '{{ action('Admin\PaymentController@getClose', ['loan_id'=>$loan->id]) }}';">
                                 <i class="fa fa-plus-circle fa-fw"></i> ปิดยอดเงินกู้
+                            </button>
+                        </div>
+
+                        <div class="btn-group">
+                            <button id="close_loan" class="btn btn-primary btn-flat" style="margin-bottom: 15px;"
+                                {{ (($is_super || $is_admin) ? '' : 'disabled') }}
+                                onclick="javascript:document.location.href = '{{ action('Admin\PaymentController@getRefinance', ['loan_id'=>$loan->id]) }}';">
+                                <i class="fa fa-plus-circle fa-fw"></i> ปิดยอดเงินกู้เพื่อกู้ใหม่
                             </button>
                         </div>
 
@@ -191,7 +224,7 @@
                                 <i class="fa fa-calculator fa-fw"></i> คำนวณยอดเงินที่ต้องการปิดยอดเงินกู้
                             </button>
                         </div>
-                    @endif
+                    @endif    
                 @endif
 
                 <div class="table-responsive" style=" margin-top: 10px;">

@@ -83,7 +83,7 @@ class UploadDocument
         if ($document->position != $position) {
             $start = ($document->position > $position) ? $position : $document->position;
             $end = ($document->position > $position) ? $document->position : $position;
-            $direction = ($carousel->position > $position) ? 'down' : 'up';
+            $direction = ($document->position > $position) ? 'down' : 'up';
 
             $friends = Document::where('document_type_id', $document->document_type_id)
                 ->whereBetween('position', [$start, $end])

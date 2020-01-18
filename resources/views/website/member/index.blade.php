@@ -31,6 +31,18 @@
                         <th>ประเภทสมาชิก:</th>
                         <td>{{ $member->profile->employee->employee_type->name }}</td>
                     </tr> 
+                    <tr>
+                        <th>ผู้รับผลประโยชน์:</th>
+                        @if ($member->beneficiaries->count() > 0)
+                            <td>
+                                <a href="{{ url(env('APP_URL') . '/storage/file/beneficiaries/' . $member->beneficiaries->first()->file) }}" target="_blank">
+                                    <i class="fa fa-paperclip"></i> เอกสารแนบ
+                                </a>
+                            </td>
+                        @else
+                            <td>N/A</td>
+                        @endif
+                    </tr> 
                 </table>
                 <!-- /.table -->
             </div>  

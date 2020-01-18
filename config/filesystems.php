@@ -64,6 +64,11 @@ return [
             'root' => storage_path('app/documents'),
         ],
 
+        'beneficiaries' => [
+            'driver' => 'local',
+            'root' => storage_path('app/beneficiaries'),
+        ],
+
         'loans' => [
             'driver' => 'local',
             'root' => storage_path('app/loans'),

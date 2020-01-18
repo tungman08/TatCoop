@@ -115,13 +115,13 @@ class NormalLoanController extends Controller
             // ตรวจสอบจำนวนหุ้นที่ต้องใช้
             LoanManager::check_shareholding($validator, $loan, $outstanding);
 
-            // ตรวจสอบเงินเดือนผู้กู้ (วงเงินที่ต้องการกู้ต้องไม่เกิน 40 เท่าของเงินเดือนและสูงสุดไม่เกิน 1,200,000 บาท)
+            // ตรวจสอบเงินเดือนผู้กู้ (วงเงินที่ต้องการกู้ต้องไม่เกิน 40 เท่าของเงินเดือนและสูงสุดไม่เกิน 1,500,000 บาท)
             LoanManager::check_salarynormal($validator, $loan, $salary, $outstanding);
 
             // ตรวจสอบเงินเดือนสุทธิของผู้กู้ ลบด้วยยอดใหม่ที่ต้องหักแล้วต้องไม่น้อยกว่า 3,000 บาท
             LoanManager::check_netsalary($validator, $loan, $netsalary, $outstanding, $period, $payment_type);
 
-            // ตรวจสอบยอดรวมของเงินกู้ที่กำลังผ่อนชำระอยู่ (ยอดรวมทั้งหมดต้องไม่เกิน 1,200,000 บาท)
+            // ตรวจสอบยอดรวมของเงินกู้ที่กำลังผ่อนชำระอยู่ (ยอดรวมทั้งหมดต้องไม่เกิน 1,500,000 บาท)
             LoanManager::check_overflow($validator, $loan, $outstanding);
 
             // กรณีใช้หุ้นตนเองค้ำประกัน (พนักงาน/ลูกจ้าง ททท. ใช้ 90% ของหุ้น)

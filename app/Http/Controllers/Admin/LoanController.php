@@ -305,8 +305,13 @@ class LoanController extends Controller
             ->get();
         $loans = Loan::where('member_id', $member_id)
             ->whereNotNull('code')
-            ->whereNull('completed_at')
-            ->get();
+            //->whereNull('completed_at')
+            ->where(function ($query) {
+                $query->whereNull('completed_at')
+                    ->orWhere(function ($sub) {
+                        $sub->whereYear('completed_at', '=', \Carbon\Carbon::today()->year);
+                    });
+            })->get();
 
         return view('admin.loan.debt', [
             'member' => $member,
@@ -321,8 +326,13 @@ class LoanController extends Controller
             ->get();
         $loans = Loan::where('member_id', $member_id)
             ->whereNotNull('code')
-            ->whereNull('completed_at')
-            ->get();
+            //->whereNull('completed_at')
+            ->where(function ($query) {
+                $query->whereNull('completed_at')
+                    ->orWhere(function ($sub) {
+                        $sub->whereYear('completed_at', '=', \Carbon\Carbon::today()->year);
+                    });
+            })->get();
 
         return view('admin.loan.debtprint', [
             'member' => $member,
@@ -337,8 +347,13 @@ class LoanController extends Controller
             ->get();
         $loans = Loan::where('member_id', $member_id)
             ->whereNotNull('code')
-            ->whereNull('completed_at')
-            ->get();
+            //->whereNull('completed_at')
+            ->where(function ($query) {
+                $query->whereNull('completed_at')
+                    ->orWhere(function ($sub) {
+                        $sub->whereYear('completed_at', '=', \Carbon\Carbon::today()->year);
+                    });
+            })->get();
 
         $data = [
             'member' => Member::find($member_id),

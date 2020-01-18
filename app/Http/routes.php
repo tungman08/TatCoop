@@ -195,6 +195,12 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
         Route::get('/loan/{loan_id}/calculate', ['as' => 'service.payment.calculate', 'uses' => 'PaymentController@getCalculate']);
         Route::get('/loan/{loan_id}/close', ['as' => 'service.payment.close', 'uses' => 'PaymentController@getClose']);
         Route::post('/loan/{loan_id}/close', 'PaymentController@postClose');
+        Route::get('/loan/{loan_id}/close/print', ['as' => 'service.payment.close.print', 'uses' => 'PaymentController@getPrintClose']);
+        Route::post('/loan/{loan_id}/close/print', 'PaymentController@postPrintClose');
+        Route::get('/loan/{loan_id}/refinance', ['as' => 'service.payment.refinance', 'uses' => 'PaymentController@getRefinance']);
+        Route::post('/loan/{loan_id}/refinance', 'PaymentController@postRefinance');
+        Route::get('/loan/{loan_id}/refinance/print', ['as' => 'service.payment.refinance.print', 'uses' => 'PaymentController@getPrintRefinance']);
+        Route::post('/loan/{loan_id}/refinance/print', 'PaymentController@postPrintRefinance');
         Route::resource('/loan/{loan_id}/payment', 'PaymentController', ['except' => [ 'index' ]]);
 
         // Guaruntee Route...

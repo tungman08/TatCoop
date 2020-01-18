@@ -101,6 +101,15 @@ class PaymentCalculator {
                     $detail->principle = round($payment->principle, 2);
                     $detail->interest = round($payment->interest, 2);
                     $detail->save();
+
+                    if (round($loan->outstanding, 2) == round($loan->payments->sum('principle'), 2)) {
+                        $loan->completed_at = Diamond::parse($loan->payments->max('pay_date'));
+                        $loan->save(); 
+                    }
+                    else {
+                        $loan->completed_at = null;
+                        $loan->save();
+                    }
                 }
             });
 
@@ -139,7 +148,7 @@ class PaymentCalculator {
         if ($routines->count() > 0) {
             foreach ($routines as $routine) {
                 DB::transaction(function() use ($routine, $date) {
-                    $routine->approve_date = $date;
+                    $routine->approved_date = $date;
                     $routine->save();
                 });
             }
@@ -163,10 +172,12 @@ class PaymentCalculator {
                 DB::transaction(function() use ($routine) {
                     foreach ($routine->details as $detail) {
                         if ($detail->status == false) {
+                            $loan = Loan::find($detail->loan_id);
+
                             $payment = new Payment();
-                            $payment->loan_id = $detail->member_id;
+                            $payment->loan_id = $detail->loan_id;
                             $payment->pay_date = Diamond::parse($detail->pay_date);
-                            $payment->period = $detail->period;
+                            $payment->period = ($loan->payments->count() > 0) ? $loan->payments->max('period') + 1 : 1;
                             $payment->principle = $detail->principle;
                             $payment->interest = $detail->interest;
                             $payment->remark = 'ป้อนข้อมูลอัตโนมัติ';

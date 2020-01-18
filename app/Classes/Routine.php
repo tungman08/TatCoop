@@ -68,20 +68,23 @@ class Routine
                     if (RoutinePaymentDetail::where('routine_payment_id', $routine->id)->where('loan_id', $loan->id)->count() > 0) {
                         // update
                         $detail = RoutinePaymentDetail::where('routine_payment_id', $routine->id)->where('loan_id', $loan->id)->first();
+                        $detail->period = ($loan->payments->count() > 0) ? $loan->payments->max('period') + 1 : 1;
                         $detail->principle = round($principle, 2);
                         $detail->interest = round($pmt - $principle, 2);
                         $detail->save();
                     }
                     else {
                         // insert
-                        $detail = new RoutinePaymentDetail();
-                        $detail->routine_payment_id = $routine->id;
-                        $detail->loan_id = $loan->member->id;
-                        $detail->pay_date = Diamond::parse($endOfMonth->format('Y-m-d'));
-                        $detail->period = ($loan->payments->count() > 0) ? $loan->payments->max('period') + 1 : 1;
-                        $detail->principle = round($principle, 2);
-                        $detail->interest = round($pmt - $principle, 2);
-                        $detail->save();
+                        if (is_null($loan->completed_at)) {
+                            $detail = new RoutinePaymentDetail();
+                            $detail->routine_payment_id = $routine->id;
+                            $detail->loan_id = $loan->id;
+                            $detail->pay_date = Diamond::parse($endOfMonth->format('Y-m-d'));
+                            $detail->period = ($loan->payments->count() > 0) ? $loan->payments->max('period') + 1 : 1;
+                            $detail->principle = round($principle, 2);
+                            $detail->interest = round($pmt - $principle, 2);
+                            $detail->save();
+                        }
                     }
                 }
             }
@@ -106,7 +109,7 @@ class Routine
                             // insert
                             $detail = new RoutinePaymentDetail();
                             $detail->routine_payment_id = $routine->id;
-                            $detail->loan_id = $loan->member->id;
+                            $detail->loan_id = $loan->id;
                             $detail->pay_date = Diamond::parse($endOfMonth->format('Y-m-d'));
                             $detail->period = ($loan->payments->count() > 0) ? $loan->payments->max('period') + 1 : 1;
                             $detail->principle = round($payment->principle, 2);
@@ -153,21 +156,43 @@ class Routine
                         if (RoutinePaymentDetail::where('routine_payment_id', $routine->id)->where('loan_id', $loan->id)->count() > 0) {            
                             // update
                             $detail = RoutinePaymentDetail::where('routine_payment_id', $routine->id)->where('loan_id', $loan->id)->first();
+                            $detail->period = ($loan->payments->count() > 0) ? $loan->payments->max('period') + 1 : 1;
                             $detail->principle = round($principle, 2);
                             $detail->interest = round($pmt - $principle, 2);
                             $detail->save();
                         }
                         else {
                             // insert
-                            $detail = new RoutinePaymentDetail();
-                            $detail->routine_payment_id = $routine->id;
-                            $detail->loan_id = $loan->member->id;
-                            $detail->pay_date = Diamond::parse($endOfMonth->format('Y-m-d'));
-                            $detail->period = ($loan->payments->count() > 0) ? $loan->payments->max('period') + 1 : 1;
-                            $detail->principle = round($principle, 2);
-                            $detail->interest = round($pmt - $principle, 2);
-                            $detail->save();
+                            if (is_null($loan->completed_at)) {
+                                $detail = new RoutinePaymentDetail();
+                                $detail->routine_payment_id = $routine->id;
+                                $detail->loan_id = $loan->id;
+                                $detail->pay_date = Diamond::parse($endOfMonth->format('Y-m-d'));
+                                $detail->period = ($loan->payments->count() > 0) ? $loan->payments->max('period') + 1 : 1;
+                                $detail->principle = round($principle, 2);
+                                $detail->interest = round($pmt - $principle, 2);
+                                $detail->save();
+                            }
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    public function refinanceloan($date, $loan_id) {
+        $startOfMonth = $date->copy()->startOfMonth();
+        $loan = Loan::find($loan_id);
+
+        if ($loan->member->profile->employee->employee_type_id == 1) {
+            if (RoutinePayment::where('calculated_date', $startOfMonth)->whereNull('saved_date')->count() > 0) {
+                $routine = RoutinePayment::where('calculated_date', $startOfMonth)->first();
+
+                if ($routine != null) {
+                    if (RoutinePaymentDetail::where('routine_payment_id', $routine->id)->where('loan_id', $loan->id)->count() > 0) {
+                        // delete
+                        $detail = RoutinePaymentDetail::where('routine_payment_id', $routine->id)->where('loan_id', $loan->id)->first();
+                        $detail->delete();
                     }
                 }
             }

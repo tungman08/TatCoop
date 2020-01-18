@@ -75,6 +75,13 @@ class Member extends Model
     }
 
     /**
+     * Get the beneficiaries for the member.
+     */
+    public function beneficiaries() {
+        return $this->hasMany(Beneficiary::class);
+    }
+
+    /**
      * Get the loan sureties that uses by the member.
      */
     public function sureties() {

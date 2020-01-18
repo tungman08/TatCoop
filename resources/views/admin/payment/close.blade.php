@@ -86,14 +86,17 @@
             </div>
         @endif
 
-       <div class="box box-primary">
-            @php
-                $start = $loan->payments->count() > 0 ? Diamond::parse($loan->payments->max('pay_date'))->thai_format('d M Y') : Diamond::parse($loan->loaned_at)->thai_format('d M Y');
-                $header = $start . ' ถึงวันที่มาชำระ';
-            @endphp
-
+        <!-- form start -->
+        {{ Form::open(['action' => ['Admin\PaymentController@postPrintClose', $loan->id], 'method' => 'post', 'target' => '_blank', 'id' => 'printclose']) }}
+            {{ Form::hidden('hidden_cal', null, ['id'=>'hidden_cal']) }}
+            {{ Form::hidden('hidden_principle', null, ['id'=>'hidden_principle']) }}
+            {{ Form::hidden('hidden_interest', null, ['id'=>'hidden_interest']) }}
+            {{ Form::hidden('hidden_total', null, ['id'=>'hidden_total']) }}
+        {{ Form::close() }}
+        
+        <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title"><i class="fa fa-credit-card"></i> ปิดยอดเงินกู้ (คำนวณดอกเบี้ยตั้งแต่ {{ $header }})</h3>
+                <h3 class="box-title"><i class="fa fa-credit-card"></i> ปิดยอดเงินกู้</h3>
                 <input type="hidden" id="loan_id" value="{{ $loan->id }}" />
             </div>
             <!-- /.box-header -->
@@ -102,10 +105,25 @@
             {{ Form::open(['action' => ['Admin\PaymentController@postClose', $loan->id], 'method' => 'post', 'class' => 'form-horizontal']) }}
                 <div class="box-body">
                     <div class="form-group">
-                        {{ Form::label('pay_date', 'วันที่ชำระ', [
+                        {{ Form::label('lastpay_date', 'วันที่ชำระล่าสุด', [
                             'class'=>'col-sm-2 control-label']) 
                         }}
+                        <div class="col-sm-10">
+                            <div class="input-group">
+                                <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
+                                {{ Form::text('lastpay_date', $lastpay_date, [
+                                    'id'=>'lastpay_date',
+                                    'readonly'=>true,
+                                    'class'=>'form-control'])
+                                }}    
+                            </div>   
+                        </div>
+                    </div>
 
+                    <div class="form-group">
+                        {{ Form::label('pay_date', 'วันที่ต้องการชำระ', [
+                            'class'=>'col-sm-2 control-label']) 
+                        }}
                         <div class="col-sm-10">
                             <div class="input-group">
                                 <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
@@ -120,54 +138,85 @@
                     </div>
                     <div class="form-group">
                         <div class="col-md-offset-2 padding-l-xs">
-                            {{ Form::button('<i class="fa fa-calculator"></i> คำนวณ', [
-                                'id'=>'calculate',
-                                'type' => 'button', 
-                                'data-id' => $loan->id,
-                                'class'=>'btn btn-default btn-flat'])
-                            }}
+                            <button type="button" id="calculate" class="btn btn-default btn-flat">
+                                <i class="fa fa-calculator"></i> คำนวณ
+                            </button>
                         </div>
                     </div>
-                    <div class="form-group">
-                        {{ Form::label('total', 'จำนวนเงินที่ต้องชำระ', [
-                            'class'=>'col-sm-2 control-label']) 
-                        }}
-
-                        <div class="col-sm-10">
-                            {{ Form::text('total', null, [
-                                'readonly' => true,
-                                'class'=>'form-control', 
-                                'placeholder'=>'กรุณากดปุมคำนวณ...', 
-                                'autocomplete'=>'off'])
-                            }}  
+                    <div class="row">
+                        <div class="col-sm-offset-2 col-sm-5 padding-l-none">
+                            <div class="well">
+                                <i class="fa fa-money"></i> <strong>เงินที่ต้องนำมาปิดยอด</strong>
+                                <div class="pull-right"><a href="javascript:void(0);" onclick="javascript:$('#printclose').submit();"
+                                    class="btn btn-default btn-flat"><i class="fa fa-print"></i></a></div>
+                                <hr />
+                                <div class="form-group" style="margin-left: 0px; margin-right: 0px;">
+                                    <label for="cal">ช่วงเวลาคำนวณดอกเบี้ย</label>
+                                    <input type="text" id="cal" name="cal" readonly="readonly"
+                                        placeholder="กรุณากดปุมคำนวณ..."
+                                        class="form-control" />  
+                                </div>
+                                <div class="form-group" style="margin-left: 0px; margin-right: 0px;">
+                                    <label for="principle">จำนวนเงินต้น</label>
+                                    <input type="text" id="principle" name="principle" readonly="readonly"
+                                        placeholder="กรุณากดปุมคำนวณ..."
+                                        class="form-control" />  
+                                </div>
+                                <div class="form-group" style="margin-left: 0px; margin-right: 0px;">
+                                    <label for="interest">จำนวนดอกเบี้ย</label>
+                                    <input type="text" id="interest" name="interest" readonly="readonly"
+                                        placeholder="กรุณากดปุมคำนวณ..."
+                                        class="form-control" />       
+                                </div>
+                                <div class="form-group" style="margin-left: 0px; margin-right: 0px;">
+                                    <label for="total">รวม</label>
+                                    <input type="text" id="total" name="total" readonly="readonly"
+                                        placeholder="กรุณากดปุมคำนวณ..."
+                                        class="form-control" />       
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        {{ Form::label('principle', 'เงินต้น', [
-                            'class'=>'col-sm-2 control-label']) 
-                        }}
+                        <!--/.col-->
 
-                        <div class="col-sm-10">
-                            {{ Form::text('principle', null, [
-                                'readonly' => true,
-                                'class'=>'form-control', 
-                                'placeholder'=>'กรุณากดปุมคำนวณ...', 
-                                'autocomplete'=>'off'])
-                            }}        
+                        <div class="col-sm-5 padding-r-none">
+                            <div class="well">
+                                <i class="fa fa-money"></i> <strong>เงินที่หักนำส่งตัดบัญชีเงินเดือน</strong>
+                                <hr />
+                                <div class="form-group" style="margin-left: 0px; margin-right: 0px;">
+                                        <label for="routine_cal">ช่วงเวลาคำนวณดอกเบี้ย</label>
+                                        <input type="text" id="routine_cal" readonly="readonly"
+                                            placeholder="กรุณากดปุมคำนวณ..."
+                                            class="form-control" />  
+                                    </div>
+                                <div class="form-group" style="margin-left: 0px; margin-right: 0px;">
+                                    <label for="routine_principle">จำนวนเงินต้น</label>
+                                    <input type="text" id="routine_principle" readonly="readonly"
+                                        placeholder="กรุณากดปุมคำนวณ..."
+                                        class="form-control" />  
+                                </div>
+                                <div class="form-group" style="margin-left: 0px; margin-right: 0px;">
+                                    <label for="routine_interest">จำนวนดอกเบี้ย</label>
+                                    <input type="text" id="routine_interest" readonly="readonly"
+                                        placeholder="กรุณากดปุมคำนวณ..."
+                                        class="form-control" />       
+                                </div>
+                                <div class="form-group" style="margin-left: 0px; margin-right: 0px;">
+                                    <label for="routine_total">รวม</label>
+                                    <input type="text" id="routine_total" readonly="readonly"
+                                        placeholder="กรุณากดปุมคำนวณ..."
+                                        class="form-control" />       
+                                </div>
+                            </div>
                         </div>
+                        <!--/.col-->
                     </div>
+                    <!--/.row-->
                     <div class="form-group">
-                        {{ Form::label('interest', 'ดอกเบี้ย', [
-                            'class'=>'col-sm-2 control-label']) 
-                        }}
-
+                        <label for="summary" class="col-sm-2 control-label">ยอดรวมที่ต้องชำระ</label>
                         <div class="col-sm-10">
-                            {{ Form::text('interest', null, [
-                                'readonly' => true,
-                                'class'=>'form-control', 
-                                'placeholder'=>'กรุณากดปุมคำนวณ...', 
-                                'autocomplete'=>'off'])
-                            }}        
+                            <input type="text" id="summary" readonly="readonly"
+                                placeholder="กรุณากดปุมคำนวณ..."
+                                class="form-control" />      
                         </div>
                     </div>
                 </div>
@@ -241,6 +290,7 @@
             if (date != '') {
                 var formData = new FormData();
                     formData.append('loan_id', $('#loan_id').val());
+                    formData.append('lastpay_date', moment($('#lastpay_date').val()));
                     formData.append('pay_date', moment(date));
 
                 $.ajax({
@@ -256,9 +306,22 @@
                     success: function(result) {
                         $(".ajax-loading").css("display", "none");
 
+                        $('#cal').val(result.cal);
                         $('#principle').val($.number(result.principle, 2));
                         $('#interest').val($.number(result.interest, 2));
                         $('#total').val($.number(result.total, 2));
+
+                        $('#hidden_cal').val(result.cal);
+                        $('#hidden_principle').val($.number(result.principle, 2));
+                        $('#hidden_interest').val($.number(result.interest, 2));
+                        $('#hidden_total').val($.number(result.total, 2));
+
+                        $('#routine_cal').val(result.routine_cal);
+                        $('#routine_principle').val($.number(result.routine_principle, 2));
+                        $('#routine_interest').val($.number(result.routine_interest, 2));
+                        $('#routine_total').val($.number(result.routine_total, 2));
+
+                        $('#summary').val($.number(result.total, 2));
 
                         $('#save').removeAttr("disabled");
                     }

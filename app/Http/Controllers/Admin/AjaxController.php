@@ -22,6 +22,7 @@ use Statistic;
 use stdClass;
 use Storage;
 use Routine;
+use App\Beneficiary;
 use App\VisitorStatistic;
 use App\UserStatistic;
 use App\AdministratorStatistic;
@@ -1022,29 +1023,61 @@ class AjaxController extends Controller
     }
 
     public function postCalculate(Request $request) {
-        $loan = Loan::find($request->input('loan_id'));
+        $lastpay_date = Diamond::parse($request->input('lastpay_date'));
         $pay_date = Diamond::parse($request->input('pay_date'));
-        $pmt = ($loan->pmt == 0) ? LoanCalculator::pmt($loan->rate, $loan->outstanding, $loan->period) : $loan->pmt;
-        $summary = LoanCalculator::normal_payment($loan, $pmt, $pay_date->format('Y-m-j'));
+
+        $loan = Loan::find($request->input('loan_id'));
+        $amount = $request->input('amount');
+        $summary = LoanCalculator::normal_payment_2($loan, $lastpay_date->format('Y-m-j'), $pay_date->format('Y-m-j'), $amount);
 
         $result = new stdClass();
+        $result->cal = $summary->cal;
+        $result->period = $summary->period;
         $result->principle = $summary->principle;
         $result->interest = $summary->interest;
-        $result->total = $summary->principle + $summary->interest;
-        $result->balance = $loan->outstanding - ($loan->payments->sum('principle') + $summary->principle);
+        $result->total = ($summary->principle + $summary->interest);
+        $result->routine_cal = $summary->routine_cal;
+        $result->routine_period = $summary->routine_period;
+        $result->routine_principle = $summary->routine_principle;
+        $result->routine_interest = $summary->routine_interest;
+        $result->routine_total = ($summary->routine_principle + $summary->routine_interest);
 
         return Response::json($result);
     }
 
     public function postClosecalculate(Request $request) {
-        $date = Diamond::parse($request->input('pay_date'));
+        $lastpay_date = Diamond::parse($request->input('lastpay_date'));
+        $pay_date = Diamond::parse($request->input('pay_date'));
 
         $loan = Loan::find($request->input('loan_id'));
-        $summary = LoanCalculator::close_payment($loan, $date->format('Y-m-j'));
+        $summary = LoanCalculator::close_payment($loan, $lastpay_date->format('Y-m-j'), $pay_date->format('Y-m-j'));
+
         $result = new stdClass();
+        $result->cal = $summary->cal;
         $result->principle = $summary->principle;
         $result->interest = $summary->interest;
         $result->total = ($summary->principle + $summary->interest);
+        $result->routine_cal = $summary->routine_cal;
+        $result->routine_principle = $summary->routine_principle;
+        $result->routine_interest = $summary->routine_interest;
+        $result->routine_total = ($summary->routine_principle + $summary->routine_interest);
+
+        return Response::json($result);
+    }
+
+    public function postRefinancecalculate(Request $request) {
+        $lastpay_date = Diamond::parse($request->input('lastpay_date'));
+        $pay_date = Diamond::parse($request->input('pay_date'));
+
+        $loan = Loan::find($request->input('loan_id'));
+        $summary = LoanCalculator::refinance_payment($loan, $lastpay_date->format('Y-m-j'), $pay_date->format('Y-m-j'));
+
+        $result = new stdClass();
+        $result->cal = $summary->cal;
+        $result->principle = $summary->principle;
+        $result->interest = $summary->interest;
+        $result->total = ($summary->principle + $summary->interest);
+        $result->refund = $summary->refund;
 
         return Response::json($result);
     }
@@ -1472,5 +1505,38 @@ class AjaxController extends Controller
         $routine = RoutinePayment::find($id);
 
         return Response::json(!is_null($routine->approved_date));
+    }
+
+    public function postUploadbeneficiary(Request $request) {
+        $id = $request->input('ID');
+        $file = $request->file('File');
+
+        $filename = time() . uniqid() . '.' . $file->getClientOriginalExtension();
+        $path = ($file->getRealPath() != false) ? $file->getRealPath() : $file->getPathname();
+        Storage::disk('beneficiaries')->put($filename, file_get_contents($path));
+
+        History::addAdminHistory(Auth::guard($this->guard)->id(), 'เพิ่มข้อมูล', 'เพิ่มเอกสารผู้รับผลประโยชน์ของ ' . Member::find($id)->profile->fullname);
+        $beneficiary = new Beneficiary();
+        $beneficiary->member_id = $id;
+        $beneficiary->file = $filename;
+        $beneficiary->save();
+
+        $data = new stdClass();
+        $data->id = $beneficiary->id;
+        $data->display = Diamond::parse($beneficiary->created_at)->thai_format('j M Y');
+        $data->link = url(env('APP_URL') . '/storage/file/beneficiaries/' . $beneficiary->file);
+
+        return Response::json($data);
+    }
+
+    public function postDeletebeneficiary(Request $request) {
+        $id = $request->input('id');
+
+        $document = Beneficiary::find($id);
+        Storage::disk('beneficiaries')->delete($document->file);
+        History::addAdminHistory(Auth::guard($this->guard)->id(), 'ลบข้อมูล', 'ลบเอกสารผู้รับผลประโยชน์ของ ' . Member::find($document->member_id)->profile->fullname);
+        $document->delete();
+
+        return Response::json($id);
     }
 }

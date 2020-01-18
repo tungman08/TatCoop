@@ -152,7 +152,7 @@
                                     $summary += $shareholding->amount;
                                 @endphp
                                 <tr>
-                                    <td class="text-center">{{ Diamond::parse($shareholding->pay_date)->thai_format('j M Y') }}</td>
+                                    <td class="text-center">{{ Diamond::parse($shareholding->pay_date)->thai_format('j M y') }}</td>
                                     <td class="text-center">{{ number_format($forward->count() + $count, 0, '.', ',') }}</td>
                                     <td class="text-center">{{ number_format($shareholding->amount / 10, 0, '.', ',') }}</td>
                                     <td class="text-right">{{ number_format($shareholding->amount, 2, '.', ',') }}</td>
@@ -217,15 +217,15 @@
                                     <th class="text-center" rowspan="3" style="width: 10%; vertical-align: middle;">หมายเหตุ</th>
                                 </tr>
                                 <tr>
-                                    <th class="text-center" rowspan="2" style="width: 10%; vertical-align: middle;">วันที่</th>
+                                    <th class="text-center" rowspan="2" style="width: 12%; vertical-align: middle;">วันที่</th>
                                     <th class="text-center" rowspan="2" style="width: 10%; vertical-align: middle;">หนังสือกู้ที่</th>
-                                    <th class="text-center" rowspan="2" style="width: 10%; vertical-align: middle;">เงินกู้ (กู้เพิ่ม)</th>
+                                    <th class="text-center" rowspan="2" style="width: 12%; vertical-align: middle;">เงินกู้ (กู้เพิ่ม)</th>
                                     <th class="text-center" colspan="4">การชำระหนี้</th>
                                     <th class="text-center" rowspan="2" style="width: 10%; vertical-align: middle;">เงินกู้คงเหลือ</th>
                                     <th class="text-center" rowspan="2" style="width: 10%; vertical-align: middle;">ใบรับเลขที่</th>
                                 </tr>
                                 <tr>
-                                    <th class="text-center" style="width: 10%;">งวดที่</th>
+                                    <th class="text-center" style="width: 6%;">งวดที่</th>
                                     <th class="text-center" style="width: 10%;">ชำระเงิน</th>
                                     <th class="text-center" style="width: 10%;">เงินต้น</th>
                                     <th class="text-center" style="width: 10%;">ดอกเบี้ย</th>
@@ -258,7 +258,7 @@
                                         $balance -= $payment->principle;
                                     @endphp  
                                     <tr>
-                                        <td class="text-center">{{ Diamond::parse($payment->pay_date)->thai_format('j M Y') }}</td>
+                                        <td class="text-center">{{ Diamond::parse($payment->pay_date)->thai_format('j M y') }}</td>
 
                                         @if ($count == 1)
                                             <td class="text-center">{{ $loan->period }} งวด</td>

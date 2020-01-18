@@ -82,22 +82,37 @@
                     <input type="hidden" id="loan_id" value="{{ $loan->id }}" />
 
                     <div class="form-group">
-                            {{ Form::label('pay_date', 'วันที่ชำระ', [
-                                'class'=>'col-sm-2 control-label']) 
-                            }}
-    
-                            <div class="col-sm-10">
-                                <div class="input-group">
-                                    <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
-                                    {{ Form::text('pay_date', Diamond::today()->format('Y-m-d'), [
-                                        'id'=>'pay_date',
-                                        'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
-                                        'autocomplete'=>'off',
-                                        'class'=>'form-control'])
-                                    }} 
-                                </div>      
-                            </div>
+                        {{ Form::label('lastpay_date', 'วันที่ชำระล่าสุด', [
+                            'class'=>'col-sm-2 control-label']) 
+                        }}
+                        <div class="col-sm-10">
+                            <div class="input-group">
+                                <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
+                                {{ Form::text('lastpay_date', $lastpay_date, [
+                                    'id'=>'lastpay_date',
+                                    'readonly'=>true,
+                                    'class'=>'form-control'])
+                                }}    
+                            </div>   
                         </div>
+                    </div>
+
+                    <div class="form-group">
+                        {{ Form::label('pay_date', 'วันที่ต้องการชำระ', [
+                            'class'=>'col-sm-2 control-label']) 
+                        }}
+                        <div class="col-sm-10">
+                            <div class="input-group">
+                                <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
+                                {{ Form::text('pay_date', Diamond::today()->format('Y-m-d'), [
+                                    'id'=>'pay_date',
+                                    'placeholder'=>'กรุณาเลือกจากปฏิทิน...', 
+                                    'autocomplete'=>'off',
+                                    'class'=>'form-control'])
+                                }} 
+                            </div>      
+                        </div>
+                    </div>
                     <div class="form-group">
                         <div class="col-md-offset-2 padding-l-xs">
                             <button type="button" id="calculate" class="btn btn-default btn-flat">
@@ -105,26 +120,76 @@
                             </button>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="principle" class="col-sm-2 control-label">จำนวนเงินต้น</label>
-                        <div class="col-sm-10">
-                            <input type="text" id="principle" readonly="readonly"
-                                placeholder="กรุณากดปุมคำนวณ..."
-                                class="form-control" />  
+                    <div class="row">
+                        <div class="col-sm-offset-2 col-sm-5 padding-l-none">
+                            <div class="well">
+                                <i class="fa fa-money"></i> <strong>เงินที่ต้องนำมาปิดยอด</strong>
+                                <hr />
+                                <div class="form-group" style="margin-left: 0px; margin-right: 0px;">
+                                    <label for="cal">ช่วงเวลาคำนวณดอกเบี้ย</label>
+                                    <input type="text" id="cal" readonly="readonly"
+                                        placeholder="กรุณากดปุมคำนวณ..."
+                                        class="form-control" />  
+                                </div>
+                                <div class="form-group" style="margin-left: 0px; margin-right: 0px;">
+                                    <label for="principle">จำนวนเงินต้น</label>
+                                    <input type="text" id="principle" readonly="readonly"
+                                        placeholder="กรุณากดปุมคำนวณ..."
+                                        class="form-control" />  
+                                </div>
+                                <div class="form-group" style="margin-left: 0px; margin-right: 0px;">
+                                    <label for="interest">จำนวนดอกเบี้ย</label>
+                                    <input type="text" id="interest" readonly="readonly"
+                                        placeholder="กรุณากดปุมคำนวณ..."
+                                        class="form-control" />       
+                                </div>
+                                <div class="form-group" style="margin-left: 0px; margin-right: 0px;">
+                                    <label for="total">รวม</label>
+                                    <input type="text" id="total" readonly="readonly"
+                                        placeholder="กรุณากดปุมคำนวณ..."
+                                        class="form-control" />       
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="interest" class="col-sm-2 control-label">จำนวนดอกเบี้ย</label>
-                        <div class="col-sm-10">
-                            <input type="text" id="interest" readonly="readonly"
-                                placeholder="กรุณากดปุมคำนวณ..."
-                                class="form-control" />       
+                        <!--/.col-->
+
+                        <div class="col-sm-5 padding-r-none">
+                            <div class="well">
+                                <i class="fa fa-money"></i> <strong>เงินที่หักนำส่งตัดบัญชีเงินเดือน</strong>
+                                <hr />
+                                <div class="form-group" style="margin-left: 0px; margin-right: 0px;">
+                                        <label for="routine_cal">ช่วงเวลาคำนวณดอกเบี้ย</label>
+                                        <input type="text" id="routine_cal" readonly="readonly"
+                                            placeholder="กรุณากดปุมคำนวณ..."
+                                            class="form-control" />  
+                                    </div>
+                                <div class="form-group" style="margin-left: 0px; margin-right: 0px;">
+                                    <label for="routine_principle">จำนวนเงินต้น</label>
+                                    <input type="text" id="routine_principle" readonly="readonly"
+                                        placeholder="กรุณากดปุมคำนวณ..."
+                                        class="form-control" />  
+                                </div>
+                                <div class="form-group" style="margin-left: 0px; margin-right: 0px;">
+                                    <label for="routine_interest">จำนวนดอกเบี้ย</label>
+                                    <input type="text" id="routine_interest" readonly="readonly"
+                                        placeholder="กรุณากดปุมคำนวณ..."
+                                        class="form-control" />       
+                                </div>
+                                <div class="form-group" style="margin-left: 0px; margin-right: 0px;">
+                                    <label for="routine_total">รวม</label>
+                                    <input type="text" id="routine_total" readonly="readonly"
+                                        placeholder="กรุณากดปุมคำนวณ..."
+                                        class="form-control" />       
+                                </div>
+                            </div>
                         </div>
+                        <!--/.col-->
                     </div>
+                    <!--/.row-->
                     <div class="form-group">
-                        <label for="total" class="col-sm-2 control-label">ยอดรวมที่ต้องชำระ</label>
+                        <label for="summary" class="col-sm-2 control-label">ยอดรวมที่ต้องชำระ</label>
                         <div class="col-sm-10">
-                            <input type="text" id="total" readonly="readonly"
+                            <input type="text" id="summary" readonly="readonly"
                                 placeholder="กรุณากดปุมคำนวณ..."
                                 class="form-control" />      
                         </div>
@@ -185,6 +250,7 @@
             if (date != '') {
                 var formData = new FormData();
                     formData.append('loan_id', $('#loan_id').val());
+                    formData.append('lastpay_date', moment($('#lastpay_date').val()));
                     formData.append('pay_date', moment(date));
 
                 $.ajax({
@@ -200,9 +266,17 @@
                     success: function(result) {
                         $(".ajax-loading").css("display", "none");
 
+                        $('#cal').val(result.cal);
                         $('#principle').val($.number(result.principle, 2));
                         $('#interest').val($.number(result.interest, 2));
                         $('#total').val($.number(result.total, 2));
+
+                        $('#routine_cal').val(result.routine_cal);
+                        $('#routine_principle').val($.number(result.routine_principle, 2));
+                        $('#routine_interest').val($.number(result.routine_interest, 2));
+                        $('#routine_total').val($.number(result.routine_total, 2));
+
+                        $('#summary').val($.number(result.total, 2));
                     }
                 });
             }

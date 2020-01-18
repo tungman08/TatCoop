@@ -131,7 +131,7 @@ class ShareholdingCalculator {
         if ($routines->count() > 0) {
             foreach ($routines as $routine) {
                 DB::transaction(function() use ($routine, $date) {
-                    $routine->approve_date = $date;
+                    $routine->approved_date = $date;
                     $routine->save();
                 });
             }

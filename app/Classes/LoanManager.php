@@ -119,7 +119,7 @@ class LoanManager {
         $limit = $loan->loanType->max_loansummary;
 
         if ($outstanding + $balance > $limit) {
-            $validator->errors()->add('overflow', "ไม่สามารถกู้ได้ เนื่องจากผลรวมยอดเงินกู้สามัญ + กู้เฉพาะกิจอื่นๆ รวมกันแล้วเกิน 1,200,000 บาท (สามารถกู้สูงสุดได้ " . number_format($limit - $balance, 2, '.', ',') . " บาท)");
+            $validator->errors()->add('overflow', "ไม่สามารถกู้ได้ เนื่องจากผลรวมยอดเงินกู้สามัญ + กู้เฉพาะกิจอื่นๆ รวมกันแล้วเกิน " . number_format($limit, 2, '.', ',') . " บาท (สามารถกู้สูงสุดได้ " . number_format($limit - $balance >= 0 ? $limit - $balance : 0, 2, '.', ',') . " บาท)");
         }
     }
 
@@ -129,9 +129,11 @@ class LoanManager {
         $rule = Bailsman::find(1);
         $shareholding = ($member->shareholdings->sum('amount') * $rule->self_rate < $rule->self_maxguaruntee) ? $member->shareholdings->sum('amount') * $rule->self_rate : $rule->self_maxguaruntee;
         $selfsurety = DB::table('loan_member')
-            ->where('member_id', $loan->member_id)
-            ->where('yourself', true)
-            ->sum('amount');
+            ->join('loans', 'loan_member.loan_id', '=', 'loans.id')
+            ->where('loan_member.member_id', $loan->member_id)
+            ->where('loan_member.yourself', true)
+            ->whereNull('loans.completed_at')
+            ->sum('loan_member.amount');
         $available = $shareholding - $selfsurety;
 
         if ($available < $outstanding) {
@@ -145,9 +147,11 @@ class LoanManager {
         $rule = Bailsman::find(2);
         $shareholding = ($member->shareholdings->sum('amount') * $rule->self_rate < $rule->self_maxguaruntee) ? $member->shareholdings->sum('amount') * $rule->self_rate : $rule->self_maxguaruntee;
         $selfsurety = DB::table('loan_member')
-            ->where('member_id', $loan->member_id)
-            ->where('yourself', true)
-            ->sum('amount');
+            ->join('loans', 'loan_member.loan_id', '=', 'loans.id')
+            ->where('loan_member.member_id', $loan->member_id)
+            ->where('loan_member.yourself', true)
+            ->whereNull('loans.completed_at')
+            ->sum('loan_member.amount');
         $available = $shareholding - $selfsurety;
 
         if ($available < $outstanding) {
