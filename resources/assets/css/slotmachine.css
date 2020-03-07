@@ -2,19 +2,75 @@ h1 {
     color: rgb(180, 75, 119);
 }
 
-.content-wrapper {
-    background-color: rgb(180, 75, 119);
-    padding: 10px 0 0 0;
-    margin-right: 450px;
-    margin-left: unset;
+.main-sidebar {
+  height: 99vh;
+  top: 0;
+  right: 0;
+  left: unset;
+  padding: 2px;
+  width: 450px;
+}
+@media (max-width: 991px) {
+  .main-sidebar {
+    -webkit-transform: translate(450px, 0);
+    transform: translate(450px, 0);
+  }
+}
+@media (min-width: 992px) {
+  .sidebar-open .main-sidebar {
+    -webkit-transform: translate(0, 0);
+    transform: translate(0, 0);
+  }
+}
+@media (max-width: 991px) {
+  .sidebar-open .main-sidebar {
+    -webkit-transform: translate(0, 0);
+    transform: translate(0, 0);
+  }
 }
 
-.main-sidebar {
-    background-color: #ecf0f5;
-    right: 0;
-    width: 450px;
-    padding: 5px 5px 0px 5px;
-    left: unset;
+.content-wrapper {
+  margin-right: 450px;
+  margin-left: 0px;
+}
+@media (max-width: 991px) {
+  .content-wrapper {
+    margin-right: 0;
+  }
+}
+@media (min-width: 992px) {
+  .sidebar-collapse .content-wrapper {
+    margin-right: 0;
+  }
+}
+@media (max-width: 991px) {
+  .sidebar-open .content-wrapper {
+    -webkit-transform: translate(450, 0);
+    transform: translate(450, 0);
+  }
+}
+
+.toggle-sidebar {
+    position: relative;
+    top: -64px;
+    right: 0px;
+    padding-top: 0px;
+    width: unset;
+}
+@media (max-width: 991px) {
+  .toggle-sidebar  {
+    display: none;
+  }
+}
+@media (min-width: 992px) {
+  .toggle-sidebar  {
+    display: none;
+  }
+}
+@media (max-width: 991px) {
+  .toggle-sidebar  {
+    display: block;
+  }
 }
 
 .box {
@@ -73,7 +129,7 @@ h1 {
 */
 #casino {
     padding-top: 50px;
-    height: 98vh;
+    height: 100vh;
     border-top: 20px dashed rgb(180, 75, 119);
     border-bottom: 20px dashed rgb(180, 75, 119);
     background-color: rgb(240, 150, 150);
@@ -114,7 +170,7 @@ h1 {
 #casino .btn-group .btn {
     color: #fff;
     border: 1px solid #b44b77;
-    background: linear-gradient(-45deg, #EE7752, #E73C7E, #23A6D5, #23D5AB);
+    background: linear-gradient(45deg, #cc66ff, #3399ff, #00cc66, #ff9933, #e73c7e);
     background-size: 400% 400%;
     -webkit-animation: gradient 15s ease infinite;
     -moz-animation: gradient 15s ease infinite;
@@ -158,3 +214,78 @@ h1 {
 @keyframes blink {
     50% { border-color: #a6a6a6; } 
 }
+
+#rewardconfigs {
+    border: 1px solid #b44b77;
+    background-color: #f09696;
+}
+
+/* The switch - the box around the slider */
+.toggle-switch {
+    position: absolute;
+    top: 25px;
+    left: 10px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    margin-top: 2px;
+}
+
+/* The slider */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 13px;
+    width: 13px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(13px);
+    -ms-transform: translateX(13px);
+    transform: translateX(20px);
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+} 

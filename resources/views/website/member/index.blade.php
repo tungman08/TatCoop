@@ -40,7 +40,7 @@
                                 </a>
                             </td>
                         @else
-                            <td>N/A</td>
+                            <td style="color: #ff0000;">ไม่มีข้อมูล (กรุณาติดต่อเจ้าหน้าที่เพื่อแต่งตั้งผู้รับผลประโยชน์)</td>
                         @endif
                     </tr> 
                 </table>
@@ -160,14 +160,73 @@
         </div>
         <!-- /.row -->
 
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">ข้อมูลยอดลูกหนี้ เงินรับฝากและทุนเรือนหุ้น</h3>
+            </div>
+            <!-- /.box-header -->
+
+            <div class="box-body">
+                <div class="table-responsive" style=" margin-top: 10px;">
+                    <table id="dataTables-cashflow" class="table table-hover dataTable" width="100%">
+                        <thead>
+                            <tr>
+                                <th style="width: 10%;">#</th>
+                                <th style="width: 90%;">ปี</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @php($index = 0)
+                            @for ($year = Diamond::today()->year - 1; $year >= $startYear; $year--)
+                                <tr onclick="javascript: document.location.href  = '{{ action('Website\CashflowController@show', ['id'=>$year]) }}';"
+                                    style="cursor: pointer;">
+                                    <td>{{ ++$index }}.</td>
+                                    <td class="text-primary"><i class="fa fa-file-o fa-fw"></i> ข้อมูลปี {{ $year + 543 }}</td>
+                                </tr>
+                            @endfor
+                        </tbody>
+                    </table>
+                    <!-- /.table -->
+                </div>
+                <!-- /.table-responsive -->
+            </div>
+            <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
     </section>
     <!-- /.content -->
 @endsection
 
 @section('styles')
+    <!-- Bootstrap DataTable CSS -->
+    {!! Html::style(elixir('css/dataTables.bootstrap.css')) !!}
+
+    <!-- Bootstrap DateTime Picker CSS -->
+    {!! Html::style(elixir('css/bootstrap-datetimepicker.css')) !!}
+
     @parent
 @endsection
 
 @section('scripts')
     @parent
+
+    <!-- Bootstrap DataTable JavaScript -->
+    {!! Html::script(elixir('js/moment.js')) !!}
+    {!! Html::script(elixir('js/jquery.dataTables.js')) !!}
+    {!! Html::script(elixir('js/dataTables.responsive.js')) !!}
+    {!! Html::script(elixir('js/dataTables.bootstrap.js')) !!}
+
+    <script>
+        $(document).ready(function () {
+            $.ajaxSetup({
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+            });
+    
+            $('[data-tooltip="true"]').tooltip();
+    
+            $('#dataTables-cashflow').dataTable({
+                "iDisplayLength": 10
+            });     
+        });
+    </script>
 @endsection

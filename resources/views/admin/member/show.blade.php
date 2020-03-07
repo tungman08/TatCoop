@@ -108,60 +108,97 @@
         </div>
         <!-- /.box -->
 
-        <div class="box box-default">
-            <div class="box-header with-border">
-                <h3 class="box-title"><i class="fa fa-user"></i> ผู้รับผลประโยชน์</h3>
-            </div>
-            <!-- /.box-header -->
-
-            <div class="box-body">
-                <input type="file" id="beneficiary" name="beneficiary" class="file-upload" accept="image/jpeg,application/pdf"
-                    onchange="javascript:uploadFile(this, {{ $member->id }});" />
-                <button class="btn btn-primary btn-flat margin-b-md"
-                    {{ (($is_super || $is_admin) ? '' : 'disabled') }} title="เพิ่มเอกสาร"
-                    onclick="$('#beneficiary').click();"><i class="fa fa-plus"></i> เพิ่มเอกสาร
-                </button>
-
-                <div class="table-responsive" style=" margin-top: 10px;">
-                    <table id="beneficiaries" class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>เอกสาร</th>
-                                <th>&nbsp;</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if ($member->beneficiaries->count() > 0)
-                                @foreach ($member->beneficiaries->sortByDesc('created_at') as $beneficiary)
-                                    <tr id="beneficiary-{{ $beneficiary->id }}">
-                                        <td>
-                                            <a href="{{ url(env('APP_URL') . '/storage/file/beneficiaries/' . $beneficiary->file) }}" target="_blank">
-                                                <i class="fa fa-paperclip"></i> {{ Diamond::parse($beneficiary->created_at)->thai_format('j M Y') }}
-                                            </a>
-                                        </td>
-                                        <td>
-                                            @if ($is_super || $is_admin)
-                                                <span class="text-danger" style="cursor: pointer;" onclick="javascript:var result = confirm('คุณต้องการลบเอกสารนี้ใช่ไหม?'); if (result) { deleteFile('{{ $beneficiary->id }}'); }"><i class="fa fa-times"></i></span>
-                                            @else
-                                                <span>&nbsp;</span>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            @else
-                                <tr id="empty">
-                                    <td colspan="2" class="text-center">ไม่มีข้อมูล</td>
-                                </tr>
-                            @endif
-                        </tbody>
-                    </table>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="box box-default">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"><i class="fa fa-user"></i> ข้อมูลผู้รับผลประโยชน์</h3>
+                    </div>
+                    <!-- /.box-header -->
+        
+                    <div class="box-body">
+                        <input type="file" id="beneficiary" name="beneficiary" class="file-upload" accept="image/jpeg,application/pdf"
+                            onchange="javascript:uploadFile(this, {{ $member->id }});" />
+                        <button class="btn btn-primary btn-flat margin-b-md"
+                            {{ (($is_super || $is_admin) ? '' : 'disabled') }} title="เพิ่มเอกสาร"
+                            onclick="$('#beneficiary').click();"><i class="fa fa-plus"></i> เพิ่มเอกสาร
+                        </button>
+        
+                        <div class="table-responsive" style=" margin-top: 10px;">
+                            <table id="beneficiaries" class="table table-striped">
+                                <tbody>
+                                    @if ($member->beneficiaries->count() > 0)
+                                        @foreach ($member->beneficiaries->sortByDesc('created_at') as $beneficiary)
+                                            <tr id="beneficiary-{{ $beneficiary->id }}">
+                                                <td>
+                                                    <a href="{{ url(env('APP_URL') . '/storage/file/beneficiaries/' . $beneficiary->file) }}" target="_blank">
+                                                        <i class="fa fa-paperclip"></i> {{ Diamond::parse($beneficiary->created_at)->thai_format('j M Y') }}
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    @if ($is_super || $is_admin)
+                                                        <span class="text-danger" style="cursor: pointer;" onclick="javascript:var result = confirm('คุณต้องการลบเอกสารนี้ใช่ไหม?'); if (result) { deleteFile('{{ $beneficiary->id }}'); }"><i class="fa fa-times"></i></span>
+                                                    @else
+                                                        <span>&nbsp;</span>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    @else
+                                        <tr id="empty">
+                                            <td colspan="2" class="text-center" style="color: #ff0000;">ไม่มีข้อมูล</td>
+                                        </tr>
+                                    @endif
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.table-responsive -->
+        
+                    </div>
+                    <!-- /.box-body -->
                 </div>
-                <!-- /.table-responsive -->
-
+                <!-- /.box -->
             </div>
-            <!-- /.box-body -->
+            <!--/.col-->
+
+            <div class="col-md-6">
+                <div class="box box-default">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"><i class="fa fa-user"></i> ข้อมูลยอดลูกหนี้ เงินรับฝากและทุนเรือนหุ้น</h3>
+                    </div>
+                    <!-- /.box-header -->
+        
+                    <div class="box-body">
+                        <div class="table-responsive" style=" margin-top: 10px;">
+                            <table id="dataTables-cashflow" class="table table-hover dataTable" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 10%;">#</th>
+                                        <th style="width: 90%;">ปี</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @php($index = 0)
+                                    @for ($year = Diamond::today()->year - 1; $year >= $startYear; $year--)
+                                        <tr onclick="javascript: document.location.href  = '{{ action('Admin\MemberController@getCashflow', ['id'=>$member->id, 'year'=>$year]) }}';"
+                                            style="cursor: pointer;">
+                                            <td>{{ ++$index }}.</td>
+                                            <td class="text-primary"><i class="fa fa-file-o fa-fw"></i> ข้อมูลปี {{ $year + 543 }}</td>
+                                        </tr>
+                                    @endfor
+                                </tbody>
+                            </table>
+                            <!-- /.table -->
+                        </div>
+                        <!-- /.table-responsive -->
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!--/.col-->
         </div>
-        <!-- /.box -->
+        <!--/.row-->
     </section>
     <!-- /.content -->
 
@@ -247,6 +284,10 @@
                 document.location.href = "/service/member/" + $('#member_id').val() + "/leave/" + leave_date;
             }
         });
+
+        $('#dataTables-cashflow').dataTable({
+            "iDisplayLength": 10
+        });     
     });
 
     function uploadFile(doc, id) {

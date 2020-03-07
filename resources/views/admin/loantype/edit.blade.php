@@ -131,7 +131,7 @@
             $('#delete_limit').click(function () {
                 $('#limits tbody tr:last-child').remove();
                 childs = $('#limits tbody tr').length;
-                check_limits(false);
+                check_limits();
 
                 if (childs < 2) {
                     $('#delete_limit').prop("disabled", true);

@@ -29,6 +29,8 @@ use App\LoanType;
 use App\Loan;
 use App\Payment;
 use Routine;
+use stdClass;
+use PDF;
 
 class MemberController extends Controller
 {    
@@ -178,11 +180,13 @@ class MemberController extends Controller
     public function show($id) {
         $member = Member::find($id);
         $account = User::where('member_id', $member->id)->first();
+        $startYear = Diamond::parse($member->start_date)->year > 2019 ? Diamond::parse($member->start_date)->year : 2019;
 
         return view('admin.member.show', [
             'member' => $member,
             'histories' => Member::where('profile_id', $member->profile_id)->get(),
-            'account' => !is_null($account) ? $account->email : '<span class="text-danger">ยังไม่ได้ลงทะเบียนใช้งาน</span>'
+            'account' => !is_null($account) ? $account->email : '<span class="text-danger">ยังไม่ได้ลงทะเบียนใช้งาน</span>',
+            'startYear' => $startYear
         ]);
     }
 
@@ -389,5 +393,114 @@ class MemberController extends Controller
                 ->with('flash_message', 'คุณ ' . $member->profile->fullname . ' รหัสสมาชิก ' . str_pad($member->id, 5, "0", STR_PAD_LEFT) . ' ได้ลาออกจากการเป็นเป็นสมาชิกสหกรณ์แล้ว')
                 ->with('callout_class', 'callout-success');      
         }
+    }
+
+    public function getCashflow($id, $year) {
+        $member = Member::find($id);
+        $loantypes = LoanType::whereYear('expire_date', '>=', Diamond::today()->year)->get();
+        $shareholding = Shareholding::where('member_id', $id)->whereYear('pay_date', '<=', $year)->sum('amount');
+
+        $debts = [];
+        foreach ($loantypes as $loantype) {
+            $loans = Loan::where('member_id', $id)
+                ->where('loan_type_id', $loantype->id)
+                ->whereNull('completed_at')
+                ->whereYear('loaned_at', '<', $year)
+                ->get();
+
+            $outstanding = ($loans->count() > 0) ? $loans->sum('outstanding') : 0;
+            $payments = 0;
+            foreach ($loans as $loan) {
+                $payments += Payment::where('loan_id', $loan->id)
+                    ->whereYear('pay_date', '<=', $year)
+                    ->sum('principle');
+            }
+
+            $debt = new stdClass();
+            $debt->name = $loantype->name;
+            $debt->balance = $outstanding - $payments;
+            $debts[] = $debt;
+        }
+
+        return view('admin.member.cashflow', [
+            'member' => $member,
+            'year' => $year,
+            'debts' => $debts,
+            'shareholding' => $shareholding
+        ]);
+    }
+
+    public function getPrintCashflow($id, $year) {
+        $member = Member::find($id);
+        $loantypes = LoanType::whereYear('expire_date', '>=', Diamond::today()->year)->get();
+        $shareholding = Shareholding::where('member_id', $id)->whereYear('pay_date', '<=', $year)->sum('amount');
+
+        $debts = [];
+        foreach ($loantypes as $loantype) {
+            $loans = Loan::where('member_id', $id)
+                ->where('loan_type_id', $loantype->id)
+                ->whereNull('completed_at')
+                ->whereYear('loaned_at', '<', $year)
+                ->get();
+
+            $outstanding = ($loans->count() > 0) ? $loans->sum('outstanding') : 0;
+            $payments = 0;
+            foreach ($loans as $loan) {
+                $payments += Payment::where('loan_id', $loan->id)
+                    ->whereYear('pay_date', '<=', $year)
+                    ->sum('principle');
+            }
+
+            $debt = new stdClass();
+            $debt->name = $loantype->name;
+            $debt->balance = $outstanding - $payments;
+            $debts[] = $debt;
+        }
+
+        return view('admin.member.print', [
+            'member' => $member,
+            'year' => $year,
+            'debts' => $debts,
+            'shareholding' => $shareholding
+        ]);
+    }
+
+    
+    public function getPrintPdfCashflow($id, $year) {
+        $member = Member::find($id);
+        $loantypes = LoanType::whereYear('expire_date', '>=', Diamond::today()->year)->get();
+        $shareholding = Shareholding::where('member_id', $id)->whereYear('pay_date', '<=', $year)->sum('amount');
+
+        $debts = [];
+        foreach ($loantypes as $loantype) {
+            $loans = Loan::where('member_id', $id)
+                ->where('loan_type_id', $loantype->id)
+                ->whereNull('completed_at')
+                ->whereYear('loaned_at', '<', $year)
+                ->get();
+
+            $outstanding = ($loans->count() > 0) ? $loans->sum('outstanding') : 0;
+            $payments = 0;
+            foreach ($loans as $loan) {
+                $payments += Payment::where('loan_id', $loan->id)
+                    ->whereYear('pay_date', '<=', $year)
+                    ->sum('principle');
+            }
+
+            $debt = new stdClass();
+            $debt->name = $loantype->name;
+            $debt->balance = $outstanding - $payments;
+            $debts[] = $debt;
+        }
+
+        $data = [
+            'member' => $member,
+            'year' => $year,
+            'debts' => $debts,
+            'shareholding' => $shareholding
+        ];
+
+        return PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])
+            ->loadView('admin.member.pdf', $data)->download('หนังสือขอยืนยันยอดลูกหนี้ เงินรับฝากและทุนเรือนหุ้น ปี ' . ($year + 543) . '.pdf');
     }
 }

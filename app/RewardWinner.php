@@ -4,14 +4,14 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Winner extends Model
+class RewardWinner extends Model
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'winners';
+    protected $table = 'reward_winners';
     
     /**
      * The attributes that are mass assignable.
@@ -19,7 +19,7 @@ class Winner extends Model
      * @var array
      */
     protected $fillable = [
-        'reward_id', 'member_id', 'status'
+        'reward_config_id', 'member_id', 'status'
     ];
 
     /**
@@ -32,8 +32,8 @@ class Winner extends Model
     /**
      * Get the reward of the winner.
      */
-    public function reward() {
-        return $this->belongsTo(Reward::class);
+    public function rewardConfig() {
+        return $this->belongsTo(RewardConfig::class);
     }
 
     /**

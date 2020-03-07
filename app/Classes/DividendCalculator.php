@@ -24,12 +24,12 @@ class DividendCalculator {
     protected function dividend($year) {
         $result = 'Nothing';
 
-        if (!is_null($year)) {
+        if (!empty($year)) {
             $dividend = Dividend::where('calculated', false)
                 ->where('rate_year', $year)
                 ->first();
 
-            if (!is_null($dividend)) {
+            if (!empty($dividend)) {
                 $result = $this->addnew($dividend->id);
             }
         }
@@ -93,6 +93,7 @@ class DividendCalculator {
                 foreach ($member_dividends as $member_dividend) {
                     DB::transaction(function() use ($member_dividend, $dividend, $member) {
                         $dividend_member = new Dividendmember();
+                        $dividend_member->dividend_id = $dividend->id;
                         $dividend_member->member_id = $member->id;
                         $dividend_member->dividend_name = $member_dividend->name;
                         $dividend_member->dividend_date = $member_dividend->date;
@@ -100,7 +101,7 @@ class DividendCalculator {
                         $dividend_member->shareholding_dividend = $member_dividend->shareholding_dividend;
                         $dividend_member->interest = $member_dividend->interest;
                         $dividend_member->interest_dividend = $member_dividend->interest_dividend;
-                        $dividend->members()->save($dividend_member);
+                        $dividend_member->save();
                     });
                 }
             }
@@ -170,6 +171,12 @@ class DividendCalculator {
             ->whereYear('pay_date', '<', $dividend->rate_year)
             ->sum('amount');
 
+        $lastyear_interest = Payment::join('loans', 'payments.loan_id', '=', 'loans.id')
+            ->where('loans.member_id', $member_id)
+            ->whereMonth('payments.pay_date', '=', 12)
+            ->whereYear('payments.pay_date','=', $dividend->rate_year - 1)
+            ->sum('payments.interest');
+
         $member_dividends = collect([]);
 
         $item = new stdClass();
@@ -177,8 +184,8 @@ class DividendCalculator {
         $item->date = Diamond::parse("{$dividend->rate_year}-1-1");
         $item->shareholding = $forward_shareholding;
         $item->shareholding_dividend = $forward_shareholding * ($dividend->shareholding_rate / 100);
-        $item->interest = 0;
-        $item->interest_dividend = 0;
+        $item->interest = !empty($lastyear_interest) ? $lastyear_interest : 0;
+        $item->interest_dividend = (!empty($lastyear_interest) ? $lastyear_interest : 0) * ($dividend->loan_rate / 100);
         $member_dividends->push($item);
 
         $shareholdings = Shareholding::where('member_id', $member_id)
@@ -204,8 +211,8 @@ class DividendCalculator {
             $item->date = Diamond::parse("{$dividend->rate_year}-$month-31");
             $item->shareholding = $shareholding;
             $item->shareholding_dividend = $shareholding * ($dividend->shareholding_rate / 100) * ((12 - $month) / 12);
-            $item->interest = $interest;
-            $item->interest_dividend = $interest * ($dividend->loan_rate / 100);
+            $item->interest = ($month < 12) ? $interest : 0;
+            $item->interest_dividend = ($month < 12) ? $interest * ($dividend->loan_rate / 100) : 0;
             $member_dividends->push($item);      
         }
 

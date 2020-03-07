@@ -37,7 +37,7 @@
         {{ Html::style(elixir('css/jquery.slotmachine.css')) }}
     @show
 </head>
-<body> 
+<body class="hold-transition skin-blue sidebar-mini"> 
     <div class="wrapper">
         <div class="content-wrapper">
             @yield('content')
@@ -48,12 +48,12 @@
         <aside class="main-sidebar">
             <div class="box box-primary">
                 <div class="box-header with-border">
-                    <h3 class="box-title"><i class="fa fa-smile-o"></i> รายชื่อผู้โชคดี</h3>
+                    <h3 class="box-title"><i class="fa fa-smile-o"></i> รายชื่อผู้โชคดี <span id="config"></span></h3>
                 </div>
                 <!-- /.box-header -->
 
                 <div class="box-body">
-                    <div class="table-responsive" style=" margin-top: 10px;">
+                    <div class="table-responsive">
                         <table id="dataTables" class="table table-hover dataTable" width="100%">
                             <thead>
                                 <tr>
@@ -74,9 +74,38 @@
     </div>
     <!-- ./wrapper -->
 
+    <!-- Modal -->
+    <div id="winners-modal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title"><i class="fa fa-smile-o"></i> รายชื่อผู้โชคดี <span id="config_modal"></span></h4>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table id="winners-dataTables" class="table table-hover dataTable" width="100%">
+                            <thead>
+                                <tr>
+                                    <th style="width: 20%;">รหัส</th>
+                                    <th style="width: 60%;">ชื่อสมาชิก</th>
+                                    <th style="width: 20%;">สถานะ</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    <!-- /.table-responsive -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     @section('scripts')
         <!-- jQuery -->
         {{ Html::script(elixir('js/jquery.js')) }}
+        {{ Html::script(elixir('js/jquery-ui.js')) }}
 
         <!-- Bootstrap Core JavaScript -->
         {{ Html::script(elixir('js/bootstrap.js')) }}

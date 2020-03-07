@@ -52,7 +52,7 @@ elixir(function(mix) {
         .scripts('./bower_components/jquery-number/jquery.number.js')
         .scripts(['jquery.inputmask.js', 'jquery.inputmask.date.extensions.js', 'jquery.inputmask.extensions.js'], 'public/js/jquery.inputmask.js', './bower_components/AdminLTE/plugins/input-mask')
         .scripts('./bower_components/jquery-confirm2/js/jquery-confirm.js')
-        .scripts(['./bower_components/jQuery-SlotMachine/dist/slotmachine.js', './bower_components/jQuery-SlotMachine/dist/jquery.slotmachine.js'], 'public/js/jquery.slotmachine.js')
+        .scripts('./bower_components/jQuery-SlotMachine/dist/slotmachine.js', 'public/js/jquery.slotmachine.js')
         .scripts('jquery.easing.js')
         .scripts('admin-statistics.js')
         .scripts('admin-form.js')

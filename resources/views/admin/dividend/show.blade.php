@@ -159,13 +159,14 @@
                         <tbody>
                             @php($total = 0)
                             @foreach ($dividends as $dividend)
-                                @if ($is_super || $is_admin)
-                                <tr onclick="javascript: document.location.href  = '{{ action('Admin\DividendController@getMemberEdit', ['member_id'=>$member->id, 'id'=>$dividend->id]) }}';" style="cursor: pointer;">
-                                @endif
+                                {{--@if ($is_super || $is_admin)--}}
+                                {{--<tr onclick="javascript: document.location.href  = '{{ action('Admin\DividendController@getMemberEdit', ['member_id'=>$member->id, 'id'=>$dividend->id]) }}';" style="cursor: pointer;">--}}
+                                {{--@endif--}}
+                                <tr>
                                     <td class="text-primary">{{ $dividend->dividend_name }}</td>
                                     <td class="text-right">{{ number_format($dividend->shareholding, 2, '.', ',') }}</td>
                                     <td class="text-right">{{ number_format($dividend->shareholding_dividend, 2, '.', ',') }}</td>
-                                    <td class="text-right">{{ ($dividend->dividend_id == 3 && $dividend->dividend_name == 'ยอดยกมา' && $dividend->interest != 0) ? '(ดอกเบี้ย ธ.ค.60) ' : '' }}{{ number_format($dividend->interest, 2, '.', ',') }}</td>
+                                    <td class="text-right">{{ ($dividend->dividend_name == 'ยอดยกมา' && $dividend->interest != 0) ? '(ดอกเบี้ย ธ.ค. ปีก่อน) ' : '' }}{{ number_format($dividend->interest, 2, '.', ',') }}</td>
                                     <td class="text-right">{{ number_format($dividend->interest_dividend, 2, '.', ',') }}</td>
                                     <td class="text-right">{{ number_format($dividend->shareholding_dividend + $dividend->interest_dividend, 2, '.', ',') }}</td>
                                 </tr>
@@ -257,7 +258,7 @@
                             val.dividend_name + '</td><td class="text-right">' + 
                             val.shareholding.format(2) + '</td><td class="text-right">' + 
                             val.shareholding_dividend.format(2) + '</td><td class="text-right">' + 
-                            ((val.dividend_id == 3 && val.dividend_name == 'ยอดยกมา' && val.interest != 0) ? '(ดอกเบี้ย ธ.ค.60) ' : '') + val.interest.format(2) + '</td><td class="text-right">' +
+                            ((val.dividend_name == 'ยอดยกมา' && val.interest != 0) ? '(ดอกเบี้ย ธ.ค. ปีก่อน) ' : '') + val.interest.format(2) + '</td><td class="text-right">' +
                             val.interest_dividend.format(2) + '</td><td class="text-right">' +
                             (val.shareholding_dividend + val.interest_dividend).format(2) + '</td></tr>');
 

@@ -63,8 +63,16 @@ class Member extends Model
     /**
      * Get the winners that uses by the member.
      */
-    public function winners() {
-        return $this->hasMany(Winner::class);
+    public function reward_winners() {
+        return $this->hasMany(RewardWinner::class);
+    }
+
+    /**
+     * Get the reward that uses by the member.
+     */
+    public function reward() {
+        return $this->belongsToMany(Reward::class)
+            ->withTimestamps();
     }
 
     /**

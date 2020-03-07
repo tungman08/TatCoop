@@ -32,5 +32,6 @@ class DatabaseSeeder extends Seeder
         $this->call(PaymentTypesTableSeeder::class);
         $this->call(BailsmansTableSeeder::class);
         $this->call(RoutineSettingsTableSeeder::class);
+        $this->call(RewardStatussTableSeeder::class);
     }
 }

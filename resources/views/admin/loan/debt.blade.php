@@ -22,14 +22,34 @@
             <h4>รายละเอียดทะเบียนหนี้</h4>
             <p>ข้อมูลทะเบียนหนี้ของสมาชิก เพื่อใช้พิจารณาในการอนุมัติเงินกู้</p>
 
+            <select class="form-control" onchange="javascript: document.location.href='/service/loan/member/{{ $member->id }}/debt?year=' + $(this).val();">
+                @if (Diamond::parse($member->start_date)->year < 2019)
+                    @for ($year = Diamond::today()->year; $year >= 2019 ; $year--)
+                        @if ($year == $selected_year)
+                            <option value="{{ $year }}" selected>ปี {{ $year + 543 }}</option>
+                        @else
+                            <option value="{{ $year }}">ปี {{ $year + 543 }}</option>
+                        @endif
+                    @endfor
+                @else
+                    @for ($year = Diamond::today()->year; $year >= Diamond::parse($member->start_date)->year; $year--)
+                        @if ($year == $selected_year)
+                            <option value="{{ $year }}" selected>ปี {{ $year + 543 }}</option>
+                        @else
+                            <option value="{{ $year }}">ปี {{ $year + 543 }}</option>
+                        @endif
+                    @endfor
+                @endif
+            </select>
+
             <!-- this row will not appear when printing -->
             <div class="row no-print" style="margin-top: 30px;">
                 <div class="col-xs-12">
-                    <a href="javascript: document.location.href='{{ action('Admin\LoanController@getDebtPrint', ['member_id' => $member->id]) }}';" target="_blank" class="btn btn-default btn-flat"><i class="fa fa-print"></i> พิมพ์</a>
+                    <a href="javascript: document.location.href='{{ action('Admin\LoanController@getDebtPrint', ['member_id' => $member->id, 'year' => $selected_year]) }}';" target="_blank" class="btn btn-default btn-flat"><i class="fa fa-print"></i> พิมพ์</a>
                     <button type="button"
                         class="btn btn-primary btn-flat pull-right"
                         style="margin-right: 5px;"
-                        onclick="javascript: document.location.href='{{ action('Admin\LoanController@getDebtPdf', ['member_id' => $member->id]) }}';">
+                        onclick="javascript: document.location.href='{{ action('Admin\LoanController@getDebtPdf', ['member_id' => $member->id, 'year' => $selected_year]) }}';">
                         <i class="fa fa-download"></i> บันทึกเป็น PDF
                     </button>
                 </div>

@@ -121,7 +121,7 @@ class DividendController extends Controller
                 $dividend->release_date = Diamond::parse($request->input('release_date'));
                 $dividend->save();
     
-                History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'แก้ไขอัตราเงินปันผล ประจำปี ' . $dividend->rate_year + 543);
+                History::addAdminHistory(Auth::guard($this->guard)->id(), 'แก้ไขข้อมูล', 'แก้ไขอัตราเงินปันผล ประจำปี ' . $dividend->rate_year);
             });
 
             return redirect()->action('Admin\DividendController@index')
@@ -148,7 +148,7 @@ class DividendController extends Controller
             DB::transaction(function() use ($id) {
                 $dividend = Dividend::find($id);
     
-                History::addAdminHistory(Auth::guard($this->guard)->id(), 'ลบข้อมูล', 'ลบอัตราเงินปันผล ประจำปี ' . $dividend->rate_year + 543);
+                History::addAdminHistory(Auth::guard($this->guard)->id(), 'ลบข้อมูล', 'ลบอัตราเงินปันผล ประจำปี ' . $dividend->rate_year);
     
                 $dividend->delete();
             });

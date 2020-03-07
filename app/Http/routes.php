@@ -61,6 +61,11 @@ Route::group(['domain' => 'www.' . env('APP_DOMAIN'),
         // Profile Route...
         Route::controller('/profile', 'ProfileController');
 
+        // Cash flow Route...
+        Route::get('/home/cashflow/{year}/print', ['as' => 'website.cashflow.print', 'uses' => 'CashflowController@getPrintCashflow']);
+        Route::get('/home/cashflow/{year}/pdf', ['as' => 'website.cashflow.pdf', 'uses' => 'CashflowController@getPrintPdfCashflow']);
+        Route::resource('/home/cashflow', 'CashflowController', ['only' => [ 'show' ]]);
+
         // Member Route...
         Route::resource('/home', 'MemberController', ['only' => [ 'index' ]]);
     });
@@ -144,6 +149,9 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
         Route::get('/member/inactive', ['as' => 'service.member.inactive', 'uses' => 'MemberController@getInactive']);
         Route::get('/member/{id}/leave/{date}', ['as' => 'service.member.leave', 'uses' => 'MemberController@getLeave']);
         Route::post('/member/{id}/leave', 'MemberController@postLeave');
+        Route::get('/member/{id}/cashflow/{year}/print', ['as' => 'service.member.cashflow.print', 'uses' => 'MemberController@getPrintCashflow']);
+        Route::get('/member/{id}/cashflow/{year}/pdf', ['as' => 'service.member.cashflow.pdf', 'uses' => 'MemberController@getPrintPdfCashflow']);
+        Route::get('/member/{id}/cashflow/{year}', ['as' => 'service.member.cashflow', 'uses' => 'MemberController@getCashflow']);
         Route::resource('/member', 'MemberController', ['except' => [ 'destroy' ]]);
 
         // Share Holding Route...
@@ -296,11 +304,20 @@ Route::group(['domain' => 'admin.' . env('APP_DOMAIN'),
         Route::resource('/account', 'AccountController', ['only' => [ 'index', 'show', 'edit', 'update' ]]);
 
         // Slotmachine Route...
-        Route::get('/reward/slotmachine', ['as' => 'admin.reward.play', 'uses' => 'RewardController@getSlotmachine']);
+        Route::get('/reward/{id}/register', ['as' => 'admin.reward.register', 'uses' => 'RewardController@getRegister']);
+        Route::get('/reward/{id}/late', ['as' => 'admin.reward.late', 'uses' => 'RewardController@getLate']);
+        Route::post('/reward/{id}/register/close', 'RewardController@postCloseRegister');
+        Route::post('/reward/register', 'RewardController@postRegister');
+        Route::post('/reward/late', 'RewardController@postLate');
+        Route::post('/reward/checkmember', 'RewardController@postCheckmember');
+        Route::post('/reward/addmember', 'RewardController@postAddmember');
+        Route::post('/reward/deletemember', 'RewardController@postDeletemember');
+        Route::get('/reward/{id}/slotmachine', ['as' => 'admin.reward.play', 'uses' => 'RewardController@getSlotmachine']);
         Route::post('/reward/winners', 'RewardController@postWinners');
         Route::post('/reward/shuffle', 'RewardController@postShuffle');
         Route::post('/reward/savewinner', 'RewardController@postSavewinner');
-        Route::resource('/reward', 'RewardController', ['only' => [ 'index', 'show', 'destroy' ]]);
+        Route::post('/reward/finish', 'RewardController@postFinish');
+        Route::resource('/reward', 'RewardController');
 
         // Reports Route...
         Route::post('/report/export', 'ReportController@postExport'); 

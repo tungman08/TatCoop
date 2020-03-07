@@ -299,8 +299,9 @@ class LoanController extends Controller
         return view('admin.loan.available');
     }
 
-    public function getDebt($member_id) {
+    public function getDebt($member_id, Request $request) {
         $member = Member::find($member_id);
+        $year = $request->query('year');
         $shareholdings = Shareholding::where('member_id', $member_id)
             ->get();
         $loans = Loan::where('member_id', $member_id)
@@ -315,13 +316,15 @@ class LoanController extends Controller
 
         return view('admin.loan.debt', [
             'member' => $member,
+            'selected_year' => $year,
             'shareholdings' => $shareholdings,
             'loans' => $loans
         ]);
     }
 
-    public function getDebtPrint($member_id) {
+    public function getDebtPrint($member_id, Request $request) {
         $member = Member::find($member_id);
+        $year = $request->query('year');
         $shareholdings = Shareholding::where('member_id', $member_id)
             ->get();
         $loans = Loan::where('member_id', $member_id)
@@ -336,13 +339,15 @@ class LoanController extends Controller
 
         return view('admin.loan.debtprint', [
             'member' => $member,
+            'selected_year' => $year,
             'shareholdings' => $shareholdings,
             'loans' => $loans
         ]);
     }
 
-    public function getDebtPdf($member_id) {
+    public function getDebtPdf($member_id, Request $request) {
         $member = Member::find($member_id);
+        $year = $request->query('year');
         $shareholdings = Shareholding::where('member_id', $member_id)
             ->get();
         $loans = Loan::where('member_id', $member_id)
@@ -357,6 +362,7 @@ class LoanController extends Controller
 
         $data = [
             'member' => Member::find($member_id),
+            'selected_year' => $year,
             'shareholdings' => $shareholdings,
             'loans' => $loans
         ];

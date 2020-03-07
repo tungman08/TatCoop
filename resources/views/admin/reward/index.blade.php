@@ -13,7 +13,6 @@
         ]])
     </section>
 
-
     <!-- Main content -->
     <section class="content">
         <!-- Info boxes -->
@@ -42,8 +41,9 @@
             <!-- /.box-header -->
 
             <div class="box-body">
-                <a class="btn btn-primary btn-flat margin-b-md" href="{{ action('Admin\RewardController@getSlotmachine') }}" target="_blank">
-                    <i class="fa fa-smile-o"></i> สุ่มจับรางวัล
+                <a class="btn btn-primary btn-flat margin-b-md" href="{{ action('Admin\RewardController@create') }}"
+                    {{ (($is_super || $is_admin) ? '' : 'disabled') }}>
+                    <i class="fa fa-plus"></i> สร้างการจับรางวัล
                 </a>
 
                 <div class="table-responsive" style=" margin-top: 10px;">
@@ -51,9 +51,9 @@
                         <thead>
                             <tr>
                                 <th style="width: 10%;">#</th>
-                                <th style="width: 30%;">สร้างโดย</th>
                                 <th style="width: 30%;">วันที่</th>
-                                <th style="width: 30%;">จำนวนสมาชิกที่ได้รางวัล</th>
+                                <th style="width: 40%;">สร้างโดย</th>
+                                <th style="width: 20%;">สถานะ</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -61,9 +61,13 @@
                                 <tr onclick="javascript: document.location.href  = '{{ action('Admin\RewardController@show', ['id' => $reward->id]) }}';"
                                     style="cursor: pointer;">
                                     <td>{{ $index + 1 }}.</td>
-                                    <td class="text-primary"><i class="fa fa-user-secret fa-fw"></i> {{ $reward->admin->fullname }}</td>
-                                    <td>{{ Diamond::parse($reward->created_at)->thai_format('j M Y') }}</td>
-                                    <td>{{ number_format($reward->winners->count(), 0, '.', ',') }} คน</td>
+                                    <td class="text-primary">{{ Diamond::parse($reward->created_at)->thai_format('j M Y') }}</td>
+                                    <td><i class="fa fa-user-secret fa-fw"></i> {{ $reward->admin->fullname }}</td>
+                                    <td>
+                                        <span class="label label-{{ ($reward->reward_status_id <> 4) ? ($reward->reward_status_id <> 3) ? ($reward->reward_status_id <> 2) ? 'danger' : 'warning' : 'info' : 'success' }}">
+                                            {{ $reward->rewardStatus->name }}
+                                        </span>
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>

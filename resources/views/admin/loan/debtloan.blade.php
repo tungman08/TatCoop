@@ -71,8 +71,8 @@
                 </thead>
                 <tbody>
                     @php
-                        $forward = $loan->payments->filter(function ($value, $key) { return Diamond::parse($value->pay_date)->year < Diamond::today()->year; });
-                        $presents = $loan->payments->filter(function ($value, $key) { return Diamond::parse($value->pay_date)->year == Diamond::today()->year; });
+                        $forward = $loan->payments->filter(function ($value, $key) use ($selected_year) { return Diamond::parse($value->pay_date)->year < $selected_year; });
+                        $presents = $loan->payments->filter(function ($value, $key) use ($selected_year) { return Diamond::parse($value->pay_date)->year == $selected_year; });
                     @endphp
                     <tr>
                         <td class="text-center">ยอดยกมา</td>

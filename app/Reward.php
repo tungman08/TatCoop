@@ -19,7 +19,7 @@ class Reward extends Model
      * @var array
      */
     protected $fillable = [
-        'admin_id', 'session'
+        'admin_id', 'session', 'reward_status_id'
     ];
 
     /**
@@ -30,16 +30,31 @@ class Reward extends Model
     protected $dates = ['created_at', 'updated_at'];
 
     /**
-     * Get the winners associated with the reward.
-     */
-    public function winners() {
-        return $this->hasMany(Winner::class);
-    }
-
-    /**
      * Get the admin of the reward.
      */
     public function admin() {
         return $this->belongsTo(Administrator::class);
+    }
+
+    /**
+     * Get the status of the reward.
+     */
+    public function rewardStatus() {
+        return $this->belongsTo(RewardStatus::class);
+    }
+
+    /**
+     * Get the configs associated with the reward.
+     */
+    public function rewardConfigs() {
+        return $this->hasMany(RewardConfig::class);
+    }
+
+    /**
+     * Get the register member associated with the reward.
+     */
+    public function members() {
+        return $this->belongsToMany(Member::class)
+            ->withTimestamps();
     }
 }

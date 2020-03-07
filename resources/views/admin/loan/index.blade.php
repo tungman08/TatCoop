@@ -101,7 +101,7 @@
             
                 {{--@if ($loans->filter(function ($value, $key) { return is_null($value->completed_at); })->count() > 0)--}}
                     <button class="btn btn-default btn-flat pull-right"
-                        onclick="javascript: document.location.href='{{ action('Admin\LoanController@getDebt', ['member_id' => $member->id]) }}';">
+                        onclick="javascript: document.location.href='{{ action('Admin\LoanController@getDebt', ['member_id' => $member->id, 'year' => Diamond::today()->year]) }}';">
                         <i class="fa fa-file-text-o fa-fw"></i> ทะเบียนหนี้
                     </button>
                 {{--@endif--}}
